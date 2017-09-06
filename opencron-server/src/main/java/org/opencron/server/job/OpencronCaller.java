@@ -87,7 +87,7 @@ public class OpencronCaller {
             transport = new TSocket(request.getHostName(), request.getPort());
         }
         TProtocol protocol = new TBinaryProtocol(transport);
-        Opencron.Client client = new Opencron.Client(protocol);
+        /*Opencron.Client client = new Opencron.Client(protocol);
         transport.open();
 
         Response response = null;
@@ -96,11 +96,11 @@ public class OpencronCaller {
                 response = (Response) method.invoke(client, request);
                 break;
             }
-        }
+        }*/
 
         transport.flush();
         transport.close();
-        return response;
+        return null;
     }
 
 }

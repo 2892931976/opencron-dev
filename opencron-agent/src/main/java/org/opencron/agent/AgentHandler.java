@@ -1,29 +1,9 @@
-/**
- * Copyright 2016 benjobs
- * <p>
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements. See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership. The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License. You may obtain a copy of the License at
- * <p>
- * http://www.apache.org/licenses/LICENSE-2.0
- * <p>
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied. See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
-
-
 package org.opencron.agent;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
 import org.apache.commons.exec.*;
 import org.apache.thrift.TException;
 import org.apache.thrift.protocol.TBinaryProtocol;
@@ -39,20 +19,14 @@ import java.beans.PropertyDescriptor;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.lang.reflect.Method;
-import java.net.Socket;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 import static org.opencron.common.utils.CommonUtils.*;
 
-/**
- * Created by benjo on 2016/3/25.
- */
-public class AgentProcessor implements Opencron.Iface {
+public class AgentHandler extends ChannelInboundHandlerAdapter {
 
-    private Logger logger = LoggerFactory.getLogger(AgentProcessor.class);
+    private Logger logger = LoggerFactory.getLogger(AgentHandler.class);
 
     private String password;
 
@@ -64,41 +38,93 @@ public class AgentProcessor implements Opencron.Iface {
 
     private AgentMonitor agentMonitor;
 
-    private Map<String, AgentHeartBeat> agentHeartBeatMap = new ConcurrentHashMap<String, AgentHeartBeat>(0);
-
-    public AgentProcessor(String password) {
-        this.password = password;
+    @Override
+    public void channelActive(ChannelHandlerContext handlerContext) {
+        logger.info("[opencron] agent channelActive Active...");
+        handlerContext.fireChannelActive();
+        //start monitor...
         this.agentMonitor = new AgentMonitor();
+        this.agentMonitor.start();
+    }
+
+    public void channelRead(ChannelHandlerContext handlerContext, Object content) throws Exception {
+
+        System.out.println("action...");
+/*
+        Request request = (Request) content;
+        Action action = request.getAction();
+
+        //verify password...
+        if (!this.password.equalsIgnoreCase(request.getPassword())) {
+            Response response = Response.response(request)
+                    .setSuccess(false)
+                    .setExitCode(Opencron.StatusCode.ERROR_PASSWORD.getValue())
+                    .setMessage(Opencron.StatusCode.ERROR_PASSWORD.getDescription())
+                    .end();
+
+            handlerContext.writeAndFlush(response);
+            handlerContext.close();
+            return;
+        }
+
+        Response response = null;
+
+        switch (action) {
+            case PING:
+                response = ping(request);
+                break;
+            case EXECUTE:
+                response = execute(request);
+                break;
+            case PASSWORD:
+                response = password(request);
+                break;
+            case KILL:
+                response = kill(request);
+                break;
+            case GUID:
+                response = guid(request);
+                break;
+            case PATH:
+                response = path(request);
+                break;
+            case PROXY:
+                response = proxy(request);
+                break;
+            case MONITOR:
+                response = monitor(request);
+                break;
+            case RESTART:
+                restart(request);
+                break;
+            default:
+                break;
+        }
+        handlerContext.writeAndFlush(response);
+        handlerContext.close();*/
     }
 
     @Override
+    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        System.out.println("HelloWorldClientHandler inActive===========");
+        super.channelInactive(ctx);
+    }
+
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
+        cause.printStackTrace();
+        ctx.close();
+    }
+
+    //@Override
     public Response ping(Request request) throws TException {
         if (!this.password.equalsIgnoreCase(request.getPassword())) {
             return errorPasswordResponse(request);
         }
-
-        //非直连
-        if ( CommonUtils.isEmpty(request.getParams().get("proxy")) ) {
-            String hostName = Configuration.OPENCRON_SOCKET_ADDRESS.split(":")[0];
-            int serverPort = Integer.parseInt(request.getParams().get("serverPort"));
-
-            AgentHeartBeat agentHeartBeat = agentHeartBeatMap.get(hostName);
-            if (agentHeartBeat == null) {
-                try {
-                    agentHeartBeat = new AgentHeartBeat(hostName, serverPort, request.getHostName());
-                    agentHeartBeat.start();
-                    agentHeartBeatMap.put(hostName, agentHeartBeat);
-                    logger.info("[opencron]:ping ip:{},port:{}", hostName, serverPort);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
         return Response.response(request).setSuccess(true).setExitCode(Opencron.StatusCode.SUCCESS_EXIT.getValue()).end();
     }
 
-    @Override
+    //@Override
     public Response path(Request request) throws TException {
         //返回密码文件的路径...
         return Response.response(request).setSuccess(true)
@@ -107,7 +133,7 @@ public class AgentProcessor implements Opencron.Iface {
                 .end();
     }
 
-    @Override
+    //@Override
     public Response monitor(Request request) throws TException {
         Opencron.ConnType connType = Opencron.ConnType.getByName(request.getParams().get("connType"));
         Response response = Response.response(request);
@@ -122,7 +148,7 @@ public class AgentProcessor implements Opencron.Iface {
         }
     }
 
-    @Override
+    //@Override
     public Response execute(final Request request) throws TException {
 
         if (!this.password.equalsIgnoreCase(request.getPassword())) {
@@ -281,7 +307,7 @@ public class AgentProcessor implements Opencron.Iface {
         return response;
     }
 
-    @Override
+   // @Override
     public Response password(Request request) throws TException {
         if (!this.password.equalsIgnoreCase(request.getPassword())) {
             return errorPasswordResponse(request);
@@ -300,7 +326,7 @@ public class AgentProcessor implements Opencron.Iface {
         return response.setSuccess(true).setExitCode(Opencron.StatusCode.SUCCESS_EXIT.getValue()).end();
     }
 
-    @Override
+   // @Override
     public Response kill(Request request) throws TException {
 
         if (!this.password.equalsIgnoreCase(request.getPassword())) {
@@ -332,7 +358,7 @@ public class AgentProcessor implements Opencron.Iface {
         return response;
     }
 
-    @Override
+    //@Override
     public Response proxy(Request request) throws TException {
         String proxyHost = request.getParams().get("proxyHost");
         String proxyPort = request.getParams().get("proxyPort");
@@ -360,7 +386,7 @@ public class AgentProcessor implements Opencron.Iface {
         } else {
             transport = new TSocket(proxyReq.getHostName(), proxyReq.getPort());
         }
-        TProtocol protocol = new TBinaryProtocol(transport);
+       /* TProtocol protocol = new TBinaryProtocol(transport);
         Opencron.Client client = new Opencron.Client(protocol);
         transport.open();
 
@@ -381,11 +407,11 @@ public class AgentProcessor implements Opencron.Iface {
             }
         }
         transport.flush();
-        transport.close();
-        return response;
+        transport.close();*/
+        return null;
     }
 
-    @Override
+   // @Override
     public Response guid(Request request) throws TException {
         if (!this.password.equalsIgnoreCase(request.getPassword())) {
             return errorPasswordResponse(request);
@@ -417,7 +443,7 @@ public class AgentProcessor implements Opencron.Iface {
      * @throws TException
      * @throws InterruptedException
      */
-    @Override
+    //@Override
     public void restart(Request request) throws TException {
 
     }
@@ -492,80 +518,6 @@ public class AgentProcessor implements Opencron.Iface {
             }
         }
         return false;
-    }
-
-    class AgentHeartBeat {
-
-        private String serverIp;
-        private String clientIp;
-        private Socket socket;
-        private boolean running = false;
-        private long lastSendTime;
-
-        public AgentHeartBeat(String serverIp, int port, String clientIp) throws IOException {
-            this.serverIp = serverIp;
-            this.clientIp = clientIp;
-            socket = new Socket(serverIp, port);
-            socket.setKeepAlive(true);
-        }
-
-        public void start() throws IOException {
-            running = true;
-            lastSendTime = System.currentTimeMillis();
-            new Thread(new KeepAliveWatchDog()).start();
-        }
-
-        public void stop() throws IOException {
-            if (running) {
-                running = false;
-                this.socket.close();
-                agentHeartBeatMap.remove(serverIp);
-                logger.info("[opencron]:heartBeat: stoped " + this.serverIp);
-            }
-        }
-
-        public void sendMessage(Object obj) throws IOException {
-            ObjectOutputStream outputStream = new ObjectOutputStream(socket.getOutputStream());
-            outputStream.writeObject(obj);
-            outputStream.flush();
-        }
-
-        class KeepAliveWatchDog implements Runnable {
-            long checkDelay = 10;
-            long keepAliveDelay = 1000*5;
-
-            public void run() {
-                while (running) {
-                    if (System.currentTimeMillis() - lastSendTime > keepAliveDelay) {
-                        lastSendTime = System.currentTimeMillis();
-                        try {
-                            AgentHeartBeat.this.sendMessage(AgentHeartBeat.this.clientIp);
-                        } catch (IOException e) {
-                            logger.debug("[opencron]:heartbeat error:{}", e.getMessage());
-                            try {
-                                int tryIndex = 0;
-                                boolean autoReg = false;
-                                //失联后自动发起注册...
-                                while (!autoReg||tryIndex<3) {
-                                    autoReg = register();
-                                    ++tryIndex;
-                                }
-                                AgentHeartBeat.this.stop();
-                            } catch (Exception e1) {
-                                logger.debug("[opencron]:heartbeat error:{}", e1.getMessage());
-                            }
-                        }
-                    } else {
-                        try {
-                            Thread.sleep(checkDelay);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
-            }
-        }
-
     }
 
 }

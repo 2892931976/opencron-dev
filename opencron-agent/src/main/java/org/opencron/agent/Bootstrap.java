@@ -24,16 +24,6 @@ package org.opencron.agent;
  */
 
 import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.thrift.protocol.TBinaryProtocol;
-import org.apache.thrift.protocol.TProtocol;
-import org.apache.thrift.server.ServerContext;
-import org.apache.thrift.server.TServer;
-import org.apache.thrift.server.TServerEventHandler;
-import org.apache.thrift.server.TThreadPoolServer;
-import org.apache.thrift.transport.TServerSocket;
-import org.apache.thrift.transport.TSocket;
-import org.apache.thrift.transport.TTransport;
-import org.opencron.common.job.Opencron;
 import org.opencron.common.utils.IOUtils;
 import org.opencron.common.utils.LoggerFactory;
 import org.slf4j.Logger;
@@ -44,7 +34,6 @@ import java.lang.management.RuntimeMXBean;
 import java.lang.reflect.InvocationTargetException;
 import java.net.*;
 import java.security.AccessControlException;
-import java.util.Properties;
 import java.util.Random;
 
 import static org.opencron.common.utils.CommonUtils.isEmpty;
@@ -61,7 +50,7 @@ public class Bootstrap implements Serializable {
     /**
      * thrift server
      */
-    private TServer server;
+    private AgentServer server;
 
     /**
      * agent port
@@ -172,45 +161,22 @@ public class Bootstrap implements Serializable {
     }
 
     private void start() throws Exception {
-
         try {
 
-            TServerSocket serverTransport = new TServerSocket(port);
+            this.server = new AgentServer(this.port,this.password);
 
-            AgentProcessor agentProcessor = new AgentProcessor(password);
-
-            Opencron.Processor processor = new Opencron.Processor(agentProcessor);
-            TBinaryProtocol.Factory protFactory = new TBinaryProtocol.Factory(true, true);
-            TThreadPoolServer.Args arg = new TThreadPoolServer.Args(serverTransport);
-            arg.protocolFactory(protFactory);
-            arg.processor(processor);
-            this.server = new TThreadPoolServer(arg);
-
-            this.server.setServerEventHandler(new TServerEventHandler(){
-                public void preServe() {}
-                public void deleteContext(ServerContext serverContext, TProtocol tProtocol, TProtocol tProtocol1) {}
-                public ServerContext createContext(TProtocol tProtocol, TProtocol tProtocol1) {return null;}
-                public void processContext(ServerContext serverContext, TTransport inputTransport, TTransport outputTransport) {
-                    TSocket socket = (TSocket) inputTransport;
-                    //获取OPENCRON-server的ip
-                    Configuration.OPENCRON_SOCKET_ADDRESS = socket.getSocket().getRemoteSocketAddress().toString().substring(1);
+            //new thread to start for netty server
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    server.start();
                 }
-            });
+            }).start();
 
             /**
              * write pid to pidfile...
              */
             IOUtils.writeText(Configuration.OPENCRON_PID_FILE, getPid(), CHARSET);
-
-            //new thread to start for thrift server
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    server.serve();
-                }
-            }).start();
-
-            agentProcessor.register();
 
             logger.info("[opencron]agent started @ port:{},pid:{}", port, getPid());
         } catch (Exception e) {
@@ -238,7 +204,8 @@ public class Bootstrap implements Serializable {
             return;
         }
 
-        Integer shutdownPort = Integer.valueOf(System.getProperty("opencron.shutdown"));
+        Integer shutdownPort = Integer.valueOf(AgentProperties.getProperty("opencron.shutdown"));
+
         // Set up a server socket to wait on
         try {
             awaitSocket = new ServerSocket(shutdownPort);
@@ -340,15 +307,8 @@ public class Bootstrap implements Serializable {
 
         String address = "localhost";
 
-        File home = new File(Configuration.OPENCRON_HOME);
-        File conf = new File(home, "conf");
-        File propsFile = new File(conf, "conf.properties");
-        FileInputStream inputStream = new FileInputStream(propsFile);
+        Integer shutdownPort = Integer.valueOf(AgentProperties.getProperty("opencron.shutdown"));
 
-        Properties prop = new Properties();
-        prop.load(inputStream);
-
-        Integer shutdownPort = Integer.valueOf(prop.getProperty("opencron.shutdown"));
         // Stop the existing server
         try  {
             Socket socket = new Socket(address, shutdownPort);
@@ -367,16 +327,8 @@ public class Bootstrap implements Serializable {
         }
     }
 
-
     private void stopServer() {
-        if (this.server != null && this.server.isServing()) {
-            this.server.stop();
-            /**
-             * delete pid file...
-             */
-            Configuration.OPENCRON_PID_FILE.delete();
-            System.exit(0);
-        }
+       this.server.stop();
     }
 
     private static void handleThrowable(Throwable t) {

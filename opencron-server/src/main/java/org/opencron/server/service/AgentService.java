@@ -76,13 +76,18 @@ public class AgentService {
         OpencronTools.CACHE.put(OpencronTools.CACHED_AGENT_ID, queryDao.sqlQuery(Agent.class, "SELECT * FROM T_AGENT WHERE deleted=0"));
     }
 
-    public List<Agent> getOwnerAgentByStatus(HttpSession session, int status) {
+    public List<Agent> getAgentByConnStatus(Opencron.ConnStatus status) {
         String sql = "SELECT * FROM T_AGENT WHERE deleted=0 AND status=?";
-        if (!OpencronTools.isPermission(session)) {
+        return queryDao.sqlQuery(Agent.class, sql, status.getValue());
+    }
+
+    public List<Agent> getOwnerAgentByConnStatus(HttpSession session, Opencron.ConnStatus status) {
+        String sql = "SELECT * FROM T_AGENT WHERE deleted=0 AND status=?";
+        if ( !OpencronTools.isPermission(session)) {
             User user = OpencronTools.getUser(session);
             sql += " AND agentId in (" + user.getAgentIds() + ")";
         }
-        return queryDao.sqlQuery(Agent.class, sql, status);
+        return queryDao.sqlQuery(Agent.class, sql, status.getValue());
     }
 
     public PageBean getOwnerAgent(HttpSession session, PageBean pageBean) {

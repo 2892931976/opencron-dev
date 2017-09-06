@@ -94,8 +94,8 @@ public class DashboardController extends BaseController {
         /**
          * agent...
          */
-        List<Agent> success = agentService.getOwnerAgentByStatus(session, 1);
-        List<Agent> failed = agentService.getOwnerAgentByStatus(session, 0);
+        List<Agent> success = agentService.getOwnerAgentByConnStatus(session, Opencron.ConnStatus.CONNECTED);
+        List<Agent> failed = agentService.getOwnerAgentByConnStatus(session, Opencron.ConnStatus.DISCONNECTED);
         model.addAttribute("success", success.size());
         model.addAttribute("failed", failed.size());
 

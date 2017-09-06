@@ -22,7 +22,7 @@
 
 package org.opencron.common.job;
 
-public enum Action implements org.apache.thrift.TEnum {
+public enum Action  {
   PING(0),
   PATH(1),
   MONITOR(2),
@@ -35,7 +35,7 @@ public enum Action implements org.apache.thrift.TEnum {
 
   private final int value;
 
-  private Action(int value) {
+  Action(int value) {
     this.value = value;
   }
 
@@ -46,34 +46,6 @@ public enum Action implements org.apache.thrift.TEnum {
     return value;
   }
 
-  /**
-   * Find a the enum type by its integer value, as defined in the Thrift IDL.
-   * @return null if the value is not found.
-   */
-  public static Action findByValue(int value) {
-    switch (value) {
-      case 0:
-        return PING;
-      case 1:
-        return PATH;
-      case 2:
-        return MONITOR;
-      case 3:
-        return EXECUTE;
-      case 4:
-        return PASSWORD;
-      case 5:
-        return KILL;
-      case 6:
-        return PROXY;
-      case 7:
-        return GUID;
-      case 8:
-        return RESTART;
-      default:
-        return null;
-    }
-  }
 
   public static Action findByName(String name) {
     for (Action action: Action.values()) {

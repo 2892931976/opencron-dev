@@ -53,7 +53,7 @@ public class AgentMonitor {
 
     private Map<UUID, SocketIOClient> clients = new HashMap<UUID, SocketIOClient>(0);
 
-    public AgentMonitor() {
+    public void start(){
 
         final Integer port = Integer.parseInt(AgentProperties.getProperty("opencorn.monitorPort"));
 
@@ -72,7 +72,7 @@ public class AgentMonitor {
                 /**
                  * 断开连接或者获取数据错误,不在推送数据...
                  */
-                while (clients.get(sessionId) != null) {
+                while (  clients.get(sessionId) != null  ) {
                     client.sendEvent("monitor", monitor());
                     try {
                         TimeUnit.MICROSECONDS.sleep(1000);
@@ -98,7 +98,6 @@ public class AgentMonitor {
         });
 
         server.start();
-
     }
 
     public Monitor monitor() {

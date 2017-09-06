@@ -18,15 +18,12 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
-
 package org.opencron.server.job;
 
 import org.opencron.common.job.Opencron;
 import org.opencron.common.utils.CommonUtils;
-import org.opencron.server.domain.Record;
+import org.opencron.server.domain.Agent;
 import org.opencron.server.service.*;
-import org.opencron.server.vo.JobVo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -35,7 +32,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-
 
 @Component
 public class OpencronTask implements InitializingBean {
@@ -49,19 +45,13 @@ public class OpencronTask implements InitializingBean {
     private ExecuteService executeService;
 
     @Autowired
-    private RecordService recordService;
-
-    @Autowired
-    private JobService jobService;
-
-    @Autowired
     private ConfigService configService;
 
     @Autowired
     private SchedulerService schedulerService;
 
     @Autowired
-    private OpencronMonitor opencronMonitor;
+    private OpencronHeartBeat opencronHeartBeat;
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -69,33 +59,9 @@ public class OpencronTask implements InitializingBean {
         //检测所有的agent...
         clearCache();
         //通知所有的agent,启动心跳检测...
-        opencronMonitor.start();
+        allAgentHeartbeat();
         schedulerService.initQuartz(executeService);
         schedulerService.initCrontab();
-    }
-
-    @Scheduled(cron = "0/5 * * * * ?")
-    public void reExecuteJob() {
-        logger.info("[opencron] reExecuteIob running...");
-        final List<Record> records = recordService.getReExecuteRecord();
-        if (CommonUtils.notEmpty(records)) {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    for (final Record record : records) {
-                        final JobVo jobVo = jobService.getJobVoById(record.getJobId());
-                        logger.info("[opencron] reexecutejob:jobName:{},jobId:{},recordId:{}", jobVo.getJobName(), jobVo.getJobId(), record.getRecordId());
-                        final Thread thread = new Thread(new Runnable() {
-                            public void run() {
-                                jobVo.setAgent(agentService.getAgent(jobVo.getAgentId()));
-                                executeService.reExecuteJob(record, jobVo, Opencron.JobType.SINGLETON);
-                            }
-                        });
-                        thread.start();
-                    }
-                }
-            }).start();
-        }
     }
 
     private void clearCache() {
@@ -103,5 +69,30 @@ public class OpencronTask implements InitializingBean {
         OpencronTools.CACHE.remove(OpencronTools.CACHED_JOB_ID);
     }
 
+    private void allAgentHeartbeat() throws Exception {
+        logger.info("[opencron]:checking Agent connection...");
+        List<Agent> agents = agentService.getAll();
+        if (CommonUtils.notEmpty(agents)) {
+            for (Agent agent:agents) {
+                opencronHeartBeat.heartbeat(agent);
+            }
+        }
+    }
+
+    /**
+     *
+     * 一分钟扫描一次已经失联的Agent，如果Agent失联后重启会自动连接上...
+     * @throws Exception
+     */
+    @Scheduled(cron = "0 */1 * * * ?")
+    public void disconnectedAgentHeartbeat() throws Exception {
+        logger.info("[opencron] reExecuteIob running...");
+        List<Agent> agents = agentService.getAgentByConnStatus(Opencron.ConnStatus.DISCONNECTED);
+        if (CommonUtils.notEmpty(agents)) {
+            for (Agent agent:agents) {
+                opencronHeartBeat.heartbeat(agent);
+            }
+        }
+    }
 
 }

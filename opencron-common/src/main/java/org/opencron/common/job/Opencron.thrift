@@ -21,13 +21,14 @@ struct Request {
 }
 
 struct Response {
-     1:Action action,
-     2:map<string, string> result,
-     3:i32 exitCode,
-     4:bool success,
-     5:i64 startTime,
-     6:i64 endTime,
-     7:string message
+     1:i64 recordId,
+     2:Action action,
+     3:map<string, string> result,
+     4:i32 exitCode,
+     5:bool success,
+     6:i64 startTime,
+     7:i64 endTime,
+     8:string message
 }
 
 service Opencron {

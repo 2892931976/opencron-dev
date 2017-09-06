@@ -96,6 +96,12 @@
                 </td>
             </tr>
             <tr>
+                <td class="item"><i class="glyphicon glyphicon-time"></i>&nbsp;server url：</td>
+                <td>
+                    ${config.spaceTime} 分钟<span class="tips">（同一执行器失联后告警邮件和短信发送后到下一次发送的时间间隔）</span>
+                </td>
+            </tr>
+            <tr>
                 <td class="item"><i class="glyphicon glyphicon-list-alt"></i>&nbsp;短信模板：</td>
                 <td>
                     ${cron:escapeHtml(config.template)}
