@@ -1,6 +1,5 @@
 package org.opencron.server.job;
 
-import com.alibaba.fastjson.JSON;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -15,17 +14,14 @@ import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;
 import io.netty.handler.timeout.IdleStateHandler;
 import io.netty.util.*;
-import org.opencron.common.job.Action;
-import org.opencron.common.job.Request;
-import org.opencron.common.job.Response;
+import org.opencron.common.logging.InternalLogger;
+import org.opencron.common.logging.InternalLoggerFactory;
 import org.opencron.common.utils.CommonUtils;
 import org.opencron.common.utils.DateUtils;
 import org.opencron.server.domain.Agent;
 import org.opencron.server.service.AgentService;
 import org.opencron.server.service.ConfigService;
 import org.opencron.server.service.NoticeService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -36,7 +32,7 @@ import java.util.concurrent.TimeUnit;
 @Component
 public class OpencronHeartBeat {
 
-    private Logger logger = LoggerFactory.getLogger(getClass());
+    private static final InternalLogger logger = InternalLoggerFactory.getInstance(OpencronHeartBeat.class);
 
     protected final HashedWheelTimer timer = new HashedWheelTimer();
 
@@ -65,11 +61,8 @@ public class OpencronHeartBeat {
 
         this.agent = agent;
 
-        Request request = Request.request(agent.getIp(),agent.getPort(), Action.PING,agent.getPassword());
-
-        ByteBuf byteBuf = Unpooled.unreleasableBuffer(Unpooled.copiedBuffer(JSON.toJSONString(request), CharsetUtil.UTF_8));
-
-        this.heartbeatRequest = byteBuf.duplicate();
+        //agent password...
+        this.heartbeatRequest = Unpooled.unreleasableBuffer(Unpooled.copiedBuffer(agent.getPassword(), CharsetUtil.UTF_8)).duplicate();
 
         this.group = new NioEventLoopGroup();
 
@@ -135,16 +128,21 @@ public class OpencronHeartBeat {
     @ChannelHandler.Sharable
     public class HeartBeatHandler extends ChannelInboundHandlerAdapter {
 
-        @Override
+       @Override
         public void channelActive(ChannelHandlerContext handlerContext) throws Exception {
             logger.info("[opencron] agent heartbeat Starting..... {}",DateUtils.formatFullDate(new Date()));
             handlerContext.fireChannelActive().writeAndFlush(heartbeatRequest);
         }
 
         @Override
+        public void channelInactive(ChannelHandlerContext handlerContext) throws Exception {
+            logger.info("[opencron] agent channelInactive {}",DateUtils.formatFullDate(new Date()));
+        }
+
+        @Override
         public void channelRead(ChannelHandlerContext handlerContext, Object msg) throws Exception {
-            Response response = JSON.parseObject(msg.toString(),Response.class);
-            if (response.success) {
+            String result = (String) msg;
+            if (result.equals("1")) {
                 if (!agent.getStatus()) {
                     agent.setStatus(true);
                     agentService.merge(agent);
@@ -154,6 +152,7 @@ public class OpencronHeartBeat {
                 //立即停止连接。。。
                 group.shutdownGracefully();
             }
+            ReferenceCountUtil.release(msg);
         }
 
         @Override
@@ -161,12 +160,6 @@ public class OpencronHeartBeat {
             cause.printStackTrace();
             super.exceptionCaught(ctx, cause);
         }
-
-        @Override
-        public void channelInactive(ChannelHandlerContext handlerContext) throws Exception {
-            logger.info("[opencron] agent channelInactive {}",DateUtils.formatFullDate(new Date()));
-        }
-
     }
 
 
@@ -249,9 +242,6 @@ public class OpencronHeartBeat {
                             logger.info("[opencron] agent channel reTry connection successful");
                         }
                     }
-
-
-
                 });
             }
 
