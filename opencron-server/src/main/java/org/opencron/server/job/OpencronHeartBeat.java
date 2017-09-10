@@ -45,21 +45,16 @@ public class OpencronHeartBeat {
 
     private long keepAliveDelay = 1000 * 5;//5秒一次心跳
 
-
     @Autowired
     private AgentService agentService;
-
 
     @Autowired
     private ConfigService configService;
 
-
     @Autowired
     private NoticeService noticeService;
 
-
     private Map<String, Agent> heartbeatAgentMap = new ConcurrentHashMap<String, Agent>(0);
-
 
     public void heartbeat(Agent agent) throws Exception {
 
@@ -155,8 +150,8 @@ public class OpencronHeartBeat {
                 }
             } else {
                 disconnectAction(agent.getIp());
-                //立即停止连接。。。
-                group.shutdownGracefully();
+                //链路关闭通...
+                handlerContext.fireChannelInactive();
             }
             ReferenceCountUtil.release(msg);
         }
@@ -267,18 +262,21 @@ public class OpencronHeartBeat {
 
     public void disconnectAction(String host) {
         Agent agent = heartbeatAgentMap.get(host);
+
         if (agent.getStatus()) {
+
             agent.setStatus(false);
+
+            if (CommonUtils.isEmpty(agent.getNotifyTime()) || new Date().getTime() - agent.getNotifyTime().getTime() >= configService.getSysConfig().getSpaceTime() * 60 * 1000) {
+                noticeService.notice(agent);
+                //记录本次任务失败的时间
+                agent.setNotifyTime(new Date());
+            }
+
+            //save disconnect status to db.....
+            agentService.merge(agent);
         }
 
-        if (CommonUtils.isEmpty(agent.getNotifyTime()) || new Date().getTime() - agent.getNotifyTime().getTime() >= configService.getSysConfig().getSpaceTime() * 60 * 1000) {
-            noticeService.notice(agent);
-            //记录本次任务失败的时间
-            agent.setNotifyTime(new Date());
-        }
-        //save disconnect status to db.....
-        agentService.merge(agent);
     }
-
 
 }

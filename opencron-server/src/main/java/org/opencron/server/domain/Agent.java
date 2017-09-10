@@ -134,7 +134,6 @@ public class Agent implements Serializable {
 
     public void setPassword(String password) {
         this.password = password;
-        this.passwordByteBuf = Unpooled.unreleasableBuffer(Unpooled.copiedBuffer(password, CharsetUtil.UTF_8)).duplicate();
     }
 
     public Boolean getWarning() {
@@ -234,6 +233,9 @@ public class Agent implements Serializable {
     }
 
     public ByteBuf getPasswordByteBuf() {
+        if ( passwordByteBuf==null ) {
+            return passwordByteBuf = Unpooled.unreleasableBuffer(Unpooled.copiedBuffer(password, CharsetUtil.UTF_8)).duplicate();
+        }
         return passwordByteBuf;
     }
 
