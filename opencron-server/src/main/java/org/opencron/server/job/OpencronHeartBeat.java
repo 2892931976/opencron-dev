@@ -26,7 +26,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.net.ConnectException;
+import java.net.SocketAddress;
 import java.util.Date;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 @Component
@@ -44,9 +47,7 @@ public class OpencronHeartBeat {
 
     private long keepAliveDelay = 1000 * 5;//5秒一次心跳
 
-    private Agent agent;
-
-    private  ByteBuf heartbeatRequest;
+    private ByteBuf heartbeatRequest;
 
     @Autowired
     private AgentService agentService;
@@ -57,9 +58,11 @@ public class OpencronHeartBeat {
     @Autowired
     private NoticeService noticeService;
 
+    private Map<String, Agent> agentMap = new ConcurrentHashMap<String, Agent>(0);
+
     public void heartbeat(Agent agent) throws Exception {
 
-        this.agent = agent;
+        agentMap.put(agent.getIp(), agent);
 
         //agent password...
         this.heartbeatRequest = Unpooled.unreleasableBuffer(Unpooled.copiedBuffer(agent.getPassword(), CharsetUtil.UTF_8)).duplicate();
@@ -70,10 +73,10 @@ public class OpencronHeartBeat {
 
         bootstrap.group(group).channel(NioSocketChannel.class).handler(new LoggingHandler(LogLevel.INFO));
 
-        final ConnectionWatchdog watchdog = new ConnectionWatchdog(bootstrap, timer, agent.getPort(),agent.getIp() ) {
+        final ConnectionWatchdog watchdog = new ConnectionWatchdog(bootstrap, timer, agent.getPort(), agent.getIp()) {
 
             public ChannelHandler[] handlers() {
-                return new ChannelHandler[] {
+                return new ChannelHandler[]{
                         this,
                         new IdleStateHandler(0, 4, 0, TimeUnit.SECONDS),
                         idleStateTrigger,
@@ -95,12 +98,12 @@ public class OpencronHeartBeat {
                     }
                 });
 
-                future = bootstrap.connect(agent.getIp(),agent.getPort());
+                future = bootstrap.connect(agent.getIp(), agent.getPort());
             }
             future.sync();
         } catch (Throwable t) {
             if (t instanceof ConnectException) {
-                disconnectAction();
+                disconnectAction(agent.getIp());
             }
             this.group.shutdownGracefully();
         }
@@ -128,32 +131,37 @@ public class OpencronHeartBeat {
     @ChannelHandler.Sharable
     public class HeartBeatHandler extends ChannelInboundHandlerAdapter {
 
-       @Override
+        @Override
         public void channelActive(ChannelHandlerContext handlerContext) throws Exception {
-            logger.info("[opencron] agent heartbeat Starting..... {}",DateUtils.formatFullDate(new Date()));
+            logger.info("[opencron] agent heartbeat Starting..... {}", DateUtils.formatFullDate(new Date()));
             handlerContext.fireChannelActive().writeAndFlush(heartbeatRequest);
         }
 
         @Override
         public void channelInactive(ChannelHandlerContext handlerContext) throws Exception {
-            logger.info("[opencron] agent channelInactive {}",DateUtils.formatFullDate(new Date()));
+            logger.info("[opencron] agent channelInactive {}", DateUtils.formatFullDate(new Date()));
         }
 
         @Override
         public void channelRead(ChannelHandlerContext handlerContext, Object msg) throws Exception {
+            Agent agent = getAgentFromHandlerContext(handlerContext);
+            if (agent == null) {
+                throw new RuntimeException("[opencron] ChannelHandlerContext can't found agent");
+            }
             String result = (String) msg;
             if (result.equals("1")) {
                 if (!agent.getStatus()) {
                     agent.setStatus(true);
                     agentService.merge(agent);
                 }
-            }else {
-                disconnectAction();
+            } else {
+                disconnectAction(agent.getIp());
                 //立即停止连接。。。
                 group.shutdownGracefully();
             }
             ReferenceCountUtil.release(msg);
         }
+
 
         @Override
         public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
@@ -169,11 +177,10 @@ public class OpencronHeartBeat {
     }
 
     /**
-     *
      * 重连检测狗，当发现当前的链路不稳定关闭之后，进行12次重连
      */
     @ChannelHandler.Sharable
-    public abstract class ConnectionWatchdog extends ChannelInboundHandlerAdapter implements TimerTask,ChannelHandlerHolder{
+    public abstract class ConnectionWatchdog extends ChannelInboundHandlerAdapter implements TimerTask, ChannelHandlerHolder {
 
         private final Bootstrap bootstrap;
         private final Timer timer;
@@ -202,17 +209,21 @@ public class OpencronHeartBeat {
 
         @Override
         public void channelInactive(ChannelHandlerContext handlerContext) throws Exception {
-            logger.info("[opencron] agent channel closed,reTry connection [{}] starting...",attempts);
+            logger.info("[opencron] agent channel closed,reTry connection [{}] starting...", attempts);
             if (attempts < 10) {
                 attempts++;
                 timer.newTimeout(this, keepAliveDelay, TimeUnit.MILLISECONDS);
-            }else {
+            } else {
                 /**
                  * Agent机器失连,进行10次的连接重试,如果都是连接失败，则认为Agent已经失联,发送通知,关闭Agent链路...
                  */
                 logger.warn("[opencron] agent channel disconnected");
-
-                disconnectAction();
+                Agent agent = getAgentFromHandlerContext(handlerContext);
+                if (agent != null) {
+                    disconnectAction(agent.getIp());
+                } else {
+                    throw new RuntimeException("[opencron] ChannelHandlerContext can't found agent");
+                }
             }
 
             handlerContext.fireChannelInactive();
@@ -231,14 +242,14 @@ public class OpencronHeartBeat {
                     }
                 });
 
-                bootstrap.connect(host,port).addListener(new ChannelFutureListener() {
+                bootstrap.connect(host, port).addListener(new ChannelFutureListener() {
 
                     public void operationComplete(ChannelFuture channelFuture) throws Exception {
                         boolean succeed = channelFuture.isSuccess();
                         if (!succeed) {
                             logger.info("[opencron] agent channel reTry connection failed");
                             channelFuture.channel().pipeline().fireChannelInactive();
-                        }else {
+                        } else {
                             logger.info("[opencron] agent channel reTry connection successful");
                         }
                     }
@@ -248,7 +259,14 @@ public class OpencronHeartBeat {
         }
     }
 
-    public void disconnectAction(){
+    private Agent getAgentFromHandlerContext(ChannelHandlerContext handlerContext) {
+        SocketAddress socketAddress = handlerContext.channel().remoteAddress();
+        String host = socketAddress.toString().replaceAll("^/|:\\d+$", "");
+        return agentMap.get(host);
+    }
+
+    public void disconnectAction(String host) {
+        Agent agent = agentMap.get(host);
         if (agent.getStatus()) {
             agent.setStatus(false);
         }

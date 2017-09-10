@@ -23,15 +23,15 @@ public class AgentIdleHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext handlerContext, Object msg) throws Exception {
         //request password。...
-        String reqpass = msg.toString();
+        String reqpwd = msg.toString();
 
-        if (!this.password.equalsIgnoreCase(reqpass)) {
+        if (!this.password.equalsIgnoreCase(reqpwd)) {
             logger.error("[opencron] heartbeat password error!,with server {}",handlerContext.channel().remoteAddress());
         }
 
         //write result.
         handlerContext.writeAndFlush(Unpooled.unreleasableBuffer(
-                Unpooled.copiedBuffer(this.password.equalsIgnoreCase(reqpass) ? "1" : "0",
+                Unpooled.copiedBuffer(this.password.equalsIgnoreCase(reqpwd) ? "1" : "0",
                         CharsetUtil.UTF_8)));
 
     }
