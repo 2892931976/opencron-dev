@@ -1,8 +1,6 @@
 package org.opencron.server.job;
 
 import io.netty.bootstrap.Bootstrap;
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
@@ -47,25 +45,25 @@ public class OpencronHeartBeat {
 
     private long keepAliveDelay = 1000 * 5;//5秒一次心跳
 
-    private ByteBuf heartbeatRequest;
 
     @Autowired
     private AgentService agentService;
 
+
     @Autowired
     private ConfigService configService;
+
 
     @Autowired
     private NoticeService noticeService;
 
-    private Map<String, Agent> agentMap = new ConcurrentHashMap<String, Agent>(0);
+
+    private Map<String, Agent> heartbeatAgentMap = new ConcurrentHashMap<String, Agent>(0);
+
 
     public void heartbeat(Agent agent) throws Exception {
 
-        agentMap.put(agent.getIp(), agent);
-
-        //agent password...
-        this.heartbeatRequest = Unpooled.unreleasableBuffer(Unpooled.copiedBuffer(agent.getPassword(), CharsetUtil.UTF_8)).duplicate();
+        heartbeatAgentMap.put(agent.getIp(), agent);
 
         this.group = new NioEventLoopGroup();
 
@@ -85,6 +83,7 @@ public class OpencronHeartBeat {
                         new HeartBeatHandler()
                 };
             }
+
         };
 
         ChannelFuture future;
@@ -118,7 +117,7 @@ public class OpencronHeartBeat {
                 IdleState state = ((IdleStateEvent) evt).state();
                 if (state == IdleState.WRITER_IDLE) {
                     // write heartbeat to server
-                    handlerContext.writeAndFlush(heartbeatRequest);
+                    handlerContext.writeAndFlush(getAgentFromHandlerContext(handlerContext).getPasswordByteBuf());
                 }
             } else {
                 super.userEventTriggered(handlerContext, evt);
@@ -134,7 +133,7 @@ public class OpencronHeartBeat {
         @Override
         public void channelActive(ChannelHandlerContext handlerContext) throws Exception {
             logger.info("[opencron] agent heartbeat Starting..... {}", DateUtils.formatFullDate(new Date()));
-            handlerContext.fireChannelActive().writeAndFlush(heartbeatRequest);
+            handlerContext.fireChannelActive().writeAndFlush(getAgentFromHandlerContext(handlerContext).getPasswordByteBuf());
         }
 
         @Override
@@ -254,6 +253,7 @@ public class OpencronHeartBeat {
                         }
                     }
                 });
+
             }
 
         }
@@ -262,11 +262,11 @@ public class OpencronHeartBeat {
     private Agent getAgentFromHandlerContext(ChannelHandlerContext handlerContext) {
         SocketAddress socketAddress = handlerContext.channel().remoteAddress();
         String host = socketAddress.toString().replaceAll("^/|:\\d+$", "");
-        return agentMap.get(host);
+        return heartbeatAgentMap.get(host);
     }
 
     public void disconnectAction(String host) {
-        Agent agent = agentMap.get(host);
+        Agent agent = heartbeatAgentMap.get(host);
         if (agent.getStatus()) {
             agent.setStatus(false);
         }

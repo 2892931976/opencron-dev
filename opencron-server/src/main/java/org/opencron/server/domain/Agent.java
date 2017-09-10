@@ -22,6 +22,10 @@
 
 package org.opencron.server.domain;
 
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
+import io.netty.util.CharsetUtil;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
@@ -72,6 +76,9 @@ public class Agent implements Serializable {
 
     @Transient
     private List<User> users = new ArrayList<User>();
+
+    @Transient
+    private ByteBuf passwordByteBuf;
 
     public Long getAgentId() {
         return agentId;
@@ -127,6 +134,7 @@ public class Agent implements Serializable {
 
     public void setPassword(String password) {
         this.password = password;
+        this.passwordByteBuf = Unpooled.unreleasableBuffer(Unpooled.copiedBuffer(password, CharsetUtil.UTF_8)).duplicate();
     }
 
     public Boolean getWarning() {
@@ -225,6 +233,13 @@ public class Agent implements Serializable {
         this.users = users;
     }
 
+    public ByteBuf getPasswordByteBuf() {
+        return passwordByteBuf;
+    }
+
+    public void setPasswordByteBuf(ByteBuf passwordByteBuf) {
+        this.passwordByteBuf = passwordByteBuf;
+    }
 
     @Override
     public boolean equals(Object o) {
