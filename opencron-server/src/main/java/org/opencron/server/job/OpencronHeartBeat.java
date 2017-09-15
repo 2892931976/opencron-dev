@@ -231,7 +231,6 @@ public class OpencronHeartBeat {
                 bootstrap.handler(new ChannelInitializer<Channel>() {
                     @Override
                     protected void initChannel(Channel channel) throws Exception {
-
                         channel.pipeline().addLast(handlers());
                     }
                 });
