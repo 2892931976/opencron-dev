@@ -59,6 +59,12 @@ public class AgentService {
     @Autowired
     private SchedulerService schedulerService;
 
+    @Autowired
+    private NoticeService noticeService;
+
+    @Autowired
+    private ConfigService configService;
+
     public List<Agent> getAgentByConnType(Opencron.ConnType connType) {
         return queryDao.sqlQuery(Agent.class, "SELECT * FROM T_AGENT WHERE deleted=0 AND status = 1 AND proxy = " + connType.getType());
     }
@@ -258,5 +264,17 @@ public class AgentService {
     public List<Agent> getAgentByIds(String agentIds) {
         String sql = String.format("SELECT * FROM T_AGENT WHERE agentId IN (%s)",agentIds);
         return queryDao.sqlQuery(Agent.class,sql);
+    }
+
+    public void doDisconnect(Agent agent) {
+        agent.setStatus(false);
+        if (CommonUtils.isEmpty(agent.getNotifyTime()) || new Date().getTime() - agent.getNotifyTime().getTime() >= configService.getSysConfig().getSpaceTime() * 60 * 1000) {
+            noticeService.notice(agent);
+            //记录本次任务失败的时间
+            agent.setNotifyTime(new Date());
+        }
+        //save disconnect status to db.....
+        this.merge(agent);
+
     }
 }

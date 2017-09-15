@@ -14,12 +14,9 @@ import io.netty.handler.timeout.IdleStateHandler;
 import io.netty.util.*;
 import org.opencron.common.logging.InternalLogger;
 import org.opencron.common.logging.InternalLoggerFactory;
-import org.opencron.common.utils.CommonUtils;
 import org.opencron.common.utils.DateUtils;
 import org.opencron.server.domain.Agent;
 import org.opencron.server.service.AgentService;
-import org.opencron.server.service.ConfigService;
-import org.opencron.server.service.NoticeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -47,12 +44,6 @@ public class OpencronHeartBeat {
 
     @Autowired
     private AgentService agentService;
-
-    @Autowired
-    private ConfigService configService;
-
-    @Autowired
-    private NoticeService noticeService;
 
     private Map<String, Agent> heartbeatAgentMap = new ConcurrentHashMap<String, Agent>(0);
 
@@ -259,21 +250,11 @@ public class OpencronHeartBeat {
         return heartbeatAgentMap.get(host);
     }
 
-    public void disconnectAction(String host) {
+    private void disconnectAction(String host) {
         Agent agent = heartbeatAgentMap.get(host);
 
         if (agent.getStatus()) {
-
-            agent.setStatus(false);
-
-            if (CommonUtils.isEmpty(agent.getNotifyTime()) || new Date().getTime() - agent.getNotifyTime().getTime() >= configService.getSysConfig().getSpaceTime() * 60 * 1000) {
-                noticeService.notice(agent);
-                //记录本次任务失败的时间
-                agent.setNotifyTime(new Date());
-            }
-
-            //save disconnect status to db.....
-            agentService.merge(agent);
+            agentService.doDisconnect(agent);
         }
 
     }
