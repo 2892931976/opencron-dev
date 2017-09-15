@@ -62,7 +62,7 @@ public class TerminalController extends BaseController {
 
     @RequestMapping(value = "ssh.do",method= RequestMethod.POST)
     @ResponseBody
-    public Map<String,String> ssh(HttpSession session, HttpServletResponse response, Terminal terminal) throws Exception {
+    public Map<String,String> ssh(HttpSession session,Terminal terminal) throws Exception {
         User user = OpencronTools.getUser(session);
 
         terminal = termService.getById(terminal.getId());
