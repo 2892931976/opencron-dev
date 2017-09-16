@@ -20,14 +20,20 @@
  */
 package org.opencron.common.job;
 
+import org.opencron.common.rpc.model.RpcType;
+import org.opencron.common.utils.CommonUtils;
+
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
 public class Request implements Serializable {
 
+    private String id;
+    private RpcType type;
     public String hostName;
     public int port;
+    public String address;
     public Action action;
     public String password;
     public Map<String, String> params;
@@ -87,5 +93,32 @@ public class Request implements Serializable {
     public Request setParams(Map<String, String> params) {
         this.params = params;
         return this;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public RpcType getType() {
+        return type;
+    }
+
+    public void setType(RpcType type) {
+        this.type = type;
+    }
+
+    public String getAddress() {
+        if (CommonUtils.notEmpty(this.hostName,this.port)) {
+            return this.hostName+":"+this.port;
+        }
+        return null;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 }

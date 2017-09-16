@@ -34,4 +34,15 @@ public void demo(){
     Person result = ProtostuffUtil.deserializer(arr, Person.class);
     System.out.println(result.getName());
 }
+
+
+@Test
+public void regTest(){
+
+    String addr = "/123.35.65.209:1577";
+    System.out.println(addr.replaceAll("^/|:\\d+$",""));
+
 }
+
+}
+

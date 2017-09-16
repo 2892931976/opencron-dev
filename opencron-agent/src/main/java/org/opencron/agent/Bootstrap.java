@@ -50,7 +50,7 @@ public class Bootstrap implements Serializable {
     /**
      * thrift server
      */
-    private AgentServer server;
+    private OpencronServer server;
 
     /**
      * agent port
@@ -163,7 +163,7 @@ public class Bootstrap implements Serializable {
     private void start() throws Exception {
         try {
 
-            this.server = new AgentServer(this.port,this.password);
+            this.server = new OpencronServer(this.port,this.password);
 
             //new thread to start for netty server
             new Thread(new Runnable() {

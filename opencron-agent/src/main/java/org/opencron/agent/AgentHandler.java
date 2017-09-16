@@ -3,14 +3,13 @@ package org.opencron.agent;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.channel.SimpleChannelInboundHandler;
 import org.apache.commons.exec.*;
 import org.apache.thrift.TException;
-import org.apache.thrift.protocol.TBinaryProtocol;
-import org.apache.thrift.protocol.TProtocol;
 import org.apache.thrift.transport.TSocket;
 import org.apache.thrift.transport.TTransport;
 import org.opencron.common.job.*;
+import org.opencron.common.rpc.model.RpcType;
 import org.opencron.common.utils.*;
 import org.slf4j.Logger;
 
@@ -19,12 +18,13 @@ import java.beans.PropertyDescriptor;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Method;
 import java.util.*;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import static org.opencron.common.utils.CommonUtils.*;
 
-public class AgentHandler extends ChannelInboundHandlerAdapter {
+public class AgentHandler extends SimpleChannelInboundHandler<Request> {
 
     private Logger logger = LoggerFactory.getLogger(AgentHandler.class);
 
@@ -38,18 +38,52 @@ public class AgentHandler extends ChannelInboundHandlerAdapter {
 
     private AgentMonitor agentMonitor;
 
+    private ThreadPoolExecutor pool;
+
+    public AgentHandler(){}
+
+    public AgentHandler(ThreadPoolExecutor pool){
+        this.pool = pool;
+    }
+
     @Override
     public void channelActive(ChannelHandlerContext handlerContext) {
+
         logger.info("[opencron] agent channelActive Active...");
+
         handlerContext.fireChannelActive();
+
         //start monitor...
         this.agentMonitor = new AgentMonitor();
         this.agentMonitor.start();
     }
 
-    public void channelRead(ChannelHandlerContext handlerContext, Object content) throws Exception {
+    @Override
+    protected void channelRead0(final ChannelHandlerContext handlerContext,final Request request) throws Exception {
 
         System.out.println("action...");
+
+        this.pool.execute(new Runnable() {
+            @Override
+            public void run() {
+
+                int time = new Random().nextInt(500);
+                logger.info("Rpc server process request:{}, time:{} start...", request.getId(), time);
+                try {
+                    TimeUnit.MILLISECONDS.sleep(time);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                Response response = new Response();
+                response.setId(request.getId());
+                response.setMessage("Rpc Result:"+time);
+
+                if(request.getType()!= RpcType.ONE_WAY){    //非单向调用
+                    handlerContext.writeAndFlush(response);
+                }
+                logger.info("Rpc server process request:{}, time:{} end...", request.getId(), time);
+            }
+        });
 /*
         Request request = (Request) content;
         Action action = request.getAction();
