@@ -47,7 +47,6 @@ public class AgentHandler extends SimpleChannelInboundHandler<Request> {
     public void channelActive(ChannelHandlerContext handlerContext) {
 
         logger.info("[opencron] agent channelActive Active...");
-
         handlerContext.fireChannelActive();
 
         //start monitor...
