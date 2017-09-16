@@ -20,7 +20,6 @@
  */
 package org.opencron.common.job;
 
-import org.opencron.common.rpc.model.RpcType;
 import org.opencron.common.utils.CommonUtils;
 
 import java.io.Serializable;

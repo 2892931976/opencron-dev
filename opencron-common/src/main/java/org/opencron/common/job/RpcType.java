@@ -1,4 +1,4 @@
-package org.opencron.common.rpc.model;
+package org.opencron.common.job;
 
 /**
  * ${DESCRIPTION}
