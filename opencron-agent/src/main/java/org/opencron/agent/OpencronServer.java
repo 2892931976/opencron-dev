@@ -60,12 +60,14 @@ public class OpencronServer {
                 .handler(new LoggingHandler(LogLevel.INFO))
                 .localAddress(new InetSocketAddress(port)).childHandler(new ChannelInitializer<SocketChannel>() {
                     protected void initChannel(SocketChannel channel) throws Exception {
-                        channel.pipeline().addLast(new IdleStateHandler(5, 0, 0, TimeUnit.SECONDS),
-                        new AgentIdleHandler.AcceptorIdleStateTrigger(),
-                        new RpcDecoder(Request.class),
-                        new RpcEncoder(Response.class),
-                        new AgentIdleHandler(password),
-                        new AgentHandler(pool));
+                        channel.pipeline().addLast(
+                                new IdleStateHandler(5, 0, 0, TimeUnit.SECONDS),
+                                new AgentIdleHandler.AcceptorIdleStateTrigger(),
+                                new RpcDecoder(Request.class),
+                                new RpcEncoder(Response.class),
+                                new AgentIdleHandler(password),
+                                new AgentHandler(pool)
+                        );
                     }
                 });
 

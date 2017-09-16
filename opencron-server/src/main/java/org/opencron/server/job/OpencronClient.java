@@ -80,12 +80,12 @@ public class OpencronClient {
                 .option(ChannelOption.SO_KEEPALIVE, true)
                 .handler(new ChannelInitializer<SocketChannel>() {
                     @Override
-                    public void initChannel(SocketChannel ch) throws Exception {
-                        ch.pipeline().addLast(new LengthFieldBasedFrameDecoder(1<<20, 0, 4, 0, 4),
-                                new LengthFieldPrepender(4),
+                    public void initChannel(SocketChannel channel) throws Exception {
+                        channel.pipeline().addLast(
                                 new RpcDecoder(Response.class), //
                                 new RpcEncoder(Request.class), //
-                                new OpencronHandler());
+                                new OpencronHandler()
+                        );
                     }
                 });
 
@@ -120,7 +120,6 @@ public class OpencronClient {
             channel.writeAndFlush(request).addListener(new ChannelFutureListener() {
                 @Override
                 public void operationComplete(ChannelFuture future) throws Exception {
-
                     if (future.isSuccess()) {
                         logger.info("send success, request id:{}", request.getId());
                         rpcFuture.setSendRequestSuccess(true);
