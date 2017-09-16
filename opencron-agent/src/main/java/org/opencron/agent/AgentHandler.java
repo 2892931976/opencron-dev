@@ -9,7 +9,7 @@ import org.apache.thrift.TException;
 import org.apache.thrift.transport.TSocket;
 import org.apache.thrift.transport.TTransport;
 import org.opencron.common.job.*;
-import org.opencron.common.rpc.model.RpcType;
+import org.opencron.common.job.RpcType;
 import org.opencron.common.utils.*;
 import org.slf4j.Logger;
 
