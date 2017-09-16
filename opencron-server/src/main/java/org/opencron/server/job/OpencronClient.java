@@ -68,7 +68,7 @@ public class OpencronClient {
 
     private Bootstrap bootstrap = new Bootstrap();
 
-    protected final ConcurrentHashMap<String, RpcFuture> rpcFutureTable =  new ConcurrentHashMap<String, RpcFuture>(256);
+    protected final ConcurrentHashMap<Integer, RpcFuture> rpcFutureTable =  new ConcurrentHashMap<Integer, RpcFuture>(256);
 
     private final ConcurrentHashMap<String, ChannelWrapper> channelTable = new ConcurrentHashMap<String, ChannelWrapper>();
 
@@ -96,7 +96,6 @@ public class OpencronClient {
                 return new Thread(r, "Rpc-Scheduled-" + this.idGenerator.incrementAndGet());
             }
         });
-
 
         this.scheduledThreadPoolExecutor.scheduleAtFixedRate(new Runnable() {
             @Override
@@ -250,9 +249,9 @@ public class OpencronClient {
     /**定时清理超时Future**/
     private void scanRpcFutureTable() {
         final List<RpcFuture> timeoutReqList = new ArrayList<RpcFuture>();
-        Iterator<Map.Entry<String, RpcFuture>> it = this.rpcFutureTable.entrySet().iterator();
+        Iterator<Map.Entry<Integer, RpcFuture>> it = this.rpcFutureTable.entrySet().iterator();
         while (it.hasNext()) {
-            Map.Entry<String, RpcFuture> next = it.next();
+            Map.Entry<Integer, RpcFuture> next = it.next();
             RpcFuture rep = next.getValue();
 
             if ((rep.getBeginTimestamp() + rep.getTimeoutMillis() + 1000) <= System.currentTimeMillis()) {  //超时

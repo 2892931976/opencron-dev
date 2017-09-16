@@ -29,14 +29,14 @@ import java.util.Map;
 
 public class Request implements Serializable {
 
-    private String id;
-    private RpcType type;
-    public String hostName;
-    public int port;
-    public String address;
-    public Action action;
-    public String password;
-    public Map<String, String> params;
+    private Integer id;
+    private RpcType rpcType = RpcType.ASYNC;//默认异步调用
+    private String hostName;
+    private int port;
+    private String address;
+    private Action action;
+    private String password;
+    private Map<String, String> params;
 
     public static Request request(String hostName, Integer port, Action action, String password) {
         return new Request().setHostName(hostName).setPort(port).setAction(action).setPassword(password);
@@ -95,20 +95,22 @@ public class Request implements Serializable {
         return this;
     }
 
-    public String getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public Request setId(Integer id) {
         this.id = id;
+        return this;
     }
 
-    public RpcType getType() {
-        return type;
+    public RpcType getRpcType() {
+        return rpcType;
     }
 
-    public void setType(RpcType type) {
-        this.type = type;
+    public Request setRpcType(RpcType rpcType) {
+        this.rpcType = rpcType;
+        return this;
     }
 
     public String getAddress() {

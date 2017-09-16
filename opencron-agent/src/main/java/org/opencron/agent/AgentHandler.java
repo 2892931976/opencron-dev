@@ -78,7 +78,7 @@ public class AgentHandler extends SimpleChannelInboundHandler<Request> {
                 response.setId(request.getId());
                 response.setMessage("Rpc Result:"+time);
 
-                if(request.getType()!= RpcType.ONE_WAY){    //非单向调用
+                if(request.getRpcType()!= RpcType.ONE_WAY){    //非单向调用
                     handlerContext.writeAndFlush(response);
                 }
                 logger.info("Rpc server process request:{}, time:{} end...", request.getId(), time);

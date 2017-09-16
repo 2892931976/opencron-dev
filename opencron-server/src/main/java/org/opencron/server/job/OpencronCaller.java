@@ -24,6 +24,7 @@ package org.opencron.server.job;
 import org.opencron.common.job.Request;
 import org.opencron.common.job.Response;
 import org.opencron.common.rpc.core.InvokeCallback;
+import org.opencron.common.rpc.model.RpcType;
 import org.springframework.stereotype.Component;
 
 import java.util.concurrent.TimeUnit;
@@ -42,11 +43,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class OpencronCaller {
 
     //同步调用
-    private Response callSync(Request request){
+    public Response callSync(Request request){
         try {
+            request.setRpcType(RpcType.SYNC).setId(new AtomicInteger(0).incrementAndGet());
             OpencronClient client = new OpencronClient();
             client.start();
-            request.setId(new AtomicInteger(0).incrementAndGet()+"");
             Response response = client.sendSync(request.getAddress(),request, 1000, TimeUnit.MILLISECONDS);
             System.out.println("send request:"+request.getId()+", receive response id:"+response.getId()+",result:"+response.getResult());
             return response;
@@ -57,11 +58,11 @@ public class OpencronCaller {
     }
 
     //单向调用
-    private void callOneway(Request request){
+    public void callOneway(Request request){
         try {
+            request.setRpcType(RpcType.ONE_WAY).setId(new AtomicInteger(0).incrementAndGet());
             OpencronClient client = new OpencronClient();
             client.start();
-            request.setId(new AtomicInteger(0).incrementAndGet()+"");
             client.sendOneway(request.getAddress(), request, 1000, TimeUnit.MILLISECONDS);
         } catch (Exception e) {
             e.printStackTrace();
@@ -69,11 +70,11 @@ public class OpencronCaller {
     }
 
     //异步调用...
-    private void callAsync(Request request, InvokeCallback callback){
+    public void callAsync(Request request, InvokeCallback callback){
         try {
+            request.setRpcType(RpcType.ASYNC).setId(new AtomicInteger(0).incrementAndGet());
             OpencronClient client = new OpencronClient();
             client.start();
-            request.setId(new AtomicInteger(0).incrementAndGet()+"");
             client.sendAsync(request.getAddress(),request, 1000, TimeUnit.MILLISECONDS, callback);
         } catch (Exception e) {
             e.printStackTrace();

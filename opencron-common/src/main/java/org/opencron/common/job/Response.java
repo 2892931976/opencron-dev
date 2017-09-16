@@ -41,8 +41,8 @@ public class Response implements Serializable {
     public long startTime; // required
     public long endTime; // required
     public String message; // required
-    private String id;
-    private Throwable ex;
+    private Integer id;
+    private Throwable throwable;
 
     public Action getAction() {
         return action;
@@ -117,20 +117,20 @@ public class Response implements Serializable {
         return this;
     }
 
-    public String getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
-    public Throwable getEx() {
-        return ex;
+    public Throwable getThrowable() {
+        return throwable;
     }
 
-    public void setEx(Throwable ex) {
-        this.ex = ex;
+    public void setThrowable(Throwable throwable) {
+        this.throwable = throwable;
     }
 
     public static Response response(Request request) {
