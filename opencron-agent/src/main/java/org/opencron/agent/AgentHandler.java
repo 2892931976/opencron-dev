@@ -20,7 +20,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 import static org.opencron.common.utils.CommonUtils.*;
 
@@ -39,8 +38,6 @@ public class AgentHandler extends SimpleChannelInboundHandler<Request> {
     private AgentMonitor agentMonitor;
 
     private ThreadPoolExecutor pool;
-
-    public AgentHandler(){}
 
     public AgentHandler(ThreadPoolExecutor pool){
         this.pool = pool;
@@ -61,81 +58,67 @@ public class AgentHandler extends SimpleChannelInboundHandler<Request> {
     @Override
     protected void channelRead0(final ChannelHandlerContext handlerContext,final Request request) throws Exception {
 
-        System.out.println("action...");
-
         this.pool.execute(new Runnable() {
+
             @Override
             public void run() {
 
-                int time = new Random().nextInt(500);
-                logger.info("Rpc server process request:{}, time:{} start...", request.getId(), time);
-                try {
-                    TimeUnit.MILLISECONDS.sleep(time);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+                Action action = request.getAction();
+
+                //verify password...
+                if (!password.equalsIgnoreCase(request.getPassword())) {
+                    Response response = Response.response(request)
+                            .setSuccess(false)
+                            .setExitCode(Opencron.StatusCode.ERROR_PASSWORD.getValue())
+                            .setMessage(Opencron.StatusCode.ERROR_PASSWORD.getDescription())
+                            .end();
+
+                    handlerContext.writeAndFlush(response);
+                    handlerContext.close();
+                    return;
                 }
-                Response response = new Response();
-                response.setId(request.getId());
-                response.setMessage("Rpc Result:"+time);
+
+                Response response = null;
+
+                switch (action) {
+                    case PING:
+                        response = ping(request);
+                        break;
+                    case EXECUTE:
+                        response = execute(request);
+                        break;
+                    case PASSWORD:
+                        response = password(request);
+                        break;
+                    case KILL:
+                        response = kill(request);
+                        break;
+                    case GUID:
+                        response = guid(request);
+                        break;
+                    case PATH:
+                        response = path(request);
+                        break;
+                    case PROXY:
+                        response = proxy(request);
+                        break;
+                    case MONITOR:
+                        response = monitor(request);
+                        break;
+                    case RESTART:
+                        restart(request);
+                        break;
+                    default:
+                        break;
+                }
 
                 if(request.getRpcType()!= RpcType.ONE_WAY){    //非单向调用
                     handlerContext.writeAndFlush(response);
                 }
-                logger.info("Rpc server process request:{}, time:{} end...", request.getId(), time);
+                logger.info("[opencron] agent process done,request:{},action:", request.getId(), request.getAction());
             }
+
         });
-/*
-        Request request = (Request) content;
-        Action action = request.getAction();
-
-        //verify password...
-        if (!this.password.equalsIgnoreCase(request.getPassword())) {
-            Response response = Response.response(request)
-                    .setSuccess(false)
-                    .setExitCode(Opencron.StatusCode.ERROR_PASSWORD.getValue())
-                    .setMessage(Opencron.StatusCode.ERROR_PASSWORD.getDescription())
-                    .end();
-
-            handlerContext.writeAndFlush(response);
-            handlerContext.close();
-            return;
-        }
-
-        Response response = null;
-
-        switch (action) {
-            case PING:
-                response = ping(request);
-                break;
-            case EXECUTE:
-                response = execute(request);
-                break;
-            case PASSWORD:
-                response = password(request);
-                break;
-            case KILL:
-                response = kill(request);
-                break;
-            case GUID:
-                response = guid(request);
-                break;
-            case PATH:
-                response = path(request);
-                break;
-            case PROXY:
-                response = proxy(request);
-                break;
-            case MONITOR:
-                response = monitor(request);
-                break;
-            case RESTART:
-                restart(request);
-                break;
-            default:
-                break;
-        }
-        handlerContext.writeAndFlush(response);
-        handlerContext.close();*/
     }
 
     @Override
@@ -151,7 +134,7 @@ public class AgentHandler extends SimpleChannelInboundHandler<Request> {
     }
 
     //@Override
-    public Response ping(Request request) throws TException {
+    public Response ping(Request request) {
         if (!this.password.equalsIgnoreCase(request.getPassword())) {
             return errorPasswordResponse(request);
         }
@@ -159,7 +142,7 @@ public class AgentHandler extends SimpleChannelInboundHandler<Request> {
     }
 
     //@Override
-    public Response path(Request request) throws TException {
+    public Response path(Request request) {
         //返回密码文件的路径...
         return Response.response(request).setSuccess(true)
                 .setExitCode(Opencron.StatusCode.SUCCESS_EXIT.getValue())
@@ -168,7 +151,7 @@ public class AgentHandler extends SimpleChannelInboundHandler<Request> {
     }
 
     //@Override
-    public Response monitor(Request request) throws TException {
+    public Response monitor(Request request) {
         Opencron.ConnType connType = Opencron.ConnType.getByName(request.getParams().get("connType"));
         Response response = Response.response(request);
         switch (connType) {
@@ -183,7 +166,7 @@ public class AgentHandler extends SimpleChannelInboundHandler<Request> {
     }
 
     //@Override
-    public Response execute(final Request request) throws TException {
+    public Response execute(final Request request) {
 
         if (!this.password.equalsIgnoreCase(request.getPassword())) {
             return errorPasswordResponse(request);
@@ -252,7 +235,7 @@ public class AgentHandler extends SimpleChannelInboundHandler<Request> {
                             try {
                                 kill(request);
                                 response.setExitCode(Opencron.StatusCode.TIME_OUT.getValue());
-                            } catch (TException e) {
+                            } catch (Exception e) {
                                 e.printStackTrace();
                             }
 
@@ -342,7 +325,7 @@ public class AgentHandler extends SimpleChannelInboundHandler<Request> {
     }
 
    // @Override
-    public Response password(Request request) throws TException {
+    public Response password(Request request) {
         if (!this.password.equalsIgnoreCase(request.getPassword())) {
             return errorPasswordResponse(request);
         }
@@ -361,7 +344,7 @@ public class AgentHandler extends SimpleChannelInboundHandler<Request> {
     }
 
    // @Override
-    public Response kill(Request request) throws TException {
+    public Response kill(Request request) {
 
         if (!this.password.equalsIgnoreCase(request.getPassword())) {
             return errorPasswordResponse(request);
@@ -393,7 +376,7 @@ public class AgentHandler extends SimpleChannelInboundHandler<Request> {
     }
 
     //@Override
-    public Response proxy(Request request) throws TException {
+    public Response proxy(Request request) {
         String proxyHost = request.getParams().get("proxyHost");
         String proxyPort = request.getParams().get("proxyPort");
         String proxyAction = request.getParams().get("proxyAction");
@@ -446,7 +429,7 @@ public class AgentHandler extends SimpleChannelInboundHandler<Request> {
     }
 
    // @Override
-    public Response guid(Request request) throws TException {
+    public Response guid(Request request) {
         if (!this.password.equalsIgnoreCase(request.getPassword())) {
             return errorPasswordResponse(request);
         }
@@ -478,7 +461,7 @@ public class AgentHandler extends SimpleChannelInboundHandler<Request> {
      * @throws InterruptedException
      */
     //@Override
-    public void restart(Request request) throws TException {
+    public void restart(Request request) {
 
     }
 
