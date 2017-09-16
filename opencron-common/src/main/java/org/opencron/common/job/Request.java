@@ -114,9 +114,9 @@ public class Request implements Serializable {
 
     public String getAddress() {
         if (CommonUtils.notEmpty(this.hostName,this.port)) {
-            return this.hostName+":"+this.port;
+            this.address = this.hostName+":"+this.port;
         }
-        return null;
+        return this.address;
     }
 
     public void setAddress(String address) {
