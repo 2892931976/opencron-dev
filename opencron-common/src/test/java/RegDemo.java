@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 benjobs
+ * Copyright (c) 2015 The Opencron Project
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements. See the NOTICE file
@@ -28,6 +28,6 @@ public class RegDemo {
     public static void main(String[] args) {
 
         System.out.println(0x7fffffff);
-        System.out.println(1<<16);
+        System.out.println(1<<20);
     }
 }

@@ -10,6 +10,7 @@
     <version>1.1.0-RELEASE</version>
     <modules>
         <module>opencron-common</module>
+        <module>opencron-transport</module>
        <!-- <module>opencron-examples</module>-->
         <module>opencron-agent</module>
         <module>opencron-server</module>
@@ -62,6 +63,10 @@
         <junit.version>4.7</junit.version>
         <slf4j.version>1.7.5</slf4j.version>
         <protostuff.version>1.1.2</protostuff.version>
+        <objenesis.version>2.1</objenesis.version>
+        <asm.version>5.2</asm.version>
+        <javassist.version>3.19.0-GA</javassist.version>
+        <bytebuddy.version>1.6.3</bytebuddy.version>
     </properties>
 
     <dependencies>
@@ -77,6 +82,12 @@
             <dependency>
                 <groupId>org.opencron</groupId>
                 <artifactId>opencron-common</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.opencron</groupId>
+                <artifactId>opencron-transport</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
@@ -443,6 +454,34 @@
                 <artifactId>objenesis</artifactId>
                 <version>2.4</version>
             </dependency>
+            <dependency>
+                <groupId>org.ow2.asm</groupId>
+                <artifactId>asm</artifactId>
+                <version>${asm.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.javassist</groupId>
+                <artifactId>javassist</artifactId>
+                <version>${javassist.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.bytebuddy</groupId>
+                <artifactId>byte-buddy</artifactId>
+                <version>${bytebuddy.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>net.openhft</groupId>
+                <artifactId>affinity</artifactId>
+                <version>3.0.6</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>slf4j-api</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+
             <!-- serialization  -->
             <dependency>
                 <groupId>com.dyuproject.protostuff</groupId>

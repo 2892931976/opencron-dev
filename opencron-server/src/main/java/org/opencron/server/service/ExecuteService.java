@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 benjobs
+ * Copyright (c) 2015 The Opencron Project
  * <p>
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements. See the NOTICE file
@@ -26,7 +26,7 @@ import org.opencron.common.exception.PingException;
 import org.opencron.common.job.Action;
 import org.opencron.common.job.Request;
 import org.opencron.common.job.Response;
-import org.opencron.common.utils.ParamsMap;
+import org.opencron.common.util.collection.ParamsMap;
 import org.opencron.server.domain.Record;
 import org.opencron.server.domain.Agent;
 import org.opencron.server.domain.User;

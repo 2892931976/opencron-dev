@@ -24,7 +24,7 @@ package org.opencron.common.logging;
 /**
  * Creates an {@link InternalLogger} or changes the default factory
  * implementation.  This factory allows you to choose what logging framework
- * jupiter should use.  The default factory is {@link Slf4JLoggerFactory}.
+ * opencron should use.  The default factory is {@link Slf4JLoggerFactory}.
  * If SLF4J is not available, {@link JdkLoggerFactory} is used.  You can change
  * it to your preferred
  *

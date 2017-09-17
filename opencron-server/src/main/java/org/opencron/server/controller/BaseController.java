@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 benjobs
+ * Copyright (c) 2015 The Opencron Project
  * <p>
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements. See the NOTICE file
@@ -21,7 +21,7 @@
 
 package org.opencron.server.controller;
 
-import org.opencron.common.utils.StringUtils;
+import org.opencron.common.util.StringUtils;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
 

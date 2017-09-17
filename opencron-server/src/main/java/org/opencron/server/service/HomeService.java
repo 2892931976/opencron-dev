@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 benjobs
+ * Copyright (c) 2015 The Opencron Project
  * <p>
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements. See the NOTICE file
@@ -22,14 +22,13 @@
 package org.opencron.server.service;
 
 import org.opencron.common.job.Opencron;
-import org.opencron.common.utils.PropertyPlaceholder;
+import org.opencron.common.util.DigestUtils;
+import org.opencron.common.util.PropertyPlaceholder;
 import org.opencron.server.dao.QueryDao;
 import org.opencron.server.domain.Log;
 import org.opencron.server.domain.User;
 import org.opencron.server.handler.SingleLoginListener;
 import org.opencron.server.job.OpencronTools;
-import org.opencron.common.utils.Digests;
-import org.opencron.common.utils.Encodes;
 import org.opencron.server.tag.PageBean;
 import org.opencron.server.vo.LogVo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +41,7 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.List;
 
-import static org.opencron.common.utils.CommonUtils.notEmpty;
+import static org.opencron.common.util.CommonUtils.notEmpty;
 
 /**
  * Created by ChenHui on 2016/2/17.
@@ -61,8 +60,8 @@ public class HomeService {
         if (user == null) return 500;
 
         //拿到数据库的数据盐
-        byte[] salt = Encodes.decodeHex(user.getSalt());
-        String saltPassword = Encodes.encodeHex(Digests.sha1(password.getBytes(), salt, 1024));
+        byte[] salt = DigestUtils.decodeHex(user.getSalt());
+        String saltPassword = DigestUtils.encodeHex(DigestUtils.sha1(password.getBytes(), salt, 1024));
 
         if (saltPassword.equals(user.getPassword())) {
             if (user.getRoleId() == 999L) {

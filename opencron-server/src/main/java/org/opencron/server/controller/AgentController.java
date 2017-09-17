@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 benjobs
+ * Copyright (c) 2015 The Opencron Project
  * <p>
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements. See the NOTICE file
@@ -29,8 +29,8 @@ import javax.servlet.http.HttpSession;
 
 import com.alibaba.fastjson.JSON;
 import org.opencron.common.job.Opencron;
-import org.opencron.common.utils.CommonUtils;
-import org.opencron.common.utils.PropertyPlaceholder;
+import org.opencron.common.util.CommonUtils;
+import org.opencron.common.util.PropertyPlaceholder;
 import org.opencron.server.job.OpencronTools;
 import org.opencron.server.service.AgentService;
 import org.opencron.server.service.ExecuteService;
@@ -45,7 +45,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import static org.opencron.common.utils.WebUtils.*;
+import static org.opencron.common.util.WebUtils.*;
 
 
 @Controller

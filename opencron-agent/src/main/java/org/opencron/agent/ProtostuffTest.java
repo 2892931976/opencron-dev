@@ -2,7 +2,7 @@ package org.opencron.agent;
 
 
 import org.junit.Test;
-import org.opencron.common.utils.ProtostuffUtil;
+import org.opencron.common.util.ProtostuffUtils;
 
 public class ProtostuffTest {
 
@@ -30,8 +30,8 @@ public static class Person{
 @Test
 public void demo(){
     Person p = new Person(1,"ff");
-    byte[] arr = ProtostuffUtil.serializer(p);
-    Person result = ProtostuffUtil.deserializer(arr, Person.class);
+    byte[] arr = ProtostuffUtils.serializer(p);
+    Person result = ProtostuffUtils.deserializer(arr, Person.class);
     System.out.println(result.getName());
 }
 

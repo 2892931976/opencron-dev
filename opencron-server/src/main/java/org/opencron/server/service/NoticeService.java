@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 benjobs
+ * Copyright (c) 2015 The Opencron Project
  * <p/>
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements. See the NOTICE file
@@ -29,9 +29,9 @@ import org.opencron.server.domain.User;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import org.apache.commons.mail.HtmlEmail;
-import org.opencron.common.utils.CommonUtils;
-import org.opencron.common.utils.DateUtils;
-import org.opencron.common.utils.HttpUtils;
+import org.opencron.common.util.CommonUtils;
+import org.opencron.common.util.DateUtils;
+import org.opencron.common.util.HttpUtils;
 import org.opencron.server.domain.Agent;
 import org.opencron.server.vo.JobVo;
 import org.slf4j.Logger;

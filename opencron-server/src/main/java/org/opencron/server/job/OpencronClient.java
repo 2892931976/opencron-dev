@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 benjobs
+ * Copyright (c) 2015 The Opencron Project
  * <p>
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements. See the NOTICE file
@@ -30,12 +30,10 @@ import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.handler.codec.LengthFieldPrepender;
 import org.opencron.common.job.Request;
 import org.opencron.common.job.Response;
-import org.opencron.common.rpc.codec.RpcDecoder;
-import org.opencron.common.rpc.codec.RpcEncoder;
-import org.opencron.common.rpc.core.ChannelWrapper;
-import org.opencron.common.rpc.core.InvokeCallback;
-import org.opencron.common.rpc.core.RpcFuture;
-import org.opencron.common.utils.NetUtils;
+import org.opencron.common.util.NetUtils;
+import org.opencron.transport.netty.core.ChannelWrapper;
+import org.opencron.transport.netty.core.InvokeCallback;
+import org.opencron.transport.netty.core.RpcFuture;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -74,7 +72,7 @@ public class OpencronClient {
 
     private ScheduledThreadPoolExecutor scheduledThreadPoolExecutor;
 
-    public void start(){
+    public void start() {
         bootstrap.group(group).channel(NioSocketChannel.class)
                 .option(ChannelOption.TCP_NODELAY, true)
                 .option(ChannelOption.SO_KEEPALIVE, true)
@@ -82,8 +80,10 @@ public class OpencronClient {
                     @Override
                     public void initChannel(SocketChannel channel) throws Exception {
                         channel.pipeline().addLast(
-                                new RpcDecoder(Response.class), //
-                                new RpcEncoder(Request.class), //
+                                new LengthFieldBasedFrameDecoder(1<<20, 0, 4, 0, 4),
+                                new LengthFieldPrepender(4),
+                                //new Decoder(Response.class), //
+                                //new Encoder(Request.class), //
                                 new OpencronHandler()
                         );
                     }
@@ -195,9 +195,7 @@ public class OpencronClient {
     class OpencronHandler extends SimpleChannelInboundHandler<Response> {
 
         @Override
-        protected void channelRead0(ChannelHandlerContext channelHandlerContext, Response msg) throws Exception {
-
-            final Response response = msg;
+        protected void channelRead0(ChannelHandlerContext channelHandlerContext, Response response) throws Exception {
             logger.info("Rpc client receive response id:{}", response.getId());
             RpcFuture future = rpcFutureTable.get(response.getId());
 

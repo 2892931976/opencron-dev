@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 benjobs
+ * Copyright (c) 2015 The Opencron Project
  * <p>
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements. See the NOTICE file
@@ -23,9 +23,9 @@
 package org.opencron.server.handler;
 
 
-import org.opencron.common.utils.CommonUtils;
-import org.opencron.common.utils.CookieUtils;
-import org.opencron.common.utils.StringUtils;
+import org.opencron.common.util.CommonUtils;
+import org.opencron.common.util.CookieUtils;
+import org.opencron.common.util.StringUtils;
 import org.opencron.server.domain.User;
 import org.opencron.server.job.OpencronTools;
 import org.slf4j.Logger;

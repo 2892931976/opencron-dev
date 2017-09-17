@@ -10,7 +10,8 @@ import org.apache.thrift.transport.TSocket;
 import org.apache.thrift.transport.TTransport;
 import org.opencron.common.job.*;
 import org.opencron.common.job.RpcType;
-import org.opencron.common.utils.*;
+import org.opencron.common.logging.LoggerFactory;
+import org.opencron.common.util.*;
 import org.slf4j.Logger;
 
 import java.beans.Introspector;
@@ -21,7 +22,8 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ThreadPoolExecutor;
 
-import static org.opencron.common.utils.CommonUtils.*;
+import static org.opencron.common.util.CommonUtils.*;
+import static org.opencron.common.util.ReflectUtils.isPrototype;
 
 public class AgentHandler extends SimpleChannelInboundHandler<Request> {
 
@@ -45,13 +47,14 @@ public class AgentHandler extends SimpleChannelInboundHandler<Request> {
 
     @Override
     public void channelActive(ChannelHandlerContext handlerContext) {
-
         logger.info("[opencron] agent channelActive Active...");
         handlerContext.fireChannelActive();
 
-        //start monitor...
-        this.agentMonitor = new AgentMonitor();
-        this.agentMonitor.start();
+        if (this.agentMonitor == null) {
+            //start monitor...
+            this.agentMonitor = new AgentMonitor();
+            this.agentMonitor.start();
+        }
     }
 
     @Override
@@ -122,7 +125,7 @@ public class AgentHandler extends SimpleChannelInboundHandler<Request> {
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        System.out.println("HelloWorldClientHandler inActive===========");
+        logger.error("[opencron] agent channelInactive");
         super.channelInactive(ctx);
     }
 
@@ -489,7 +492,7 @@ public class AgentHandler extends SimpleChannelInboundHandler<Request> {
                 if (notEmpty(value)) {
                     if (isPrototype(pds[index].getPropertyType())//java里的原始类型(去除自己定义类型)
                             || pds[index].getPropertyType().isPrimitive()//基本类型
-                            || ReflectUitls.isPrimitivePackageType(pds[index].getPropertyType())
+                            //|| ReflectUtils.isPrimitivePackageType(pds[index].getPropertyType())
                             || pds[index].getPropertyType() == String.class) {
 
                         resultMap.put(pds[index].getName(), value.toString());

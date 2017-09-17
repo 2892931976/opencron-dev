@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 benjobs
+ * Copyright (c) 2015 The Opencron Project
  * <p>
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements. See the NOTICE file
@@ -24,7 +24,7 @@ package org.opencron.server.controller;
 import com.alibaba.fastjson.JSON;
 import org.opencron.common.job.Opencron;
 import org.opencron.common.job.Response;
-import org.opencron.common.utils.*;
+import org.opencron.common.util.*;
 import org.opencron.server.domain.Agent;
 import org.opencron.server.domain.Job;
 import org.opencron.server.domain.Log;
@@ -51,9 +51,9 @@ import java.io.File;
 import java.io.Serializable;
 import java.util.*;
 
-import static org.opencron.common.utils.CommonUtils.isEmpty;
-import static org.opencron.common.utils.CommonUtils.notEmpty;
-import static org.opencron.common.utils.WebUtils.*;
+import static org.opencron.common.util.CommonUtils.isEmpty;
+import static org.opencron.common.util.CommonUtils.notEmpty;
+import static org.opencron.common.util.WebUtils.*;
 
 /**
  * Created by ChenHui on 2016/2/17.
@@ -207,9 +207,9 @@ public class DashboardController extends BaseController {
 
             User user = OpencronTools.getUser(session);
             //提示用户更改默认密码
-            byte[] salt = Encodes.decodeHex(user.getSalt());
-            byte[] hashPassword = Digests.sha1(DigestUtils.md5Hex("opencron").toUpperCase().getBytes(), salt, 1024);
-            String hashPass = Encodes.encodeHex(hashPassword);
+            byte[] salt = DigestUtils.decodeHex(user.getSalt());
+            byte[] hashPassword = DigestUtils.sha1(DigestUtils.md5Hex("opencron").toUpperCase().getBytes(), salt, 1024);
+            String hashPass = DigestUtils.encodeHex(hashPassword);
 
             String format = "{\"status\":\"%s\",\"%s\":\"%s\",\"%s\":\"%s\"}";
 

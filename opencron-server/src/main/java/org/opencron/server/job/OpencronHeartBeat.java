@@ -4,17 +4,18 @@ import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.codec.string.StringDecoder;
-import io.netty.handler.codec.string.StringEncoder;
+import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
+import io.netty.handler.codec.LengthFieldPrepender;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;
 import io.netty.handler.timeout.IdleStateHandler;
 import io.netty.util.*;
+import org.opencron.common.job.Response;
 import org.opencron.common.logging.InternalLogger;
 import org.opencron.common.logging.InternalLoggerFactory;
-import org.opencron.common.utils.DateUtils;
+import org.opencron.common.util.DateUtils;
 import org.opencron.server.domain.Agent;
 import org.opencron.server.service.AgentService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,11 +62,13 @@ public class OpencronHeartBeat {
 
             public ChannelHandler[] handlers() {
                 return new ChannelHandler[]{
+                        new LengthFieldBasedFrameDecoder(1<<20, 0, 4, 0, 4),
+                        new LengthFieldPrepender(4),
                         this,
                         new IdleStateHandler(0, 4, 0, TimeUnit.SECONDS),
                         idleStateTrigger,
-                        new StringDecoder(),
-                        new StringEncoder(),
+                        //new Decoder(Response.class),
+                        //new Encoder(Request.class),
                         new HeartBeatHandler()
                 };
             }
@@ -114,7 +117,7 @@ public class OpencronHeartBeat {
 
 
     @ChannelHandler.Sharable
-    public class HeartBeatHandler extends ChannelInboundHandlerAdapter {
+    public class HeartBeatHandler extends SimpleChannelInboundHandler<Response> {
 
         @Override
         public void channelActive(ChannelHandlerContext handlerContext) throws Exception {
@@ -128,13 +131,12 @@ public class OpencronHeartBeat {
         }
 
         @Override
-        public void channelRead(ChannelHandlerContext handlerContext, Object msg) throws Exception {
+        protected void channelRead0(ChannelHandlerContext handlerContext, Response response) throws Exception {
             Agent agent = getAgentFromHandlerContext(handlerContext);
             if (agent == null) {
                 throw new RuntimeException("[opencron] ChannelHandlerContext can't found agent");
             }
-            String result = (String) msg;
-            if (result.equals("1")) {
+            if (response.isSuccess()) {
                 if (!agent.getStatus()) {
                     agent.setStatus(true);
                     agentService.merge(agent);
@@ -144,9 +146,8 @@ public class OpencronHeartBeat {
                 //链路关闭通...
                 handlerContext.fireChannelInactive();
             }
-            ReferenceCountUtil.release(msg);
+            ReferenceCountUtil.release(response);
         }
-
 
         @Override
         public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
@@ -159,6 +160,7 @@ public class OpencronHeartBeat {
     interface ChannelHandlerHolder {
 
         ChannelHandler[] handlers();
+
     }
 
     /**

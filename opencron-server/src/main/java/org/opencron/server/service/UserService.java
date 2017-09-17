@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 benjobs
+ * Copyright (c) 2015 The Opencron Project
  * <p>
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements. See the NOTICE file
@@ -22,14 +22,13 @@
 
 package org.opencron.server.service;
 
-import org.opencron.common.utils.CommonUtils;
+import org.opencron.common.util.CommonUtils;
+import org.opencron.common.util.DigestUtils;
 import org.opencron.server.dao.QueryDao;
 import org.opencron.server.dao.UploadDao;
 import org.opencron.server.domain.Role;
 import org.opencron.server.domain.User;
 import org.opencron.server.tag.PageBean;
-import org.opencron.common.utils.Digests;
-import org.opencron.common.utils.Encodes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -65,8 +64,8 @@ public class UserService {
     public void addUser(User user) {
         String salter = CommonUtils.uuid(16);
         user.setSalt(salter);
-        byte[] salt = Encodes.decodeHex(salter);
-        String saltPassword = Encodes.encodeHex(Digests.sha1(user.getPassword().getBytes(), salt, 1024));
+        byte[] salt = DigestUtils.decodeHex(salter);
+        String saltPassword = DigestUtils.encodeHex(DigestUtils.sha1(user.getPassword().getBytes(), salt, 1024));
         user.setPassword(saltPassword);
         user.setCreateTime(new Date());
         queryDao.merge(user);
@@ -91,13 +90,13 @@ public class UserService {
 
     public String editPwd(Long id, String pwd0, String pwd1, String pwd2) {
         User user = getUserById(id);
-        byte[] salt = Encodes.decodeHex(user.getSalt());
-        byte[] hashPassword = Digests.sha1(pwd0.getBytes(), salt, 1024);
-        pwd0 = Encodes.encodeHex(hashPassword);
+        byte[] salt = DigestUtils.decodeHex(user.getSalt());
+        byte[] hashPassword = DigestUtils.sha1(pwd0.getBytes(), salt, 1024);
+        pwd0 = DigestUtils.encodeHex(hashPassword);
         if (pwd0.equals(user.getPassword())) {
             if (pwd1.equals(pwd2)) {
-                byte[] hashPwd = Digests.sha1(pwd1.getBytes(), salt, 1024);
-                user.setPassword(Encodes.encodeHex(hashPwd));
+                byte[] hashPwd = DigestUtils.sha1(pwd1.getBytes(), salt, 1024);
+                user.setPassword(DigestUtils.encodeHex(hashPwd));
                 queryDao.merge(user);
                 return "true";
             } else {

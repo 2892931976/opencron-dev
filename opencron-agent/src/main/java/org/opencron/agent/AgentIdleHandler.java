@@ -1,16 +1,17 @@
 package org.opencron.agent;
 
-import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;
-import io.netty.util.CharsetUtil;
-import org.opencron.common.utils.LoggerFactory;
+import org.opencron.common.job.Request;
+import org.opencron.common.job.Response;
+import org.opencron.common.logging.LoggerFactory;
 import org.slf4j.Logger;
 
-public class AgentIdleHandler extends ChannelInboundHandlerAdapter {
+public class AgentIdleHandler extends SimpleChannelInboundHandler<Request> {
 
     private String password;
 
@@ -21,21 +22,13 @@ public class AgentIdleHandler extends ChannelInboundHandlerAdapter {
     }
 
     @Override
-    public void channelRead(ChannelHandlerContext handlerContext, Object msg) throws Exception {
-        //request password。...
-        String reqpwd = msg.toString();
-
-        if (!this.password.equalsIgnoreCase(reqpwd)) {
+    protected void channelRead0(ChannelHandlerContext handlerContext, Request request) throws Exception {
+        if (!this.password.equalsIgnoreCase(request.getPassword())) {
             logger.error("[opencron] heartbeat password error!,with server {}",handlerContext.channel().remoteAddress());
         }
-
-        //write result.
-        handlerContext.writeAndFlush(Unpooled.unreleasableBuffer(
-                Unpooled.copiedBuffer(this.password.equalsIgnoreCase(reqpwd) ? "1" : "0",
-                        CharsetUtil.UTF_8)));
-
+        Response response = Response.response(request).setSuccess(this.password.equalsIgnoreCase(request.getPassword())).end();
+        handlerContext.writeAndFlush(response);
     }
-
 
     @Override
     public void exceptionCaught(ChannelHandlerContext handlerContext, Throwable cause) throws Exception {

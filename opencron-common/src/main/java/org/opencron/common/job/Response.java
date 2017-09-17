@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 benjobs
+ * Copyright (c) 2015 The Opencron Project
  * <p>
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements. See the NOTICE file
@@ -34,13 +34,13 @@ public class Response implements Serializable {
     /**
      * @see Action
      */
-    public Action action; // required
-    public Map<String, String> result; // required
-    public int exitCode; // required
-    public boolean success; // required
-    public long startTime; // required
-    public long endTime; // required
-    public String message; // required
+    private Action action; // required
+    private Map<String, String> result; // required
+    private int exitCode; // required
+    private boolean success; // required
+    private long startTime; // required
+    private long endTime; // required
+    private String message; // required
     private Integer id;
     private Throwable throwable;
 

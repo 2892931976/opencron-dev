@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 benjobs
+ * Copyright (c) 2015 The Opencron Project
  * <p>
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements. See the NOTICE file
@@ -26,7 +26,8 @@ import com.corundumstudio.socketio.*;
 import com.corundumstudio.socketio.listener.ConnectListener;
 import com.corundumstudio.socketio.listener.DisconnectListener;
 import org.opencron.common.job.Monitor;
-import org.opencron.common.utils.*;
+import org.opencron.common.logging.LoggerFactory;
+import org.opencron.common.util.*;
 import org.slf4j.Logger;
 
 import java.lang.reflect.Field;
@@ -39,8 +40,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static org.opencron.common.utils.CommandUtils.executeShell;
-import static org.opencron.common.utils.CommonUtils.toLong;
+import static org.opencron.common.util.CommandUtils.executeShell;
+import static org.opencron.common.util.CommonUtils.toLong;
 
 /**
  * Created by benjobs on 16/4/7.
@@ -163,7 +164,7 @@ public class AgentMonitor {
             } else {
                 Monitor.Top top = new Monitor.Top();
                 for (Map.Entry<Integer, String> entry : index.entrySet()) {
-                    ReflectUitls.setter(Monitor.Top.class, entry.getValue()).invoke(top, data[entry.getKey()]);
+                    ReflectUtils.setter(Monitor.Top.class, entry.getValue()).invoke(top, data[entry.getKey()]);
                 }
                 topList.add(JSON.toJSONString(top));
             }
@@ -378,7 +379,7 @@ public class AgentMonitor {
             } else {
                 Monitor.Iostat iostat = new Monitor.Iostat();
                 for (Map.Entry<Integer, String> entry : index.entrySet()) {
-                    Method setMethod = ReflectUitls.setter(Monitor.Iostat.class, entry.getValue());
+                    Method setMethod = ReflectUtils.setter(Monitor.Iostat.class, entry.getValue());
                     setMethod.invoke(iostat, data[entry.getKey()]);
                 }
                 ioList.add(JSON.toJSONString(iostat));

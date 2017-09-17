@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 benjobs
+ * Copyright (c) 2015 The Opencron Project
  * <p>
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements. See the NOTICE file
@@ -23,7 +23,7 @@
 package org.opencron.server.dao;
 
 import org.apache.commons.lang3.StringUtils;
-import org.opencron.common.utils.IgnoreCaseMap;
+import org.opencron.common.util.collection.IgnoreCaseMap;
 import org.hibernate.transform.BasicTransformerAdapter;
 
 import java.io.Serializable;

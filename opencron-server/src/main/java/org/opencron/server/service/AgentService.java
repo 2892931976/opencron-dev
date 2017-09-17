@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 benjobs
+ * Copyright (c) 2015 The Opencron Project
  * <p>
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements. See the NOTICE file
@@ -25,7 +25,7 @@ package org.opencron.server.service;
 import java.util.*;
 
 import org.opencron.common.job.Opencron;
-import org.opencron.common.utils.CommonUtils;
+import org.opencron.common.util.CommonUtils;
 import org.opencron.server.dao.QueryDao;
 import org.opencron.server.domain.User;
 import org.opencron.server.job.OpencronTools;
@@ -40,8 +40,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpSession;
 
-import static org.opencron.common.utils.CommonUtils.isEmpty;
-import static org.opencron.common.utils.CommonUtils.notEmpty;
+import static org.opencron.common.util.CommonUtils.isEmpty;
+import static org.opencron.common.util.CommonUtils.notEmpty;
 
 @Service
 @Transactional

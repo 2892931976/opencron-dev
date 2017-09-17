@@ -24,8 +24,8 @@ package org.opencron.agent;
  */
 
 import org.apache.commons.codec.digest.DigestUtils;
-import org.opencron.common.utils.IOUtils;
-import org.opencron.common.utils.LoggerFactory;
+import org.opencron.common.util.IOUtils;
+import org.opencron.common.logging.LoggerFactory;
 import org.slf4j.Logger;
 
 import java.io.*;
@@ -36,8 +36,8 @@ import java.net.*;
 import java.security.AccessControlException;
 import java.util.Random;
 
-import static org.opencron.common.utils.CommonUtils.isEmpty;
-import static org.opencron.common.utils.CommonUtils.notEmpty;
+import static org.opencron.common.util.CommonUtils.isEmpty;
+import static org.opencron.common.util.CommonUtils.notEmpty;
 
 public class Bootstrap implements Serializable {
 

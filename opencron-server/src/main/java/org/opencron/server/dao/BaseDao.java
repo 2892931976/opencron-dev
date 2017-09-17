@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 benjobs
+ * Copyright (c) 2015 The Opencron Project
  * <p>
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements. See the NOTICE file
@@ -22,7 +22,8 @@
 
 package org.opencron.server.dao;
 
-import org.opencron.common.utils.CommonUtils;
+import org.opencron.common.util.CommonUtils;
+import org.opencron.common.util.ReflectUtils;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,7 +32,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static org.opencron.common.utils.CommonUtils.toLong;
+import static org.opencron.common.util.CommonUtils.toLong;
 
 
 @SuppressWarnings("unchecked")
@@ -45,7 +46,7 @@ public class BaseDao<T, PK extends Serializable> extends HibernateDao {
     protected Class<T> entityClass = null;
 
     public BaseDao() {
-        entityClass = (Class<T>) CommonUtils.getGenericType(this.getClass());
+        entityClass = (Class<T>) ReflectUtils.getGenericType(this.getClass());
     }
 
     /**

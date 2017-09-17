@@ -20,7 +20,7 @@
  */
 
 /**
- * <em>Internal-use-only</em> logging API which is not allowed to be used outside Jupiter.
+ * <em>Internal-use-only</em> logging API which is not allowed to be used outside Opencron.
  *
  * Forked from <a href="https://github.com/netty/netty">Netty</a>.
  */

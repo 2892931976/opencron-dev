@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 benjobs
+ * Copyright (c) 2015 The Opencron Project
  * <p>
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements. See the NOTICE file
@@ -22,8 +22,8 @@
 package org.opencron.server.service;
 
 import com.jcraft.jsch.*;
-import org.opencron.common.utils.CommonUtils;
-import org.opencron.common.utils.DigestUtils;
+import org.opencron.common.util.CommonUtils;
+import org.opencron.common.util.DigestUtils;
 import org.opencron.server.dao.QueryDao;
 import org.opencron.server.domain.Terminal;
 import org.opencron.server.domain.User;
@@ -44,7 +44,7 @@ import java.text.DecimalFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static org.opencron.common.utils.CommonUtils.notEmpty;
+import static org.opencron.common.util.CommonUtils.notEmpty;
 import static org.opencron.server.job.OpencronTools.HTTP_SESSION_ID;
 import static org.opencron.server.job.OpencronTools.SSH_SESSION_ID;
 

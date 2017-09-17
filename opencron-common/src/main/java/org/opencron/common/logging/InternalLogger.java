@@ -22,8 +22,8 @@
 package org.opencron.common.logging;
 
 /**
- * <em>Internal-use-only</em> logger used by Jupiter. <strong>DO NOT</strong>
- * access this class outside of Jupiter.
+ * <em>Internal-use-only</em> logger used by Opencron. <strong>DO NOT</strong>
+ * access this class outside of Opencron.
  *
  * Forked from <a href="https://github.com/netty/netty">Netty</a>.
  */

@@ -5,14 +5,12 @@ import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
+import io.netty.handler.codec.LengthFieldPrepender;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.timeout.IdleStateHandler;
-import org.opencron.common.job.Request;
-import org.opencron.common.job.Response;
-import org.opencron.common.rpc.codec.RpcDecoder;
-import org.opencron.common.rpc.codec.RpcEncoder;
-import org.opencron.common.utils.LoggerFactory;
+import org.opencron.common.logging.LoggerFactory;
 import org.slf4j.Logger;
 
 import java.net.InetSocketAddress;
@@ -54,22 +52,21 @@ public class OpencronServer {
 
         this.bootstrap.group(bossGroup, workerGroup)
                 .channel(NioServerSocketChannel.class)
-                .option(ChannelOption.SO_BACKLOG, 128)
-                .option(ChannelOption.SO_KEEPALIVE, true)
-                .childOption(ChannelOption.TCP_NODELAY, true)
                 .handler(new LoggingHandler(LogLevel.INFO))
                 .localAddress(new InetSocketAddress(port)).childHandler(new ChannelInitializer<SocketChannel>() {
                     protected void initChannel(SocketChannel channel) throws Exception {
                         channel.pipeline().addLast(
+                                new LengthFieldBasedFrameDecoder(1<<20, 0, 4, 0, 4),
+                                new LengthFieldPrepender(4),
                                 new IdleStateHandler(5, 0, 0, TimeUnit.SECONDS),
                                 new AgentIdleHandler.AcceptorIdleStateTrigger(),
-                                new RpcDecoder(Request.class),
-                                new RpcEncoder(Response.class),
-                                new AgentIdleHandler(password),
-                                new AgentHandler(pool)
+                                //new Decoder(Request.class), //
+                                //new Encoder(Response.class), //
+                                new AgentIdleHandler(password)
+                                //new AgentHandler(pool)
                         );
                     }
-                });
+                }).option(ChannelOption.SO_BACKLOG, 128).childOption(ChannelOption.SO_KEEPALIVE, true);
 
         try {
             this.channelFuture = this.bootstrap.bind(port).sync();

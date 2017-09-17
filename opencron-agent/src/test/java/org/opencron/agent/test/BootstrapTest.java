@@ -2,7 +2,7 @@ package org.opencron.agent.test;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.opencron.agent.OpencronServer;
-import org.opencron.common.utils.LoggerFactory;
+import org.opencron.common.logging.LoggerFactory;
 import org.slf4j.Logger;
 
 import java.io.*;

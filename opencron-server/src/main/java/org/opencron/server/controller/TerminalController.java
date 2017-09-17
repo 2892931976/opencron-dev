@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 benjobs
+ * Copyright (c) 2015 The Opencron Project
  * <p>
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements. See the NOTICE file
@@ -21,7 +21,7 @@
 
 package org.opencron.server.controller;
 
-import org.opencron.common.utils.CommonUtils;
+import org.opencron.common.util.CommonUtils;
 import org.opencron.server.domain.Terminal;
 import org.opencron.server.domain.User;
 
@@ -48,7 +48,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.opencron.server.service.TerminalService.*;
-import static org.opencron.common.utils.WebUtils.*;
+import static org.opencron.common.util.WebUtils.*;
 
 /**
  * benjobs..
