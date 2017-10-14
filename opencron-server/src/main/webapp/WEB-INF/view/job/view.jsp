@@ -48,7 +48,7 @@
                         $("#id").val(obj.jobId);
                         $("#magentId").val(obj.agentId);
                         $("#jobName").val(unEscapeHtml(obj.jobName));
-                        $("#agent").val(obj.agentName + "   " + obj.ip);
+                        $("#agent").val(obj.agentName + "   " + obj.host);
                         $("#cronExp").val(obj.cronExp);
                         $("#cmd").val(obj.command);
                         if (obj.execType == 1) {

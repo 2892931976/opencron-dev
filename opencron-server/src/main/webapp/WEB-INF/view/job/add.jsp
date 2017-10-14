@@ -62,16 +62,16 @@
                         <c:if test="${empty agent}">
                             <select id="agentId" name="agentId" class="form-control m-b-10 input-sm">
                                 <c:forEach var="d" items="${agents}">
-                                    <option value="${d.agentId}">${d.ip}&nbsp;(${d.name})</option>
+                                    <option value="${d.agentId}">${d.host}&nbsp;(${d.name})</option>
                                 </c:forEach>
                             </select>
                         </c:if>
                         <c:if test="${!empty agent}">
                             <input type="hidden" id="agentId" name="agentId" value="${agent.agentId}">
-                            <input type="text" class="form-control input-sm" value="${agent.name}&nbsp;&nbsp;&nbsp;${agent.ip}" readonly>
+                            <input type="text" class="form-control input-sm" value="${agent.name}&nbsp;&nbsp;&nbsp;${agent.host}" readonly>
                             <font color="red">&nbsp;*只读</font>
                         </c:if>
-                        <span class="tips">&nbsp;&nbsp;要执行此作业的机器名称和IP地址</span>
+                        <span class="tips">&nbsp;&nbsp;要执行此作业的机器名称和Host</span>
                     </div>
                 </div>
                 <br>
@@ -277,7 +277,7 @@
                             <div class="col-md-9">
                                 <select id="agentId1" name="agentId1" class="form-control m-b-10 ">
                                     <c:forEach var="d" items="${agents}">
-                                        <option value="${d.agentId}">${d.ip}&nbsp;(${d.name})</option>
+                                        <option value="${d.agentId}">${d.host}&nbsp;(${d.name})</option>
                                     </c:forEach>
                                 </select>
                             </div>

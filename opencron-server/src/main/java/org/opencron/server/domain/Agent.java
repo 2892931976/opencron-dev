@@ -43,7 +43,7 @@ public class Agent implements Serializable {
     //代理执行器的Id
     private Long proxyAgent;
 
-    private String ip;
+    private String host;
     private Integer port;
     private String name;
     private String password;
@@ -97,12 +97,12 @@ public class Agent implements Serializable {
         this.proxyAgent = proxyAgent;
     }
 
-    public String getIp() {
-        return ip;
+    public String getHost() {
+        return host;
     }
 
-    public void setIp(String ip) {
-        this.ip = ip;
+    public void setHost(String host) {
+        this.host = host;
     }
 
     public Integer getPort() {
@@ -246,7 +246,7 @@ public class Agent implements Serializable {
                 "agentId=" + agentId +
                 ", machineId='" + machineId + '\'' +
                 ", proxyAgent=" + proxyAgent +
-                ", ip='" + ip + '\'' +
+                ", host='" + host + '\'' +
                 ", port=" + port +
                 ", name='" + name + '\'' +
                 ", password='" + password + '\'' +

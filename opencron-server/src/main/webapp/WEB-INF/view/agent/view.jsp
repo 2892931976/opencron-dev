@@ -156,7 +156,7 @@
                             $("#status").val("0");
                         }
                         $("#name").val(obj.name);
-                        $("#ip").val(obj.ip);
+                        $("#host").val(obj.host);
                         $("#port").val(obj.port);
                         if (obj.proxy == 1) {
                             showProxy();
@@ -217,12 +217,12 @@
                 alert("页面异常，请刷新重试!");
                 return false;
             }
-            var ip = $("#ip").val();
-            if (!ip) {
-                alert("请填写机器IP!");
+            var host = $("#host").val();
+            if (!host) {
+                alert("请填写机器Host!");
                 return false;
             }
-            if (!opencron.testIp(ip)) {
+            if (!opencron.testIp(host)) {
                 alert("请填写正确的IP地址!");
                 return false;
             }
@@ -284,7 +284,7 @@
                                     headers:{"csrf":"${csrf}"},
                                     "proxy": proxy,
                                     "proxyId": $("#proxyAgent").val(),
-                                    "ip": ip,
+                                    "host": host,
                                     "port": port,
                                     "password": password
                                 },
@@ -368,7 +368,7 @@
                     if (obj != null) {
                         $("#proxyAgent").empty();
                         for (var i in obj) {
-                            $("#proxyAgent").append('<option value="' + obj[i].agentId + '" id="agent_' + obj[i].agentId + '">' + obj[i].ip + ' (' + obj[i].name + ')</option>');
+                            $("#proxyAgent").append('<option value="' + obj[i].agentId + '" id="agent_' + obj[i].agentId + '">' + obj[i].host + ' (' + obj[i].name + ')</option>');
                         }
                     }
                 }
@@ -522,9 +522,9 @@
 
         function pingCheck() {
 
-            var ip = $("#ip").val();
-            if (!ip) {
-                alert("请填写机器IP!");
+            var host = $("#host").val();
+            if (!host) {
+                alert("请填写机器Host!");
                 return false;
             }
             var proxy = $('input[type="radio"][name="proxy"]:checked').val();
@@ -537,7 +537,7 @@
                 alert("页面异常，请刷新重试！");
                 return false;
             }
-            if (!opencron.testIp(ip)) {
+            if (!opencron.testIp(host)) {
                 alert("请填写正确的IP地址!");
                 return false;
             }
@@ -560,7 +560,7 @@
                 data: {
                     "proxy": proxy,
                     "proxyId": $("#proxyAgent").val(),
-                    "ip": ip,
+                    "host": host,
                     "port": port,
                     "password": password
                 },
@@ -677,16 +677,16 @@
                 </c:choose>
 
                 <c:choose>
-                    <c:when test="${pageBean.orderBy eq 'ip'}">
+                    <c:when test="${pageBean.orderBy eq 'host'}">
                         <c:if test="${pageBean.order eq 'asc'}">
-                            <th  class="sortable sort-numeric sort-asc" style="cursor: pointer" onclick="sortPage('ip')" title="点击排序">ip</th>
+                            <th  class="sortable sort-numeric sort-asc" style="cursor: pointer" onclick="sortPage('host')" title="点击排序">Host</th>
                         </c:if>
                         <c:if test="${pageBean.order eq 'desc'}">
-                            <th  class="sortable sort-numeric sort-desc" style="cursor: pointer" onclick="sortPage('ip')" title="点击排序">ip</th>
+                            <th  class="sortable sort-numeric sort-desc" style="cursor: pointer" onclick="sortPage('host')" title="点击排序">Host</th>
                         </c:if>
                     </c:when>
-                    <c:when test="${pageBean.orderBy ne 'ip'}">
-                        <th  class="sortable sort-numeric" style="cursor: pointer" onclick="sortPage('ip')" title="点击排序">ip</th>
+                    <c:when test="${pageBean.orderBy ne 'host'}">
+                        <th  class="sortable sort-numeric" style="cursor: pointer" onclick="sortPage('host')" title="点击排序">Host</th>
                     </c:when>
                 </c:choose>
                 <c:choose>
@@ -716,7 +716,7 @@
             <c:forEach var="w" items="${pageBean.result}" varStatus="index">
                 <tr>
                     <td id="name_${w.agentId}">${w.name}</td>
-                    <td>${w.ip}</td>
+                    <td>${w.host}</td>
                     <td id="port_${w.agentId}">${w.port}</td>
                     <td>
                         <c:if test="${w.status eq false}">
@@ -781,9 +781,9 @@
                         <input type="hidden" id="id" name="id"><input type="hidden" id="password" name="password"><input
                             type="hidden" id="status" name="status">
                         <div class="form-group" style="margin-bottom: 4px;">
-                            <label for="ip" class="col-lab control-label" title="执行器IP地址只能为点分十进制方式表示">机&nbsp;&nbsp;器&nbsp;&nbsp;IP：</label>
+                            <label for="host" class="col-lab control-label" title="必填项,执行器Host为IP地址,或者可以连接到该Agent的网址">机&nbsp;&nbsp;器&nbsp;&nbsp;Host：</label>
                             <div class="col-md-9">
-                                <input type="text" class="form-control " id="ip" readonly>&nbsp;
+                                <input type="text" class="form-control " id="host" readonly>&nbsp;
                             </div>
                         </div>
 
@@ -814,7 +814,7 @@
                             <div class="col-md-9">
                                 <select id="proxyAgent" name="proxyAgent" class="form-control">
                                     <c:forEach var="d" items="${connAgents}">
-                                        <option value="${d.agentId}" id="agent_${d.agentId}">${d.ip}&nbsp;(${d.name})
+                                        <option value="${d.agentId}" id="agent_${d.agentId}">${d.host}&nbsp;(${d.name})
                                         </option>
                                     </c:forEach>
                                 </select>

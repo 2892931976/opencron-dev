@@ -89,7 +89,7 @@ public class GroupService {
                 Agent agent = new Agent();
                 agent.setAgentId(agentGroup.getAgentId());
                 agent.setName(agentGroup.getAgentName());
-                agent.setIp(agentGroup.getAgentIp());
+                agent.setHost(agentGroup.getAgentHost());
 
                 if (agentGroup.getGroupId()==null) {
                     noGroup.getAgents().add(agent);

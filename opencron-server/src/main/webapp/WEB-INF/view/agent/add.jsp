@@ -47,14 +47,14 @@
                 }
             },
 
-            ip:function () {
-                var _ip = $("#ip").val();
-                if (!_ip) {
-                    opencron.tipError("#ip","请填写机器IP!");
+            host:function () {
+                var _host = $("#host").val();
+                if (!_host) {
+                    opencron.tipError("#host","请填写机器host!");
                     this.status = false;
                 }else{
-                    if (!opencron.testIp(_ip)) {
-                        opencron.tipError("#ip","请填写正确的IP地址!");
+                    if (!opencron.testIp(_host)) {
+                        opencron.tipError("#host","请填写正确的Host地址!");
                         this.status = false;
                     }else{
                         var _this = this;
@@ -63,14 +63,14 @@
                             type: "POST",
                             url: "${contextPath}/agent/checkhost.do",
                             data: {
-                                "ip": _ip
+                                "host": _host
                             }
                         }).done(function (data) {
                             if (!data){
-                                opencron.tipError("#ip","该执行器IP已存在!不能重复添加!");
+                                opencron.tipError("#host","该执行器Host已存在!不能重复添加!");
                                 _this.status = false;
                             }else{
-                                opencron.tipOk("#ip");
+                                opencron.tipOk("#host");
                             }
                         })
                     }
@@ -142,7 +142,7 @@
                 if (_ping == 1) {
                     proxyId = $("#proxyAgent").val();
                 }
-                var _this=this;
+                var _this = this;
                 $.ajax({
                     headers: {"csrf": "${csrf}"},
                     url: "${contextPath}/verify/ping.do",
@@ -151,7 +151,7 @@
                     data: {
                         "proxy": _ping || 0,
                         "proxyId": proxyId,
-                        "ip":$("#ip").val(),
+                        "host":$("#host").val(),
                         "port": $("#port").val(),
                         "password": calcMD5($("#password").val())
                     }
@@ -165,7 +165,7 @@
                             data: {
                                 "proxy": _ping || 0,
                                 "proxyId": proxyId,
-                                "ip":$("#ip").val(),
+                                "host":$("#host").val(),
                                 "port": $("#port").val(),
                                 "password": calcMD5($("#password").val())
                             }
@@ -190,7 +190,7 @@
             verify:function () {
                 validata.init();
                 validata.name();
-                validata.ip();
+                validata.host();
                 validata.password();
                 validata.port();
                 validata.warning();
@@ -254,10 +254,10 @@
                 opencron.tipDefault("#name");
             });
 
-            $("#ip").blur(function () {
-                validata.ip();
+            $("#host").blur(function () {
+                validata.host();
             }).focus(function () {
-                opencron.tipDefault("#ip");
+                opencron.tipDefault("#host");
             });
 
             $("#password").blur(function () {
@@ -346,7 +346,7 @@
                             <div class="col-md-10">
                                 <select id="proxyAgent" name="proxyAgent" class="form-control input-sm">
                                     <c:forEach var="d" items="${connAgents}">
-                                        <option value="${d.agentId}">${d.ip}&nbsp;(${d.name})</option>
+                                        <option value="${d.agentId}">${d.host}&nbsp;(${d.name})</option>
                                     </c:forEach>
                                 </select>
                             </div>
@@ -355,10 +355,10 @@
                     </c:if>
 
                     <div class="form-group">
-                        <label for="ip" class="col-lab control-label wid150"><i class="glyphicon glyphicon-tag"></i>&nbsp;&nbsp;机&nbsp;&nbsp;器&nbsp;&nbsp;IP&nbsp;&nbsp;<b>*</b></label>
+                        <label for="host" class="col-lab control-label wid150"><i class="glyphicon glyphicon-tag"></i>&nbsp;&nbsp;机&nbsp;&nbsp;器&nbsp;&nbsp;host&nbsp;&nbsp;<b>*</b></label>
                         <div class="col-md-10">
-                            <input type="text" class="form-control input-sm" id="ip" name="ip">
-                            <span class="tips" tip="必填项,执行器IP地址只能为点分十进制方式表示,如192.168.0.1">必填项,执行器IP地址只能为点分十进制方式表示,如192.168.0.1</span>
+                            <input type="text" class="form-control input-sm" id="host" name="host">
+                            <span class="tips" tip="必填项,执行器Host为IP地址,或者可以连接到该Agent的网址">必填项,执行器Host为IP地址,或者可以连接到该Agent的网址</span>
                         </div>
                     </div>
                     <br>

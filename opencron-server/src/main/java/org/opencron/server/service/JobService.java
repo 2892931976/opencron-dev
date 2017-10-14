@@ -79,7 +79,7 @@ public class JobService {
      * @return
      */
     public List<JobVo> getJobVo(ExecType execType, CronType cronType) {
-        String sql = "SELECT T.*,D.name AS agentName,D.port,D.ip,D.password FROM T_JOB AS T " +
+        String sql = "SELECT T.*,D.name AS agentName,D.port,D.host,D.password FROM T_JOB AS T " +
                 "LEFT JOIN T_AGENT AS D " +
                 "ON T.agentId = D.agentId " +
                 "WHERE IFNULL(T.flowNum,0)=0 " +
@@ -92,7 +92,7 @@ public class JobService {
     }
 
     public List<JobVo> getJobVoByAgentId(Agent agent, ExecType execType, CronType cronType) {
-        String sql = "SELECT T.*,D.name AS agentName,D.port,D.ip,D.password FROM T_JOB AS T " +
+        String sql = "SELECT T.*,D.name AS agentName,D.port,D.host,D.password FROM T_JOB AS T " +
                 "INNER JOIN T_AGENT D " +
                 "ON T.agentId = D.agentId " +
                 "WHERE IFNULL(T.flowNum,0)=0 " +
@@ -146,7 +146,7 @@ public class JobService {
     }
 
     public PageBean<JobVo> getJobVos(HttpSession session, PageBean pageBean, JobVo job) {
-        String sql = "SELECT T.*,D.name AS agentName,D.port,D.ip,D.password,U.userName AS operateUname " +
+        String sql = "SELECT T.*,D.name AS agentName,D.port,D.host,D.password,U.userName AS operateUname " +
                 "FROM T_JOB AS T " +
                 "LEFT JOIN T_AGENT AS D " +
                 "ON T.agentId = D.agentId " +
@@ -187,7 +187,7 @@ public class JobService {
 
     private List<JobVo> queryChildren(JobVo job) {
         if (job.getJobType().equals(JobType.FLOW.getCode())) {
-            String sql = "SELECT T.*,D.name AS agentName,D.port,D.ip,D.password,U.userName AS operateUname FROM T_JOB AS T " +
+            String sql = "SELECT T.*,D.name AS agentName,D.port,D.host,D.password,U.userName AS operateUname FROM T_JOB AS T " +
                     "LEFT JOIN T_AGENT AS D " +
                     "ON T.agentId = D.agentId " +
                     "LEFT JOIN T_USER AS U " +
@@ -216,7 +216,7 @@ public class JobService {
     }
 
     public JobVo getJobVoById(Long id) {
-        String sql = "SELECT T.*,D.name AS agentName,D.port,D.ip,D.password,U.username AS operateUname " +
+        String sql = "SELECT T.*,D.name AS agentName,D.port,D.host,D.password,U.username AS operateUname " +
                 " FROM T_JOB AS T " +
                 "LEFT JOIN T_AGENT AS D " +
                 "ON T.agentId = D.agentId " +
@@ -239,7 +239,7 @@ public class JobService {
     }
 
     public List<JobVo> getJobByAgentId(Long agentId) {
-        String sql = "SELECT T.*,D.name AS agentName,D.port,D.ip,D.password,U.userName AS operateUname FROM T_JOB AS T " +
+        String sql = "SELECT T.*,D.name AS agentName,D.port,D.host,D.password,U.userName AS operateUname FROM T_JOB AS T " +
                 "LEFT JOIN T_USER AS U " +
                 "ON T.userId = U.userId " +
                 "LEFT JOIN T_AGENT D " +

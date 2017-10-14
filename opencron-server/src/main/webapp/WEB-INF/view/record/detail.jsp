@@ -48,7 +48,7 @@
             </tr>
             <tr>
                 <td><i class="glyphicon glyphicon-hdd"></i>&nbsp;机&nbsp;&nbsp;器&nbsp;&nbsp;IP</td>
-                <td>${record.ip}</td>
+                <td>${record.host}</td>
                 <td><i class="glyphicon glyphicon-play"></i>&nbsp;开始时间</td>
                 <td><fmt:formatDate value="${record.startTime}" pattern="yyyy-MM-dd HH:mm:ss"/></td>
             </tr>

@@ -78,9 +78,9 @@
                 <div class="form-group">
                     <label for="agentId" class="col-lab control-label wid150"><i class="glyphicon glyphicon-leaf"></i>&nbsp;&nbsp;执&nbsp;&nbsp;行&nbsp;&nbsp;器&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
                     <div class="col-md-10">
-                        <input type="text" class="form-control input-sm" value="${job.agentName}&nbsp;&nbsp;&nbsp;${job.ip}" readonly>
+                        <input type="text" class="form-control input-sm" value="${job.agentName}&nbsp;&nbsp;&nbsp;${job.host}" readonly>
                         <font color="red">&nbsp;*只读</font>
-                        <span class="tips">&nbsp;&nbsp;要执行此作业的机器名称和IP地址</span>
+                        <span class="tips">&nbsp;&nbsp;要执行此作业的机器名称和Host</span>
                     </div>
                 </div><br>
 
@@ -290,7 +290,7 @@
                             <div class="col-md-9">
                                 <select id="agentId1" name="agentId1" class="form-control m-b-10 ">
                                     <c:forEach var="d" items="${agents}">
-                                        <option value="${d.agentId}">${d.ip}&nbsp;(${d.name})</option>
+                                        <option value="${d.agentId}">${d.host}&nbsp;(${d.name})</option>
                                     </c:forEach>
                                 </select>
                             </div>

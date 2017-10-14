@@ -49,7 +49,7 @@ public class RecordVo implements Serializable {
     private Long agentId;
     private String agentName;
     private String jobName;
-    private String ip;
+    private String host;
     private User user;
     private Integer redo;
     private Integer runCount;
@@ -219,12 +219,12 @@ public class RecordVo implements Serializable {
         this.jobName = jobName;
     }
 
-    public String getIp() {
-        return ip;
+    public String getHost() {
+        return host;
     }
 
-    public void setIp(String ip) {
-        this.ip = ip;
+    public void setHost(String host) {
+        this.host = host;
     }
 
     public User getUser() {

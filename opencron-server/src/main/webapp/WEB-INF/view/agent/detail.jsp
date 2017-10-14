@@ -38,7 +38,7 @@
 
                 <tr>
                     <td class="item"><i class="glyphicon glyphicon-tag"></i>&nbsp;机&nbsp;器&nbsp;&nbsp;IP：</td>
-                    <td>${agent.ip}</td>
+                    <td>${agent.host}</td>
                 </tr>
                 <tr>
                     <td class="item"><i class="glyphicon glyphicon-question-sign"></i>&nbsp;端&nbsp;口&nbsp;&nbsp;号：</td>

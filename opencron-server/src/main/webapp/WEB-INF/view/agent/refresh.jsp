@@ -12,7 +12,7 @@
 <c:forEach var="w" items="${pageBean.result}" varStatus="index">
     <tr>
         <td id="name_${w.agentId}">${w.name}</td>
-        <td>${w.ip}</td>
+        <td>${w.host}</td>
         <td id="port_${w.agentId}">${w.port}</td>
         <td id="agent_${w.agentId}">
             <c:if test="${w.status eq false}">

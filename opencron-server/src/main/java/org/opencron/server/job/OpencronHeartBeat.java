@@ -53,7 +53,7 @@ public class  OpencronHeartBeat {
 
     public void heartbeat(Agent agent) throws Exception {
 
-        heartbeatAgentMap.put(agent.getIp(), agent);
+        heartbeatAgentMap.put(agent.getHost(), agent);
 
         this.group = new NioEventLoopGroup();
 
@@ -61,7 +61,7 @@ public class  OpencronHeartBeat {
 
         bootstrap.group(group).channel(NioSocketChannel.class).handler(new LoggingHandler(LogLevel.INFO));
 
-        final ConnectionWatchdog watchdog = new ConnectionWatchdog(bootstrap, timer, agent.getPort(), agent.getIp()) {
+        final ConnectionWatchdog watchdog = new ConnectionWatchdog(bootstrap, timer, agent.getPort(), agent.getHost()) {
 
             public ChannelHandler[] handlers() throws IOException {
                 return new ChannelHandler[]{
@@ -89,12 +89,12 @@ public class  OpencronHeartBeat {
                     }
                 });
 
-                future = bootstrap.connect(agent.getIp(), agent.getPort());
+                future = bootstrap.connect(agent.getHost(), agent.getPort());
             }
             future.sync();
         } catch (Throwable t) {
             if (t instanceof ConnectException) {
-                disconnectAction(agent.getIp());
+                disconnectAction(agent.getHost());
             }
             this.group.shutdownGracefully();
         }
@@ -111,7 +111,7 @@ public class  OpencronHeartBeat {
                     // write heartbeat to server
                     Agent agent = getAgent(handlerContext);
                     if (agent!=null) {
-                        Request request = Request.request(agent.getIp(),agent.getPort(), null,agent.getPassword());
+                        Request request = Request.request(agent.getHost(),agent.getPort(), null,agent.getPassword());
                         handlerContext.fireChannelActive().writeAndFlush(request);
                     }
                 }
@@ -131,7 +131,7 @@ public class  OpencronHeartBeat {
             logger.info("[opencron] agent heartbeat Starting..... {}", DateUtils.formatFullDate(new Date()));
             Agent agent = getAgent(handlerContext);
             if (agent!=null) {
-                Request request = Request.request(agent.getIp(),agent.getPort(), null,agent.getPassword());
+                Request request = Request.request(agent.getHost(),agent.getPort(), null,agent.getPassword());
                 handlerContext.fireChannelActive().writeAndFlush(request);
             }
 
@@ -154,7 +154,7 @@ public class  OpencronHeartBeat {
                     agentService.merge(agent);
                 }
             } else {
-                disconnectAction(agent.getIp());
+                disconnectAction(agent.getHost());
                 //链路关闭通...
                 handlerContext.fireChannelInactive();
             }
@@ -219,7 +219,7 @@ public class  OpencronHeartBeat {
                 logger.warn("[opencron] agent channel disconnected");
                 Agent agent = getAgent(handlerContext);
                 if (agent != null) {
-                    disconnectAction(agent.getIp());
+                    disconnectAction(agent.getHost());
                 } else {
                     throw new RuntimeException("[opencron] ChannelHandlerContext can't found agent");
                 }

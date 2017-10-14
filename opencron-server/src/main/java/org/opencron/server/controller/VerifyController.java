@@ -60,10 +60,10 @@ public class VerifyController extends BaseController {
 
     @RequestMapping(value = "ping.do",method= RequestMethod.POST)
     @ResponseBody
-    public boolean validatePing(int proxy, Long proxyId, String ip, Integer port, String password) {
+    public boolean validatePing(int proxy, Long proxyId, String host, Integer port, String password) {
         Agent agent = new Agent();
         agent.setProxy(proxy);
-        agent.setIp(ip);
+        agent.setHost(host);
         agent.setPort(port);
         agent.setPassword(password);
 
@@ -82,17 +82,17 @@ public class VerifyController extends BaseController {
         boolean ping = executeService.ping(agent);
 
         if (!ping) {
-            logger.error(String.format("validate ip:%s,port:%s cannot ping!", agent.getIp(), port));
+            logger.error(String.format("validate host:%s,port:%s cannot ping!", agent.getHost(), port));
         }
         return ping;
     }
 
     @RequestMapping(value = "guid.do",method= RequestMethod.POST)
     @ResponseBody
-    public String getGuid(int proxy, Long proxyId, String ip, Integer port, String password, HttpServletResponse response) {
+    public String getGuid(int proxy, Long proxyId, String host, Integer port, String password, HttpServletResponse response) {
         Agent agent = new Agent();
         agent.setProxy(proxy);
-        agent.setIp(ip);
+        agent.setHost(host);
         agent.setPort(port);
         agent.setPassword(password);
 

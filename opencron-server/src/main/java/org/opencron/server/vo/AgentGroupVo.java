@@ -9,7 +9,7 @@ public class AgentGroupVo {
     private String groupName;
     private Long agentId;
     private String agentName;
-    private String agentIp;
+    private String agentHost;
 
     public Long getGroupId() {
         return groupId;
@@ -43,11 +43,11 @@ public class AgentGroupVo {
         this.agentName = agentName;
     }
 
-    public String getAgentIp() {
-        return agentIp;
+    public String getAgentHost() {
+        return agentHost;
     }
 
-    public void setAgentIp(String agentIp) {
-        this.agentIp = agentIp;
+    public void setAgentHost(String agentHost) {
+        this.agentHost = agentHost;
     }
 }

@@ -176,7 +176,7 @@ public class DashboardController extends BaseController {
          * 直联
          */
         if (agent.getProxy().equals(Opencron.ConnType.CONN.getType())) {
-            final String url = String.format("http://%s:%s", agent.getIp(), PropertyPlaceholder.get("opencorn.monitorPort"));
+            final String url = String.format("http://%s:%s", agent.getHost(), PropertyPlaceholder.get("opencorn.monitorPort"));
             return new HashMap<String,Serializable>(){{
                 put("connType",agent.getProxy());
                 put("data",url);

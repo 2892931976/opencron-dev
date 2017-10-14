@@ -147,12 +147,12 @@ public class AgentController extends BaseController {
         Agent dbAgent = agentService.getAgentByMachineId(agent.getMachineId());
         //agent ip发生改变的情况下，自动重新注册
         if (dbAgent!=null) {
-            dbAgent.setIp(ip);
+            dbAgent.setHost(ip);
             agentService.merge(dbAgent);
             writeJson(response, String.format(format, 200, ip));
         }else {
             //新的机器，需要自动注册.
-            agent.setIp(ip);
+            agent.setHost(ip);
             agent.setName(ip);
             agent.setComment("agent auto registered");
             agent.setWarning(false);

@@ -65,7 +65,7 @@ public class JobVo implements Serializable {
 
     private String operateUname;
 
-    private String ip;
+    private String host;
 
     private Integer port;
 
@@ -100,7 +100,7 @@ public class JobVo implements Serializable {
         this.execType = Opencron.ExecType.BATCH.getStatus();
         this.agent = agent;
         this.agentId = agent.getAgentId();
-        this.ip = agent.getIp();
+        this.host = agent.getHost();
         this.port = agent.getPort();
         this.password = agent.getPassword();
         this.redo = 0;
@@ -283,12 +283,13 @@ public class JobVo implements Serializable {
         this.operateUname = operateUname;
     }
 
-    public String getIp() {
-        return ip;
+
+    public String getHost() {
+        return host;
     }
 
-    public void setIp(String ip) {
-        this.ip = ip;
+    public void setHost(String host) {
+        this.host = host;
     }
 
     public Integer getPort() {

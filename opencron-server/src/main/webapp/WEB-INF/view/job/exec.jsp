@@ -149,7 +149,7 @@
                                 <input type="checkbox" name="agent" value="${w.agentId}" class="each-box">
                             </td>
                             <td width="25%" id="name_${w.agentId}">${w.name}</td>
-                            <td width="25%">${w.ip}</td>
+                            <td width="25%">${w.host}</td>
                             <td width="20%" id="port_${w.agentId}">${w.port}</td>
                             <td width="20%" id="agent_${w.agentId}">
                                 <c:if test="${w.status eq false}">

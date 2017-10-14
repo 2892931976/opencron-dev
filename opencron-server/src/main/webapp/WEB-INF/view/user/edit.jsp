@@ -166,7 +166,7 @@
                         <input type="checkbox" id="checkAllInput">全选<span class="tips">&nbsp;&nbsp;&nbsp;<b>*&nbsp;</b>此管理员可操作的执行器操组</span></br>
                         <div class="form-control m-b-10 input-sm" id="agent-content" style="height: 150px;overflow: hidden;">
                             <c:forEach var="w" items="${agents}" varStatus="index">
-                                <input type="checkbox" name="agentIds" value="${w.agentId}" id="agent_${w.agentId}" class="each-box form-control input-sm">${w.name}&nbsp;&nbsp;${w.ip}<br>
+                                <input type="checkbox" name="agentIds" value="${w.agentId}" id="agent_${w.agentId}" class="each-box form-control input-sm">${w.name}&nbsp;&nbsp;${w.host}<br>
                             </c:forEach>
                         </div>
                     </div>

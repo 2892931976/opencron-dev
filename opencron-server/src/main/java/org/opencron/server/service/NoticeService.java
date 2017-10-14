@@ -103,7 +103,7 @@ public class NoticeService {
 
     private String getMessage(Agent agent, String message) {
         String msgFormat = "[opencron] 机器:%s(%s:%s)%s\n\r\t\t--%s";
-        return String.format(msgFormat, agent.getName(), agent.getIp(), agent.getPort(), message, DateUtils.formatFullDate(new Date()));
+        return String.format(msgFormat, agent.getName(), agent.getHost(), agent.getPort(), message, DateUtils.formatFullDate(new Date()));
     }
 
     public void sendMessage(List<User> users,Long workId, String emailAddress, String mobiles, String content) {

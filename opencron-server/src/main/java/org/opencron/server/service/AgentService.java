@@ -102,7 +102,7 @@ public class AgentService {
             User user = OpencronTools.getUser(session);
             sql += " AND agentId IN (" + user.getAgentIds() + ")";
         }
-        pageBean.verifyOrderBy("name", "name", "ip", "port");
+        pageBean.verifyOrderBy("name", "name", "host", "port");
         sql += " ORDER By " + pageBean.getOrderBy() + " " + pageBean.getOrder();
         queryDao.getPageBySql(pageBean, Agent.class, sql);
         return pageBean;
