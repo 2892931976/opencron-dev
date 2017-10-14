@@ -18,30 +18,17 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.opencron.common.serialization;
 
-package org.opencron.common.exception;
+
+import org.opencron.common.serialization.kryo.KryoSerializer;
+
 /**
- * 参数异常
- * @author wanghuajie
- *
+ * @author benjobs
  */
-public class InvalidException extends BasicException {
+public class SerializerFactory {
 
-	private static final long serialVersionUID = 2513495667924595876L;
-
-	public InvalidException() {
-		super();
-	}
-
-	public InvalidException(String msg) {
-		super(msg);
-	}
-
-	public InvalidException(Throwable nestedThrowable) {
-		super(nestedThrowable);
-	}
-
-	public InvalidException(String msg, Throwable nestedThrowable) {
-		super(msg, nestedThrowable);
-	}
+    public static Serializer getSerializer(){
+        return new KryoSerializer();
+    }
 }

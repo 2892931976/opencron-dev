@@ -17,8 +17,8 @@
 package org.opencron.common.util;
 
 
-import org.opencron.common.logging.InternalLogger;
-import org.opencron.common.logging.InternalLoggerFactory;
+import org.opencron.common.logging.LoggerFactory;
+import org.slf4j.Logger;
 
 import java.security.AccessController;
 import java.security.PrivilegedAction;
@@ -33,7 +33,7 @@ import static org.opencron.common.util.ExceptionUtils.stackTrace;
  */
 public class SystemPropertyUtils {
 
-    private static final InternalLogger logger = InternalLoggerFactory.getInstance(SystemPropertyUtils.class);
+    private static final Logger logger = LoggerFactory.getLogger(SystemPropertyUtils.class);
 
     /**
      * Returns {@code true} if and only if the system property with the specified {@code key}

@@ -18,30 +18,30 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.opencron.common.serialization.jackson;
 
-package org.opencron.common.exception;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.opencron.common.serialization.Serializer;
+
+import java.io.IOException;
+
 /**
- * 参数异常
- * @author wanghuajie
- *
+ * @author benjobs
  */
-public class InvalidException extends BasicException {
+public class JacksonSerializer implements Serializer {
 
-	private static final long serialVersionUID = 2513495667924595876L;
+    private static final String CHARSET = "UTF-8";
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
-	public InvalidException() {
-		super();
-	}
+    @Override
+    public byte[] encode(Object msg) throws IOException {
+        String jsonString = objectMapper.writeValueAsString(msg);
+        return jsonString.getBytes(CHARSET);
+    }
 
-	public InvalidException(String msg) {
-		super(msg);
-	}
-
-	public InvalidException(Throwable nestedThrowable) {
-		super(nestedThrowable);
-	}
-
-	public InvalidException(String msg, Throwable nestedThrowable) {
-		super(msg, nestedThrowable);
-	}
+    @Override
+    public <T> T decode(byte[] buf, Class<T> type) throws IOException {
+        String jsonString =  new String(buf, CHARSET);
+        return objectMapper.readValue(jsonString, type);
+    }
 }

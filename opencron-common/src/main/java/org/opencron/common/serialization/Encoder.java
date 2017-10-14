@@ -18,47 +18,38 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.opencron.common.serialization;
 
-package org.opencron.common.exception;
+import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.handler.codec.MessageToByteEncoder;
 
-import java.io.PrintStream;
-import java.io.PrintWriter;
 
 /**
- * Created by benjobs on 2016/10/10.
+ * @author benjobs
  */
-public class PingException extends BasicException {
+public final class Encoder<T> extends MessageToByteEncoder {
+    private final byte type = 0X00;
+    private final byte flag = 0X0F;
 
-    private static final long serialVersionUID = 2030063376333004234L;
+    private Serializer serializer = SerializerFactory.getSerializer();
+    private Class<T> clazz;
 
-    public PingException() {
-        super();
-    }
-
-    public PingException(String msg) {
-        super(msg);
-    }
-
-    public PingException(Throwable nestedThrowable) {
-        super(nestedThrowable);
-    }
-
-    public PingException(String msg, Throwable nestedThrowable) {
-        super(msg, nestedThrowable);
+    public Encoder(Class<T> clazz) {
+        this.clazz = clazz;
     }
 
     @Override
-    public void printStackTrace() {
-        super.printStackTrace();
-    }
+    protected void encode(ChannelHandlerContext ctx, Object msg, ByteBuf out) throws Exception {
+        try {
+            out.writeByte(type);
+            out.writeByte(flag);
+            byte[] data = serializer.encode(msg);
+            out.writeInt(data.length);
+            out.writeBytes(data);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
-    @Override
-    public void printStackTrace(PrintStream ps) {
-        super.printStackTrace(ps);
-    }
-
-    @Override
-    public void printStackTrace(PrintWriter pw) {
-        super.printStackTrace(pw);
     }
 }

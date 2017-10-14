@@ -4,23 +4,26 @@ import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
-import io.netty.handler.codec.LengthFieldPrepender;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;
 import io.netty.handler.timeout.IdleStateHandler;
 import io.netty.util.*;
+import org.opencron.common.job.Action;
+import org.opencron.common.job.Request;
 import org.opencron.common.job.Response;
-import org.opencron.common.logging.InternalLogger;
-import org.opencron.common.logging.InternalLoggerFactory;
+import org.opencron.common.serialization.Decoder;
+import org.opencron.common.serialization.Encoder;
 import org.opencron.common.util.DateUtils;
 import org.opencron.server.domain.Agent;
 import org.opencron.server.service.AgentService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.net.ConnectException;
 import java.net.SocketAddress;
 import java.util.Date;
@@ -29,9 +32,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 @Component
-public class OpencronHeartBeat {
+public class  OpencronHeartBeat {
 
-    private static final InternalLogger logger = InternalLoggerFactory.getInstance(OpencronHeartBeat.class);
+    private static final Logger logger = LoggerFactory.getLogger(OpencronHeartBeat.class);
 
     protected final HashedWheelTimer timer = new HashedWheelTimer();
 
@@ -60,15 +63,15 @@ public class OpencronHeartBeat {
 
         final ConnectionWatchdog watchdog = new ConnectionWatchdog(bootstrap, timer, agent.getPort(), agent.getIp()) {
 
-            public ChannelHandler[] handlers() {
+            public ChannelHandler[] handlers() throws IOException {
                 return new ChannelHandler[]{
-                        new LengthFieldBasedFrameDecoder(1<<20, 0, 4, 0, 4),
-                        new LengthFieldPrepender(4),
+                        //new LengthFieldBasedFrameDecoder(1<<20, 0, 4, 0, 4),
+                        //new LengthFieldPrepender(4),
                         this,
                         new IdleStateHandler(0, 4, 0, TimeUnit.SECONDS),
                         idleStateTrigger,
-                        //new Decoder(Response.class),
-                        //new Encoder(Request.class),
+                        new Decoder<Response>(Response.class, 1024 * 1024, 2, 4),
+                        new Encoder<Request>(Request.class),
                         new HeartBeatHandler()
                 };
             }
@@ -106,7 +109,11 @@ public class OpencronHeartBeat {
                 IdleState state = ((IdleStateEvent) evt).state();
                 if (state == IdleState.WRITER_IDLE) {
                     // write heartbeat to server
-                    handlerContext.writeAndFlush(getAgentFromHandlerContext(handlerContext).getPasswordByteBuf());
+                    Agent agent = getAgent(handlerContext);
+                    if (agent!=null) {
+                        Request request = Request.request(agent.getIp(),agent.getPort(), null,agent.getPassword());
+                        handlerContext.fireChannelActive().writeAndFlush(request);
+                    }
                 }
             } else {
                 super.userEventTriggered(handlerContext, evt);
@@ -122,7 +129,12 @@ public class OpencronHeartBeat {
         @Override
         public void channelActive(ChannelHandlerContext handlerContext) throws Exception {
             logger.info("[opencron] agent heartbeat Starting..... {}", DateUtils.formatFullDate(new Date()));
-            handlerContext.fireChannelActive().writeAndFlush(getAgentFromHandlerContext(handlerContext).getPasswordByteBuf());
+            Agent agent = getAgent(handlerContext);
+            if (agent!=null) {
+                Request request = Request.request(agent.getIp(),agent.getPort(), null,agent.getPassword());
+                handlerContext.fireChannelActive().writeAndFlush(request);
+            }
+
         }
 
         @Override
@@ -132,7 +144,7 @@ public class OpencronHeartBeat {
 
         @Override
         protected void channelRead0(ChannelHandlerContext handlerContext, Response response) throws Exception {
-            Agent agent = getAgentFromHandlerContext(handlerContext);
+            Agent agent = getAgent(handlerContext);
             if (agent == null) {
                 throw new RuntimeException("[opencron] ChannelHandlerContext can't found agent");
             }
@@ -159,7 +171,7 @@ public class OpencronHeartBeat {
 
     interface ChannelHandlerHolder {
 
-        ChannelHandler[] handlers();
+        ChannelHandler[] handlers() throws IOException;
 
     }
 
@@ -205,7 +217,7 @@ public class OpencronHeartBeat {
                  * Agent机器失连,进行10次的连接重试,如果都是连接失败，则认为Agent已经失联,发送通知,关闭Agent链路...
                  */
                 logger.warn("[opencron] agent channel disconnected");
-                Agent agent = getAgentFromHandlerContext(handlerContext);
+                Agent agent = getAgent(handlerContext);
                 if (agent != null) {
                     disconnectAction(agent.getIp());
                 } else {
@@ -246,7 +258,7 @@ public class OpencronHeartBeat {
         }
     }
 
-    private Agent getAgentFromHandlerContext(ChannelHandlerContext handlerContext) {
+    private Agent getAgent(ChannelHandlerContext handlerContext) {
         SocketAddress socketAddress = handlerContext.channel().remoteAddress();
         String host = socketAddress.toString().replaceAll("^/|:\\d+$", "");
         return heartbeatAgentMap.get(host);
@@ -258,7 +270,6 @@ public class OpencronHeartBeat {
         if (agent.getStatus()) {
             agentService.doDisconnect(agent);
         }
-
     }
 
 }

@@ -12,7 +12,7 @@
     <dependencies>
         <dependency>
             <groupId>org.opencron</groupId>
-            <artifactId>opencron-transport</artifactId>
+            <artifactId>opencron-common</artifactId>
             <exclusions>
                 <!-- Spring -->
                 <exclusion>

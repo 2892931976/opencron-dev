@@ -16,8 +16,9 @@
 
 package org.opencron.common.util.internal;
 
-import org.opencron.common.logging.InternalLogger;
-import org.opencron.common.logging.InternalLoggerFactory;
+import org.opencron.common.logging.LoggerFactory;
+import org.opencron.common.util.SystemPropertyUtils;
+import org.slf4j.Logger;
 
 import java.lang.reflect.Field;
 import java.security.AccessController;
@@ -31,7 +32,8 @@ import static org.opencron.common.util.ExceptionUtils.stackTrace;
  */
 public final class Unsafe {
 
-    private static final InternalLogger logger = InternalLoggerFactory.getInstance(Unsafe.class);
+    private static final Logger logger = LoggerFactory.getLogger(SystemPropertyUtils.class);
+
 
     private static final sun.misc.Unsafe UNSAFE;
 

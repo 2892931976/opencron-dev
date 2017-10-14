@@ -18,30 +18,29 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.opencron.common.serialization.msgpack;
 
-package org.opencron.common.exception;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.msgpack.jackson.dataformat.MessagePackFactory;
+import org.opencron.common.serialization.Serializer;
+
+import java.io.IOException;
+
 /**
- * 参数异常
- * @author wanghuajie
- *
+ * @author benjobs
+ * msgpack-java: https://github.com/msgpack/msgpack-java
  */
-public class InvalidException extends BasicException {
+public class MessagePackSerializer implements Serializer {
 
-	private static final long serialVersionUID = 2513495667924595876L;
+    private final ObjectMapper objectMapper = new ObjectMapper(new MessagePackFactory());;
 
-	public InvalidException() {
-		super();
-	}
+    @Override
+    public byte[] encode(Object msg) throws IOException {
+        return objectMapper.writeValueAsBytes(msg);
+    }
 
-	public InvalidException(String msg) {
-		super(msg);
-	}
-
-	public InvalidException(Throwable nestedThrowable) {
-		super(nestedThrowable);
-	}
-
-	public InvalidException(String msg, Throwable nestedThrowable) {
-		super(msg, nestedThrowable);
-	}
+    @Override
+    public <T> T decode(byte[] buf, Class<T> type) throws IOException {
+        return objectMapper.readValue(buf, type);
+    }
 }

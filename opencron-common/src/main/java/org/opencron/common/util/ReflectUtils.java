@@ -330,39 +330,6 @@ public final class ReflectUtils {
     }
 
     /**
-     * Find an array of parameter {@link Type}s that matches the given compatible parameters.
-     */
-    public static <Ext> Pair<Class<?>[], Ext> findMatchingParameterTypesExt(List<Pair<Class<?>[], Ext>> pairs, Object[] args) {
-        if (pairs.size() == 1) {
-            return pairs.get(0);
-        }
-
-        // 获取参数类型
-        Class<?>[] parameterTypes;
-        if (args == null || args.length == 0) {
-            parameterTypes = new Class[0];
-        } else {
-            parameterTypes = new Class[args.length];
-            for (int i = 0; i < args.length; i++) {
-                parameterTypes[i] = args[i].getClass();
-            }
-        }
-
-        Pair<Class<?>[], Ext> bestMatch = null;
-        for (Pair<Class<?>[], Ext> pair : pairs) {
-            Class<?>[] pTypes = pair.getFirst();
-            if (isAssignable(parameterTypes, pTypes, true)) {
-                if (bestMatch == null
-                        || compareParameterTypes(pTypes, bestMatch.getFirst(), parameterTypes) < 0) {
-                    bestMatch = pair;
-                }
-            }
-        }
-
-        return bestMatch;
-    }
-
-    /**
      * Checks if an array of {@link Class}es can be assigned to another array of {@link Class}es.
      */
     public static boolean isAssignable(Class<?>[] classArray, Class<?>[] toClassArray, final boolean autoboxing) {

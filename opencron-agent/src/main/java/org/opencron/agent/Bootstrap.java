@@ -45,7 +45,7 @@ public class Bootstrap implements Serializable {
     private static final long serialVersionUID = 20150614L;
 
 
-    private static Logger logger = LoggerFactory.getLogger(Bootstrap.class);
+    private static Logger logger = LoggerFactory.getLogger(AgentMonitor.class);
 
     /**
      * thrift server

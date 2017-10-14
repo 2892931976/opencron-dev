@@ -17,13 +17,12 @@
 package org.opencron.common.util;
 
 
-import org.opencron.common.logging.InternalLogger;
-import org.opencron.common.logging.InternalLoggerFactory;
-
+import org.opencron.common.logging.LoggerFactory;
+import org.slf4j.Logger;
 
 public class ClassUtils {
 
-    private static final InternalLogger logger = InternalLoggerFactory.getInstance(ClassUtils.class);
+    private static final Logger logger = LoggerFactory.getLogger(SystemPropertyUtils.class);
 
     /**
      * 提前加载并初始化指定的类, 某些平台下某些类的静态块里面的代码执行实在是太慢了:(

@@ -19,29 +19,16 @@
  * under the License.
  */
 
-package org.opencron.common.exception;
+package org.opencron.common.serialization;
+
+import java.io.IOException;
+
 /**
- * 参数异常
- * @author wanghuajie
- *
+ * @author benjobs
  */
-public class InvalidException extends BasicException {
+public interface Serializer {
 
-	private static final long serialVersionUID = 2513495667924595876L;
+    byte[] encode(Object msg) throws IOException;
 
-	public InvalidException() {
-		super();
-	}
-
-	public InvalidException(String msg) {
-		super(msg);
-	}
-
-	public InvalidException(Throwable nestedThrowable) {
-		super(nestedThrowable);
-	}
-
-	public InvalidException(String msg, Throwable nestedThrowable) {
-		super(msg, nestedThrowable);
-	}
+    <T> T decode(byte[] buf, Class<T> type) throws IOException;
 }

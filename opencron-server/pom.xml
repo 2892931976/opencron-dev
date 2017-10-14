@@ -17,11 +17,6 @@
         </dependency>
 
         <dependency>
-            <groupId>org.opencron</groupId>
-            <artifactId>opencron-transport</artifactId>
-        </dependency>
-
-        <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-websocket</artifactId>
         </dependency>

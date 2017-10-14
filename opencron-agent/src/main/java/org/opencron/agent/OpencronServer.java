@@ -10,7 +10,11 @@ import io.netty.handler.codec.LengthFieldPrepender;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.timeout.IdleStateHandler;
+import org.opencron.common.job.Request;
+import org.opencron.common.job.Response;
 import org.opencron.common.logging.LoggerFactory;
+import org.opencron.common.serialization.Decoder;
+import org.opencron.common.serialization.Encoder;
 import org.slf4j.Logger;
 
 import java.net.InetSocketAddress;
@@ -51,20 +55,15 @@ public class OpencronServer {
         });
 
         this.bootstrap.group(bossGroup, workerGroup)
-                .channel(NioServerSocketChannel.class)
-                .handler(new LoggingHandler(LogLevel.INFO))
+                .channel(NioServerSocketChannel.class).handler(new LoggingHandler(LogLevel.INFO))
                 .localAddress(new InetSocketAddress(port)).childHandler(new ChannelInitializer<SocketChannel>() {
-                    protected void initChannel(SocketChannel channel) throws Exception {
-                        channel.pipeline().addLast(
-                                new LengthFieldBasedFrameDecoder(1<<20, 0, 4, 0, 4),
-                                new LengthFieldPrepender(4),
-                                new IdleStateHandler(5, 0, 0, TimeUnit.SECONDS),
-                                new AgentIdleHandler.AcceptorIdleStateTrigger(),
-                                //new Decoder(Request.class), //
-                                //new Encoder(Response.class), //
-                                new AgentIdleHandler(password)
-                                //new AgentHandler(pool)
-                        );
+                    protected void initChannel(SocketChannel ch) throws Exception {
+                        ch.pipeline().addLast(new IdleStateHandler(5, 0, 0, TimeUnit.SECONDS));
+                        ch.pipeline().addLast(new AgentIdleHandler.AcceptorIdleStateTrigger());
+                        ch.pipeline().addLast(new Decoder(Request.class,1<<20, 2, 4));
+                        ch.pipeline().addLast(new Encoder(Response.class));
+                        ch.pipeline().addLast(new AgentIdleHandler(password));
+                        //ch.pipeline().addLast(new AgentHandler(pool));
                     }
                 }).option(ChannelOption.SO_BACKLOG, 128).childOption(ChannelOption.SO_KEEPALIVE, true);
 
@@ -75,16 +74,16 @@ public class OpencronServer {
                 @Override
                 public void operationComplete(ChannelFuture f) throws Exception {
                     if(f.isSuccess()){
-                        logger.info("Rpc Server start at address:{} success", port);
+                        logger.info("Rpc Server start at address:{} success",port);
                     } else {
-                        logger.error("Rpc Server start at address:{} failure", port);
+                        logger.error("Rpc Server start at address:{} failure",port);
                     }
                 }
             });
             System.out.println("Rpc Server start..."+port);
 
         } catch (InterruptedException e) {
-            throw new RuntimeException("bind server error", e);
+            throw new RuntimeException("bind server error",e);
         }
     }
 
@@ -96,5 +95,8 @@ public class OpencronServer {
     }
 
 }
+
+
+
 
 

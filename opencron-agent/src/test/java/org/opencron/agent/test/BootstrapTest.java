@@ -3,6 +3,7 @@ package org.opencron.agent.test;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.opencron.agent.OpencronServer;
 import org.opencron.common.logging.LoggerFactory;
+import org.opencron.common.util.SystemPropertyUtils;
 import org.slf4j.Logger;
 
 import java.io.*;
@@ -12,11 +13,9 @@ import java.lang.reflect.InvocationTargetException;
 
 public class BootstrapTest implements Serializable {
 
-
     private static final long serialVersionUID = 20150614L;
 
-
-    private static Logger logger = LoggerFactory.getLogger(org.opencron.agent.Bootstrap.class);
+    private static final Logger logger = LoggerFactory.getLogger(SystemPropertyUtils.class);
 
     /**
      * thrift server
