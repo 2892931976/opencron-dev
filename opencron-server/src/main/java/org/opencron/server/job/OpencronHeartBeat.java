@@ -117,7 +117,7 @@ public class OpencronHeartBeat {
             future.sync();
         } catch (Throwable t) {
             if (t instanceof ConnectException) {
-                disconnectAction(agent);
+                disconnectAgent(agent);
             }
             this.group.shutdownGracefully();
         }
@@ -179,7 +179,7 @@ public class OpencronHeartBeat {
                     agentService.merge(agent);
                 }
             } else {
-                disconnectAction(agent);
+                disconnectAgent(agent);
                 //链路关闭通...
                 handlerContext.fireChannelInactive();
             }
@@ -244,7 +244,7 @@ public class OpencronHeartBeat {
                 logger.warn("[opencron] agent channel disconnected");
                 Agent agent = getAgent(handlerContext);
                 if (agent != null) {
-                    disconnectAction(agent);
+                    disconnectAgent(agent);
                 } else {
                     throw new RuntimeException("[opencron] ChannelHandlerContext can't found agent");
                 }
@@ -291,7 +291,7 @@ public class OpencronHeartBeat {
         return this.heartbeatAgentMap.get(host);
     }
 
-    private void disconnectAction(Agent agent) {
+    private void disconnectAgent(Agent agent) {
         if (agent.getStatus()) {
             agentService.doDisconnect(agent);
         }
