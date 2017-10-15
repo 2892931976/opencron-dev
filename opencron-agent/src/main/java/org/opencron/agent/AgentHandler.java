@@ -49,32 +49,28 @@ public class AgentHandler extends SimpleChannelInboundHandler<Request> {
 
     private Logger logger = LoggerFactory.getLogger(AgentHandler.class);
 
-    private String password;
-
     private final String REPLACE_REX = "%s:\\sline\\s[0-9]+:";
 
     private String EXITCODE_KEY = "exitCode";
 
     private String EXITCODE_SCRIPT = String.format("\n\necho %s:$?", EXITCODE_KEY);
 
-    private AgentMonitor agentMonitor;
-
     private ThreadPoolExecutor pool;
 
-    public AgentHandler(ThreadPoolExecutor pool){
+    private AgentMonitor agentMonitor;
+
+    private String password;
+
+    public AgentHandler(ThreadPoolExecutor pool,AgentMonitor agentMonitor){
         this.pool = pool;
+        this.agentMonitor = agentMonitor;
+        this.password = SystemPropertyUtils.get("opencron.password","opencron");
     }
 
     @Override
     public void channelActive(ChannelHandlerContext handlerContext) {
         logger.info("[opencron] agent channelActive Active...");
         handlerContext.fireChannelActive();
-
-        if (this.agentMonitor == null) {
-            //start monitor...
-            this.agentMonitor = new AgentMonitor();
-            this.agentMonitor.start();
-        }
     }
 
     @Override
@@ -96,7 +92,6 @@ public class AgentHandler extends SimpleChannelInboundHandler<Request> {
                             .end();
 
                     handlerContext.writeAndFlush(response);
-                    handlerContext.close();
                     return;
                 }
 
@@ -157,9 +152,6 @@ public class AgentHandler extends SimpleChannelInboundHandler<Request> {
 
     //@Override
     public Response ping(Request request) {
-        if (!this.password.equalsIgnoreCase(request.getPassword())) {
-            return errorPasswordResponse(request);
-        }
         return Response.response(request).setSuccess(true).setExitCode(Opencron.StatusCode.SUCCESS_EXIT.getValue()).end();
     }
 
@@ -189,11 +181,6 @@ public class AgentHandler extends SimpleChannelInboundHandler<Request> {
 
     //@Override
     public Response execute(final Request request) {
-
-        if (!this.password.equalsIgnoreCase(request.getPassword())) {
-            return errorPasswordResponse(request);
-        }
-
         String command = request.getParams().get("command");
 
         String pid = request.getParams().get("pid");
@@ -348,9 +335,6 @@ public class AgentHandler extends SimpleChannelInboundHandler<Request> {
 
    // @Override
     public Response password(Request request) {
-        if (!this.password.equalsIgnoreCase(request.getPassword())) {
-            return errorPasswordResponse(request);
-        }
 
         String newPassword = request.getParams().get("newPassword");
         Response response = Response.response(request);
@@ -358,20 +342,15 @@ public class AgentHandler extends SimpleChannelInboundHandler<Request> {
         if (isEmpty(newPassword)) {
             return response.setSuccess(false).setExitCode(Opencron.StatusCode.SUCCESS_EXIT.getValue()).setMessage("密码不能为空").end();
         }
+
         this.password = newPassword.toLowerCase().trim();
-
-        IOUtils.writeText(Configuration.OPENCRON_PASSWORD_FILE, this.password, "UTF-8");
-
+        SystemPropertyUtils.setProperty("opencron.password",password);
+        IOUtils.writeText(Configuration.OPENCRON_PASSWORD_FILE, password, "UTF-8");
         return response.setSuccess(true).setExitCode(Opencron.StatusCode.SUCCESS_EXIT.getValue()).end();
     }
 
    // @Override
     public Response kill(Request request) {
-
-        if (!this.password.equalsIgnoreCase(request.getPassword())) {
-            return errorPasswordResponse(request);
-        }
-
         String pid = request.getParams().get("pid");
         logger.info("[opencron]:kill pid:{}", pid);
 
@@ -452,9 +431,6 @@ public class AgentHandler extends SimpleChannelInboundHandler<Request> {
 
    // @Override
     public Response guid(Request request) {
-        if (!this.password.equalsIgnoreCase(request.getPassword())) {
-            return errorPasswordResponse(request);
-        }
         String macId = null;
         try {
             //多个网卡地址,按照字典顺序把他们连接在一块,用-分割.
@@ -485,14 +461,6 @@ public class AgentHandler extends SimpleChannelInboundHandler<Request> {
     //@Override
     public void restart(Request request) {
 
-    }
-
-    private Response errorPasswordResponse(Request request) {
-        return Response.response(request)
-                .setSuccess(false)
-                .setExitCode(Opencron.StatusCode.ERROR_PASSWORD.getValue())
-                .setMessage(Opencron.StatusCode.ERROR_PASSWORD.getDescription())
-                .end();
     }
 
     private Map<String, String> serializableToMap(Object obj) {

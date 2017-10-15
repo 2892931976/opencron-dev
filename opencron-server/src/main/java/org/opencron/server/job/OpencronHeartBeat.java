@@ -88,8 +88,6 @@ public class OpencronHeartBeat {
 
             public ChannelHandler[] handlers() throws IOException {
                 return new ChannelHandler[]{
-                        //new LengthFieldBasedFrameDecoder(1<<20, 0, 4, 0, 4),
-                        //new LengthFieldPrepender(4),
                         this,
                         new IdleStateHandler(0, 4, 0, TimeUnit.SECONDS),
                         idleStateTrigger,

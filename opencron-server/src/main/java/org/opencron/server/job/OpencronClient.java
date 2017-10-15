@@ -30,6 +30,8 @@ import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.handler.codec.LengthFieldPrepender;
 import org.opencron.common.job.Request;
 import org.opencron.common.job.Response;
+import org.opencron.common.serialization.Decoder;
+import org.opencron.common.serialization.Encoder;
 import org.opencron.common.transport.ChannelWrapper;
 import org.opencron.common.transport.InvokeCallback;
 import org.opencron.common.transport.RpcFuture;
@@ -80,10 +82,8 @@ public class OpencronClient {
                     @Override
                     public void initChannel(SocketChannel channel) throws Exception {
                         channel.pipeline().addLast(
-                                new LengthFieldBasedFrameDecoder(1<<20, 0, 4, 0, 4),
-                                new LengthFieldPrepender(4),
-                                //new Decoder(Response.class), //
-                                //new Encoder(Request.class), //
+                                new Decoder<Response>(Response.class, 1024 * 1024, 2, 4),
+                                new Encoder<Request>(Request.class),
                                 new OpencronHandler()
                         );
                     }

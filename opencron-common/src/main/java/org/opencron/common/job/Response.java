@@ -121,8 +121,9 @@ public class Response implements Serializable {
         return id;
     }
 
-    public void setId(Integer id) {
+    public Response setId(Integer id) {
         this.id = id;
+        return this;
     }
 
     public Throwable getThrowable() {
@@ -134,6 +135,6 @@ public class Response implements Serializable {
     }
 
     public static Response response(Request request) {
-        return new Response().setAction(request.getAction()).start();
+        return new Response().setAction(request.getAction()).setId(request.getId()).start();
     }
 }

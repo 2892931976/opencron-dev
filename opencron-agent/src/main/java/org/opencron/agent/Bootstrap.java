@@ -28,6 +28,7 @@ package org.opencron.agent;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.opencron.common.util.IOUtils;
 import org.opencron.common.logging.LoggerFactory;
+import org.opencron.common.util.SystemPropertyUtils;
 import org.slf4j.Logger;
 
 import java.io.*;
@@ -160,12 +161,13 @@ public class Bootstrap implements Serializable {
                 IOUtils.writeText(Configuration.OPENCRON_PASSWORD_FILE, this.password, CHARSET);
             }
         }
+        SystemPropertyUtils.setProperty("opencron.port",this.port+"");
+        SystemPropertyUtils.setProperty("opencron.password",this.password);
     }
 
     private void start() throws Exception {
         try {
-
-            this.server = new OpencronServer(this.port,this.password);
+            this.server = new OpencronServer();
 
             //new thread to start for netty server
             new Thread(new Runnable() {

@@ -29,24 +29,23 @@ import io.netty.handler.timeout.IdleStateEvent;
 import org.opencron.common.job.Request;
 import org.opencron.common.job.Response;
 import org.opencron.common.logging.LoggerFactory;
+import org.opencron.common.util.SystemPropertyUtils;
 import org.slf4j.Logger;
 
 public class AgentIdleHandler extends SimpleChannelInboundHandler<Request> {
 
-    private String password;
 
     private static Logger logger = LoggerFactory.getLogger(Bootstrap.class);
 
-    public AgentIdleHandler(String password) {
-        this.password = password;
-    }
+    public AgentIdleHandler(){}
 
     @Override
     protected void channelRead0(ChannelHandlerContext handlerContext, Request request) throws Exception {
-        if (!this.password.equalsIgnoreCase(request.getPassword())) {
+        String password = SystemPropertyUtils.get("opencron.password","opencron");
+        if (!password.equalsIgnoreCase(request.getPassword())) {
             logger.error("[opencron] heartbeat password error!,with server {}",handlerContext.channel().remoteAddress());
         }
-        Response response = Response.response(request).setSuccess(this.password.equalsIgnoreCase(request.getPassword())).end();
+        Response response = Response.response(request).setSuccess(password.equalsIgnoreCase(request.getPassword())).end();
         handlerContext.writeAndFlush(response);
     }
 

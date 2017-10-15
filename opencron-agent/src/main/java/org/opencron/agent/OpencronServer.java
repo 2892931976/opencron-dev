@@ -26,8 +26,6 @@ import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
-import io.netty.handler.codec.LengthFieldPrepender;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.timeout.IdleStateHandler;
@@ -36,6 +34,7 @@ import org.opencron.common.job.Response;
 import org.opencron.common.logging.LoggerFactory;
 import org.opencron.common.serialization.Decoder;
 import org.opencron.common.serialization.Encoder;
+import org.opencron.common.util.SystemPropertyUtils;
 import org.slf4j.Logger;
 
 import java.net.InetSocketAddress;
@@ -56,16 +55,11 @@ public class OpencronServer {
 
     private ThreadPoolExecutor pool;//业务处理线程池
 
-    private int port;
-
-    private String password;
-
-    public OpencronServer(int port, String password) {
-        this.port = port;
-        this.password = password;
-    }
+    public OpencronServer() {  }
 
     public void start() {
+
+        final int port = SystemPropertyUtils.getInt("opencron.port",1577);
 
         this.pool = new ThreadPoolExecutor(50, 100, 10, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(), new ThreadFactory() {
             private final AtomicInteger idGenerator = new AtomicInteger(0);
@@ -75,16 +69,22 @@ public class OpencronServer {
             }
         });
 
+        final AgentMonitor monitor = new AgentMonitor();
+
+        monitor.start();
+
         this.bootstrap.group(bossGroup, workerGroup)
                 .channel(NioServerSocketChannel.class).handler(new LoggingHandler(LogLevel.INFO))
                 .localAddress(new InetSocketAddress(port)).childHandler(new ChannelInitializer<SocketChannel>() {
-                    protected void initChannel(SocketChannel ch) throws Exception {
-                        ch.pipeline().addLast(new IdleStateHandler(5, 0, 0, TimeUnit.SECONDS));
-                        ch.pipeline().addLast(new AgentIdleHandler.AcceptorIdleStateTrigger());
-                        ch.pipeline().addLast(new Decoder(Request.class,1<<20, 2, 4));
-                        ch.pipeline().addLast(new Encoder(Response.class));
-                        ch.pipeline().addLast(new AgentIdleHandler(password));
-                        //ch.pipeline().addLast(new AgentHandler(pool));
+                    protected void initChannel(SocketChannel channel) throws Exception {
+                        channel.pipeline().addLast(
+                            new IdleStateHandler(5, 0, 0, TimeUnit.SECONDS),
+                            new AgentIdleHandler.AcceptorIdleStateTrigger(),
+                            new Decoder(Request.class,1<<20, 2, 4),
+                            new Encoder(Response.class),
+                            new AgentIdleHandler(),
+                            new AgentHandler(pool,monitor)
+                        );
                     }
                 }).option(ChannelOption.SO_BACKLOG, 128).childOption(ChannelOption.SO_KEEPALIVE, true);
 

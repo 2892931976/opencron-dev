@@ -36,11 +36,11 @@ public final class Configuration {
     /**
      * port
      */
-    public static final String OPENCRON_PORT = SystemPropertyUtils.get("opencron.port");
+    public static final Integer OPENCRON_PORT =  Integer.valueOf(SystemPropertyUtils.get("opencron.port","1577")) ;
     /**
      * password
      */
-    public static final String OPENCRON_PASSWORD = SystemPropertyUtils.get("opencron.password");
+    public static final String OPENCRON_PASSWORD = SystemPropertyUtils.get("opencron.password","opencron");
 
     /**
      * serverurl

@@ -54,51 +54,63 @@ public class AgentMonitor {
 
     private Map<UUID, SocketIOClient> clients = new HashMap<UUID, SocketIOClient>(0);
 
-    public void start(){
+    private SocketIOServer server = null;
 
-        final Integer port = Integer.parseInt(AgentProperties.getProperty("opencorn.monitorPort"));
+    public void start() {
 
-        com.corundumstudio.socketio.Configuration configuration = new com.corundumstudio.socketio.Configuration();
+        if (this.server!=null) {
 
-        configuration.setPort(port);
+            final Integer port = Integer.parseInt(AgentProperties.getProperty("opencorn.monitorPort"));
 
-        SocketIOServer server = new SocketIOServer(configuration);
+            com.corundumstudio.socketio.Configuration configuration = new com.corundumstudio.socketio.Configuration();
 
-        server.addConnectListener(new ConnectListener() {//添加客户端连接监听器
-            @Override
-            public void onConnect(final SocketIOClient client) {
-                UUID sessionId = client.getSessionId();
-                logger.info("[opencron]:monitor connected:SessionId @ {},port @ {}", sessionId, port);
-                clients.put(sessionId, client);
-                /**
-                 * 断开连接或者获取数据错误,不在推送数据...
-                 */
-                while (  clients.get(sessionId) != null  ) {
-                    client.sendEvent("monitor", monitor());
-                    try {
-                        TimeUnit.MICROSECONDS.sleep(1000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
+            configuration.setPort(port);
+
+            this.server = new SocketIOServer(configuration);
+
+            this.server.addConnectListener(new ConnectListener() {//添加客户端连接监听器
+                @Override
+                public void onConnect(final SocketIOClient client) {
+                    UUID sessionId = client.getSessionId();
+                    logger.info("[opencron]:monitor connected:SessionId @ {},port @ {}", sessionId, port);
+                    clients.put(sessionId, client);
+                    /**
+                     * 断开连接或者获取数据错误,不在推送数据...
+                     */
+                    while (  clients.get(sessionId) != null  ) {
+                        client.sendEvent("monitor", monitor());
+                        try {
+                            TimeUnit.MICROSECONDS.sleep(1000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
-            }
-        });
+            });
 
-        server.addDisconnectListener(new DisconnectListener() {
-            @Override
-            public void onDisconnect(SocketIOClient client) {
-                /**
-                 * 一旦客户端断开连接,立即将该连接实例移除...
-                 */
-                clients.remove(client.getSessionId());
-                logger.info("[opencron]:monitor disconnect:SessionId @ {},port @ {} ", client.getSessionId(), port);
-                if (clients.isEmpty()) {
-                    logger.info("[opencron]:monitor client is empty...");
+            this.server.addDisconnectListener(new DisconnectListener() {
+                @Override
+                public void onDisconnect(SocketIOClient client) {
+                    /**
+                     * 一旦客户端断开连接,立即将该连接实例移除...
+                     */
+                    clients.remove(client.getSessionId());
+                    logger.info("[opencron]:monitor disconnect:SessionId @ {},port @ {} ", client.getSessionId(), port);
+                    if (clients.isEmpty()) {
+                        logger.info("[opencron]:monitor client is empty...");
+                    }
                 }
-            }
-        });
+            });
 
-        server.start();
+            this.server.start();
+        }
+    }
+
+    public void stop() {
+        if (this.server!=null) {
+            this.server.stop();
+            this.server = null;
+        }
     }
 
     public Monitor monitor() {

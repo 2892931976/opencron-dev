@@ -48,7 +48,7 @@ public class OpencronCaller {
             request.setRpcType(RpcType.SYNC).setId(new AtomicInteger(0).incrementAndGet());
             OpencronClient client = new OpencronClient();
             client.start();
-            Response response = client.sendSync(request.getAddress(),request, 1000, TimeUnit.MILLISECONDS);
+            Response response = client.sendSync(request.getAddress(),request, 1000 * 5, TimeUnit.MILLISECONDS);
             System.out.println("send request:"+request.getId()+", receive response id:"+response.getId()+",result:"+response.getResult());
             return response;
         } catch (Exception e) {
@@ -63,7 +63,7 @@ public class OpencronCaller {
             request.setRpcType(RpcType.ONE_WAY).setId(new AtomicInteger(0).incrementAndGet());
             OpencronClient client = new OpencronClient();
             client.start();
-            client.sendOneway(request.getAddress(), request, 1000, TimeUnit.MILLISECONDS);
+            client.sendOneway(request.getAddress(), request, Integer.MAX_VALUE, TimeUnit.MILLISECONDS);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -75,7 +75,7 @@ public class OpencronCaller {
             request.setRpcType(RpcType.ASYNC).setId(new AtomicInteger(0).incrementAndGet());
             OpencronClient client = new OpencronClient();
             client.start();
-            client.sendAsync(request.getAddress(),request, 1000, TimeUnit.MILLISECONDS, callback);
+            client.sendAsync(request.getAddress(),request, Integer.MAX_VALUE, TimeUnit.MILLISECONDS, callback);
         } catch (Exception e) {
             e.printStackTrace();
         }
