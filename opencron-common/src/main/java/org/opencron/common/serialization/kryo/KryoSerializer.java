@@ -38,7 +38,6 @@ public class KryoSerializer implements Serializer {
     private static final ThreadLocal<Kryo> THREAD_LOCAL = new ThreadLocal<Kryo>(){
         @Override
         protected Kryo initialValue() {
-
             Kryo kryo = new Kryo();
             kryo.setInstantiatorStrategy(new Kryo.DefaultInstantiatorStrategy(new StdInstantiatorStrategy()));
             return kryo;
