@@ -183,4 +183,9 @@ public abstract class HttpUtils {
         return isa;
     }
 
+    public static String parseHost(final SocketAddress socketAddress) {
+        AssertUtils.notNull(socketAddress);
+        return socketAddress.toString().replaceAll("^/|:\\d+$", "");
+    }
+
 }

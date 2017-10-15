@@ -84,9 +84,8 @@ public class OpencronTask implements InitializingBean {
      * 一分钟扫描一次已经失联的Agent，如果Agent失联后重启会自动连接上...
      * @throws Exception
      */
-    @Scheduled(cron = "0 */1 * * * ?")
+    @Scheduled(cron = "0/5 * * * * ?")
     public void disconnectedAgentHeartbeat() throws Exception {
-        logger.info("[opencron] reExecuteIob running...");
         List<Agent> agents = agentService.getAgentByConnStatus(Opencron.ConnStatus.DISCONNECTED);
         if (CommonUtils.notEmpty(agents)) {
             for (Agent agent:agents) {

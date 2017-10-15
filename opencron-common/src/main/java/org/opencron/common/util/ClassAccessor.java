@@ -19,6 +19,7 @@ package org.opencron.common.util;
 import org.objectweb.asm.*;
 
 import java.lang.ref.WeakReference;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -29,15 +30,16 @@ import java.util.concurrent.ConcurrentMap;
 import static org.objectweb.asm.Opcodes.*;
 
 
-public abstract class FastMethodAccessor {
+public abstract class ClassAccessor {
 
-    private static final ConcurrentMap<Class<?>, FastMethodAccessor> fastAccessorCache = ContainerUtils.newConcurrentMap(true);
+    private static final ConcurrentMap<Class<?>, ClassAccessor> fastAccessorCache = ContainerUtils.newConcurrentMap(true);
 
+    private String[] fields;
     private String[] methodNames;
     private Class<?>[][] parameterTypes_s;
 
     /**
-     * 用ASM生成的类继承 {@link FastMethodAccessor} 并实现这个抽象方法
+     * 用ASM生成的类继承 {@link ClassAccessor} 并实现这个抽象方法
      *
      * 子类 invoke() 以下面的方式规避反射调用:
      *
@@ -69,8 +71,8 @@ public abstract class FastMethodAccessor {
                 "unable to find non-private method: " + methodName + " " + Arrays.toString(parameterTypes));
     }
 
-    public static FastMethodAccessor get(Class<?> type) {
-        FastMethodAccessor accessor = fastAccessorCache.get(type);
+    public static ClassAccessor get(Class<?> type) {
+        ClassAccessor accessor = fastAccessorCache.get(type);
         if (accessor == null) {
             // avoid duplicate class definition
             synchronized (getClassLock(type)) {
@@ -89,7 +91,7 @@ public abstract class FastMethodAccessor {
         return type;
     }
 
-    private static FastMethodAccessor create(Class<?> type) {
+    private static ClassAccessor create(Class<?> type) {
         ArrayList<Method> methods = ContainerUtils.newArrayList();
         boolean isInterface = type.isInterface();
         if (!isInterface) {
@@ -117,7 +119,7 @@ public abstract class FastMethodAccessor {
         String accessorClassName = className + "_FastMethodAccessor";
         String accessorClassNameInternal = accessorClassName.replace('.', '/');
         String classNameInternal = className.replace('.', '/');
-        String superClassNameInternal = FastMethodAccessor.class.getName().replace('.', '/');
+        String superClassNameInternal = ClassAccessor.class.getName().replace('.', '/');
 
         ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_MAXS);
         MethodVisitor mv;
@@ -288,7 +290,7 @@ public abstract class FastMethodAccessor {
         AccessorClassLoader loader = AccessorClassLoader.get(type);
         Class<?> accessorClass = loader.defineClass(accessorClassName, bytes);
         try {
-            FastMethodAccessor accessor = (FastMethodAccessor) accessorClass.newInstance();
+            ClassAccessor accessor = (ClassAccessor) accessorClass.newInstance();
             accessor.methodNames = methodNames;
             accessor.parameterTypes_s = parameterTypes_s;
             return accessor;
