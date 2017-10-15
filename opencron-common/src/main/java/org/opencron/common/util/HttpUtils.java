@@ -177,4 +177,10 @@ public abstract class HttpUtils {
         return port;
     }
 
+    public static InetSocketAddress parseSocketAddress(final String addr) {
+        String[] arr = addr.split(":");
+        InetSocketAddress isa = new InetSocketAddress(arr[0], Integer.parseInt(arr[1]));
+        return isa;
+    }
+
 }

@@ -91,8 +91,8 @@ public class AgentController extends BaseController {
 
     @RequestMapping(value = "checkhost.do",method= RequestMethod.POST)
     @ResponseBody
-    public boolean checkhost(Long id, String ip) {
-        return  !agentService.existshost(id, ip);
+    public boolean checkhost(Long id, String host) {
+        return  !agentService.existshost(id, host);
     }
 
     @RequestMapping("add.htm")
@@ -124,10 +124,10 @@ public class AgentController extends BaseController {
 
     @RequestMapping(value = "autoreg.do",method= RequestMethod.POST)
     public synchronized void autoReg(HttpServletRequest request, HttpServletResponse response, Agent agent, String key) {
-        String ip = getIp(request);
+        String host = getIp(request);
         String format = "{\"status\":%d,\"message\":\"%s\"}";
-        if (ip == null) {
-            writeJson(response, String.format(format,500,"can't get agent'ip"));
+        if (host == null) {
+            writeJson(response, String.format(format,500,"can't get agent'host"));
             return;
         }
 
@@ -145,15 +145,15 @@ public class AgentController extends BaseController {
         }
 
         Agent dbAgent = agentService.getAgentByMachineId(agent.getMachineId());
-        //agent ip发生改变的情况下，自动重新注册
+        //agent host发生改变的情况下，自动重新注册
         if (dbAgent!=null) {
-            dbAgent.setHost(ip);
+            dbAgent.setHost(host);
             agentService.merge(dbAgent);
-            writeJson(response, String.format(format, 200, ip));
+            writeJson(response, String.format(format, 200, host));
         }else {
             //新的机器，需要自动注册.
-            agent.setHost(ip);
-            agent.setName(ip);
+            agent.setHost(host);
+            agent.setName(host);
             agent.setComment("agent auto registered");
             agent.setWarning(false);
             agent.setMobiles(null);
@@ -164,7 +164,7 @@ public class AgentController extends BaseController {
             agent.setDeleted(false);
             agent.setUpdateTime(new Date());
             agentService.merge(agent);
-            writeJson(response, String.format(format,200,ip));
+            writeJson(response, String.format(format,200,host));
         }
     }
 

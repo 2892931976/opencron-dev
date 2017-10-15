@@ -30,10 +30,10 @@ import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.handler.codec.LengthFieldPrepender;
 import org.opencron.common.job.Request;
 import org.opencron.common.job.Response;
-import org.opencron.common.util.NetUtils;
 import org.opencron.common.transport.ChannelWrapper;
 import org.opencron.common.transport.InvokeCallback;
 import org.opencron.common.transport.RpcFuture;
+import org.opencron.common.util.HttpUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -222,7 +222,7 @@ public class OpencronClient {
 
         synchronized (this){
             // 发起异步连接操作
-            ChannelFuture channelFuture = bootstrap.connect(NetUtils.parseSocketAddress(address));
+            ChannelFuture channelFuture = bootstrap.connect(HttpUtils.parseSocketAddress(address));
             cw = new ChannelWrapper(channelFuture);
             this.channelTable.put(address, cw);
         }

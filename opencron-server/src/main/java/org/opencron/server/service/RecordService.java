@@ -49,7 +49,7 @@ public class RecordService {
     public PageBean query(HttpSession session, PageBean<RecordVo> pageBean, RecordVo recordVo, String queryTime, boolean status) {
         String sql = "SELECT R.recordId,R.jobId,R.command,R.success,R.startTime,R.status,R.redoCount,R.jobType,R.groupId," +
                 "CASE WHEN R.status IN (1,3,5,6) THEN R.endTime WHEN R.status IN (0,2,4) THEN NOW() END AS endTime," +
-                "R.execType,T.jobName,T.agentId,D.name AS agentName,D.password,D.ip,T.cronExp,U.userName AS operateUname FROM T_RECORD AS R " +
+                "R.execType,T.jobName,T.agentId,D.name AS agentName,D.password,D.host,T.cronExp,U.userName AS operateUname FROM T_RECORD AS R " +
                 "LEFT JOIN T_JOB AS T " +
                 "ON R.jobId = T.jobId " +
                 "LEFT JOIN T_AGENT AS D " +
@@ -95,7 +95,7 @@ public class RecordService {
     private void queryChildrenAndRedo(PageBean<RecordVo> pageBean) {
         List<RecordVo> parentRecords = pageBean.getResult();
         for (RecordVo parentRecord : parentRecords) {
-            String sql = "SELECT R.recordId,R.jobId,R.jobType,R.startTime,R.endTime,R.execType,R.status,R.redoCount,R.command,R.success,T.jobName,D.name AS agentName,D.password,D.ip,T.cronExp,U.userName AS operateUname FROM T_RECORD AS R " +
+            String sql = "SELECT R.recordId,R.jobId,R.jobType,R.startTime,R.endTime,R.execType,R.status,R.redoCount,R.command,R.success,T.jobName,D.name AS agentName,D.password,D.host,T.cronExp,U.userName AS operateUname FROM T_RECORD AS R " +
                     "INNER JOIN T_JOB AS T " +
                     "ON R.jobId = T.jobId " +
                     "LEFT JOIN T_AGENT AS D " +
@@ -119,7 +119,7 @@ public class RecordService {
                     parentRecord.setSuccess(Opencron.ResultStatus.FAILED.getStatus());
                     parentRecord.setChildRecord(records);
                 }
-                sql = "SELECT R.recordId,R.jobId,R.jobType,R.startTime,R.endTime,R.execType,R.status,R.redoCount,R.command,R.success,R.groupId,T.jobName,T.lastChild,D.name as agentName,D.password,D.ip,T.cronExp,U.userName AS operateUname FROM T_RECORD AS R " +
+                sql = "SELECT R.recordId,R.jobId,R.jobType,R.startTime,R.endTime,R.execType,R.status,R.redoCount,R.command,R.success,R.groupId,T.jobName,T.lastChild,D.name as agentName,D.password,D.host,T.cronExp,U.userName AS operateUname FROM T_RECORD AS R " +
                         "INNER JOIN T_JOB AS T " +
                         "ON R.jobId = T.jobId " +
                         "LEFT JOIN T_AGENT AS D " +
@@ -135,7 +135,7 @@ public class RecordService {
                     parentRecord.setChildJob(childJobs);
                     for (RecordVo childJob : parentRecord.getChildJob()) {
                         if (childJob.getRedoCount() > 0) {
-                            sql = "SELECT R.recordId,R.jobId,R.jobType,R.startTime,R.endTime,R.execType,R.status,R.redoCount,R.command,R.success,R.parentId,T.jobName,D.name AS agentName,D.password,D.ip,T.cronExp,U.userName AS operateUname FROM T_RECORD AS R " +
+                            sql = "SELECT R.recordId,R.jobId,R.jobType,R.startTime,R.endTime,R.execType,R.status,R.redoCount,R.command,R.success,R.parentId,T.jobName,D.name AS agentName,D.password,D.host,T.cronExp,U.userName AS operateUname FROM T_RECORD AS R " +
                                     "INNER JOIN T_JOB AS T " +
                                     "ON R.jobId = T.jobId " +
                                     "LEFT JOIN T_AGENT AS D " +
@@ -169,7 +169,7 @@ public class RecordService {
     public RecordVo getDetailById(Long id) {
         return queryDao.sqlUniqueQuery(
                 RecordVo.class,
-                "SELECT R.recordId,R.jobType,R.jobId,R.startTime,R.endTime,R.execType,R.returnCode,R.message,R.redoCount,R.command,R.success,T.jobName,T.agentId,D.name AS agentName,D.password,D.ip,T.cronExp,T.userId,U.userName AS operateUname FROM T_RECORD AS R " +
+                "SELECT R.recordId,R.jobType,R.jobId,R.startTime,R.endTime,R.execType,R.returnCode,R.message,R.redoCount,R.command,R.success,T.jobName,T.agentId,D.name AS agentName,D.password,D.host,T.cronExp,T.userId,U.userName AS operateUname FROM T_RECORD AS R " +
                         "LEFT JOIN T_JOB AS T " +
                         "ON R.jobId = T.jobId " +
                         "LEFT JOIN T_AGENT AS D " +
@@ -197,7 +197,7 @@ public class RecordService {
      * @return
      */
     public List<Record> getReExecuteRecord() {
-        String sql = "SELECT R.*,D.ip,D.`name` AS agentName,D.password FROM T_RECORD AS R " +
+        String sql = "SELECT R.*,D.host,D.`name` AS agentName,D.password FROM T_RECORD AS R " +
                 "INNER JOIN T_AGENT AS D " +
                 "ON R.agentId = D.agentId " +
                 "WHERE R.success=0 " +

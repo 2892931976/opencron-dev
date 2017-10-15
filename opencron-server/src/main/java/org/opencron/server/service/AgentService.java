@@ -196,7 +196,7 @@ public class AgentService {
     }
 
     public boolean existshost(Long id, String host) {
-        String sql = "SELECT COUNT(1) FROM T_AGENT WHERE deleted=0 AND ip=? ";
+        String sql = "SELECT COUNT(1) FROM T_AGENT WHERE deleted=0 AND host=? ";
         if (notEmpty(id)) {
             sql += " AND agentId != " + id;
         }
@@ -243,7 +243,7 @@ public class AgentService {
     }
 
     public Agent getByHost(String host) {
-        String sql = "SELECT * FROM T_AGENT WHERE deleted=0 AND ip=?";
+        String sql = "SELECT * FROM T_AGENT WHERE deleted=0 AND host=?";
         Agent agent = queryDao.sqlUniqueQuery(Agent.class, sql, host);
         if (agent != null) {
             agent.setUsers(getAgentUsers(agent));

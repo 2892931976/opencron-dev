@@ -68,7 +68,7 @@ public class GroupService {
     }
 
     public List<Group> getGroupforAgent() {
-        String sql = "SELECT T.groupId,G.groupName,A.agentId,A.`name` AS agentName,A.ip AS agentIp " +
+        String sql = "SELECT T.groupId,G.groupName,A.agentId,A.`name` AS agentName,A.host AS agentIp " +
                 " FROM T_AGENT A " +
                 " LEFT JOIN T_AGENT_GROUP AS T " +
                 " ON A.agentId = T.agentId" +

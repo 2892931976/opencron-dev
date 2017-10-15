@@ -126,19 +126,19 @@ public class ExecuteService implements Job {
                 if (job.getRedo() == 0 || job.getRunCount() == 0) {
                     noticeService.notice(job, null);
                 }
-                this.loggerInfo("execute failed:jobName:{} at ip:{},port:{},info:{}", job, record.getMessage());
+                this.loggerInfo("execute failed:jobName:{} at host:{},port:{},info:{}", job, record.getMessage());
                 return false;
             } else {
-                this.loggerInfo("execute successful:jobName:{} at ip:{},port:{}", job, null);
+                this.loggerInfo("execute successful:jobName:{} at host:{},port:{}", job, null);
             }
         } catch (PacketTooBigException e) {
             noticeService.notice(job, PACKETTOOBIG_ERROR);
-            this.loggerError("execute failed:jobName:%s at ip:%s,port:%d,info:%s", job, PACKETTOOBIG_ERROR, e);
+            this.loggerError("execute failed:jobName:%s at host:%s,port:%d,info:%s", job, PACKETTOOBIG_ERROR, e);
         } catch (Exception e) {
             if (job.getRedo() == 0 || job.getRunCount() == 0) {
                 noticeService.notice(job, null);
             }
-            this.loggerError("execute failed:jobName:%s at ip:%s,port:%d,info:%s", job, e.getMessage(), e);
+            this.loggerError("execute failed:jobName:%s at host:%s,port:%d,info:%s", job, e.getMessage(), e);
         }
         return record.getSuccess().equals(ResultStatus.SUCCESSFUL.getStatus());
     }
@@ -254,9 +254,9 @@ public class ExecuteService implements Job {
             return false;
         } catch (Exception e) {
             if (e instanceof PacketTooBigException) {
-                record.setMessage(this.loggerError("execute failed(flow job):jobName:%s at ip:%s,port:%d,info:", job, PACKETTOOBIG_ERROR, e));
+                record.setMessage(this.loggerError("execute failed(flow job):jobName:%s at host:%s,port:%d,info:", job, PACKETTOOBIG_ERROR, e));
             } else {
-                record.setMessage(this.loggerError("execute failed(flow job):jobName:%s at ip:%s,port:%d,info:%s", job, e.getMessage(), e));
+                record.setMessage(this.loggerError("execute failed(flow job):jobName:%s at host:%s,port:%d,info:%s", job, e.getMessage(), e));
             }
             record.setSuccess(ResultStatus.FAILED.getStatus());//程序调用失败
             record.setReturnCode(StatusCode.ERROR_EXEC.getValue());
@@ -371,14 +371,14 @@ public class ExecuteService implements Job {
                 }
                 parentRecord.setStatus(RunStatus.RERUNUNDONE.getStatus());
             }
-            this.loggerInfo("execute successful:jobName:{} at ip:{},port:{}", job, null);
+            this.loggerInfo("execute successful:jobName:{} at host:{},port:{}", job, null);
         } catch (Exception e) {
             if (e instanceof PacketTooBigException) {
                 noticeService.notice(job, PACKETTOOBIG_ERROR);
-                errorExec(record, this.loggerError("execute failed:jobName:%s at ip:%s,port:%d,info:%s", job, PACKETTOOBIG_ERROR, e));
+                errorExec(record, this.loggerError("execute failed:jobName:%s at host:%s,port:%d,info:%s", job, PACKETTOOBIG_ERROR, e));
             }
             noticeService.notice(job, e.getMessage());
-            errorExec(record, this.loggerError("execute failed:jobName:%s at ip:%s,port:%d,info:%s", job, e.getMessage(), e));
+            errorExec(record, this.loggerError("execute failed:jobName:%s at host:%s,port:%d,info:%s", job, e.getMessage(), e));
 
         } finally {
             //如果已经到了任务重跑的截至次数直接更新为已重跑完成
@@ -390,9 +390,9 @@ public class ExecuteService implements Job {
                 recordService.merge(parentRecord);
             } catch (Exception e) {
                 if (e instanceof PacketTooBigException) {
-                    record.setMessage(this.loggerError("execute failed(flow job):jobName:%s at ip:%s,port:%d,info:" + PACKETTOOBIG_ERROR, job, e.getMessage(), e));
+                    record.setMessage(this.loggerError("execute failed(flow job):jobName:%s at host:%s,port:%d,info:" + PACKETTOOBIG_ERROR, job, e.getMessage(), e));
                 } else {
-                    record.setMessage(this.loggerError("execute failed(flow job):jobName:%s at ip:%s,port:%d,info:%s", job, e.getMessage(), e));
+                    record.setMessage(this.loggerError("execute failed(flow job):jobName:%s at host:%s,port:%d,info:%s", job, e.getMessage(), e));
                 }
             }
 
@@ -437,14 +437,14 @@ public class ExecuteService implements Job {
                         cord.setStatus(RunStatus.STOPED.getStatus());
                         cord.setEndTime(new Date());
                         recordService.merge(cord);
-                        loggerInfo("killed successful :jobName:{} at ip:{},port:{},pid:{}", job, cord.getPid());
+                        loggerInfo("killed successful :jobName:{} at host:{},port:{},pid:{}", job, cord.getPid());
                     } catch (Exception e) {
                         if (e instanceof PacketTooBigException) {
                             noticeService.notice(job, PACKETTOOBIG_ERROR);
-                            loggerError("killed error:jobName:%s at ip:%s,port:%d,pid:%s", job, cord.getPid() + " failed info: " + PACKETTOOBIG_ERROR, e);
+                            loggerError("killed error:jobName:%s at host:%s,port:%d,pid:%s", job, cord.getPid() + " failed info: " + PACKETTOOBIG_ERROR, e);
                         }
                         noticeService.notice(job, null);
-                        loggerError("killed error:jobName:%s at ip:%s,port:%d,pid:%s", job, cord.getPid() + " failed info: " + e.getMessage(), e);
+                        loggerError("killed error:jobName:%s at host:%s,port:%d,pid:%s", job, cord.getPid() + " failed info: " + e.getMessage(), e);
 
                         logger.error("[opencron] job rumModel with SAMETIME error:{}", e.getMessage());
 

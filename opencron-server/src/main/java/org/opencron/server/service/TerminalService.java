@@ -159,8 +159,8 @@ public class TerminalService {
         if (!OpencronTools.isPermission(session) && !user.getUserId().equals(term.getUserId())) {
             return "error";
         }
-        queryDao.createSQLQuery("DELETE FROM T_TERMINAL WHERE id=?", term.getId()).executeUpdate();
-        return "true";
+        int count = queryDao.createSQLQuery("DELETE FROM T_TERMINAL WHERE id=?", term.getId()).executeUpdate();
+        return String.valueOf(count>0);
     }
 
     public void login(Terminal terminal) {
