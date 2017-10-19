@@ -31,6 +31,7 @@ import com.alibaba.fastjson.JSON;
 import org.opencron.common.job.Opencron;
 import org.opencron.common.util.CommonUtils;
 import org.opencron.common.util.PropertyPlaceholder;
+import org.opencron.server.job.OpencronHeartBeat;
 import org.opencron.server.job.OpencronTools;
 import org.opencron.server.service.AgentService;
 import org.opencron.server.service.ExecuteService;
@@ -57,6 +58,9 @@ public class AgentController extends BaseController {
 
     @Autowired
     private ExecuteService executeService;
+
+    @Autowired
+    private OpencronHeartBeat opencronHeartBeat;
 
     @RequestMapping("view.htm")
     public String queryAllAgent(HttpSession session, Model model, PageBean pageBean) {
@@ -103,7 +107,7 @@ public class AgentController extends BaseController {
     }
 
     @RequestMapping(value = "add.do",method= RequestMethod.POST)
-    public String add(HttpSession session, Agent agent) {
+    public String add(HttpSession session, Agent agent) throws Exception {
         if (!agent.getWarning()) {
             agent.setMobiles(null);
             agent.setEmailAddress(null);
@@ -119,6 +123,9 @@ public class AgentController extends BaseController {
         agent.setDeleted(false);
         agent.setUpdateTime(new Date());
         agentService.merge(agent);
+
+        opencronHeartBeat.heartbeat(agent);
+
         return "redirect:/agent/view.htm?csrf=" + OpencronTools.getCSRF(session);
     }
 

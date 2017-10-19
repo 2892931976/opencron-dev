@@ -157,6 +157,7 @@
                     }
                 }).done(function (data) {
                     if (data) {
+                        opencron.tipOk("#port");
                         $.ajax({
                             headers: {"csrf": "${csrf}"},
                             url: "${contextPath}/verify/guid.do",
@@ -165,7 +166,7 @@
                             data: {
                                 "proxy": _ping || 0,
                                 "proxyId": proxyId,
-                                "host":$("#host").val(),
+                                "ip":$("#ip").val(),
                                 "port": $("#port").val(),
                                 "password": calcMD5($("#password").val())
                             }
@@ -174,8 +175,6 @@
                             if(callback){
                                 callback();
                             }
-                        }).fail(function () {
-                            opencron.tipOk("#port");
                         });
                     } else {
                         opencron.tipError("#port","通信失败");
