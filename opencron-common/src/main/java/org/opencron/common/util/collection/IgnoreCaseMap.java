@@ -55,7 +55,7 @@ public class IgnoreCaseMap<K, V> extends HashMap<K, V> {
      */
     public IgnoreCaseMap(Map<K, V> map) {
         super(map.size());
-        for (Entry<K, V> entry : map.entrySet()) {
+        for (Map.Entry<K, V> entry : map.entrySet()) {
             put(entry.getKey(), entry.getValue());
         }
     }
