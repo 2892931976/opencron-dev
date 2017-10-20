@@ -43,7 +43,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class OpencronCaller {
 
     //同步调用
-    public Response callSync(Request request){
+    public Response callSync(Request request) {
         try {
             request.setRpcType(RpcType.SYNC).setId(new AtomicInteger(0).incrementAndGet());
             OpencronClient client = new OpencronClient();
@@ -58,7 +58,7 @@ public class OpencronCaller {
     }
 
     //单向调用
-    public void callOneway(Request request){
+    public void callOneway(Request request) {
         try {
             request.setRpcType(RpcType.ONE_WAY).setId(new AtomicInteger(0).incrementAndGet());
             OpencronClient client = new OpencronClient();
@@ -70,7 +70,7 @@ public class OpencronCaller {
     }
 
     //异步调用...
-    public void callAsync(Request request, InvokeCallback callback){
+    public void callAsync(Request request, InvokeCallback callback) {
         try {
             request.setRpcType(RpcType.ASYNC).setId(new AtomicInteger(0).incrementAndGet());
             OpencronClient client = new OpencronClient();
