@@ -20,6 +20,7 @@
  */
 package org.opencron.common.job;
 
+import org.opencron.common.transport.payload.RequestBytes;
 import org.opencron.common.util.CommonUtils;
 
 import java.io.Serializable;
@@ -28,7 +29,8 @@ import java.util.Map;
 
 public class Request implements Serializable {
 
-    private Integer id;
+    private final RequestBytes requestBytes;   // 请求bytes
+
     private RpcType rpcType = RpcType.ASYNC;//默认异步调用
     private String hostName;
     private int port;
@@ -36,6 +38,14 @@ public class Request implements Serializable {
     private Action action;
     private String password;
     private Map<String, String> params;
+
+    public Request() {
+        this(new RequestBytes());
+    }
+
+    public Request(RequestBytes requestBytes) {
+        this.requestBytes = requestBytes;
+    }
 
     public static Request request(String hostName, Integer port, Action action, String password) {
         return new Request().setHostName(hostName).setPort(port).setAction(action).setPassword(password);
@@ -94,15 +104,6 @@ public class Request implements Serializable {
         return this;
     }
 
-    public Integer getId() {
-        return id;
-    }
-
-    public Request setId(Integer id) {
-        this.id = id;
-        return this;
-    }
-
     public RpcType getRpcType() {
         return rpcType;
     }
@@ -110,6 +111,10 @@ public class Request implements Serializable {
     public Request setRpcType(RpcType rpcType) {
         this.rpcType = rpcType;
         return this;
+    }
+
+    public RequestBytes getRequestBytes() {
+        return requestBytes;
     }
 
     public String getAddress() {

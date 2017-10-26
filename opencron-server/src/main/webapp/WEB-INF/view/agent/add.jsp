@@ -23,8 +23,8 @@
                     opencron.tipError("#name","执行器名称不能为空!");
                     this.status = false;
                 }else{
-                    if (_name.length<4 || _name.length>17){
-                        opencron.tipError("#name","执行器名称不能小于4个字符并且不能超过16个字符!");
+                    if (_name.length<4 || _name.length>50){
+                        opencron.tipError("#name","执行器名称不能小于4个字符并且不能超过50个字符!");
                         this.status = false;
                     }else {
                         var _this = this;

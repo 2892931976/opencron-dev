@@ -29,11 +29,16 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.timeout.IdleStateHandler;
+import io.netty.util.HashedWheelTimer;
 import org.opencron.common.job.Request;
 import org.opencron.common.job.Response;
 import org.opencron.common.logging.LoggerFactory;
 import org.opencron.common.serialization.Decoder;
 import org.opencron.common.serialization.Encoder;
+import org.opencron.common.transport.IdleStateChecker;
+import org.opencron.common.transport.ProtocolDecoder;
+import org.opencron.common.transport.ProtocolEncoder;
+import org.opencron.common.util.Constants;
 import org.opencron.common.util.SystemPropertyUtils;
 import org.slf4j.Logger;
 
@@ -52,6 +57,8 @@ public class OpencronServer {
     private EventLoopGroup workerGroup = new NioEventLoopGroup();
     private ServerBootstrap bootstrap = new ServerBootstrap();
     private ChannelFuture channelFuture;
+
+    protected final HashedWheelTimer timer = new HashedWheelTimer();
 
     private ThreadPoolExecutor pool;//业务处理线程池
 
@@ -78,10 +85,10 @@ public class OpencronServer {
                 .localAddress(new InetSocketAddress(port)).childHandler(new ChannelInitializer<SocketChannel>() {
                     protected void initChannel(SocketChannel channel) throws Exception {
                         channel.pipeline().addLast(
-                            new IdleStateHandler(5, 0, 0, TimeUnit.SECONDS),
+                           new IdleStateChecker(timer, 0, Constants.READER_IDLE_TIME_SECONDS, 0),
                             new AgentIdleHandler.AcceptorIdleStateTrigger(),
-                            new Decoder(Request.class,1<<20, 2, 4),
-                            new Encoder(Response.class),
+                            new ProtocolDecoder(),
+                            new ProtocolEncoder(),
                             new AgentIdleHandler(),
                             new AgentHandler(pool,monitor)
                         );

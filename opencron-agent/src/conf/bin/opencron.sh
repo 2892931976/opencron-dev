@@ -461,7 +461,3 @@ case "$1" in
     esac
 
 exit 0;
-
-
-
-${mysql_bin} --socket=${socket} -h${host} -P${port} -u${user} -p${password}

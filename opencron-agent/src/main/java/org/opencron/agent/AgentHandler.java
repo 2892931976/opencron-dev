@@ -23,6 +23,7 @@ package org.opencron.agent;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.SimpleChannelInboundHandler;
 import org.apache.commons.exec.*;
 import org.apache.thrift.TException;
@@ -31,6 +32,7 @@ import org.apache.thrift.transport.TTransport;
 import org.opencron.common.job.*;
 import org.opencron.common.job.RpcType;
 import org.opencron.common.logging.LoggerFactory;
+import org.opencron.common.transport.payload.RequestBytes;
 import org.opencron.common.util.*;
 import org.slf4j.Logger;
 
@@ -45,7 +47,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import static org.opencron.common.util.CommonUtils.*;
 import static org.opencron.common.util.ReflectUtils.isPrototype;
 
-public class AgentHandler extends SimpleChannelInboundHandler<Request> {
+public class AgentHandler extends ChannelInboundHandlerAdapter {
 
     private Logger logger = LoggerFactory.getLogger(AgentHandler.class);
 
@@ -74,68 +76,75 @@ public class AgentHandler extends SimpleChannelInboundHandler<Request> {
     }
 
     @Override
-    protected void channelRead0(final ChannelHandlerContext handlerContext,final Request request) throws Exception {
+    public void channelRead(final ChannelHandlerContext handlerContext,final Object msg) throws Exception {
 
-        this.pool.execute(new Runnable() {
+        if (msg instanceof RequestBytes) {
 
-            @Override
-            public void run() {
+            this.pool.execute(new Runnable() {
 
-                Action action = request.getAction();
+                final  Request request = new Request((RequestBytes) msg);
 
-                //verify password...
-                if (!password.equalsIgnoreCase(request.getPassword())) {
-                    Response response = Response.response(request)
-                            .setSuccess(false)
-                            .setExitCode(Opencron.StatusCode.ERROR_PASSWORD.getValue())
-                            .setMessage(Opencron.StatusCode.ERROR_PASSWORD.getDescription())
-                            .end();
+                @Override
+                public void run() {
 
-                    handlerContext.writeAndFlush(response);
-                    return;
+                    Action action = request.getAction();
+
+                    //verify password...
+                    if (!password.equalsIgnoreCase(request.getPassword())) {
+                        Response response = Response.response(request)
+                                .setSuccess(false)
+                                .setExitCode(Opencron.StatusCode.ERROR_PASSWORD.getValue())
+                                .setMessage(Opencron.StatusCode.ERROR_PASSWORD.getDescription())
+                                .end();
+
+                        handlerContext.writeAndFlush(response);
+                        handlerContext.close();
+                        return;
+                    }
+
+                    Response response = null;
+
+                    switch (action) {
+                        case PING:
+                            response = ping(request);
+                            break;
+                        case EXECUTE:
+                            response = execute(request);
+                            break;
+                        case PASSWORD:
+                            response = password(request);
+                            break;
+                        case KILL:
+                            response = kill(request);
+                            break;
+                        case GUID:
+                            response = guid(request);
+                            break;
+                        case PATH:
+                            response = path(request);
+                            break;
+                        case PROXY:
+                            response = proxy(request);
+                            break;
+                        case MONITOR:
+                            response = monitor(request);
+                            break;
+                        case RESTART:
+                            restart(request);
+                            break;
+                        default:
+                            break;
+                    }
+
+                    if(request.getRpcType()!= RpcType.ONE_WAY){    //非单向调用
+                        handlerContext.writeAndFlush(response);
+                    }
+                    handlerContext.close();
+                    logger.info("[opencron] agent process done,request:{},action:", request.getAction());
                 }
 
-                Response response = null;
-
-                switch (action) {
-                    case PING:
-                        response = ping(request);
-                        break;
-                    case EXECUTE:
-                        response = execute(request);
-                        break;
-                    case PASSWORD:
-                        response = password(request);
-                        break;
-                    case KILL:
-                        response = kill(request);
-                        break;
-                    case GUID:
-                        response = guid(request);
-                        break;
-                    case PATH:
-                        response = path(request);
-                        break;
-                    case PROXY:
-                        response = proxy(request);
-                        break;
-                    case MONITOR:
-                        response = monitor(request);
-                        break;
-                    case RESTART:
-                        restart(request);
-                        break;
-                    default:
-                        break;
-                }
-
-                if(request.getRpcType()!= RpcType.ONE_WAY){    //非单向调用
-                    handlerContext.writeAndFlush(response);
-                }
-                logger.info("[opencron] agent process done,request:{},action:", request.getId(), request.getAction());
-            }
-
-        });
+            });
+        }
     }
 
     @Override

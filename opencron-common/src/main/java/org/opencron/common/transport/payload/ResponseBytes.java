@@ -18,38 +18,30 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.opencron.common.serialization;
-
-import io.netty.buffer.ByteBuf;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.MessageToByteEncoder;
-
+package org.opencron.common.transport.payload;
 
 /**
- * @author benjobs
+ * 响应的消息体bytes载体, 避免在IO线程中序列化/反序列化, jupiter-transport这一层不关注消息体的对象结构.
  */
-public final class Encoder<T> extends MessageToByteEncoder {
-    private final byte type = 0X00;
-    private final byte flag = 0X0F;
+public class ResponseBytes extends BytesHolder {
 
-    private Serializer serializer = SerializerFactory.getSerializer();
-    private Class<T> clazz;
+    // 用于映射 <id, request, response> 三元组
+    private final long id; // request.invokeId
+    private byte status;
 
-    public Encoder(Class<T> clazz) {
-        this.clazz = clazz;
+    public ResponseBytes(long id) {
+        this.id = id;
     }
 
-    @Override
-    protected void encode(ChannelHandlerContext ctx, Object msg, ByteBuf out) throws Exception {
-        try {
-            out.writeByte(type);
-            out.writeByte(flag);
-            byte[] data = serializer.encode(msg);
-            out.writeInt(data.length);
-            out.writeBytes(data);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    public long id() {
+        return id;
+    }
 
+    public byte status() {
+        return status;
+    }
+
+    public void status(byte status) {
+        this.status = status;
     }
 }

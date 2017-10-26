@@ -20,34 +20,20 @@
  */
 package org.opencron.agent;
 
-import io.netty.channel.ChannelHandler;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
-import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.channel.*;
 import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;
-import org.opencron.common.job.Request;
-import org.opencron.common.job.Response;
 import org.opencron.common.logging.LoggerFactory;
-import org.opencron.common.util.SystemPropertyUtils;
+import org.opencron.common.transport.IoSignals;
 import org.slf4j.Logger;
 
-public class AgentIdleHandler extends SimpleChannelInboundHandler<Request> {
+@ChannelHandler.Sharable
+public class AgentIdleHandler extends ChannelInboundHandlerAdapter {
 
 
     private static Logger logger = LoggerFactory.getLogger(Bootstrap.class);
 
     public AgentIdleHandler(){}
-
-    @Override
-    protected void channelRead0(ChannelHandlerContext handlerContext, Request request) throws Exception {
-        String password = SystemPropertyUtils.get("opencron.password","opencron");
-        if (!password.equalsIgnoreCase(request.getPassword())) {
-            logger.error("[opencron] heartbeat password error!,with server {}",handlerContext.channel().remoteAddress());
-        }
-        Response response = Response.response(request).setSuccess(password.equalsIgnoreCase(request.getPassword())).end();
-        handlerContext.writeAndFlush(response);
-    }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext handlerContext, Throwable cause) throws Exception {
@@ -63,14 +49,14 @@ public class AgentIdleHandler extends SimpleChannelInboundHandler<Request> {
     public static class AcceptorIdleStateTrigger extends ChannelInboundHandlerAdapter {
 
         @Override
-        public void userEventTriggered(ChannelHandlerContext handlerContext, Object evt) throws Exception {
+        public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
             if (evt instanceof IdleStateEvent) {
                 IdleState state = ((IdleStateEvent) evt).state();
                 if (state == IdleState.READER_IDLE) {
-                    logger.warn("[opencron] heartbeat READER_IDLE,with server {}",handlerContext.channel().remoteAddress());
+                    throw IoSignals.READER_IDLE;
                 }
             } else {
-                super.userEventTriggered(handlerContext, evt);
+                super.userEventTriggered(ctx, evt);
             }
         }
     }
