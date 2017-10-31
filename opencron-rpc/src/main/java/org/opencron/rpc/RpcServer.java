@@ -54,8 +54,6 @@ public class RpcServer {
 
     protected final HashedWheelTimer timer = new HashedWheelTimer();
 
-    private ThreadPoolExecutor pool;//业务处理线程池
-
     private int prot;
 
     private RpcHandler handler;
@@ -68,15 +66,6 @@ public class RpcServer {
     }
 
     public void start() {
-
-        this.pool = new ThreadPoolExecutor(50, 100, 10, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(), new ThreadFactory() {
-            private final AtomicInteger idGenerator = new AtomicInteger(0);
-            @Override
-            public Thread newThread(Runnable r) {
-                return new Thread(r, "opencron-Agent-" + this.idGenerator.incrementAndGet());
-            }
-        });
-
         this.bootstrap.group(bossGroup, workerGroup)
                 .channel(NioServerSocketChannel.class).handler(new LoggingHandler(LogLevel.INFO))
                 .localAddress(new InetSocketAddress(this.prot)).childHandler(new ChannelInitializer<SocketChannel>() {
@@ -111,7 +100,6 @@ public class RpcServer {
 
     public void stop() {
         logger.info("[opencron] Agent stopping... ");
-        this.pool.shutdown();
         this.bossGroup.shutdownGracefully();
         this.workerGroup.shutdownGracefully();
     }
