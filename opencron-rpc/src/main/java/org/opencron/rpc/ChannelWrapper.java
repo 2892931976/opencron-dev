@@ -18,7 +18,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.opencron.common.transport;
+package org.opencron.rpc;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;

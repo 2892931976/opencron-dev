@@ -24,7 +24,6 @@ package org.opencron.rpc;
 import org.opencron.common.job.Request;
 import org.opencron.common.job.Response;
 import org.opencron.common.job.RpcType;
-import org.opencron.common.transport.InvokeCallback;
 import org.springframework.stereotype.Component;
 
 import java.util.concurrent.atomic.AtomicInteger;

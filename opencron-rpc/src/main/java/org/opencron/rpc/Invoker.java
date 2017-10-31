@@ -23,7 +23,6 @@ package org.opencron.rpc;
 
 import org.opencron.common.job.Request;
 import org.opencron.common.job.Response;
-import org.opencron.common.transport.InvokeCallback;
 
 public interface Invoker {
 
