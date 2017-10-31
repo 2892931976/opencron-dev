@@ -26,7 +26,6 @@
  */
 package org.opencron.common.job;
 
-import org.opencron.common.transport.payload.ResponseBytes;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -36,9 +35,7 @@ public class Response implements Serializable {
     /**
      * @see Action
      */
-
-    private final ResponseBytes responseBytes;   // 请求bytes
-
+    private int id;
     private Action action; // required
     private Map<String, String> result; // required
     private int exitCode; // required
@@ -48,12 +45,8 @@ public class Response implements Serializable {
     private String message; // required
     private Throwable throwable;
 
-    public Response(long id) {
-        responseBytes = new ResponseBytes(id);
-    }
-
-    public Response(ResponseBytes responseBytes) {
-        this.responseBytes = responseBytes;
+    public static Response response(Request request) {
+        return new Response().setAction(request.getAction()).setId(request.getId()).start();
     }
 
     public Action getAction() {
@@ -137,7 +130,12 @@ public class Response implements Serializable {
         this.throwable = throwable;
     }
 
-    public ResponseBytes getResponseBytes() {
-        return responseBytes;
+    public int getId() {
+        return id;
+    }
+
+    public Response setId(int id) {
+        this.id = id;
+        return this;
     }
 }

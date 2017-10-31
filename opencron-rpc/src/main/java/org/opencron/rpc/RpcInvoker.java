@@ -19,7 +19,7 @@
  * under the License.
  */
 
-package org.opencron.server.job;
+package org.opencron.rpc;
 
 import org.opencron.common.job.Request;
 import org.opencron.common.job.Response;
@@ -27,7 +27,6 @@ import org.opencron.common.job.RpcType;
 import org.opencron.common.transport.InvokeCallback;
 import org.springframework.stereotype.Component;
 
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 
@@ -40,15 +39,14 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 
 @Component
-public class OpencronCaller {
+public class RpcInvoker implements Invoker {
 
     //同步调用
     public Response callSync(Request request) {
         try {
             request.setRpcType(RpcType.SYNC).setId(new AtomicInteger(0).incrementAndGet());
-            OpencronClient client = new OpencronClient();
-            client.start();
-            Response response = client.sendSync(request.getAddress(),request, 1000 * 5, TimeUnit.MILLISECONDS);
+            RpcClient rpcClient = new RpcClient();
+            Response response = rpcClient.sendSync(request);
             System.out.println("send request:"+request.getId()+", receive response id:"+response.getId()+",result:"+response.getResult());
             return response;
         } catch (Exception e) {
@@ -61,9 +59,8 @@ public class OpencronCaller {
     public void callOneway(Request request) {
         try {
             request.setRpcType(RpcType.ONE_WAY).setId(new AtomicInteger(0).incrementAndGet());
-            OpencronClient client = new OpencronClient();
-            client.start();
-            client.sendOneway(request.getAddress(), request, Integer.MAX_VALUE, TimeUnit.MILLISECONDS);
+            RpcClient rpcClient = new RpcClient();
+            rpcClient.sendOneway(request);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -73,9 +70,8 @@ public class OpencronCaller {
     public void callAsync(Request request, InvokeCallback callback) {
         try {
             request.setRpcType(RpcType.ASYNC).setId(new AtomicInteger(0).incrementAndGet());
-            OpencronClient client = new OpencronClient();
-            client.start();
-            client.sendAsync(request.getAddress(),request, Integer.MAX_VALUE, TimeUnit.MILLISECONDS, callback);
+            RpcClient rpcClient = new RpcClient();
+            rpcClient.sendAsync(request, callback);
         } catch (Exception e) {
             e.printStackTrace();
         }

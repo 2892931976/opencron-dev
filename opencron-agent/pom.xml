@@ -142,6 +142,10 @@
         </dependency>
 
         <dependency>
+            <groupId>org.opencron</groupId>
+            <artifactId>opencron-rpc</artifactId>
+        </dependency>
+        <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-all</artifactId>
         </dependency>

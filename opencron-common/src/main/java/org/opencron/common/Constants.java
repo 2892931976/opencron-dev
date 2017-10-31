@@ -20,34 +20,66 @@
  */
 package org.opencron.common;
 
+import org.opencron.common.util.SystemPropertyUtils;
+
+import java.io.File;
 import java.util.regex.Pattern;
 
 public class Constants {
 
+    public static final int ZK_SESSION_TIMEOUT = 5000;
 
-    public static final String PROVIDERS_CATEGORY = "providers";
+    public static final int RPC_TIMEOUT = 5000;
 
+    public static final String ZK_REGISTRY_PATH = "/registry";
+    public static final String ZK_DATA_PATH = ZK_REGISTRY_PATH + "/data";
 
-    public static final String DEFAULT_KEY_PREFIX = "default.";
+    public static final Pattern COMMA_SPLIT_PATTERN = Pattern.compile("\\s*[,]+\\s*");
 
-    public static final String BACKUP_KEY = "backup";
+    /**
+     * Name of the system property containing
+     */
+    public static final String OPENCRON_HOME = SystemPropertyUtils.get("opencron.home");
 
-    public static final String ANYHOST_KEY = "anyhost";
+    /**
+     * port
+     */
+    public static final Integer OPENCRON_PORT =  Integer.valueOf(SystemPropertyUtils.get("opencron.port","1577")) ;
+    /**
+     * password
+     */
+    public static final String OPENCRON_PASSWORD = SystemPropertyUtils.get("opencron.password","opencron");
 
-    public static final String ANYHOST_VALUE = "0.0.0.0";
+    /**
+     * serverurl
+     */
+    public static final String OPENCRON_SERVER = SystemPropertyUtils.get("opencron.server");
+    /**
+     * regkey
+     */
+    public static final String OPENCRON_REGKEY = SystemPropertyUtils.get("opencron.regkey");
 
-    public static final String LOCALHOST_KEY = "localhost";
+    /**
+     * pid
+     */
+    public static final File OPENCRON_PID_FILE = new File(SystemPropertyUtils.get("opencron.pid"));
 
-    public static final String GROUP_KEY = "group";
+    /**
+     * password file
+     */
 
-    public static final String PATH_KEY = "path";
+    public static final File OPENCRON_PASSWORD_FILE = new File(OPENCRON_HOME + File.separator + ".password");
 
-    public static final String INTERFACE_KEY = "interface";
+    /**
+     * monitor file
+     */
+    public static final File OPENCRON_MONITOR_SHELL = new File(OPENCRON_HOME + "/bin/monitor.sh");
 
-    public static final String VERSION_KEY = "version";
+    /**
+     * kill file
+     */
+    public static final File OPENCRON_KILL_SHELL = new File(OPENCRON_HOME + "/bin/kill.sh");
 
-    public static final Pattern COMMA_SPLIT_PATTERN = Pattern
-            .compile("\\s*[,]+\\s*");
 
 
 }

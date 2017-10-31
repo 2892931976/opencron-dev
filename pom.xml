@@ -10,10 +10,9 @@
     <version>1.1.0-RELEASE</version>
     <modules>
         <module>opencron-common</module>
-        <module>opencron-config</module>
-        <module>opencron-registry</module>
+       <!-- <module>opencron-config</module>-->
         <module>opencron-rpc</module>
-        <module>opencron-examples</module>
+      <!--  <module>opencron-examples</module>-->
         <module>opencron-agent</module>
         <module>opencron-server</module>
     </modules>
@@ -95,7 +94,7 @@
 
             <dependency>
                 <groupId>org.opencron</groupId>
-                <artifactId>opencron-transport</artifactId>
+                <artifactId>opencron-rpc</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
@@ -193,6 +192,15 @@
                 <artifactId>jsch</artifactId>
                 <version>0.1.54</version>
             </dependency>
+
+
+            <!-- ZooKeeper -->
+            <dependency>
+                <groupId>org.apache.zookeeper</groupId>
+                <artifactId>zookeeper</artifactId>
+                <version>3.4.8</version>
+            </dependency>
+
 
             <!-- Spring begin -->
             <dependency>

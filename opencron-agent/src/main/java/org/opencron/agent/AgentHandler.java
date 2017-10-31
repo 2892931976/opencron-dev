@@ -22,18 +22,15 @@ package org.opencron.agent;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
-import io.netty.channel.SimpleChannelInboundHandler;
 import org.apache.commons.exec.*;
 import org.apache.thrift.TException;
 import org.apache.thrift.transport.TSocket;
 import org.apache.thrift.transport.TTransport;
+import org.opencron.common.Constants;
 import org.opencron.common.job.*;
-import org.opencron.common.job.RpcType;
 import org.opencron.common.logging.LoggerFactory;
-import org.opencron.common.transport.payload.RequestBytes;
 import org.opencron.common.util.*;
+import org.opencron.rpc.Handler;
 import org.slf4j.Logger;
 
 import java.beans.Introspector;
@@ -42,12 +39,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.ThreadPoolExecutor;
 
 import static org.opencron.common.util.CommonUtils.*;
 import static org.opencron.common.util.ReflectUtils.isPrototype;
 
-public class AgentHandler extends ChannelInboundHandlerAdapter {
+public class AgentHandler implements Handler {
 
     private Logger logger = LoggerFactory.getLogger(AgentHandler.class);
 
@@ -57,106 +53,47 @@ public class AgentHandler extends ChannelInboundHandlerAdapter {
 
     private String EXITCODE_SCRIPT = String.format("\n\necho %s:$?", EXITCODE_KEY);
 
-    private ThreadPoolExecutor pool;
-
-    private AgentMonitor agentMonitor;
-
     private String password;
 
-    public AgentHandler(ThreadPoolExecutor pool,AgentMonitor agentMonitor){
-        this.pool = pool;
-        this.agentMonitor = agentMonitor;
+    public AgentHandler() {
         this.password = SystemPropertyUtils.get("opencron.password","opencron");
     }
 
     @Override
-    public void channelActive(ChannelHandlerContext handlerContext) {
-        logger.info("[opencron] agent channelActive Active...");
-        handlerContext.fireChannelActive();
-    }
+    public Response handle(Request request) {
 
-    @Override
-    public void channelRead(final ChannelHandlerContext handlerContext,final Object msg) throws Exception {
-
-        if (msg instanceof RequestBytes) {
-
-            this.pool.execute(new Runnable() {
-
-                final  Request request = new Request((RequestBytes) msg);
-
-                @Override
-                public void run() {
-
-                    Action action = request.getAction();
-
-                    //verify password...
-                    if (!password.equalsIgnoreCase(request.getPassword())) {
-                        Response response = Response.response(request)
-                                .setSuccess(false)
-                                .setExitCode(Opencron.StatusCode.ERROR_PASSWORD.getValue())
-                                .setMessage(Opencron.StatusCode.ERROR_PASSWORD.getDescription())
-                                .end();
-
-                        handlerContext.writeAndFlush(response);
-                        handlerContext.close();
-                        return;
-                    }
-
-                    Response response = null;
-
-                    switch (action) {
-                        case PING:
-                            response = ping(request);
-                            break;
-                        case EXECUTE:
-                            response = execute(request);
-                            break;
-                        case PASSWORD:
-                            response = password(request);
-                            break;
-                        case KILL:
-                            response = kill(request);
-                            break;
-                        case GUID:
-                            response = guid(request);
-                            break;
-                        case PATH:
-                            response = path(request);
-                            break;
-                        case PROXY:
-                            response = proxy(request);
-                            break;
-                        case MONITOR:
-                            response = monitor(request);
-                            break;
-                        case RESTART:
-                            restart(request);
-                            break;
-                        default:
-                            break;
-                    }
-
-                    if(request.getRpcType()!= RpcType.ONE_WAY){    //非单向调用
-                        handlerContext.writeAndFlush(response);
-                    }
-                    handlerContext.close();
-                    logger.info("[opencron] agent process done,request:{},action:", request.getAction());
-                }
-
-            });
+        Action action = request.getAction();
+        //verify password...
+        if (!password.equalsIgnoreCase(request.getPassword())) {
+            return Response.response(request)
+                    .setSuccess(false)
+                    .setExitCode(Opencron.StatusCode.ERROR_PASSWORD.getValue())
+                    .setMessage(Opencron.StatusCode.ERROR_PASSWORD.getDescription())
+                    .end();
         }
-    }
 
-    @Override
-    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        logger.error("[opencron] agent channelInactive");
-        super.channelInactive(ctx);
-    }
-
-    @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        cause.printStackTrace();
-        ctx.close();
+        switch (action) {
+            case PING:
+                return ping(request);
+            case EXECUTE:
+                return execute(request);
+            case PASSWORD:
+                return password(request);
+            case KILL:
+                return kill(request);
+            case GUID:
+                return guid(request);
+            case PATH:
+                return path(request);
+            case PROXY:
+                return proxy(request);
+            case MONITOR:
+                return monitor(request);
+            case RESTART:
+                restart(request);
+                break;
+        }
+        return null;
     }
 
     //@Override
@@ -169,7 +106,7 @@ public class AgentHandler extends ChannelInboundHandlerAdapter {
         //返回密码文件的路径...
         return Response.response(request).setSuccess(true)
                 .setExitCode(Opencron.StatusCode.SUCCESS_EXIT.getValue())
-                .setMessage(Configuration.OPENCRON_HOME)
+                .setMessage(Constants.OPENCRON_HOME)
                 .end();
     }
 
@@ -179,7 +116,7 @@ public class AgentHandler extends ChannelInboundHandlerAdapter {
         Response response = Response.response(request);
         switch (connType) {
             case PROXY:
-                Monitor monitor = agentMonitor.monitor();
+                Monitor monitor = null;//agentMonitor.monitor();
                 Map<String, String> map  = serializableToMap(monitor);
                 response.setResult(map);
                 return response;
@@ -354,7 +291,7 @@ public class AgentHandler extends ChannelInboundHandlerAdapter {
 
         this.password = newPassword.toLowerCase().trim();
         SystemPropertyUtils.setProperty("opencron.password",password);
-        IOUtils.writeText(Configuration.OPENCRON_PASSWORD_FILE, password, "UTF-8");
+        IOUtils.writeText(Constants.OPENCRON_PASSWORD_FILE, password, "UTF-8");
         return response.setSuccess(true).setExitCode(Opencron.StatusCode.SUCCESS_EXIT.getValue()).end();
     }
 
@@ -364,7 +301,7 @@ public class AgentHandler extends ChannelInboundHandlerAdapter {
         logger.info("[opencron]:kill pid:{}", pid);
 
         Response response = Response.response(request);
-        String text = CommandUtils.executeShell(Configuration.OPENCRON_KILL_SHELL, pid, EXITCODE_SCRIPT);
+        String text = CommandUtils.executeShell(Constants.OPENCRON_KILL_SHELL, pid, EXITCODE_SCRIPT);
         String message = "";
         Integer exitVal = 0;
 
@@ -399,7 +336,7 @@ public class AgentHandler extends ChannelInboundHandlerAdapter {
             params = (Map<String, String>) JSON.parse(proxyParams);
         }
 
-        Request proxyReq = Request.request(proxyHost, toInt(proxyPort), Action.findByName(proxyAction), proxyPassword).setParams(params);
+        Request proxyReq = Request.request(proxyHost, toInt(proxyPort), Action.findByName(proxyAction), proxyPassword,request.getTimeOut()).setParams(params);
 
         logger.info("[opencron]proxy params:{}", proxyReq.toString());
 
@@ -506,18 +443,18 @@ public class AgentHandler extends ChannelInboundHandlerAdapter {
     }
 
     public boolean register() {
-        if (CommonUtils.notEmpty(Configuration.OPENCRON_SERVER)) {
-            String url = Configuration.OPENCRON_SERVER+"/agent/autoreg.do";
+        if (CommonUtils.notEmpty(Constants.OPENCRON_SERVER)) {
+            String url = Constants.OPENCRON_SERVER+"/agent/autoreg.do";
             String mac = MacUtils.getMacAddress();
-            String agentPassword = IOUtils.readText(Configuration.OPENCRON_PASSWORD_FILE, "UTF-8").trim().toLowerCase();
+            String agentPassword = IOUtils.readText(Constants.OPENCRON_PASSWORD_FILE, "UTF-8").trim().toLowerCase();
 
             Map<String,Object> params = new HashMap<String, Object>(0);
             params.put("machineId",mac);
             params.put("password",agentPassword);
-            params.put("port", Configuration.OPENCRON_PORT);
-            params.put("key", Configuration.OPENCRON_REGKEY);
+            params.put("port", Constants.OPENCRON_PORT);
+            params.put("key", Constants.OPENCRON_REGKEY);
 
-            logger.info("[opencron]agent auto register staring:{}", Configuration.OPENCRON_SERVER);
+            logger.info("[opencron]agent auto register staring:{}", Constants.OPENCRON_SERVER);
             try {
                 String result = HttpClientUtils.httpPostRequest(url,params);
                 if (result==null) {
@@ -535,5 +472,8 @@ public class AgentHandler extends ChannelInboundHandlerAdapter {
         }
         return false;
     }
+
+
+
 
 }

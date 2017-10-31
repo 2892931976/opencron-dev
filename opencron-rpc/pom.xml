@@ -24,6 +24,16 @@
 
     <dependencies>
 
+        <dependency>
+            <groupId>org.opencron</groupId>
+            <artifactId>opencron-common</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.zookeeper</groupId>
+            <artifactId>zookeeper</artifactId>
+            <version>3.4.8</version>
+        </dependency>
 
     </dependencies>
 

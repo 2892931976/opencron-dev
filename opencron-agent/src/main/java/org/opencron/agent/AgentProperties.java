@@ -21,6 +21,7 @@
 
 package org.opencron.agent;
 
+import org.opencron.common.Constants;
 import org.opencron.common.logging.LoggerFactory;
 import org.slf4j.Logger;
 
@@ -64,7 +65,7 @@ public class AgentProperties {
         String fileName = "conf.properties";
 
         try {
-            File home = new File(Configuration.OPENCRON_HOME);
+            File home = new File(Constants.OPENCRON_HOME);
             File conf = new File(home, "conf");
             File propsFile = new File(conf, fileName);
             is = new FileInputStream(propsFile);

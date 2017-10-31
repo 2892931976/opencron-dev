@@ -26,9 +26,13 @@ package org.opencron.agent;
  */
 
 import org.apache.commons.codec.digest.DigestUtils;
+import org.opencron.common.Constants;
 import org.opencron.common.util.IOUtils;
 import org.opencron.common.logging.LoggerFactory;
 import org.opencron.common.util.SystemPropertyUtils;
+import org.opencron.rpc.Handler;
+import org.opencron.rpc.RpcHandler;
+import org.opencron.rpc.RpcServer;
 import org.slf4j.Logger;
 
 import java.io.*;
@@ -53,7 +57,7 @@ public class Bootstrap implements Serializable {
     /**
      * thrift server
      */
-    private OpencronServer server;
+    private RpcServer server;
 
     /**
      * agent port
@@ -134,18 +138,18 @@ public class Bootstrap implements Serializable {
      * @throws Exception
      */
     private void init() throws Exception {
-        port = Integer.valueOf(Configuration.OPENCRON_PORT);
-        String inputPassword = Configuration.OPENCRON_PASSWORD;
+        port = Integer.valueOf(Constants.OPENCRON_PORT);
+        String inputPassword = Constants.OPENCRON_PASSWORD;
         if (notEmpty(inputPassword)) {
-            Configuration.OPENCRON_PASSWORD_FILE.delete();
+            Constants.OPENCRON_PASSWORD_FILE.delete();
             this.password = DigestUtils.md5Hex(inputPassword).toLowerCase();
-            IOUtils.writeText(Configuration.OPENCRON_PASSWORD_FILE, this.password, CHARSET);
+            IOUtils.writeText(Constants.OPENCRON_PASSWORD_FILE, this.password, CHARSET);
         } else {
             boolean writeDefault = false;
             //.password file already exists
-            if (Configuration.OPENCRON_PASSWORD_FILE.exists()) {
+            if (Constants.OPENCRON_PASSWORD_FILE.exists()) {
                 //read password from .password file
-                String filePassowrd = IOUtils.readText(Configuration.OPENCRON_PASSWORD_FILE, CHARSET).trim().toLowerCase();
+                String filePassowrd = IOUtils.readText(Constants.OPENCRON_PASSWORD_FILE, CHARSET).trim().toLowerCase();
                 if (notEmpty(filePassowrd)) {
                     this.password = filePassowrd;
                 }else {
@@ -157,8 +161,8 @@ public class Bootstrap implements Serializable {
 
             if (writeDefault) {
                 this.password = DigestUtils.md5Hex(AgentProperties.getProperty("opencorn.password")).toLowerCase();
-                Configuration.OPENCRON_PASSWORD_FILE.delete();
-                IOUtils.writeText(Configuration.OPENCRON_PASSWORD_FILE, this.password, CHARSET);
+                Constants.OPENCRON_PASSWORD_FILE.delete();
+                IOUtils.writeText(Constants.OPENCRON_PASSWORD_FILE, this.password, CHARSET);
             }
         }
         SystemPropertyUtils.setProperty("opencron.port",this.port+"");
@@ -167,7 +171,10 @@ public class Bootstrap implements Serializable {
 
     private void start() throws Exception {
         try {
-            this.server = new OpencronServer();
+
+            final int port = SystemPropertyUtils.getInt("opencron.port",1577);
+
+            this.server = new RpcServer(port,new AgentHandler());
 
             //new thread to start for netty server
             new Thread(new Runnable() {
@@ -180,7 +187,7 @@ public class Bootstrap implements Serializable {
             /**
              * write pid to pidfile...
              */
-            IOUtils.writeText(Configuration.OPENCRON_PID_FILE, getPid(), CHARSET);
+            IOUtils.writeText(Constants.OPENCRON_PID_FILE, getPid(), CHARSET);
 
             logger.info("[opencron]agent started @ port:{},pid:{}", port, getPid());
         } catch (Exception e) {

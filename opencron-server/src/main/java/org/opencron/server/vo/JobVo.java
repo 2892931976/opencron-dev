@@ -349,7 +349,7 @@ public class JobVo implements Serializable {
     }
 
     public Integer getTimeout() {
-        return timeout;
+        return timeout == null?0:timeout;
     }
 
     public void setTimeout(Integer timeout) {

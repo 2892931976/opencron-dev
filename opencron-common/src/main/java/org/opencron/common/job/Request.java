@@ -20,7 +20,6 @@
  */
 package org.opencron.common.job;
 
-import org.opencron.common.transport.payload.RequestBytes;
 import org.opencron.common.util.CommonUtils;
 
 import java.io.Serializable;
@@ -29,26 +28,22 @@ import java.util.Map;
 
 public class Request implements Serializable {
 
-    private final RequestBytes requestBytes;   // 请求bytes
-
     private RpcType rpcType = RpcType.ASYNC;//默认异步调用
     private String hostName;
-    private int port;
+    private Integer id;
+    private Integer port;
     private String address;
+    private Integer timeOut;
     private Action action;
     private String password;
     private Map<String, String> params;
 
-    public Request() {
-        this(new RequestBytes());
+    public Request(){
+
     }
 
-    public Request(RequestBytes requestBytes) {
-        this.requestBytes = requestBytes;
-    }
-
-    public static Request request(String hostName, Integer port, Action action, String password) {
-        return new Request().setHostName(hostName).setPort(port).setAction(action).setPassword(password);
+    public static Request request(String hostName, Integer port, Action action, String password,Integer timeOut) {
+        return new Request().setHostName(hostName).setPort(port).setAction(action).setPassword(password).setTimeOut(timeOut);
     }
 
     public Request putParam(String key, String value) {
@@ -86,6 +81,15 @@ public class Request implements Serializable {
         return this;
     }
 
+    public Integer getTimeOut() {
+        return timeOut == null?0:timeOut;
+    }
+
+    public Request setTimeOut(Integer timeOut) {
+        this.timeOut = timeOut;
+        return this;
+    }
+
     public String getPassword() {
         return password;
     }
@@ -113,10 +117,6 @@ public class Request implements Serializable {
         return this;
     }
 
-    public RequestBytes getRequestBytes() {
-        return requestBytes;
-    }
-
     public String getAddress() {
         if (CommonUtils.notEmpty(this.hostName,this.port)) {
             this.address = this.hostName+":"+this.port;
@@ -126,5 +126,14 @@ public class Request implements Serializable {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public Request setId(int id) {
+        this.id = id;
+        return this;
     }
 }

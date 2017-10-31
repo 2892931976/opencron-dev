@@ -19,30 +19,18 @@
  * under the License.
  */
 
-package org.opencron.common.transport;
+package org.opencron.rpc;
 
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
-import org.opencron.common.transport.payload.ProtocolHeader;
+import org.opencron.common.job.Request;
+import org.opencron.common.job.Response;
+import org.opencron.common.transport.InvokeCallback;
 
-public class Heartbeats {
+public interface Invoker {
 
-    private static final ByteBuf HEARTBEAT_BUF;
+    Response callSync(Request request) ;
 
-    static {
-        ByteBuf buf = Unpooled.buffer(ProtocolHeader.HEAD_LENGTH);
-        buf.writeShort(ProtocolHeader.MAGIC);
-        buf.writeByte(ProtocolHeader.HEARTBEAT); // 心跳包这里可忽略高地址的4位序列化/反序列化标志
-        buf.writeByte(0);
-        buf.writeLong(0);
-        buf.writeInt(0);
-        HEARTBEAT_BUF = Unpooled.unreleasableBuffer(buf).asReadOnly();
-    }
+    void callOneway(Request request);
 
-    /**
-     * Returns the shared heartbeat content.
-     */
-    public static ByteBuf heartbeatContent() {
-        return HEARTBEAT_BUF.duplicate();
-    }
+    void callAsync(Request request, InvokeCallback callback);
+
 }

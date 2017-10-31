@@ -18,26 +18,14 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.opencron.registry.api;
 
+package org.opencron.rpc;
 
-import org.opencron.common.URL;
+import org.opencron.common.job.Request;
+import org.opencron.common.job.Response;
 
-public interface NotifyListener {
+public interface Handler {
 
-    /**
-     * 当agent或者server发生变更时触发。
-     * agent:激活或者销毁
-     * server:新增或者移除时
-     *
-     * URL:----->
-     *      server:
-     *         server://ip:port?action=active
-     *         server://ip:port?action=stop
-     *      agent:
-     *         agent://ip:port?action=active
-     *         agent://ip:port?action=stop
-     */
-    void notify(URL url);
+    Response handle(Request request);
 
 }

@@ -37,8 +37,9 @@ public class RpcFuture<V> {
 
     //处理开始时间
     private final long beginTimestamp = System.currentTimeMillis();
+
     /**超时时间**/
-    private long timeout;
+    private Integer timeout;
     private TimeUnit unit;
 
     //异步回调
@@ -47,14 +48,13 @@ public class RpcFuture<V> {
     public RpcFuture() {
     }
 
-    public RpcFuture(long timeout, TimeUnit unit) {
-        this.timeout = timeout;
-        this.unit = unit;
+    public RpcFuture(Integer timeout) {
+        this.timeout = timeout == null?Integer.MAX_VALUE:timeout;
     }
 
-    public RpcFuture(long timeout, TimeUnit unit, InvokeCallback callback) {
-        this.timeout = timeout;
-        this.unit = unit;
+    public RpcFuture(Integer timeout,InvokeCallback callback) {
+        this.timeout =  timeout == null?Integer.MAX_VALUE:timeout;
+        this.unit = TimeUnit.SECONDS;
         this.callback = callback;
     }
 

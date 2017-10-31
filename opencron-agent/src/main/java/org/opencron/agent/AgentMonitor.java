@@ -25,6 +25,7 @@ import com.alibaba.fastjson.JSON;
 import com.corundumstudio.socketio.*;
 import com.corundumstudio.socketio.listener.ConnectListener;
 import com.corundumstudio.socketio.listener.DisconnectListener;
+import org.opencron.common.Constants;
 import org.opencron.common.job.Monitor;
 import org.opencron.common.logging.LoggerFactory;
 import org.opencron.common.util.*;
@@ -119,7 +120,7 @@ public class AgentMonitor {
 
             Monitor monitor = new Monitor();
 
-            String monitorString = executeShell(Configuration.OPENCRON_MONITOR_SHELL);
+            String monitorString = executeShell(Constants.OPENCRON_MONITOR_SHELL);
 
             Monitor.Info info = JSON.parseObject(monitorString, Monitor.Info.class);
 
@@ -372,7 +373,7 @@ public class AgentMonitor {
 
         List<String> ioList = new ArrayList<String>(0);
 
-        String result = CommandUtils.executeShell(Configuration.OPENCRON_MONITOR_SHELL, "io");
+        String result = CommandUtils.executeShell(Constants.OPENCRON_MONITOR_SHELL, "io");
 
         Scanner scan = new Scanner(result);
         boolean isFirst = true;

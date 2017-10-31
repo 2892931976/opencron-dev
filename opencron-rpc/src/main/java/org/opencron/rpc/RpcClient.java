@@ -19,7 +19,7 @@
  * under the License.
  */
 
-package org.opencron.server.job;
+package org.opencron.rpc;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
@@ -58,7 +58,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 
 @Component
-public class OpencronClient {
+public class RpcClient {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -72,7 +72,11 @@ public class OpencronClient {
 
     private ScheduledThreadPoolExecutor scheduledThreadPoolExecutor;
 
-    public void start() {
+    public RpcClient(){
+        this.doConnect();
+    }
+
+    public void doConnect() {
         bootstrap.group(group).channel(NioSocketChannel.class)
                 .option(ChannelOption.TCP_NODELAY, true)
                 .option(ChannelOption.SO_KEEPALIVE, true)
@@ -91,7 +95,7 @@ public class OpencronClient {
             private final AtomicInteger idGenerator = new AtomicInteger(0);
             @Override
             public Thread newThread(Runnable r) {
-                return new Thread(r, "Rpc-Scheduled-" + this.idGenerator.incrementAndGet());
+                return new Thread(r, "opencron:rpc "+ this.idGenerator.incrementAndGet());
             }
         });
 
@@ -108,11 +112,10 @@ public class OpencronClient {
         this.group.shutdownGracefully();
     }
 
-    public Response sendSync(String address, final Request request, long timeout, TimeUnit unit) throws Exception {
-        Channel channel = getOrCreateChannel(address);
+    public Response sendSync(final Request request) throws Exception {
+        Channel channel = getOrCreateChannel(request.getAddress());
         if (channel != null && channel.isActive()) {
-
-            final RpcFuture<Response> rpcFuture = new RpcFuture<Response>(timeout, unit);
+            final RpcFuture<Response> rpcFuture = new RpcFuture<Response>(request.getTimeOut() * 60000);
             this.rpcFutureTable.put(request.getId(), rpcFuture);
             //写数据
             channel.writeAndFlush(request).addListener(new ChannelFutureListener() {
@@ -130,20 +133,19 @@ public class OpencronClient {
                     }
                 }
             });
-
-            return rpcFuture.get(timeout, unit);
+            return rpcFuture.get();
         } else {
             throw new IllegalArgumentException("channel not active. request id:"+request.getId());
         }
     }
 
-    public void sendAsync(String address, final Request request, long timeout, TimeUnit unit, final InvokeCallback callback) throws Exception {
+    public void sendAsync(final Request request,final InvokeCallback callback) throws Exception {
 
-        Channel channel = getOrCreateChannel(address);
+        Channel channel = getOrCreateChannel(request.getAddress());
 
         if (channel != null && channel.isActive()) {
 
-            final RpcFuture<Response> rpcFuture = new RpcFuture<Response>(timeout, unit, callback);
+            final RpcFuture<Response> rpcFuture = new RpcFuture<Response>(request.getTimeOut(),callback);
             this.rpcFutureTable.put(request.getId(), rpcFuture);
             //写数据
             channel.writeAndFlush(request).addListener(new ChannelFutureListener() {
@@ -170,9 +172,9 @@ public class OpencronClient {
         }
     }
 
-    public void sendOneway(String address, final Request request, long timeout, TimeUnit unit){
+    public void sendOneway(final Request request){
 
-        Channel channel = getOrCreateChannel(address);
+        Channel channel = getOrCreateChannel(request.getAddress());
         if (channel != null && channel.isActive()) {
             channel.writeAndFlush(request).addListener(new ChannelFutureListener() {
                 @Override
@@ -191,7 +193,6 @@ public class OpencronClient {
     }
 
     class OpencronHandler extends SimpleChannelInboundHandler<Response> {
-
         @Override
         protected void channelRead0(ChannelHandlerContext channelHandlerContext, Response response) throws Exception {
             logger.info("Rpc client receive response id:{}", response.getId());

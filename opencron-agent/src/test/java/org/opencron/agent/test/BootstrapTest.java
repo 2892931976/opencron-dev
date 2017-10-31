@@ -1,9 +1,10 @@
 package org.opencron.agent.test;
 
 import org.apache.commons.codec.digest.DigestUtils;
-import org.opencron.agent.OpencronServer;
+import org.opencron.agent.AgentHandler;
 import org.opencron.common.logging.LoggerFactory;
 import org.opencron.common.util.SystemPropertyUtils;
+import org.opencron.rpc.RpcServer;
 import org.slf4j.Logger;
 
 import java.io.*;
@@ -20,7 +21,7 @@ public class BootstrapTest implements Serializable {
     /**
      * thrift server
      */
-    private OpencronServer server;
+    private RpcServer server;
 
     /**
      * bootstrap instance....
@@ -49,13 +50,13 @@ public class BootstrapTest implements Serializable {
     private void start() throws Exception {
         try {
 
-            String port = "1577";
-            String password = DigestUtils.md5Hex("opencron").toLowerCase();
+            int port = 1577;
 
-            SystemPropertyUtils.setProperty("opencron.port",port);
+            String password = DigestUtils.md5Hex("opencron").toLowerCase();
+            SystemPropertyUtils.setProperty("opencron.port",port+"");
             SystemPropertyUtils.setProperty("opencron.password",password);
 
-            this.server = new OpencronServer();
+            this.server = new RpcServer(port, new AgentHandler());
             //new thread to start for netty server
             new Thread(new Runnable() {
                 @Override

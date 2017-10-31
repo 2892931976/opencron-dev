@@ -52,12 +52,6 @@ public class Decoder<T> extends LengthFieldBasedFrameDecoder {
             return null;
         }
         in.markReaderIndex();
-
-        //注意在读的过程中，readIndex的指针也在移动
-        byte type = in.readByte();
-        byte flag = in.readByte();
-        //logger.info("read type:{}, flag:{}, length:{}", type, flag, dataLength);
-
         int dataLength = in.readInt();
         if (in.readableBytes() < dataLength) {
             logger.error("[opencron]serializer error!body length < {}", dataLength);
