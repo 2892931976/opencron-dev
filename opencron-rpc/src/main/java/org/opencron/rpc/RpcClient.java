@@ -112,7 +112,7 @@ public class RpcClient {
     public Response sendSync(final Request request) throws Exception {
         Channel channel = getOrCreateChannel(request.getAddress());
         if (channel != null && channel.isActive()) {
-            final RpcFuture<Response> rpcFuture = new RpcFuture<Response>(request.getTimeOut() * 60000);
+            final RpcFuture<Response> rpcFuture = new RpcFuture(request.getTimeOut() * 60000);
             this.rpcFutureTable.put(request.getId(), rpcFuture);
             //写数据
             channel.writeAndFlush(request).addListener(new ChannelFutureListener() {
@@ -142,7 +142,7 @@ public class RpcClient {
 
         if (channel != null && channel.isActive()) {
 
-            final RpcFuture<Response> rpcFuture = new RpcFuture<Response>(request.getTimeOut(),callback);
+            final RpcFuture<Response> rpcFuture = new RpcFuture(request.getTimeOut(),callback);
             this.rpcFutureTable.put(request.getId(), rpcFuture);
             //写数据
             channel.writeAndFlush(request).addListener(new ChannelFutureListener() {
