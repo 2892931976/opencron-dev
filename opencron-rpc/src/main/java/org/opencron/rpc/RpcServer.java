@@ -60,7 +60,7 @@ public class RpcServer {
 
     private RpcHandler handler;
 
-    public RpcServer() {  }
+    public RpcServer() { }
 
     public RpcServer(int prot,Handler handler){
         this.prot = prot;
@@ -82,8 +82,8 @@ public class RpcServer {
                 .localAddress(new InetSocketAddress(this.prot)).childHandler(new ChannelInitializer<SocketChannel>() {
                     protected void initChannel(SocketChannel channel) throws Exception {
                         channel.pipeline().addLast(
-                            new Decoder<Request>(Request.class, 1024 * 1024, 2, 4),
-                            new Encoder<Response>(Response.class),
+                            new Decoder(Request.class, 1024 * 1024, 2, 4),
+                            new Encoder(Response.class),
                             handler
                         );
                     }

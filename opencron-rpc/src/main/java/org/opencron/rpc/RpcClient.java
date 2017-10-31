@@ -81,8 +81,8 @@ public class RpcClient {
                     @Override
                     public void initChannel(SocketChannel channel) throws Exception {
                         channel.pipeline().addLast(
-                                new Decoder<Response>(Response.class, 1024 * 1024, 2, 4),
-                                new Encoder<Request>(Request.class),
+                                new Decoder(Response.class, 1024 * 1024, 2, 4),
+                                new Encoder(Request.class),
                                 new OpencronHandler()
                         );
                     }
