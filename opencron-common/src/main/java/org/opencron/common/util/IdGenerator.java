@@ -18,18 +18,15 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.opencron.common.serialization;
 
+package org.opencron.common.util;
 
-import org.opencron.common.serialization.kryo.KryoSerializer;
+import java.util.concurrent.atomic.AtomicInteger;
 
-/**
- * @author benjobs
- */
-public class SerializerFactory {
+public class IdGenerator {
+    private static final AtomicInteger generator = new AtomicInteger(0);
 
-    public static Serializer getSerializer(){
-        return new KryoSerializer();
+    public static Integer getId(){
+        return generator.incrementAndGet();
     }
-
 }

@@ -81,19 +81,22 @@ public class NettyServer implements Server {
                         );
                     }
                 });
-        this.channelFuture = this.bootstrap.bind(this.prot);
-        this.channelFuture.syncUninterruptibly();
-        this.channelFuture.addListener(new ChannelFutureListener() {
-            @Override
-            public void operationComplete(ChannelFuture future) throws Exception {
-                if (future.isSuccess()) {
-                    logger.info("[opencron]NettyServer start at address:{} success", prot);
-                } else {
-                    logger.error("[opencron]NettyServer start at address:{} failure", prot);
+        try {
+            this.channelFuture = this.bootstrap.bind(this.prot).sync();
+            this.channelFuture.addListener(new ChannelFutureListener() {
+                @Override
+                public void operationComplete(ChannelFuture future) throws Exception {
+                    if (future.isSuccess()) {
+                        logger.info("[opencron]NettyServer start at address:{} success", prot);
+                    } else {
+                        logger.error("[opencron]NettyServer start at address:{} failure", prot);
+                    }
                 }
-            }
-        });
-        this.channel = this.channelFuture.channel();
+            });
+            this.channel = this.channelFuture.channel();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

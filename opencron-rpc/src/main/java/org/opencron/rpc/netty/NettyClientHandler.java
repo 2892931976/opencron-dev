@@ -1,5 +1,6 @@
 package org.opencron.rpc.netty;
 
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import org.opencron.common.job.Response;
@@ -7,6 +8,7 @@ import org.opencron.common.logging.LoggerFactory;
 import org.slf4j.Logger;
 
 
+@ChannelHandler.Sharable
 public class NettyClientHandler extends SimpleChannelInboundHandler<Response> {
 
     private Logger logger = LoggerFactory.getLogger(NettyClientHandler.class);

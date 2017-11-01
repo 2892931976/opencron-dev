@@ -173,7 +173,6 @@ public class Bootstrap implements Serializable {
             final int port = SystemPropertyUtils.getInt("opencron.port",1577);
 
             this.server = new NettyServer(port,new AgentHandler());
-
             //new thread to start for netty server
             new Thread(new Runnable() {
                 @Override
@@ -188,6 +187,8 @@ public class Bootstrap implements Serializable {
             IOUtils.writeText(Constants.OPENCRON_PID_FILE, getPid(), CHARSET);
 
             logger.info("[opencron]agent started @ port:{},pid:{}", port, getPid());
+
+
         } catch (Exception e) {
             e.printStackTrace();
         }

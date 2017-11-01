@@ -202,7 +202,7 @@ public class NettyClient implements Client,RpcInvoker {
 
     private Channel getOrCreateChannel(Request request) {
 
-        ChannelWrapper channelWrapper = this.channelTable.get(request.getId());
+        ChannelWrapper channelWrapper = this.channelTable.get(request.getAddress());
 
         if (channelWrapper != null && channelWrapper.isActive()) {
             return channelWrapper.getChannel();

@@ -20,6 +20,7 @@
  */
 package org.opencron.rpc.netty;
 
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import org.opencron.common.job.*;
@@ -27,6 +28,7 @@ import org.opencron.common.logging.LoggerFactory;
 import org.opencron.rpc.RpcHandler;
 import org.slf4j.Logger;
 
+@ChannelHandler.Sharable
 public class NettyServerHandler extends SimpleChannelInboundHandler<Request> {
 
     private Logger logger = LoggerFactory.getLogger(NettyServerHandler.class);
@@ -49,7 +51,6 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Request> {
         if(request.getRpcType()!= RpcType.ONE_WAY){    //非单向调用
             handlerContext.writeAndFlush(response);
         }
-        handlerContext.close();
         logger.info("[opencron] agent process done,request:{},action:", request.getAction());
     }
 

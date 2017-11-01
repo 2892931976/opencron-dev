@@ -24,6 +24,7 @@ package org.opencron.rpc.netty;
 import org.opencron.common.job.Request;
 import org.opencron.common.job.Response;
 import org.opencron.common.job.RpcType;
+import org.opencron.common.util.IdGenerator;
 import org.opencron.rpc.RpcInvokeCallback;
 import org.opencron.rpc.RpcInvoker;
 import org.springframework.stereotype.Component;
@@ -46,7 +47,7 @@ public class NettyInvoker implements RpcInvoker {
     //同步调用
     public Response sentSync(Request request) {
         try {
-            request.setRpcType(RpcType.SYNC).setId(new AtomicInteger(0).incrementAndGet());
+            request.setRpcType(RpcType.SYNC).setId(IdGenerator.getId());
             return nettyClient.sentSync(request);
         } catch (Exception e) {
             e.printStackTrace();
@@ -57,7 +58,7 @@ public class NettyInvoker implements RpcInvoker {
     //单向调用
     public void sentOneway(Request request) {
         try {
-            request.setRpcType(RpcType.ONE_WAY).setId(new AtomicInteger(0).incrementAndGet());
+            request.setRpcType(RpcType.ONE_WAY).setId(IdGenerator.getId());
             nettyClient.sentOneway(request);
         } catch (Exception e) {
             e.printStackTrace();
@@ -67,7 +68,7 @@ public class NettyInvoker implements RpcInvoker {
     //异步调用...
     public void sentAsync(Request request, RpcInvokeCallback callback) {
         try {
-            request.setRpcType(RpcType.ASYNC).setId(new AtomicInteger(0).incrementAndGet());
+            request.setRpcType(RpcType.ASYNC).setId(IdGenerator.getId());
             nettyClient.sentAsync(request, callback);
         } catch (Exception e) {
             e.printStackTrace();
