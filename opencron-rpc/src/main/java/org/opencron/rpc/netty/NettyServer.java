@@ -94,6 +94,7 @@ public class NettyServer implements Server {
                 }
             });
             this.channel = this.channelFuture.channel();
+            this.channel.closeFuture().sync();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
