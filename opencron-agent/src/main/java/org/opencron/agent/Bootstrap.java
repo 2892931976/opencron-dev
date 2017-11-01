@@ -337,7 +337,7 @@ public class Bootstrap implements Serializable {
     }
 
     private void stopServer() throws Throwable {
-       this.server.clost();
+       this.server.close();
     }
 
     private static void handleThrowable(Throwable t) {

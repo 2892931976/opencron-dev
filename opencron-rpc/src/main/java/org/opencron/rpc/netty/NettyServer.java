@@ -102,7 +102,7 @@ public class NettyServer implements Server {
     }
 
     @Override
-    public void clost() throws Throwable {
+    public void close() throws Throwable {
         try {
             if (channel != null) {
                 // unbind.

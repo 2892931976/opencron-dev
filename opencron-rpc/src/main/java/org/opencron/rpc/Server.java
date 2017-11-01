@@ -6,6 +6,6 @@ public interface Server {
 
     void open();
 
-    void clost() throws Throwable;
+    void close() throws Throwable;
 
 }
