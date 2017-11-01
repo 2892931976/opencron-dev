@@ -30,9 +30,7 @@ import org.opencron.common.Constants;
 import org.opencron.common.util.IOUtils;
 import org.opencron.common.logging.LoggerFactory;
 import org.opencron.common.util.SystemPropertyUtils;
-import org.opencron.rpc.Handler;
-import org.opencron.rpc.RpcHandler;
-import org.opencron.rpc.RpcServer;
+import org.opencron.rpc.netty.NettyServer;
 import org.slf4j.Logger;
 
 import java.io.*;
@@ -57,7 +55,7 @@ public class Bootstrap implements Serializable {
     /**
      * thrift server
      */
-    private RpcServer server;
+    private NettyServer server;
 
     /**
      * agent port
@@ -174,13 +172,13 @@ public class Bootstrap implements Serializable {
 
             final int port = SystemPropertyUtils.getInt("opencron.port",1577);
 
-            this.server = new RpcServer(port,new AgentHandler());
+            this.server = new NettyServer(port,new AgentHandler());
 
             //new thread to start for netty server
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    server.start();
+                    server.open();
                 }
             }).start();
 
@@ -338,8 +336,8 @@ public class Bootstrap implements Serializable {
         }
     }
 
-    private void stopServer() {
-       this.server.stop();
+    private void stopServer() throws Throwable {
+       this.server.clost();
     }
 
     private static void handleThrowable(Throwable t) {

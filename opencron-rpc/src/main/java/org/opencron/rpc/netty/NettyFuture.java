@@ -18,7 +18,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.opencron.rpc;
+package org.opencron.rpc.netty;
+
+import org.opencron.common.job.Response;
+import org.opencron.rpc.RpcInvokeCallback;
 
 import java.io.IOException;
 import java.util.concurrent.*;
@@ -26,12 +29,12 @@ import java.util.concurrent.*;
 /**
  * @author benjobs
  */
-public class RpcFuture<V> {
+public class NettyFuture {
 
     private static final CancellationException CANCELLED = new CancellationException();
     private volatile boolean sendRequestSuccess = true;
     private volatile boolean haveResult;
-    private volatile V result;
+    private volatile Response result;
     private volatile Throwable exc;
     private CountDownLatch latch;
 
@@ -43,16 +46,16 @@ public class RpcFuture<V> {
     private TimeUnit unit;
 
     //异步回调
-    private InvokeCallback callback;
+    private RpcInvokeCallback callback;
 
-    public RpcFuture() {
+    public NettyFuture() {
     }
 
-    public RpcFuture(Integer timeout) {
+    public NettyFuture(Integer timeout) {
         this.timeout = timeout == null?Integer.MAX_VALUE:timeout;
     }
 
-    public RpcFuture(Integer timeout,InvokeCallback callback) {
+    public NettyFuture(Integer timeout, RpcInvokeCallback callback) {
         this.timeout =  timeout == null?Integer.MAX_VALUE:timeout;
         this.unit = TimeUnit.SECONDS;
         this.callback = callback;
@@ -79,10 +82,10 @@ public class RpcFuture<V> {
         return this.haveResult;
     }
 
-    public void setResult(V v) {
+    public void setResult(Response response) {
         synchronized(this) {
             if(!this.haveResult) {
-                this.result = v;
+                this.result = response;
                 this.haveResult = true;
                 if(this.latch != null) {
                     this.latch.countDown();
@@ -107,7 +110,7 @@ public class RpcFuture<V> {
         }
     }
 
-    public void setResult(V result, Throwable exc) {
+    public void setResult(Response result, Throwable exc) {
         if(exc == null) {
             this.setResult(result);
         } else {
@@ -116,7 +119,7 @@ public class RpcFuture<V> {
 
     }
 
-    public V get() throws InterruptedException, ExecutionException {
+    public Response get() throws InterruptedException, ExecutionException {
         if(!this.haveResult) {
             boolean wait = this.prepareForWait();
             if(wait) {
@@ -126,7 +129,7 @@ public class RpcFuture<V> {
         return returnResult();
     }
 
-    public V get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
+    public Response get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
         if(!this.haveResult) {
             boolean wait = this.prepareForWait();
             if(wait && !this.latch.await(timeout, unit)) {
@@ -136,7 +139,7 @@ public class RpcFuture<V> {
         return returnResult();
     }
 
-    private V returnResult() throws ExecutionException {
+    private Response returnResult() throws ExecutionException {
         if(this.exc != null) {
             if(this.exc == CANCELLED) {
                 throw new CancellationException();

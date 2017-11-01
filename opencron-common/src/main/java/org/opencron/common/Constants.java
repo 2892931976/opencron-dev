@@ -36,6 +36,8 @@ public class Constants {
 
     public static final Pattern COMMA_SPLIT_PATTERN = Pattern.compile("\\s*[,]+\\s*");
 
+    public static final int DEFAULT_IO_THREADS = Math.min(Runtime.getRuntime().availableProcessors() + 1, 32);
+
     /**
      * Name of the system property containing
      */

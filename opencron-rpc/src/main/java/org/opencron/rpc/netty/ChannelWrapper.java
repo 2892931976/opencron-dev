@@ -18,7 +18,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.opencron.rpc;
+package org.opencron.rpc.netty;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -30,6 +30,7 @@ import org.slf4j.LoggerFactory;
  * @author benjobs
  */
 public class ChannelWrapper {
+
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 
     private final ChannelFuture channelFuture;

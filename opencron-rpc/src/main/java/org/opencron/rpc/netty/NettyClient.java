@@ -19,18 +19,24 @@
  * under the License.
  */
 
-package org.opencron.rpc;
+package org.opencron.rpc.netty;
 
 import io.netty.bootstrap.Bootstrap;
+import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.util.concurrent.DefaultThreadFactory;
+import org.opencron.common.Constants;
 import org.opencron.common.job.Request;
 import org.opencron.common.job.Response;
 import org.opencron.common.serialization.Decoder;
 import org.opencron.common.serialization.Encoder;
 import org.opencron.common.util.HttpUtils;
+import org.opencron.rpc.Client;
+import org.opencron.rpc.RpcInvokeCallback;
+import org.opencron.rpc.RpcInvoker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -55,28 +61,31 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 
 @Component
-public class RpcClient {
+public class NettyClient implements Client,RpcInvoker {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    private EventLoopGroup group = new NioEventLoopGroup();
+    private static final NioEventLoopGroup nioEventLoopGroup = new NioEventLoopGroup(Constants.DEFAULT_IO_THREADS, new DefaultThreadFactory("NettyClientWorker", true));
 
     private Bootstrap bootstrap = new Bootstrap();
 
-    protected final ConcurrentHashMap<Integer, RpcFuture> rpcFutureTable =  new ConcurrentHashMap<Integer, RpcFuture>(256);
+    protected final ConcurrentHashMap<Integer, NettyFuture> rpcFutureTable =  new ConcurrentHashMap<Integer, NettyFuture>(256);
 
     private final ConcurrentHashMap<String, ChannelWrapper> channelTable = new ConcurrentHashMap<String, ChannelWrapper>();
 
     private ScheduledThreadPoolExecutor scheduledThreadPoolExecutor;
 
-    public RpcClient(){
-        this.doConnect();
+    public NettyClient(){
+        this.open();
     }
 
-    public void doConnect() {
-        bootstrap.group(group).channel(NioSocketChannel.class)
-                .option(ChannelOption.TCP_NODELAY, true)
+    @Override
+    public void open() {
+        bootstrap.group(nioEventLoopGroup)
                 .option(ChannelOption.SO_KEEPALIVE, true)
+                .option(ChannelOption.TCP_NODELAY, true)
+                .option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
+                .channel(NioSocketChannel.class)
                 .handler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     public void initChannel(SocketChannel channel) throws Exception {
@@ -104,46 +113,48 @@ public class RpcClient {
         }, 500, 500, TimeUnit.MILLISECONDS);
     }
 
-    public void shutdown() {
+    @Override
+    public void close() {
         this.scheduledThreadPoolExecutor.shutdown();
-        this.group.shutdownGracefully();
     }
 
-    public Response sendSync(final Request request) throws Exception {
+    @Override
+    public Response sentSync(final Request request) throws Exception {
         Channel channel = getOrCreateChannel(request.getAddress());
         if (channel != null && channel.isActive()) {
-            final RpcFuture<Response> rpcFuture = new RpcFuture(request.getTimeOut() * 60000);
-            this.rpcFutureTable.put(request.getId(), rpcFuture);
+            final NettyFuture nettyFuture = new NettyFuture(request.getTimeOut() * 60000);
+            this.rpcFutureTable.put(request.getId(), nettyFuture);
             //写数据
             channel.writeAndFlush(request).addListener(new ChannelFutureListener() {
                 @Override
                 public void operationComplete(ChannelFuture future) throws Exception {
                     if (future.isSuccess()) {
                         logger.info("send success, request id:{}", request.getId());
-                        rpcFuture.setSendRequestSuccess(true);
+                        nettyFuture.setSendRequestSuccess(true);
                         return;
                     } else {
                         logger.info("send failure, request id:{}", request.getId());
                         rpcFutureTable.remove(request.getId());
-                        rpcFuture.setSendRequestSuccess(false);
-                        rpcFuture.setFailure(future.cause());
+                        nettyFuture.setSendRequestSuccess(false);
+                        nettyFuture.setFailure(future.cause());
                     }
                 }
             });
-            return rpcFuture.get();
+            return nettyFuture.get();
         } else {
             throw new IllegalArgumentException("channel not active. request id:"+request.getId());
         }
     }
 
-    public void sendAsync(final Request request,final InvokeCallback callback) throws Exception {
+    @Override
+    public void sentAsync(final Request request,final RpcInvokeCallback callback) throws Exception {
 
         Channel channel = getOrCreateChannel(request.getAddress());
 
         if (channel != null && channel.isActive()) {
 
-            final RpcFuture<Response> rpcFuture = new RpcFuture(request.getTimeOut(),callback);
-            this.rpcFutureTable.put(request.getId(), rpcFuture);
+            final NettyFuture nettyFuture = new NettyFuture(request.getTimeOut(),callback);
+            this.rpcFutureTable.put(request.getId(), nettyFuture);
             //写数据
             channel.writeAndFlush(request).addListener(new ChannelFutureListener() {
                 @Override
@@ -151,14 +162,14 @@ public class RpcClient {
 
                     if (future.isSuccess()) {
                         logger.info("send success, request id:{}", request.getId());
-                        rpcFuture.setSendRequestSuccess(true);
+                        nettyFuture.setSendRequestSuccess(true);
                         return;
                     } else {
                         logger.info("send failure, request id:{}", request.getId());
 
                         rpcFutureTable.remove(request.getId());
-                        rpcFuture.setSendRequestSuccess(false);
-                        rpcFuture.setFailure(future.cause());
+                        nettyFuture.setSendRequestSuccess(false);
+                        nettyFuture.setFailure(future.cause());
                         //回调
                         callback.onFailure(future.cause());
                     }
@@ -169,7 +180,8 @@ public class RpcClient {
         }
     }
 
-    public void sendOneway(final Request request){
+    @Override
+    public void sentOneway(final Request request) throws Exception{
 
         Channel channel = getOrCreateChannel(request.getAddress());
         if (channel != null && channel.isActive()) {
@@ -193,7 +205,7 @@ public class RpcClient {
         @Override
         protected void channelRead0(ChannelHandlerContext channelHandlerContext, Response response) throws Exception {
             logger.info("Rpc client receive response id:{}", response.getId());
-            RpcFuture future = rpcFutureTable.get(response.getId());
+            NettyFuture future = rpcFutureTable.get(response.getId());
 
             future.setResult(response);
             if(future.isAsync()){   //异步调用
@@ -241,11 +253,11 @@ public class RpcClient {
 
     /**定时清理超时Future**/
     private void scanRpcFutureTable() {
-        final List<RpcFuture> timeoutReqList = new ArrayList<RpcFuture>();
-        Iterator<Map.Entry<Integer, RpcFuture>> it = this.rpcFutureTable.entrySet().iterator();
+        final List<NettyFuture> timeoutReqList = new ArrayList<NettyFuture>();
+        Iterator<Map.Entry<Integer, NettyFuture>> it = this.rpcFutureTable.entrySet().iterator();
         while (it.hasNext()) {
-            Map.Entry<Integer, RpcFuture> next = it.next();
-            RpcFuture rep = next.getValue();
+            Map.Entry<Integer, NettyFuture> next = it.next();
+            NettyFuture rep = next.getValue();
 
             if ((rep.getBeginTimestamp() + rep.getTimeoutMillis() + 1000) <= System.currentTimeMillis()) {  //超时
                 it.remove();
@@ -253,7 +265,7 @@ public class RpcClient {
             }
         }
 
-        for (RpcFuture future : timeoutReqList) {
+        for (NettyFuture future : timeoutReqList) {
             //释放资源
         }
     }

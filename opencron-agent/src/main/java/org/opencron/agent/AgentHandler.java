@@ -30,7 +30,7 @@ import org.opencron.common.Constants;
 import org.opencron.common.job.*;
 import org.opencron.common.logging.LoggerFactory;
 import org.opencron.common.util.*;
-import org.opencron.rpc.Handler;
+import org.opencron.rpc.RpcHandler;
 import org.slf4j.Logger;
 
 import java.beans.Introspector;
@@ -43,7 +43,7 @@ import java.util.*;
 import static org.opencron.common.util.CommonUtils.*;
 import static org.opencron.common.util.ReflectUtils.isPrototype;
 
-public class AgentHandler implements Handler {
+public class AgentHandler implements RpcHandler,AgentJob {
 
     private Logger logger = LoggerFactory.getLogger(AgentHandler.class);
 
@@ -96,12 +96,12 @@ public class AgentHandler implements Handler {
         return null;
     }
 
-    //@Override
+    @Override
     public Response ping(Request request) {
         return Response.response(request).setSuccess(true).setExitCode(Opencron.StatusCode.SUCCESS_EXIT.getValue()).end();
     }
 
-    //@Override
+    @Override
     public Response path(Request request) {
         //返回密码文件的路径...
         return Response.response(request).setSuccess(true)
@@ -110,7 +110,7 @@ public class AgentHandler implements Handler {
                 .end();
     }
 
-    //@Override
+    @Override
     public Response monitor(Request request) {
         Opencron.ConnType connType = Opencron.ConnType.getByName(request.getParams().get("connType"));
         Response response = Response.response(request);
@@ -125,7 +125,7 @@ public class AgentHandler implements Handler {
         }
     }
 
-    //@Override
+    @Override
     public Response execute(final Request request) {
         String command = request.getParams().get("command");
 
@@ -279,7 +279,7 @@ public class AgentHandler implements Handler {
         return response;
     }
 
-   // @Override
+    @Override
     public Response password(Request request) {
 
         String newPassword = request.getParams().get("newPassword");
@@ -295,7 +295,7 @@ public class AgentHandler implements Handler {
         return response.setSuccess(true).setExitCode(Opencron.StatusCode.SUCCESS_EXIT.getValue()).end();
     }
 
-   // @Override
+    @Override
     public Response kill(Request request) {
         String pid = request.getParams().get("pid");
         logger.info("[opencron]:kill pid:{}", pid);
@@ -322,7 +322,7 @@ public class AgentHandler implements Handler {
         return response;
     }
 
-    //@Override
+    @Override
     public Response proxy(Request request) {
         String proxyHost = request.getParams().get("proxyHost");
         String proxyPort = request.getParams().get("proxyPort");
@@ -375,7 +375,7 @@ public class AgentHandler implements Handler {
         return null;
     }
 
-   // @Override
+    @Override
     public Response guid(Request request) {
         String macId = null;
         try {
@@ -404,7 +404,7 @@ public class AgentHandler implements Handler {
      * @throws TException
      * @throws InterruptedException
      */
-    //@Override
+    @Override
     public void restart(Request request) {
 
     }
@@ -442,6 +442,7 @@ public class AgentHandler implements Handler {
         return resultMap;
     }
 
+    @Override
     public boolean register() {
         if (CommonUtils.notEmpty(Constants.OPENCRON_SERVER)) {
             String url = Constants.OPENCRON_SERVER+"/agent/autoreg.do";
