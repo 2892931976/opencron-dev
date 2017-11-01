@@ -64,7 +64,7 @@ public class Constants {
     /**
      * pid
      */
-    public static final File OPENCRON_PID_FILE = new File(SystemPropertyUtils.get("opencron.pid"));
+    public static final File OPENCRON_PID_FILE = new File(SystemPropertyUtils.get("opencron.pid","/var/run/opencron.pid"));
 
     /**
      * password file

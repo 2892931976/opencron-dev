@@ -39,14 +39,14 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @date 2016-03-27
  */
 
-@Component
 public class NettyInvoker implements RpcInvoker {
+
+    private NettyClient nettyClient = new NettyClient();
 
     //同步调用
     public Response sentSync(Request request) {
         try {
             request.setRpcType(RpcType.SYNC).setId(new AtomicInteger(0).incrementAndGet());
-            NettyClient nettyClient = new NettyClient();
             return nettyClient.sentSync(request);
         } catch (Exception e) {
             e.printStackTrace();
@@ -58,7 +58,6 @@ public class NettyInvoker implements RpcInvoker {
     public void sentOneway(Request request) {
         try {
             request.setRpcType(RpcType.ONE_WAY).setId(new AtomicInteger(0).incrementAndGet());
-            NettyClient nettyClient = new NettyClient();
             nettyClient.sentOneway(request);
         } catch (Exception e) {
             e.printStackTrace();
@@ -69,7 +68,6 @@ public class NettyInvoker implements RpcInvoker {
     public void sentAsync(Request request, RpcInvokeCallback callback) {
         try {
             request.setRpcType(RpcType.ASYNC).setId(new AtomicInteger(0).incrementAndGet());
-            NettyClient nettyClient = new NettyClient();
             nettyClient.sentAsync(request, callback);
         } catch (Exception e) {
             e.printStackTrace();

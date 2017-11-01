@@ -39,11 +39,8 @@ import org.opencron.rpc.RpcInvokeCallback;
 import org.opencron.rpc.RpcInvoker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -60,7 +57,6 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @date 2016-03-27
  */
 
-@Component
 public class NettyClient implements Client,RpcInvoker {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -69,18 +65,21 @@ public class NettyClient implements Client,RpcInvoker {
 
     private Bootstrap bootstrap = new Bootstrap();
 
-    protected final ConcurrentHashMap<Integer, NettyFuture> rpcFutureTable =  new ConcurrentHashMap<Integer, NettyFuture>(256);
+    protected final ConcurrentHashMap<Integer, NettyFuture> futureTable =  new ConcurrentHashMap<Integer, NettyFuture>(256);
 
     private final ConcurrentHashMap<String, ChannelWrapper> channelTable = new ConcurrentHashMap<String, ChannelWrapper>();
 
     private ScheduledThreadPoolExecutor scheduledThreadPoolExecutor;
 
-    public NettyClient(){
+    public NettyClient() {
         this.open();
     }
 
     @Override
     public void open() {
+
+        final NettyClientHandler nettyClientHandler = new NettyClientHandler(this);
+
         bootstrap.group(nioEventLoopGroup)
                 .option(ChannelOption.SO_KEEPALIVE, true)
                 .option(ChannelOption.TCP_NODELAY, true)
@@ -92,7 +91,7 @@ public class NettyClient implements Client,RpcInvoker {
                         channel.pipeline().addLast(
                                 new Decoder(Response.class, 1024 * 1024, 2, 4),
                                 new Encoder(Request.class),
-                                new OpencronHandler()
+                                nettyClientHandler
                         );
                     }
                 });
@@ -115,15 +114,17 @@ public class NettyClient implements Client,RpcInvoker {
 
     @Override
     public void close() {
+        this.futureTable.clear();
+        this.channelTable.clear();
         this.scheduledThreadPoolExecutor.shutdown();
     }
 
     @Override
     public Response sentSync(final Request request) throws Exception {
-        Channel channel = getOrCreateChannel(request.getAddress());
+        Channel channel = getOrCreateChannel(request);
         if (channel != null && channel.isActive()) {
-            final NettyFuture nettyFuture = new NettyFuture(request.getTimeOut() * 60000);
-            this.rpcFutureTable.put(request.getId(), nettyFuture);
+            final NettyFuture nettyFuture = new NettyFuture(request.getTimeOut());
+            this.futureTable.put(request.getId(), nettyFuture);
             //写数据
             channel.writeAndFlush(request).addListener(new ChannelFutureListener() {
                 @Override
@@ -134,7 +135,7 @@ public class NettyClient implements Client,RpcInvoker {
                         return;
                     } else {
                         logger.info("send failure, request id:{}", request.getId());
-                        rpcFutureTable.remove(request.getId());
+                        futureTable.remove(request.getId());
                         nettyFuture.setSendRequestSuccess(false);
                         nettyFuture.setFailure(future.cause());
                     }
@@ -149,12 +150,12 @@ public class NettyClient implements Client,RpcInvoker {
     @Override
     public void sentAsync(final Request request,final RpcInvokeCallback callback) throws Exception {
 
-        Channel channel = getOrCreateChannel(request.getAddress());
+        Channel channel = getOrCreateChannel(request);
 
         if (channel != null && channel.isActive()) {
 
             final NettyFuture nettyFuture = new NettyFuture(request.getTimeOut(),callback);
-            this.rpcFutureTable.put(request.getId(), nettyFuture);
+            this.futureTable.put(request.getId(), nettyFuture);
             //写数据
             channel.writeAndFlush(request).addListener(new ChannelFutureListener() {
                 @Override
@@ -166,8 +167,7 @@ public class NettyClient implements Client,RpcInvoker {
                         return;
                     } else {
                         logger.info("send failure, request id:{}", request.getId());
-
-                        rpcFutureTable.remove(request.getId());
+                        futureTable.remove(request.getId());
                         nettyFuture.setSendRequestSuccess(false);
                         nettyFuture.setFailure(future.cause());
                         //回调
@@ -182,8 +182,7 @@ public class NettyClient implements Client,RpcInvoker {
 
     @Override
     public void sentOneway(final Request request) throws Exception{
-
-        Channel channel = getOrCreateChannel(request.getAddress());
+        Channel channel = getOrCreateChannel(request);
         if (channel != null && channel.isActive()) {
             channel.writeAndFlush(request).addListener(new ChannelFutureListener() {
                 @Override
@@ -201,51 +200,32 @@ public class NettyClient implements Client,RpcInvoker {
         }
     }
 
-    class OpencronHandler extends SimpleChannelInboundHandler<Response> {
-        @Override
-        protected void channelRead0(ChannelHandlerContext channelHandlerContext, Response response) throws Exception {
-            logger.info("Rpc client receive response id:{}", response.getId());
-            NettyFuture future = rpcFutureTable.get(response.getId());
+    private Channel getOrCreateChannel(Request request) {
 
-            future.setResult(response);
-            if(future.isAsync()){   //异步调用
-                logger.info("Rpc client async callback invoke");
-                future.execCallback();
-            }
-        }
+        ChannelWrapper channelWrapper = this.channelTable.get(request.getId());
 
-        @Override
-        public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-            super.exceptionCaught(ctx, cause);
-            logger.error("捕获异常", cause);
-        }
-    }
-
-    private Channel getOrCreateChannel(String address){
-
-        ChannelWrapper cw = this.channelTable.get(address);
-        if (cw != null && cw.isActive()) {
-            return cw.getChannel();
+        if (channelWrapper != null && channelWrapper.isActive()) {
+            return channelWrapper.getChannel();
         }
 
         synchronized (this){
             // 发起异步连接操作
-            ChannelFuture channelFuture = bootstrap.connect(HttpUtils.parseSocketAddress(address));
-            cw = new ChannelWrapper(channelFuture);
-            this.channelTable.put(address, cw);
+            ChannelFuture channelFuture = bootstrap.connect(HttpUtils.parseSocketAddress(request.getAddress()));
+            channelWrapper = new ChannelWrapper(channelFuture);
+            this.channelTable.put(request.getAddress(), channelWrapper);
         }
-        if (cw != null) {
-            ChannelFuture channelFuture = cw.getChannelFuture();
+        if (channelWrapper != null) {
+            ChannelFuture channelFuture = channelWrapper.getChannelFuture();
             long timeout = 5000;
             if (channelFuture.awaitUninterruptibly(timeout)) {
-                if (cw.isActive()) {
-                    logger.info("createChannel: connect remote host[{}] success, {}", address, channelFuture.toString());
-                    return cw.getChannel();
+                if (channelWrapper.isActive()) {
+                    logger.info("createChannel: connect remote host[{}] success, {}", request.getAddress(), channelFuture.toString());
+                    return channelWrapper.getChannel();
                 } else {
-                    logger.warn("createChannel: connect remote host[" + address + "] failed, " + channelFuture.toString(), channelFuture.cause());
+                    logger.warn("createChannel: connect remote host[" + request.getAddress() + "] failed, " + channelFuture.toString(), channelFuture.cause());
                 }
             } else {
-                logger.warn("createChannel: connect remote host[{}] timeout {}ms, {}", address, timeout, channelFuture);
+                logger.warn("createChannel: connect remote host[{}] timeout {}ms, {}", request.getAddress(), timeout, channelFuture);
             }
         }
         return null;
@@ -253,20 +233,14 @@ public class NettyClient implements Client,RpcInvoker {
 
     /**定时清理超时Future**/
     private void scanRpcFutureTable() {
-        final List<NettyFuture> timeoutReqList = new ArrayList<NettyFuture>();
-        Iterator<Map.Entry<Integer, NettyFuture>> it = this.rpcFutureTable.entrySet().iterator();
+        Iterator<Map.Entry<Integer, NettyFuture>> it = this.futureTable.entrySet().iterator();
         while (it.hasNext()) {
             Map.Entry<Integer, NettyFuture> next = it.next();
             NettyFuture rep = next.getValue();
 
             if ((rep.getBeginTimestamp() + rep.getTimeoutMillis() + 1000) <= System.currentTimeMillis()) {  //超时
                 it.remove();
-                timeoutReqList.add(rep);
             }
-        }
-
-        for (NettyFuture future : timeoutReqList) {
-            //释放资源
         }
     }
 
