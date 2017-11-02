@@ -22,6 +22,14 @@ package org.opencron.common.extension;
 
 import java.lang.annotation.*;
 
+
+/**
+ *
+ * 十步杀一人 千里不留行
+ *
+ * 事了拂衣去 深藏身与名
+ *
+ */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE})
