@@ -20,14 +20,10 @@
  */
 package org.opencron.common.job;
 
-import com.alibaba.fastjson.JSON;
-import org.opencron.common.Constants;
 import org.opencron.common.util.CommonUtils;
 import org.opencron.common.util.IdGenerator;
-import org.opencron.common.util.collection.ParamsMap;
 
 import java.io.Serializable;
-import java.nio.file.OpenOption;
 import java.util.HashMap;
 import java.util.Map;
 

@@ -2,7 +2,7 @@ package org.opencron.agent.test;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.opencron.agent.AgentProcessor;
-import org.opencron.common.extension.ExtensionLoader;
+import org.opencron.common.ext.ExtensionLoader;
 import org.opencron.common.logging.LoggerFactory;
 import org.opencron.common.util.SystemPropertyUtils;
 import org.opencron.rpc.Server;

@@ -18,7 +18,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.opencron.common.extension;
+package org.opencron.common.ext;
 
 import java.lang.annotation.*;
 

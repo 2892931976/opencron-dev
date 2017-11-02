@@ -21,7 +21,7 @@
 
 package org.opencron.rpc;
 
-import org.opencron.common.extension.SPI;
+import org.opencron.common.ext.SPI;
 import org.opencron.common.job.Request;
 import org.opencron.common.job.Response;
 

@@ -19,7 +19,7 @@
  * under the License.
  */
 
-package org.opencron.common.extension;
+package org.opencron.common.ext;
 
 import org.opencron.common.Constants;
 import org.opencron.common.logging.LoggerFactory;

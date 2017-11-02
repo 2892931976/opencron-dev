@@ -1,5 +1,5 @@
 import org.junit.Test;
-import org.opencron.common.extension.ExtensionLoader;
+import org.opencron.common.ext.ExtensionLoader;
 import org.opencron.common.serialize.Serializer;
 
 import java.io.IOException;

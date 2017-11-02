@@ -23,7 +23,7 @@ package org.opencron.common.serialize;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
-import org.opencron.common.extension.ExtensionLoader;
+import org.opencron.common.ext.ExtensionLoader;
 
 
 /**

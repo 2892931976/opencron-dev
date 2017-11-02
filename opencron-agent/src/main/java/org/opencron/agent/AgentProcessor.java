@@ -24,7 +24,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.exec.*;
 import org.opencron.common.Constants;
-import org.opencron.common.extension.ExtensionLoader;
+import org.opencron.common.ext.ExtensionLoader;
 import org.opencron.common.job.*;
 import org.opencron.common.logging.LoggerFactory;
 import org.opencron.common.util.*;

@@ -23,7 +23,7 @@ package org.opencron.common.serialize;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
-import org.opencron.common.extension.ExtensionLoader;
+import org.opencron.common.ext.ExtensionLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

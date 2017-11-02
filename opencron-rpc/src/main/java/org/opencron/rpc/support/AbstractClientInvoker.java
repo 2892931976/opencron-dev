@@ -21,7 +21,7 @@
 
 package org.opencron.rpc.support;
 
-import org.opencron.common.extension.ExtensionLoader;
+import org.opencron.common.ext.ExtensionLoader;
 import org.opencron.common.job.Request;
 import org.opencron.common.job.Response;
 import org.opencron.common.job.RpcType;

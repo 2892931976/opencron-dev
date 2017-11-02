@@ -1,6 +1,6 @@
 package org.opencron.rpc;
 
-import org.opencron.common.extension.SPI;
+import org.opencron.common.ext.SPI;
 
 @SPI
 public interface Client extends ClientInvoker {
