@@ -33,8 +33,8 @@ import org.opencron.common.Constants;
 import org.opencron.common.job.Request;
 import org.opencron.common.job.Response;
 import org.opencron.common.logging.LoggerFactory;
-import org.opencron.common.serialization.Decoder;
-import org.opencron.common.serialization.Encoder;
+import org.opencron.common.serialize.Decoder;
+import org.opencron.common.serialize.Encoder;
 import org.opencron.rpc.RpcHandler;
 import org.opencron.rpc.Server;
 import org.slf4j.Logger;
@@ -50,19 +50,15 @@ public class NettyServer implements Server {
     private Channel channel;
 
     protected final HashedWheelTimer timer = new HashedWheelTimer();
-    private int prot;
-    private NettyServerHandler handler;
 
     public NettyServer() {
     }
 
-    public NettyServer(int prot, RpcHandler handler) {
-        this.prot = prot;
-        this.handler = new NettyServerHandler(handler);
-    }
-
     @Override
-    public void open() {
+    public void open(final int prot, RpcHandler rpcHandler) {
+
+        final NettyServerHandler handler = new NettyServerHandler(rpcHandler);
+
         this.bootstrap = new ServerBootstrap();
         this.bossGroup = new NioEventLoopGroup(1, new DefaultThreadFactory("NettyServerBoss", true));
         this.workerGroup = new NioEventLoopGroup(Constants.DEFAULT_IO_THREADS, new DefaultThreadFactory("NettyServerWorker", true));
@@ -82,7 +78,7 @@ public class NettyServer implements Server {
                     }
                 });
         try {
-            this.channelFuture = this.bootstrap.bind(this.prot).sync();
+            this.channelFuture = this.bootstrap.bind(prot).sync();
             this.channelFuture.addListener(new ChannelFutureListener() {
                 @Override
                 public void operationComplete(ChannelFuture future) throws Exception {

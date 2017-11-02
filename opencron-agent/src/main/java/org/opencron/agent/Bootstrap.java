@@ -27,9 +27,11 @@ package org.opencron.agent;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.opencron.common.Constants;
+import org.opencron.common.extension.ExtensionLoader;
 import org.opencron.common.util.IOUtils;
 import org.opencron.common.logging.LoggerFactory;
 import org.opencron.common.util.SystemPropertyUtils;
+import org.opencron.rpc.Server;
 import org.opencron.rpc.netty.NettyServer;
 import org.slf4j.Logger;
 
@@ -53,9 +55,9 @@ public class Bootstrap implements Serializable {
     private static Logger logger = LoggerFactory.getLogger(AgentMonitor.class);
 
     /**
-     * thrift server
+     * Server server
      */
-    private NettyServer server;
+    private Server server = ExtensionLoader.getExtensionLoader(Server.class).getExtension();
 
     /**
      * agent port
@@ -169,15 +171,12 @@ public class Bootstrap implements Serializable {
 
     private void start() throws Exception {
         try {
-
             final int port = SystemPropertyUtils.getInt("opencron.port",1577);
-
-            this.server = new NettyServer(port,new AgentHandler());
             //new thread to start for netty server
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    server.open();
+                    server.open(port,new AgentHandler());
                 }
             }).start();
 

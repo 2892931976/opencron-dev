@@ -1,10 +1,10 @@
-package org.opencron.common.serialization.fst;
+package org.opencron.common.serialize.fst;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import org.nustaq.serialization.FSTConfiguration;
-import org.opencron.common.serialization.Serializer;
+import org.opencron.common.serialize.Serializer;
 
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
@@ -13,6 +13,7 @@ import java.util.concurrent.ExecutionException;
  * https://github.com/RuedigerMoeller/fast-serialization/wiki/Serialization
  *
  */
+
 public class FstSerializer implements Serializer {
 
     private static final LoadingCache<Class<?>, FSTConfiguration> configurationLoadingCache = CacheBuilder.newBuilder()

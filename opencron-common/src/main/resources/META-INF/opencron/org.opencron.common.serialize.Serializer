@@ -1,0 +1,8 @@
+fastjson=org.opencron.common.serialize.fastjson.FastjsonSerializer
+fst=org.opencron.common.serialize.fst.FstSerializer
+hessian=org.opencron.common.serialize.hessian.HessianSerializer
+jackson=org.opencron.common.serialize.jackson.JacksonSerializer
+kryo=org.opencron.common.serialize.kryo.KryoSerializer
+msgpack=org.opencron.common.serialize.msgpack.MessagePackSerializer
+protostuff=org.opencron.common.serialize.protostuff.ProtostuffSerializer
+def=org.opencron.common.serialize.fastjson.FastjsonSerializer

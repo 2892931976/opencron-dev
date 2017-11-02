@@ -18,18 +18,22 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.opencron.common.serialization;
 
+package org.opencron.common.serialize;
 
-import org.opencron.common.serialization.kryo.KryoSerializer;
+import org.opencron.common.extension.SPI;
+
+import java.io.IOException;
 
 /**
  * @author benjobs
  */
-public class SerializerFactory {
 
-    public static Serializer getSerializer(){
-        return new KryoSerializer();
-    }
+@SPI("hessian")
+public interface Serializer {
+
+    byte[] encode(Object msg) throws IOException;
+
+    <T> T decode(byte[] buf, Class<T> type) throws IOException;
 
 }

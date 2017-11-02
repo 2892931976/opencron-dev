@@ -18,17 +18,19 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.opencron.rpc;
 
-import org.opencron.common.job.Response;
+package org.opencron.common.util;
 
-/**
- * @author benjobs
- */
-public interface RpcInvokeCallback {
+public class Holder<T> {
 
-    void onSuccess(Response response);
+    private volatile T value;
 
-    void onFailure(Throwable err);
+    public void set(T value) {
+        this.value = value;
+    }
+
+    public T get() {
+        return value;
+    }
 
 }

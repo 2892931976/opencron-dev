@@ -1,6 +1,9 @@
 package org.opencron.rpc;
 
-public interface Client {
+import org.opencron.common.extension.SPI;
+
+@SPI("netty")
+public interface Client extends RpcInvoker {
 
     void open();
 

@@ -18,47 +18,30 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.opencron.common.serialization.hessian;
+package org.opencron.common.serialize.msgpack;
 
-import com.caucho.hessian.io.Hessian2Input;
-import com.caucho.hessian.io.Hessian2Output;
-import org.opencron.common.serialization.Serializer;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.msgpack.jackson.dataformat.MessagePackFactory;
+import org.opencron.common.serialize.Serializer;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 /**
  * @author benjobs
+ * msgpack-java: https://github.com/msgpack/msgpack-java
  */
-public class HessianSerializer implements Serializer {
+
+public class MessagePackSerializer implements Serializer {
+
+    private final ObjectMapper objectMapper = new ObjectMapper(new MessagePackFactory());;
 
     @Override
     public byte[] encode(Object msg) throws IOException {
-        Hessian2Output out = null;
-        try {
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            out = new Hessian2Output(bos);
-            out.writeObject(msg);
-            out.flush();
-            return bos.toByteArray();
-        } finally {
-            if(out!=null){
-                out.close();
-            }
-        }
+        return objectMapper.writeValueAsBytes(msg);
     }
 
     @Override
     public <T> T decode(byte[] buf, Class<T> type) throws IOException {
-        Hessian2Input input = null;
-        try {
-            input = new Hessian2Input(new ByteArrayInputStream(buf));
-            return (T) input.readObject(type);
-        } finally {
-            if(input!=null){
-                input.close();
-            }
-        }
+        return objectMapper.readValue(buf, type);
     }
 }

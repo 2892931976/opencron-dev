@@ -18,7 +18,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.opencron.common.serialization.protostuff;
+package org.opencron.common.serialize.protostuff;
 
 import com.dyuproject.protostuff.LinkedBuffer;
 import com.dyuproject.protostuff.ProtostuffIOUtil;
@@ -27,7 +27,7 @@ import com.dyuproject.protostuff.runtime.RuntimeSchema;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import org.opencron.common.serialization.Serializer;
+import org.opencron.common.serialize.Serializer;
 
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
@@ -35,6 +35,7 @@ import java.util.concurrent.ExecutionException;
 /**
  * @author benjobs
  */
+
 public class ProtostuffSerializer implements Serializer {
 
     private static final LoadingCache<Class<?>, Schema<?>> schemas = CacheBuilder.newBuilder()

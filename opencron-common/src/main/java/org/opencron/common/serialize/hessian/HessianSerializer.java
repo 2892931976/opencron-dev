@@ -18,13 +18,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.opencron.common.serialization.kryo;
+package org.opencron.common.serialize.hessian;
 
-import com.esotericsoftware.kryo.Kryo;
-import com.esotericsoftware.kryo.io.Input;
-import com.esotericsoftware.kryo.io.Output;
-import org.objenesis.strategy.StdInstantiatorStrategy;
-import org.opencron.common.serialization.Serializer;
+import com.caucho.hessian.io.Hessian2Input;
+import com.caucho.hessian.io.Hessian2Output;
+import org.opencron.common.serialize.Serializer;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -33,36 +31,35 @@ import java.io.IOException;
 /**
  * @author benjobs
  */
-public class KryoSerializer implements Serializer {
 
-    private static final ThreadLocal<Kryo> THREAD_LOCAL = new ThreadLocal<Kryo>(){
-        @Override
-        protected Kryo initialValue() {
-            Kryo kryo = new Kryo();
-            kryo.setInstantiatorStrategy(new Kryo.DefaultInstantiatorStrategy(new StdInstantiatorStrategy()));
-            return kryo;
-        }
-    };
+public class HessianSerializer implements Serializer {
 
     @Override
     public byte[] encode(Object msg) throws IOException {
-        try(ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            Output output = new Output(bos)){
-
-            Kryo kryo = THREAD_LOCAL.get();
-            kryo.writeObject(output, msg);
-            return output.toBytes();
+        Hessian2Output out = null;
+        try {
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            out = new Hessian2Output(bos);
+            out.writeObject(msg);
+            out.flush();
+            return bos.toByteArray();
+        } finally {
+            if(out!=null){
+                out.close();
+            }
         }
     }
 
     @Override
     public <T> T decode(byte[] buf, Class<T> type) throws IOException {
-
-        try (ByteArrayInputStream bis = new ByteArrayInputStream(buf);
-             Input input = new Input(bis)) {
-
-            Kryo kryo = THREAD_LOCAL.get();
-            return kryo.readObject(input, type);
+        Hessian2Input input = null;
+        try {
+            input = new Hessian2Input(new ByteArrayInputStream(buf));
+            return (T) input.readObject(type);
+        } finally {
+            if(input!=null){
+                input.close();
+            }
         }
     }
 }

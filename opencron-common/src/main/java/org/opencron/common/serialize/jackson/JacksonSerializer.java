@@ -18,16 +18,17 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.opencron.common.serialization.jackson;
+package org.opencron.common.serialize.jackson;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.opencron.common.serialization.Serializer;
+import org.opencron.common.serialize.Serializer;
 
 import java.io.IOException;
 
 /**
  * @author benjobs
  */
+
 public class JacksonSerializer implements Serializer {
 
     private static final String CHARSET = "UTF-8";

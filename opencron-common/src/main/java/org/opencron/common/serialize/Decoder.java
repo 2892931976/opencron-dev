@@ -18,11 +18,12 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.opencron.common.serialization;
+package org.opencron.common.serialize;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
+import org.opencron.common.extension.ExtensionLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,7 +39,7 @@ public class Decoder<T> extends LengthFieldBasedFrameDecoder {
     //判断传送客户端传送过来的数据是否按照协议传输，头部信息的大小应该是 byte+byte+int = 1+1+4 = 6
     private static final int HEADER_SIZE = 6;
 
-    private Serializer serializer = SerializerFactory.getSerializer();
+    private Serializer serializer = ExtensionLoader.getExtensionLoader(Serializer.class).getExtension();
     private Class<T> clazz;
 
     public Decoder(Class<T> clazz, int maxFrameLength, int lengthFieldOffset, int lengthFieldLength) throws IOException {

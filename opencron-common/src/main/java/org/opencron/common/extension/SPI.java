@@ -18,29 +18,18 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.opencron.common.serialization.msgpack;
+package org.opencron.common.extension;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.msgpack.jackson.dataformat.MessagePackFactory;
-import org.opencron.common.serialization.Serializer;
+import java.lang.annotation.*;
 
-import java.io.IOException;
+@Documented
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.TYPE})
+public @interface SPI {
 
-/**
- * @author benjobs
- * msgpack-java: https://github.com/msgpack/msgpack-java
- */
-public class MessagePackSerializer implements Serializer {
+    /**
+     * 缺省扩展点名。
+     */
+    String value() default "def";
 
-    private final ObjectMapper objectMapper = new ObjectMapper(new MessagePackFactory());;
-
-    @Override
-    public byte[] encode(Object msg) throws IOException {
-        return objectMapper.writeValueAsBytes(msg);
-    }
-
-    @Override
-    public <T> T decode(byte[] buf, Class<T> type) throws IOException {
-        return objectMapper.readValue(buf, type);
-    }
 }

@@ -1,13 +1,14 @@
-package org.opencron.common.serialization.fastjson;
+package org.opencron.common.serialize.fastjson;
 
 import com.alibaba.fastjson.JSON;
-import org.opencron.common.serialization.Serializer;
+import org.opencron.common.serialize.Serializer;
 
 import java.io.IOException;
 
 /**
  *
  */
+
 public class FastjsonSerializer implements Serializer {
 
     private static final String CHARSET = "UTF-8";

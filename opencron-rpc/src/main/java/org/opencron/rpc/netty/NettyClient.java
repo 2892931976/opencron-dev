@@ -31,11 +31,11 @@ import io.netty.util.concurrent.DefaultThreadFactory;
 import org.opencron.common.Constants;
 import org.opencron.common.job.Request;
 import org.opencron.common.job.Response;
-import org.opencron.common.serialization.Decoder;
-import org.opencron.common.serialization.Encoder;
+import org.opencron.common.serialize.Decoder;
+import org.opencron.common.serialize.Encoder;
 import org.opencron.common.util.HttpUtils;
 import org.opencron.rpc.Client;
-import org.opencron.rpc.RpcInvokeCallback;
+import org.opencron.rpc.RpcAsyncCallback;
 import org.opencron.rpc.RpcInvoker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -148,7 +148,7 @@ public class NettyClient implements Client,RpcInvoker {
     }
 
     @Override
-    public void sentAsync(final Request request,final RpcInvokeCallback callback) throws Exception {
+    public void sentAsync(final Request request,final RpcAsyncCallback callback) throws Exception {
 
         Channel channel = getOrCreateChannel(request);
 

@@ -166,7 +166,7 @@
                             data: {
                                 "proxy": _ping || 0,
                                 "proxyId": proxyId,
-                                "ip":$("#ip").val(),
+                                "host":$("#host").val(),
                                 "port": $("#port").val(),
                                 "password": calcMD5($("#password").val())
                             }

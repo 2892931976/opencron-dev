@@ -30,6 +30,6 @@ public interface RpcInvoker {
 
     void sentOneway(Request request) throws Exception  ;
 
-    void sentAsync(Request request, RpcInvokeCallback callback) throws Exception  ;
+    void sentAsync(Request request, RpcAsyncCallback callback) throws Exception  ;
 
 }
