@@ -57,7 +57,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @date 2016-03-27
  */
 
-public class NettyClient implements Client,RpcInvoker {
+public class NettyClient implements Client {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
