@@ -29,7 +29,7 @@ import java.io.IOException;
  * @author benjobs
  */
 
-@SPI("kryo")
+@SPI
 public interface Serializer {
 
     byte[] encode(Object msg) throws IOException;

@@ -1,1 +1,4 @@
 netty=org.opencron.rpc.netty.NettyClient
+
+#default client
+def=org.opencron.rpc.netty.NettyClient

@@ -5,4 +5,6 @@ jackson=org.opencron.common.serialize.jackson.JacksonSerializer
 kryo=org.opencron.common.serialize.kryo.KryoSerializer
 msgpack=org.opencron.common.serialize.msgpack.MessagePackSerializer
 protostuff=org.opencron.common.serialize.protostuff.ProtostuffSerializer
-def=org.opencron.common.serialize.fastjson.FastjsonSerializer
+
+#default Serializer
+def=org.opencron.common.serialize.kryo.KryoSerializer

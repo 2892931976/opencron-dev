@@ -98,7 +98,6 @@ public final class ExtensionLoader<T> {
                             if (CommonUtils.notEmpty(line)) {
                                 //已经注释或者不是K=V结构的统统跳过.
                                 if (line.indexOf("#") == 0) {
-                                    logger.warn("Deprecated configuration : " + line);
                                     continue;
                                 }
 
