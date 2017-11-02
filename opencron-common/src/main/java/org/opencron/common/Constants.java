@@ -31,6 +31,8 @@ public class Constants {
 
     public static final int RPC_TIMEOUT = 5000;
 
+    public static final String META_INF_DIR = "META-INF/opencron/";
+
     public static final String ZK_REGISTRY_PATH = "/registry";
     public static final String ZK_DATA_PATH = ZK_REGISTRY_PATH + "/data";
 

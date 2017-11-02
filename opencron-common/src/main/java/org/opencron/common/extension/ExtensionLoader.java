@@ -21,6 +21,7 @@
 
 package org.opencron.common.extension;
 
+import org.opencron.common.Constants;
 import org.opencron.common.logging.LoggerFactory;
 import org.opencron.common.util.CommonUtils;
 import org.slf4j.Logger;
@@ -39,8 +40,6 @@ import static org.opencron.common.util.AssertUtils.checkNotNull;
 public final class ExtensionLoader<T> {
 
     private Logger logger = LoggerFactory.getLogger(ExtensionLoader.class);
-
-    private static final String META_DIR = "META-INF/opencron/";
 
     private final Class<T> type;
 
@@ -86,7 +85,7 @@ public final class ExtensionLoader<T> {
     }
 
     private void loadFile() {
-        String fileName = META_DIR + this.type.getName();
+        String fileName = Constants.META_INF_DIR + this.type.getName();
         try {
             Enumeration<java.net.URL> urls = ClassLoader.getSystemResources(fileName);
             if (urls != null) {
