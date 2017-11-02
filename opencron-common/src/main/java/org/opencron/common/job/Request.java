@@ -159,17 +159,4 @@ public class Request implements Serializable {
         this.proxyAgent = proxyAgent;
         return this;
     }
-/*
-    public String getProxyHost() {
-        return this.proxyHost;
-    }
-
-    public Request setProxyHost(String proxyHost) {
-        this.proxyHost = proxyHost;
-        //代理:
-        if (proxy) {
-
-        }
-        return this;
-    }*/
 }
