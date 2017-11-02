@@ -28,8 +28,8 @@ import org.slf4j.Logger;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.net.URL;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 import static org.opencron.common.util.AssertUtils.checkNotNull;
 
@@ -43,13 +43,11 @@ public final class ExtensionLoader<T> {
 
     private final Class<T> type;
 
+    private Class<T> instanceType = null;
+
     private SPI spi;
 
     private final ClassLoader loader;
-
-    private Map<String, IllegalStateException> exceptions = new ConcurrentHashMap<String, IllegalStateException>();
-
-    private LinkedHashMap<String, T> extInstances = new LinkedHashMap<>();
 
     public static <T> ExtensionLoader<T> getExtensionLoader(Class<T> type) {
         return ExtensionLoader.getExtensionLoader(type, Thread.currentThread().getContextClassLoader());
@@ -60,10 +58,14 @@ public final class ExtensionLoader<T> {
     }
 
     public T getExtension() {
-        for (Map.Entry<String,T> entry: extInstances.entrySet()) {
-            if (entry.getKey().equals( getSpiName(this.spi.value()))) {
-                return entry.getValue();
+        try {
+            if (instanceType != null) {
+                T instance = instanceType.newInstance();
+                this.type.cast(instance);
+                return instance;
             }
+        }catch (Exception e) {
+            throw new IllegalArgumentException(e);
         }
         throw new IllegalArgumentException(this.type.getName() + " impl could not be found");
     }
@@ -87,14 +89,14 @@ public final class ExtensionLoader<T> {
     private void loadFile() {
         String fileName = Constants.META_INF_DIR + this.type.getName();
         try {
-            Enumeration<java.net.URL> urls = ClassLoader.getSystemResources(fileName);
+            Enumeration<URL> urls = ClassLoader.getSystemResources(fileName);
             if (urls != null) {
                 while (urls.hasMoreElements()) {
-                    java.net.URL url = urls.nextElement();
+                    URL url = urls.nextElement();
                     try {
                         BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream(), "utf-8"));
                         try {
-                            String line = null;
+                            String line;
                             while ((line = reader.readLine()) != null) {
                                 final int ci = line.indexOf('#');
                                 if (ci >= 0) line = line.substring(0, ci);
@@ -108,27 +110,19 @@ public final class ExtensionLoader<T> {
                                             line = line.substring(i + 1).trim();
                                         }
                                         if (CommonUtils.notEmpty(name,line)) {
-                                            Class<?> clazz = Class.forName(line, true, this.loader);
-                                            if (!this.type.isAssignableFrom(clazz)) {
-                                                throw new IllegalStateException("Error when load extension class(interface: " +
-                                                        this.type + ", class line: " + clazz.getName() + "), class "
-                                                        + clazz.getName() + "is not subtype of interface.");
-                                            }
-                                            name = getSpiName(name);
-                                            if (extInstances.containsKey(name)) {
-                                                Object obj = extInstances.get(name);
-                                                //check exists....
-                                                if (!obj.getClass().equals(clazz)) {
-                                                    throw new IllegalStateException("[opencron]: spi'implements name is not unique,already exists instance["+name+"],class: " + obj.getClass().getName() + ",this class:"+this.type.getName());
+                                            if (name.equals(this.spi.value())) {
+                                                Class clazz = Class.forName(line, false, this.loader);
+                                                if (!this.type.isAssignableFrom(clazz)) {
+                                                    throw new IllegalStateException("Error when load extension class(interface: " +
+                                                            this.type + ", class line: " + clazz.getName() + "), class "
+                                                            + clazz.getName() + "is not subtype of interface.");
                                                 }
-                                            }else {
-                                                T instance = this.type.cast(clazz.newInstance());
-                                                extInstances.put(name, instance);
+                                                this.instanceType = clazz;
+                                                break;
                                             }
                                         }
                                     } catch (Throwable t) {
-                                        IllegalStateException e = new IllegalStateException("Failed to load extension class(interface: " + type + ", class line: " + line + ") in " + url + ", cause: " + t.getMessage(), t);
-                                        exceptions.put(line, e);
+                                        throw  new IllegalStateException("Failed to load extension class(interface: " + type + ", class line: " + line + ") in " + url + ", cause: " + t.getMessage(), t);
                                     }
                                 }
                             } // end of while read lines
@@ -152,7 +146,4 @@ public final class ExtensionLoader<T> {
         return type.isAnnotationPresent(SPI.class);
     }
 
-    public String getSpiName(String spiName) {
-        return this.type.getName()+":"+spiName;
-    }
 }

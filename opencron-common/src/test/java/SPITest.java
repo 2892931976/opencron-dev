@@ -11,6 +11,14 @@ public class SPITest {
         Serializer serializer = ExtensionLoader.getExtensionLoader(Serializer.class).getExtension();
         byte[] str = serializer.encode("benjobs");
         System.out.println(str);
+        ExtensionLoader.getExtensionLoader(Serializer.class).getExtension();
+        System.out.println("xxx");
+    }
+
+    @Test
+    public void testInstance(){
+
+
     }
 
 }
