@@ -93,7 +93,7 @@ public final class ExtensionLoader<T> {
                     Scanner scanner = null;
                     try {
                         scanner = new Scanner(new InputStreamReader(url.openStream(), "utf-8"));
-                        while (true) {
+                        while (scanner.hasNextLine()) {
                             String line = scanner.nextLine();
                             if (CommonUtils.notEmpty(line)) {
                                 //已经注释或者不是K=V结构的统统跳过.
