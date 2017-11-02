@@ -43,9 +43,9 @@ import java.util.*;
 import static org.opencron.common.util.CommonUtils.*;
 import static org.opencron.common.util.ReflectUtils.isPrototype;
 
-public class AgentHandler implements RpcHandler,AgentJob {
+public class AgentProcessor implements RpcHandler,AgentJob {
 
-    private Logger logger = LoggerFactory.getLogger(AgentHandler.class);
+    private Logger logger = LoggerFactory.getLogger(AgentProcessor.class);
 
     private final String REPLACE_REX = "%s:\\sline\\s[0-9]+:";
 
@@ -55,7 +55,7 @@ public class AgentHandler implements RpcHandler,AgentJob {
 
     private String password;
 
-    public AgentHandler() {
+    public AgentProcessor() {
         this.password = SystemPropertyUtils.get("opencron.password","opencron");
     }
 

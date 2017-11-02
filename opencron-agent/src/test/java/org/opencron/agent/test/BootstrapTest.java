@@ -1,12 +1,11 @@
 package org.opencron.agent.test;
 
 import org.apache.commons.codec.digest.DigestUtils;
-import org.opencron.agent.AgentHandler;
+import org.opencron.agent.AgentProcessor;
 import org.opencron.common.extension.ExtensionLoader;
 import org.opencron.common.logging.LoggerFactory;
 import org.opencron.common.util.SystemPropertyUtils;
 import org.opencron.rpc.Server;
-import org.opencron.rpc.netty.NettyServer;
 import org.slf4j.Logger;
 
 import java.io.*;
@@ -63,7 +62,7 @@ public class BootstrapTest implements Serializable {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    server.open(port, new AgentHandler());
+                    server.open(port, new AgentProcessor());
                 }
             }).start();
 

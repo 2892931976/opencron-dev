@@ -32,7 +32,6 @@ import org.opencron.common.util.IOUtils;
 import org.opencron.common.logging.LoggerFactory;
 import org.opencron.common.util.SystemPropertyUtils;
 import org.opencron.rpc.Server;
-import org.opencron.rpc.netty.NettyServer;
 import org.slf4j.Logger;
 
 import java.io.*;
@@ -176,7 +175,7 @@ public class Bootstrap implements Serializable {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    server.open(port,new AgentHandler());
+                    server.open(port,new AgentProcessor());
                 }
             }).start();
 
