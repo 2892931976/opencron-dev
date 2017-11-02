@@ -35,8 +35,7 @@ import org.opencron.common.serialize.Decoder;
 import org.opencron.common.serialize.Encoder;
 import org.opencron.common.util.HttpUtils;
 import org.opencron.rpc.Client;
-import org.opencron.rpc.RpcAsyncCallback;
-import org.opencron.rpc.RpcInvoker;
+import org.opencron.rpc.ClientAsyncCallback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -148,7 +147,7 @@ public class NettyClient implements Client {
     }
 
     @Override
-    public void sentAsync(final Request request,final RpcAsyncCallback callback) throws Exception {
+    public void sentAsync(final Request request,final ClientAsyncCallback callback) throws Exception {
 
         Channel channel = getOrCreateChannel(request);
 

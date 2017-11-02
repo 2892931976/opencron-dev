@@ -25,7 +25,7 @@ import org.opencron.common.job.Response;
 /**
  * @author benjobs
  */
-public interface RpcAsyncCallback {
+public interface ClientAsyncCallback {
 
     void onSuccess(Response response);
 

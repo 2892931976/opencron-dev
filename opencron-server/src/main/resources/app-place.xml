@@ -33,6 +33,4 @@
 
 	<bean class="org.opencron.server.job.OpencronTask" lazy-init="false"/>
 
-	<bean class="org.opencron.rpc.netty.NettyInvoker"/>
-
 </beans>

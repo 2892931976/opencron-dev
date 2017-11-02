@@ -22,6 +22,7 @@
 package org.opencron.server.controller;
 
 import com.alibaba.fastjson.JSON;
+import org.opencron.common.Constants;
 import org.opencron.common.job.Opencron;
 import org.opencron.common.job.Response;
 import org.opencron.common.util.*;
@@ -176,7 +177,7 @@ public class DashboardController extends BaseController {
          * 直联
          */
         if (agent.getProxy().equals(Opencron.ConnType.CONN.getType())) {
-            final String url = String.format("http://%s:%s", agent.getHost(), PropertyPlaceholder.get("opencorn.monitorPort"));
+            final String url = String.format("http://%s:%s", agent.getHost(), PropertyPlaceholder.get(Constants.PARAM_MONITORPORT_KEY));
             return new HashMap<String,Serializable>(){{
                 put("connType",agent.getProxy());
                 put("data",url);

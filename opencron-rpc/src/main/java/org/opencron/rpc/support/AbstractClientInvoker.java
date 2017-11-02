@@ -19,35 +19,31 @@
  * under the License.
  */
 
-package org.opencron.rpc.netty;
+package org.opencron.rpc.support;
 
 import org.opencron.common.extension.ExtensionLoader;
 import org.opencron.common.job.Request;
 import org.opencron.common.job.Response;
 import org.opencron.common.job.RpcType;
-import org.opencron.common.util.IdGenerator;
 import org.opencron.rpc.Client;
-import org.opencron.rpc.RpcAsyncCallback;
-import org.opencron.rpc.RpcInvoker;
+import org.opencron.rpc.ClientAsyncCallback;
+import org.opencron.rpc.ClientInvoker;
 
 
 /**
- * agent OpencronCaller
- *
  * @author <a href="mailto:benjobs@qq.com">B e n</a>
  * @version 1.0
  * @date 2016-03-27
  */
 
-public class NettyInvoker implements RpcInvoker {
+public class AbstractClientInvoker implements ClientInvoker {
 
     private Client client = ExtensionLoader.getExtensionLoader(Client.class).getExtension();
 
     //同步调用
     public Response sentSync(Request request) {
         try {
-            request.setRpcType(RpcType.SYNC).setId(IdGenerator.getId());
-            return client.sentSync(request);
+            return client.sentSync(request.setRpcType(RpcType.SYNC));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -57,18 +53,16 @@ public class NettyInvoker implements RpcInvoker {
     //单向调用
     public void sentOneway(Request request) {
         try {
-            request.setRpcType(RpcType.ONE_WAY).setId(IdGenerator.getId());
-            client.sentOneway(request);
+            client.sentOneway(request.setRpcType(RpcType.ONE_WAY));
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     //异步调用...
-    public void sentAsync(Request request, RpcAsyncCallback callback) {
+    public void sentAsync(Request request, ClientAsyncCallback callback) {
         try {
-            request.setRpcType(RpcType.ASYNC).setId(IdGenerator.getId());
-            client.sentAsync(request, callback);
+            client.sentAsync(request.setRpcType(RpcType.ASYNC),callback);
         } catch (Exception e) {
             e.printStackTrace();
         }

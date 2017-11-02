@@ -31,6 +31,7 @@ import org.opencron.common.extension.ExtensionLoader;
 import org.opencron.common.util.IOUtils;
 import org.opencron.common.logging.LoggerFactory;
 import org.opencron.common.util.SystemPropertyUtils;
+import org.opencron.rpc.ServerHandler;
 import org.opencron.rpc.Server;
 import org.slf4j.Logger;
 
@@ -54,9 +55,14 @@ public class Bootstrap implements Serializable {
     private static Logger logger = LoggerFactory.getLogger(AgentMonitor.class);
 
     /**
-     * Server server
+     * rpc server
      */
     private Server server = ExtensionLoader.getExtensionLoader(Server.class).getExtension();
+
+    /**
+     * rpc handler...
+     */
+    private ServerHandler handler = ExtensionLoader.getExtensionLoader(ServerHandler.class).getExtension();
 
     /**
      * agent port
@@ -175,7 +181,7 @@ public class Bootstrap implements Serializable {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    server.open(port,new AgentProcessor());
+                    server.open(port,handler);
                 }
             }).start();
 

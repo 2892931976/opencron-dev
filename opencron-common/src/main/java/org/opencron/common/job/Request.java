@@ -20,9 +20,14 @@
  */
 package org.opencron.common.job;
 
+import com.alibaba.fastjson.JSON;
+import org.opencron.common.Constants;
 import org.opencron.common.util.CommonUtils;
+import org.opencron.common.util.IdGenerator;
+import org.opencron.common.util.collection.ParamsMap;
 
 import java.io.Serializable;
+import java.nio.file.OpenOption;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -36,14 +41,23 @@ public class Request implements Serializable {
     private Integer timeOut;
     private Action action;
     private String password;
+    //是否为代理Agent的请求
+    private Long proxyAgent;
     private Map<String, String> params;
 
     public Request(){
 
     }
 
-    public static Request request(String hostName, Integer port, Action action, String password,Integer timeOut) {
-        return new Request().setHostName(hostName).setPort(port).setAction(action).setPassword(password).setTimeOut(timeOut);
+    public static Request request(String hostName, Integer port, Action action, String password, Integer timeOut,Long proxyAgent) {
+        return new Request()
+                .setHostName(hostName)
+                .setPort(port)
+                .setAction(action)
+                .setPassword(password)
+                .setTimeOut(timeOut)
+                .setProxyAgent(proxyAgent)
+                .setId(IdGenerator.getId());
     }
 
     public Request putParam(String key, String value) {
@@ -136,4 +150,26 @@ public class Request implements Serializable {
         this.id = id;
         return this;
     }
+
+    public Long getProxyAgent() {
+        return proxyAgent;
+    }
+
+    public Request setProxyAgent(Long proxyAgent) {
+        this.proxyAgent = proxyAgent;
+        return this;
+    }
+/*
+    public String getProxyHost() {
+        return this.proxyHost;
+    }
+
+    public Request setProxyHost(String proxyHost) {
+        this.proxyHost = proxyHost;
+        //代理:
+        if (proxy) {
+
+        }
+        return this;
+    }*/
 }

@@ -3,7 +3,7 @@ package org.opencron.rpc;
 import org.opencron.common.extension.SPI;
 
 @SPI
-public interface Client extends RpcInvoker {
+public interface Client extends ClientInvoker {
 
     void open();
 

@@ -8,7 +8,7 @@ public interface Server {
 
     boolean isBound();
 
-    void open(int prot, RpcHandler handler);
+    void open(int prot, ServerHandler handler);
 
     void close() throws Throwable;
 

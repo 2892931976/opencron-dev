@@ -21,15 +21,13 @@
 
 package org.opencron.rpc;
 
+import org.opencron.common.extension.SPI;
 import org.opencron.common.job.Request;
 import org.opencron.common.job.Response;
 
-public interface RpcInvoker {
+@SPI
+public interface ServerHandler {
 
-    Response sentSync(Request request) throws Exception  ;
-
-    void sentOneway(Request request) throws Exception  ;
-
-    void sentAsync(Request request, RpcAsyncCallback callback) throws Exception  ;
+    Response handle(Request request);
 
 }

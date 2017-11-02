@@ -22,7 +22,6 @@
 
 package org.opencron.server.service;
 
-import org.opencron.rpc.RpcInvoker;
 import org.opencron.common.Constants;
 import org.opencron.common.exception.PingException;
 import org.opencron.common.job.Action;
@@ -32,6 +31,7 @@ import org.opencron.common.util.collection.ParamsMap;
 import org.opencron.server.domain.Record;
 import org.opencron.server.domain.Agent;
 import org.opencron.server.domain.User;
+import org.opencron.server.job.OpencronCaller;
 import org.opencron.server.vo.JobVo;
 import com.mysql.jdbc.PacketTooBigException;
 import org.quartz.Job;
@@ -65,7 +65,7 @@ public class ExecuteService implements Job {
     private NoticeService noticeService;
 
     @Autowired
-    private RpcInvoker rpcInvoker;
+    private OpencronCaller caller;
 
     @Autowired
     private AgentService agentService;
@@ -434,7 +434,15 @@ public class ExecuteService implements Job {
                         recordService.merge(cord);
                         job = jobService.getJobVoById(cord.getJobId());
                         //向远程机器发送kill指令
-                        rpcInvoker.sentSync(Request.request(job.getHost(), job.getPort(), Action.KILL, job.getPassword(), Constants.RPC_TIMEOUT).putParam("pid", cord.getPid()));
+                        caller.sentSync( Request.request(
+                                        job.getHost(),
+                                        job.getPort(),
+                                        Action.KILL,
+                                        job.getPassword(),
+                                        Constants.RPC_TIMEOUT,
+                                        job.getAgent().getProxyAgent()
+                        ).putParam(Constants.PARAM_PID_KEY, cord.getPid()));
+
                         cord.setStatus(RunStatus.STOPED.getStatus());
                         cord.setEndTime(new Date());
                         recordService.merge(cord);
@@ -469,12 +477,19 @@ public class ExecuteService implements Job {
      * 向执行器发送请求，并封装响应结果
      */
     private Response responseToRecord(final JobVo job, final Record record) throws Exception {
-        Response response = rpcInvoker.sentSync(Request.request(job.getHost(), job.getPort(), Action.EXECUTE, job.getPassword(),job.getTimeout() * 6000 )
-                .putParam("command", job.getCommand())
-                .putParam("pid", record.getPid())
-                .putParam("timeout", job.getTimeout() + "")
-                .putParam("runAs",job.getRunAs())
-                .putParam("successExit",job.getSuccessExit()));
+        Response response = caller.sentSync( Request.request(
+                job.getHost(),
+                job.getPort(),
+                Action.EXECUTE,
+                job.getPassword(),
+                job.getTimeout() * 6000,
+                job.getAgent().getProxyAgent())
+                .putParam(Constants.PARAM_COMMAND_KEY, job.getCommand())
+                .putParam(Constants.PARAM_PID_KEY, record.getPid())
+                .putParam(Constants.PARAM_TIMEOUT_KEY, job.getTimeout() + "")
+                .putParam(Constants.PARAM_RUNAS_KEY,job.getRunAs())
+                .putParam(Constants.PARAM_SUCCESSEXIT_KEY,job.getSuccessExit())
+        );
 
         logger.info("[opencron]:execute response:{}", response.toString());
         record.setReturnCode(response.getExitCode());
@@ -531,7 +546,15 @@ public class ExecuteService implements Job {
 
     public boolean ping(Agent agent) {
         try {
-            Response response = rpcInvoker.sentSync(Request.request(agent.getHost(), agent.getPort(), Action.PING, agent.getPassword(),null).putParam("serverPort", "1577"));
+            Response response = caller.sentSync(Request.request(
+                    agent.getHost(),
+                    agent.getPort(),
+                    Action.PING,
+                    agent.getPassword(),
+                    null,
+                    agent.getProxyAgent()
+            ).putParam("serverPort", "1577"));
+
             return response!=null && response.isSuccess();
         } catch (Exception e) {
             logger.error("[opencron]ping failed,host:{},port:{}", agent.getHost(), agent.getPort());
@@ -541,7 +564,14 @@ public class ExecuteService implements Job {
 
     public String guid(Agent agent) {
         try {
-            Response response = rpcInvoker.sentSync(Request.request(agent.getHost(), agent.getPort(), Action.GUID,agent.getPassword(),null));
+            Response response = caller.sentSync(Request.request(
+                    agent.getHost(),
+                    agent.getPort(),
+                    Action.GUID,
+                    agent.getPassword(),
+                    null,
+                    agent.getProxyAgent())
+            );
             return response.getMessage();
         } catch (Exception e) {
             logger.error("[opencron]getguid failed,host:{},port:{}", agent.getHost(), agent.getPort());
@@ -551,7 +581,14 @@ public class ExecuteService implements Job {
 
     public String path(Agent agent) {
         try {
-            Response response = rpcInvoker.sentSync(Request.request(agent.getHost(), agent.getPort(), Action.PATH,null,Constants.RPC_TIMEOUT));
+            Response response = caller.sentSync(Request.request(
+                    agent.getHost(),
+                    agent.getPort(),
+                    Action.PATH,
+                    null,
+                    Constants.RPC_TIMEOUT,
+                    agent.getProxyAgent())
+            );
             return response.getMessage();
         } catch (Exception e) {
             logger.error("[opencron]ping failed,host:{},port:{}", agent.getHost(), agent.getPort());
@@ -565,8 +602,14 @@ public class ExecuteService implements Job {
     public boolean password(Agent agent, final String newPassword) {
         boolean ping = false;
         try {
-            Response response = rpcInvoker.sentSync(Request.request(agent.getHost(), agent.getPort(), Action.PASSWORD, agent.getPassword(),Constants.RPC_TIMEOUT)
-                    .putParam("newPassword", newPassword));
+            Response response = caller.sentSync(Request.request(
+                    agent.getHost(),
+                    agent.getPort(),
+                    Action.PASSWORD,
+                    agent.getPassword(),
+                    Constants.RPC_TIMEOUT,
+                    agent.getProxyAgent()
+            ).putParam(Constants.PARAM_NEWPASSWORD_KEY, newPassword));
             ping = response.isSuccess();
         } catch (Exception e) {
             e.printStackTrace();
@@ -578,9 +621,15 @@ public class ExecuteService implements Job {
      * 监测执行器运行状态
      */
     public Response monitor(Agent agent) throws Exception {
-        return rpcInvoker.sentSync(
-                Request.request(agent.getHost(), agent.getPort(), Action.MONITOR, agent.getPassword(),Constants.RPC_TIMEOUT)
-                        .setParams(ParamsMap.instance().fill("connType", ConnType.getByType(agent.getProxy()).getName())));
+        return caller.sentSync(
+                Request.request(
+                        agent.getHost(),
+                        agent.getPort(),
+                        Action.MONITOR,
+                        agent.getPassword(),
+                        Constants.RPC_TIMEOUT,
+                        agent.getProxyAgent()
+                ).setParams(ParamsMap.instance().fill("connType", ConnType.getByType(agent.getProxy()).getName())));
     }
 
     /**

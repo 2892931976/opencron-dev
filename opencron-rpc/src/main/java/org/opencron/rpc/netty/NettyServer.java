@@ -35,7 +35,7 @@ import org.opencron.common.job.Response;
 import org.opencron.common.logging.LoggerFactory;
 import org.opencron.common.serialize.Decoder;
 import org.opencron.common.serialize.Encoder;
-import org.opencron.rpc.RpcHandler;
+import org.opencron.rpc.ServerHandler;
 import org.opencron.rpc.Server;
 import org.slf4j.Logger;
 
@@ -55,9 +55,9 @@ public class NettyServer implements Server {
     }
 
     @Override
-    public void open(final int prot, RpcHandler rpcHandler) {
+    public void open(final int prot, ServerHandler serverHandler) {
 
-        final NettyServerHandler handler = new NettyServerHandler(rpcHandler);
+        final NettyServerHandler handler = new NettyServerHandler(serverHandler);
 
         this.bootstrap = new ServerBootstrap();
         this.bossGroup = new NioEventLoopGroup(1, new DefaultThreadFactory("NettyServerBoss", true));

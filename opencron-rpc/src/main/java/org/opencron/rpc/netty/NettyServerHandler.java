@@ -25,7 +25,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import org.opencron.common.job.*;
 import org.opencron.common.logging.LoggerFactory;
-import org.opencron.rpc.RpcHandler;
+import org.opencron.rpc.ServerHandler;
 import org.slf4j.Logger;
 
 @ChannelHandler.Sharable
@@ -33,9 +33,9 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Request> {
 
     private Logger logger = LoggerFactory.getLogger(NettyServerHandler.class);
 
-    private RpcHandler handler;
+    private ServerHandler handler;
 
-    public NettyServerHandler(RpcHandler handler){
+    public NettyServerHandler(ServerHandler handler){
         this.handler = handler;
     }
 

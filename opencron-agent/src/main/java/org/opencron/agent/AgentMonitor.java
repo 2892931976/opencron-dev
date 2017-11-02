@@ -61,7 +61,7 @@ public class AgentMonitor {
 
         if (this.server!=null) {
 
-            final Integer port = Integer.parseInt(AgentProperties.getProperty("opencorn.monitorPort"));
+            final Integer port = Integer.parseInt(AgentProperties.getProperty(Constants.PARAM_MONITORPORT_KEY));
 
             com.corundumstudio.socketio.Configuration configuration = new com.corundumstudio.socketio.Configuration();
 

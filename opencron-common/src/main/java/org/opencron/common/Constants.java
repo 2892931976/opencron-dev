@@ -40,6 +40,30 @@ public class Constants {
 
     public static final int DEFAULT_IO_THREADS = Math.min(Runtime.getRuntime().availableProcessors() + 1, 32);
 
+    public static final String PARAM_PROXYHOST_KEY = "proxyHost";
+
+    public static final String PARAM_PROXYPORT_KEY = "proxyPort";
+
+    public static final String PARAM_PROXYACTION_KEY = "proxyAction";
+
+    public static final String PARAM_PROXYPASSWORD_KEY = "proxyPassword";
+
+    public static final String PARAM_PROXYPARAMS_KEY = "proxyParams";
+
+    public static final String PARAM_MONITORPORT_KEY = "opencorn.monitorPort";
+
+    public static final String PARAM_NEWPASSWORD_KEY = "newPassword";
+
+    public static final String PARAM_PID_KEY = "pid";
+
+    public static final String PARAM_COMMAND_KEY = "command";
+
+    public static final String PARAM_TIMEOUT_KEY = "timeout";
+
+    public static final String PARAM_RUNAS_KEY = "runAs";
+
+    public static final String PARAM_SUCCESSEXIT_KEY = "successExit";
+
     /**
      * Name of the system property containing
      */

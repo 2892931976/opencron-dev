@@ -23,14 +23,13 @@ package org.opencron.agent;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.exec.*;
-import org.apache.thrift.TException;
-import org.apache.thrift.transport.TSocket;
-import org.apache.thrift.transport.TTransport;
 import org.opencron.common.Constants;
+import org.opencron.common.extension.ExtensionLoader;
 import org.opencron.common.job.*;
 import org.opencron.common.logging.LoggerFactory;
 import org.opencron.common.util.*;
-import org.opencron.rpc.RpcHandler;
+import org.opencron.rpc.Client;
+import org.opencron.rpc.ServerHandler;
 import org.slf4j.Logger;
 
 import java.beans.Introspector;
@@ -43,9 +42,12 @@ import java.util.*;
 import static org.opencron.common.util.CommonUtils.*;
 import static org.opencron.common.util.ReflectUtils.isPrototype;
 
-public class AgentProcessor implements RpcHandler,AgentJob {
+
+public class AgentProcessor implements ServerHandler,AgentJob {
 
     private Logger logger = LoggerFactory.getLogger(AgentProcessor.class);
+
+    private Client client = null;
 
     private final String REPLACE_REX = "%s:\\sline\\s[0-9]+:";
 
@@ -127,17 +129,18 @@ public class AgentProcessor implements RpcHandler,AgentJob {
 
     @Override
     public Response execute(final Request request) {
-        String command = request.getParams().get("command");
 
-        String pid = request.getParams().get("pid");
+        String command = request.getParams().get(Constants.PARAM_COMMAND_KEY);
+
+        String pid = request.getParams().get(Constants.PARAM_PID_KEY);
         //以分钟为单位
-        Long timeout = CommonUtils.toLong(request.getParams().get("timeout"), 0L);
+        Long timeout = CommonUtils.toLong(request.getParams().get(Constants.PARAM_TIMEOUT_KEY), 0L);
 
         boolean timeoutFlag = timeout > 0;
 
         logger.info("[opencron]:execute:{},pid:{}", command, pid);
 
-        File shellFile = CommandUtils.createShellFile(command,pid,request.getParams().get("runAs"),EXITCODE_SCRIPT);
+        File shellFile = CommandUtils.createShellFile(command,pid,request.getParams().get(Constants.PARAM_RUNAS_KEY),EXITCODE_SCRIPT);
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
@@ -151,7 +154,7 @@ public class AgentProcessor implements RpcHandler,AgentJob {
 
         Integer exitValue;
 
-        String successExit = request.getParams().get("successExit");
+        String successExit = request.getParams().get(Constants.PARAM_SUCCESSEXIT_KEY);
         if (CommonUtils.isEmpty(successExit)) {
             exitValue = 0;//标准退住值:0
         }else {
@@ -229,7 +232,7 @@ public class AgentProcessor implements RpcHandler,AgentJob {
                     timer.cancel();
                     watchdog.stop();
                 }
-                logger.info("[opencron]:job has be killed!at pid :{}", request.getParams().get("pid"));
+                logger.info("[opencron]:job has be killed!at pid :{}", request.getParams().get(Constants.PARAM_PID_KEY));
             } else {
                 logger.info("[opencron]:job execute error:{}", e.getCause().getMessage());
             }
@@ -282,7 +285,7 @@ public class AgentProcessor implements RpcHandler,AgentJob {
     @Override
     public Response password(Request request) {
 
-        String newPassword = request.getParams().get("newPassword");
+        String newPassword = request.getParams().get(Constants.PARAM_NEWPASSWORD_KEY);
         Response response = Response.response(request);
 
         if (isEmpty(newPassword)) {
@@ -297,7 +300,7 @@ public class AgentProcessor implements RpcHandler,AgentJob {
 
     @Override
     public Response kill(Request request) {
-        String pid = request.getParams().get("pid");
+        String pid = request.getParams().get(Constants.PARAM_PID_KEY);
         logger.info("[opencron]:kill pid:{}", pid);
 
         Response response = Response.response(request);
@@ -324,55 +327,37 @@ public class AgentProcessor implements RpcHandler,AgentJob {
 
     @Override
     public Response proxy(Request request) {
-        String proxyHost = request.getParams().get("proxyHost");
-        String proxyPort = request.getParams().get("proxyPort");
-        String proxyAction = request.getParams().get("proxyAction");
-        String proxyPassword = request.getParams().get("proxyPassword");
+
+        if (this.client == null) {
+            this.client = ExtensionLoader.getExtensionLoader(Client.class).getExtension();
+        }
+
+        String proxyHost = request.getParams().get(Constants.PARAM_PROXYHOST_KEY);
+        String proxyPort = request.getParams().get(Constants.PARAM_PROXYPORT_KEY);
+        String proxyAction = request.getParams().get(Constants.PARAM_PROXYACTION_KEY);
+        String proxyPassword = request.getParams().get(Constants.PARAM_PROXYPASSWORD_KEY);
 
         //其他参数....
-        String proxyParams = request.getParams().get("proxyParams");
+        String proxyParams = request.getParams().get(Constants.PARAM_PROXYPARAMS_KEY);
         Map<String, String> params = new HashMap<String, String>(0);
         if (CommonUtils.notEmpty(proxyParams)) {
             params = (Map<String, String>) JSON.parse(proxyParams);
         }
 
-        Request proxyReq = Request.request(proxyHost, toInt(proxyPort), Action.findByName(proxyAction), proxyPassword,request.getTimeOut()).setParams(params);
-
-        logger.info("[opencron]proxy params:{}", proxyReq.toString());
-
-        TTransport transport;
-        /**
-         * ping的超时设置为5毫秒,其他默认
-         */
-        if (proxyReq.getAction().equals(Action.PING)) {
-            proxyReq.getParams().put("proxy","true");
-            transport = new TSocket(proxyReq.getHostName(), proxyReq.getPort(), 1000 * 5);
-        } else {
-            transport = new TSocket(proxyReq.getHostName(), proxyReq.getPort());
-        }
-       /* TProtocol protocol = new TBinaryProtocol(transport);
-        Opencron.Client client = new Opencron.Client(protocol);
-        transport.open();
+        Request proxyReq = Request.request(proxyHost, toInt(proxyPort), Action.findByName(proxyAction), proxyPassword,request.getTimeOut(),null).setParams(params);
 
         Response response = null;
-        for (Method method : client.getClass().getMethods()) {
-            if (method.getName().equalsIgnoreCase(proxyReq.getAction().name())) {
-                try {
-                    response = (Response) method.invoke(client, proxyReq);
-                } catch (Exception e) {
-                    //proxy 执行失败,返回失败信息
-                    response = Response.response(request);
-                    response.setExitCode(Opencron.StatusCode.ERROR_EXIT.getValue())
-                            .setMessage("[opencron]:proxy error:"+e.getLocalizedMessage())
-                            .setSuccess(false)
-                            .end();
-                }
-                break;
-            }
+        try {
+            response = this.client.sentSync(proxyReq);
+        } catch (Exception e) {
+            e.printStackTrace();
+            response = Response.response(request);
+            response.setExitCode(Opencron.StatusCode.ERROR_EXIT.getValue())
+                    .setMessage("[opencron]:proxy error:"+e.getLocalizedMessage())
+                    .setSuccess(false)
+                    .end();
         }
-        transport.flush();
-        transport.close();*/
-        return null;
+        return response;
     }
 
     @Override
