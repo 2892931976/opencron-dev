@@ -16,6 +16,8 @@ public class SPITest {
         Client client = ExtensionLoader.getExtensionLoader(Client.class).getExtension();
         System.out.println(client.getClass());
 
+        System.out.println("1#23".indexOf('#'));
+
     }
 
 }

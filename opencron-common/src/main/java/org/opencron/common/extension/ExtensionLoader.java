@@ -26,7 +26,6 @@ import org.opencron.common.logging.LoggerFactory;
 import org.opencron.common.util.CommonUtils;
 import org.slf4j.Logger;
 
-import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.*;
@@ -34,7 +33,6 @@ import java.util.*;
 import static org.opencron.common.util.AssertUtils.checkNotNull;
 
 /**
- *
  * @author benjobs...
  */
 public final class ExtensionLoader<T> {
@@ -64,7 +62,7 @@ public final class ExtensionLoader<T> {
                 this.type.cast(instance);
                 return instance;
             }
-        }catch (Exception e) {
+        } catch (Exception e) {
             throw new IllegalArgumentException(e);
         }
         throw new IllegalArgumentException(this.type.getName() + " impl could not be found");
@@ -77,8 +75,7 @@ public final class ExtensionLoader<T> {
             throw new IllegalArgumentException("Extension type(" + type + ") is not interface!");
         }
         if (!withExtensionAnnotation(type)) {
-            throw new IllegalArgumentException("Extension type(" + type +
-                    ") is not extension, because WITHOUT @" + SPI.class.getSimpleName() + " Annotation!");
+            throw new IllegalArgumentException("Extension type(" + type + ") is not extension, because WITHOUT @" + SPI.class.getSimpleName() + " Annotation!");
         }
         this.type = checkNotNull(type, "type interface cannot be null");
         this.spi = this.type.getAnnotation(SPI.class);
@@ -93,51 +90,52 @@ public final class ExtensionLoader<T> {
             if (urls != null) {
                 while (urls.hasMoreElements()) {
                     URL url = urls.nextElement();
+                    Scanner scanner = null;
                     try {
-                        BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream(), "utf-8"));
-                        try {
-                            String line;
-                            while ((line = reader.readLine()) != null) {
-                                final int ci = line.indexOf('#');
-                                if (ci >= 0) line = line.substring(0, ci);
-                                line = line.trim();
-                                if (line.length() > 0) {
-                                    try {
-                                        String name = null;
-                                        int i = line.indexOf('=');
-                                        if (i > 0) {
-                                            name = line.substring(0, i).trim();
-                                            line = line.substring(i + 1).trim();
-                                        }
-                                        if (CommonUtils.notEmpty(name,line)) {
-                                            if (name.equals(this.spi.value())) {
-                                                Class clazz = Class.forName(line, false, this.loader);
-                                                if (!this.type.isAssignableFrom(clazz)) {
-                                                    throw new IllegalStateException("Error when load extension class(interface: " +
-                                                            this.type + ", class line: " + clazz.getName() + "), class "
-                                                            + clazz.getName() + "is not subtype of interface.");
-                                                }
-                                                this.instanceType = clazz;
-                                                break;
-                                            }
-                                        }
-                                    } catch (Throwable t) {
-                                        throw  new IllegalStateException("Failed to load extension class(interface: " + type + ", class line: " + line + ") in " + url + ", cause: " + t.getMessage(), t);
-                                    }
+                        scanner = new Scanner(new InputStreamReader(url.openStream(), "utf-8"));
+                        while (true) {
+                            String line = scanner.nextLine();
+                            if (CommonUtils.notEmpty(line)) {
+                                //已经注释或者不是K=V结构的统统跳过.
+                                if (line.indexOf("#") == 0) {
+                                    logger.warn("Deprecated configuration : " + line);
+                                    continue;
                                 }
-                            } // end of while read lines
-                        } finally {
-                            reader.close();
+
+                                line = line.trim();
+                                try {
+                                    String[] args = line.split("=");
+                                    if (args.length != 2) {
+                                        throw new IllegalStateException("invalid SPI configuration:" + line + "please check config: " + url);
+                                    }
+                                    String name = args[0].trim();
+                                    line = args[1].trim();
+                                    if (CommonUtils.notEmpty(name, line)) {
+                                        if (name.equals(this.spi.value())) {
+                                            Class clazz = Class.forName(line, false, this.loader);
+                                            if (!this.type.isAssignableFrom(clazz)) {
+                                                throw new IllegalStateException("Error when load extension class(interface: " +
+                                                        this.type + ", class line: " + clazz.getName() + "), class "
+                                                        + clazz.getName() + "is not subtype of interface.");
+                                            }
+                                            this.instanceType = clazz;
+                                            break;
+                                        }
+                                    }
+                                } catch (Throwable t) {
+                                    throw new IllegalStateException("Failed to load extension class(interface: " + type + ", class line: " + line + ") in " + url + ", cause: " + t.getMessage(), t);
+                                }
+                            }
                         }
                     } catch (Throwable t) {
-                        logger.error("Exception when load extension class(interface: " +
-                                type + ", class file: " + url + ") in " + url, t);
+                        logger.error("Exception when load extension class(interface: " + type + ", class file: " + url + ") in " + url, t);
+                    } finally {
+                        scanner.close();
                     }
                 } // end of while urls
             }
         } catch (Throwable t) {
-            logger.error("Exception when load extension class(interface: " +
-                    type + ", description file: " + fileName + ").", t);
+            logger.error("Exception when load extension class(interface: " + type + ", description file: " + fileName + ").", t);
         }
 
     }
