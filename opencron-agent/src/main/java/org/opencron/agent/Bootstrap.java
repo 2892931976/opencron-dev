@@ -52,7 +52,7 @@ public class Bootstrap implements Serializable {
     private static final long serialVersionUID = 20150614L;
 
 
-    private static Logger logger = LoggerFactory.getLogger(AgentMonitor.class);
+    private static Logger logger = LoggerFactory.getLogger(Bootstrap.class);
 
     /**
      * rpc server
@@ -191,7 +191,6 @@ public class Bootstrap implements Serializable {
             IOUtils.writeText(Constants.OPENCRON_PID_FILE, getPid(), CHARSET);
 
             logger.info("[opencron]agent started @ port:{},pid:{}", port, getPid());
-
 
         } catch (Exception e) {
             e.printStackTrace();

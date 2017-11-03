@@ -35,19 +35,20 @@ import org.opencron.common.job.Response;
 import org.opencron.common.logging.LoggerFactory;
 import org.opencron.common.serialize.Decoder;
 import org.opencron.common.serialize.Encoder;
+import org.opencron.common.util.ExceptionUtils;
 import org.opencron.rpc.ServerHandler;
 import org.opencron.rpc.Server;
 import org.slf4j.Logger;
+
+import static org.opencron.common.util.ExceptionUtils.stackTrace;
 
 public class NettyServer implements Server {
 
     private static Logger logger = LoggerFactory.getLogger(NettyServer.class);
 
-    private ChannelFuture channelFuture;
     private ServerBootstrap bootstrap;
     private EventLoopGroup bossGroup;
     private EventLoopGroup workerGroup;
-    private Channel channel;
 
     protected final HashedWheelTimer timer = new HashedWheelTimer();
 
@@ -78,8 +79,8 @@ public class NettyServer implements Server {
                     }
                 });
         try {
-            this.channelFuture = this.bootstrap.bind(prot).sync();
-            this.channelFuture.addListener(new ChannelFutureListener() {
+
+           this.bootstrap.bind(prot).sync().addListener(new ChannelFutureListener() {
                 @Override
                 public void operationComplete(ChannelFuture future) throws Exception {
                     if (future.isSuccess()) {
@@ -88,36 +89,24 @@ public class NettyServer implements Server {
                         logger.error("[opencron]NettyServer start at address:{} failure", prot);
                     }
                 }
-            });
-            this.channel = this.channelFuture.channel();
-            this.channel.closeFuture().sync();
+            }).channel().closeFuture().sync();
+
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            logger.error("[opencron] NettyServer start failure: {}", stackTrace(e));
         }
     }
 
-    @Override
-    public boolean isBound() {
-        return channel.isActive();
-    }
 
     @Override
     public void close() throws Throwable {
-        try {
-            if (channel != null) {
-                // unbind.
-                channel.close();
-            }
-        } catch (Throwable e) {
-            logger.warn(e.getMessage(), e);
-        }
         try {
             if (bootstrap != null) {
                 bossGroup.shutdownGracefully();
                 workerGroup.shutdownGracefully();
             }
+            logger.info("[opencron]NettyServer stoped!");
         } catch (Throwable e) {
-            logger.warn(e.getMessage(), e);
+            logger.error("[opencron]NettyServer stop error:{}",stackTrace(e));
         }
     }
 

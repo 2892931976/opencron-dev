@@ -71,11 +71,11 @@ public class NettyClient implements Client {
     private ScheduledThreadPoolExecutor scheduledThreadPoolExecutor;
 
     public NettyClient() {
-        this.open();
+        this.connect();
     }
 
     @Override
-    public void open() {
+    public void connect() {
 
         final NettyClientHandler nettyClientHandler = new NettyClientHandler(this);
 
@@ -112,7 +112,7 @@ public class NettyClient implements Client {
     }
 
     @Override
-    public void close() {
+    public void disconnect() {
         this.futureTable.clear();
         this.channelTable.clear();
         this.scheduledThreadPoolExecutor.shutdown();
