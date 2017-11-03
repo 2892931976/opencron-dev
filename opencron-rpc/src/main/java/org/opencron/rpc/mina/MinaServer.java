@@ -6,6 +6,8 @@ import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.filter.executor.ExecutorFilter;
 import org.apache.mina.transport.socket.SocketSessionConfig;
 import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
+import org.opencron.common.job.Request;
+import org.opencron.common.job.Response;
 import org.opencron.rpc.Server;
 import org.opencron.rpc.ServerHandler;
 import org.slf4j.Logger;
@@ -33,7 +35,7 @@ public class MinaServer implements Server {
 
         acceptor = new NioSocketAcceptor();
         acceptor.getFilterChain().addLast("threadPool", new ExecutorFilter(Executors.newCachedThreadPool()));
-        acceptor.getFilterChain().addLast("codec", new ProtocolCodecFilter(new MinaCodecAdapter()));
+        acceptor.getFilterChain().addLast("codec", new ProtocolCodecFilter(new MinaCodecAdapter(Response.class,Request.class)));
         acceptor.setHandler(serverHandler);
 
         try {
@@ -51,7 +53,7 @@ public class MinaServer implements Server {
     }
 
     @Override
-    public void stop() throws Throwable {
+    public void destroy() throws Throwable {
         try {
             if (acceptor != null) {
                 acceptor.unbind(this.socketAddress);

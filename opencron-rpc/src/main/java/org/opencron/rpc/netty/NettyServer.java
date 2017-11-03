@@ -69,8 +69,8 @@ public class NettyServer implements Server {
                 .childHandler(new ChannelInitializer<SocketChannel>() {
                     protected void initChannel(SocketChannel channel) throws Exception {
                         channel.pipeline().addLast(
-                                new NettyDecoder(Request.class, 1024 * 1024, 2, 4),
-                                new NettyEncoder(Response.class),
+                                NettyCodecAdapter.getCodecAdapter().getDecoder(Request.class, 1024 * 1024, 2, 4),
+                                NettyCodecAdapter.getCodecAdapter().getEncoder(Response.class),
                                 handler
                         );
                     }
@@ -95,7 +95,7 @@ public class NettyServer implements Server {
 
 
     @Override
-    public void stop() throws Throwable {
+    public void destroy() throws Throwable {
         try {
             if (bootstrap != null) {
                 bossGroup.shutdownGracefully();

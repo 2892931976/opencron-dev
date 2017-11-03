@@ -5,8 +5,6 @@ import org.apache.mina.core.session.IoSession;
 import org.apache.mina.filter.codec.*;
 import org.opencron.common.Constants;
 import org.opencron.common.ext.ExtensionLoader;
-import org.opencron.common.job.Request;
-import org.opencron.common.job.Response;
 import org.opencron.common.serialize.Serializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,21 +16,30 @@ public class MinaCodecAdapter implements ProtocolCodecFactory {
 
     private Serializer serializer = ExtensionLoader.getExtensionLoader(Serializer.class).getExtension();
 
+    private Class<?> encodeClass;
+
+    private Class<?> decodeClass;
+
+    public MinaCodecAdapter(Class<?> encodeClass,Class<?> decodeClass){
+        this.encodeClass = encodeClass;
+        this.decodeClass = decodeClass;
+    }
+
     @Override
     public ProtocolEncoder getEncoder(IoSession ioSession) throws Exception {
-        return new MinaEncoder(Request.class);
+        return new MinaEncoder(this.encodeClass);
     }
 
     @Override
     public ProtocolDecoder getDecoder(IoSession ioSession) throws Exception {
-        return new MinaDecoder(Response.class);
+        return new MinaDecoder(this.decodeClass);
     }
 
-    class MinaDecoder extends CumulativeProtocolDecoder {
+    final class MinaDecoder<T> extends CumulativeProtocolDecoder {
 
-        private Class<?> type;
+        private Class<T> type;
 
-        public MinaDecoder(Class<?> type) {
+        public MinaDecoder(Class<T> type) {
             this.type = type;
         }
 
@@ -59,11 +66,11 @@ public class MinaCodecAdapter implements ProtocolCodecFactory {
 
     }
 
-    class MinaEncoder implements ProtocolEncoder {
+    final class MinaEncoder<T> implements ProtocolEncoder {
 
-        private Class<?> type;
+        private Class<T> type;
 
-        public MinaEncoder(Class<?> type) {
+        public MinaEncoder(Class<T> type) {
             this.type = type;
         }
 

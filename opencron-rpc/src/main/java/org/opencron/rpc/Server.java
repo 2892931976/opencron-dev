@@ -8,6 +8,6 @@ public interface Server {
 
     void start(int port, ServerHandler handler);
 
-    void stop() throws Throwable;
+    void destroy() throws Throwable;
 
 }

@@ -29,7 +29,7 @@ public class MinaClient implements Client {
     public void connect() {
 
         connector = new NioSocketConnector();
-        connector.getFilterChain().addLast("codec", new ProtocolCodecFilter(new MinaCodecAdapter()));
+        connector.getFilterChain().addLast("codec", new ProtocolCodecFilter(new MinaCodecAdapter(Request.class,Response.class)));
         connector.setHandler(new MinaClientHandler());
         connector.setConnectTimeoutMillis(5000);
 
