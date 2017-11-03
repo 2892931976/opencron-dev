@@ -181,7 +181,7 @@ public class Bootstrap implements Serializable {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    server.open(port,handler);
+                    server.start(port,handler);
                 }
             }).start();
 
@@ -341,7 +341,7 @@ public class Bootstrap implements Serializable {
     }
 
     private void stopServer() throws Throwable {
-       this.server.close();
+       this.server.stop();
     }
 
     private static void handleThrowable(Throwable t) {

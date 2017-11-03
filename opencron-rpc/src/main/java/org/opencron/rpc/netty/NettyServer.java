@@ -56,7 +56,7 @@ public class NettyServer implements Server {
     }
 
     @Override
-    public void open(final int prot, ServerHandler serverHandler) {
+    public void start(final int prot, ServerHandler serverHandler) {
 
         final NettyServerHandler handler = new NettyServerHandler(serverHandler);
 
@@ -98,7 +98,7 @@ public class NettyServer implements Server {
 
 
     @Override
-    public void close() throws Throwable {
+    public void stop() throws Throwable {
         try {
             if (bootstrap != null) {
                 bossGroup.shutdownGracefully();

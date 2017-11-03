@@ -62,7 +62,7 @@ public class BootstrapTest implements Serializable {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    server.open(port, new AgentProcessor());
+                    server.start(port, new AgentProcessor());
                 }
             }).start();
 
