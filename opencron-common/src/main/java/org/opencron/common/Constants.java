@@ -66,6 +66,10 @@ public class Constants {
 
     public static final String PARAM_SUCCESSEXIT_KEY = "successExit";
 
+    public static final String CHARSET_UTF8 = "utf-8";
+
+    public static final String CHARSET_ISO88591 = "iso-8859-1 ";
+
     /**
      * Name of the system property containing
      */

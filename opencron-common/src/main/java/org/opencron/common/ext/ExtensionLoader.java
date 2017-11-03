@@ -28,6 +28,7 @@ import org.slf4j.Logger;
 
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.*;
 
 import static org.opencron.common.util.AssertUtils.checkNotNull;
@@ -97,7 +98,7 @@ public final class ExtensionLoader<T> {
                     URL url = urls.nextElement();
                     Scanner scanner = null;
                     try {
-                        scanner = new Scanner(new InputStreamReader(url.openStream(), "utf-8"));
+                        scanner = new Scanner(new InputStreamReader(url.openStream(), Charset.forName(Constants.CHARSET_UTF8)));
                         while (scanner.hasNextLine()) {
                             String line = scanner.nextLine();
                             if (CommonUtils.notEmpty(line)) {
