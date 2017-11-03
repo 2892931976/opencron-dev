@@ -18,24 +18,25 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.opencron.common.serialize;
+package org.opencron.rpc.netty;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
 import org.opencron.common.ext.ExtensionLoader;
+import org.opencron.common.serialize.Serializer;
 
 
 /**
  * @author benjobs
  */
-public final class Encoder<T> extends MessageToByteEncoder {
+public final class NettyEncoder<T> extends MessageToByteEncoder {
 
     private Serializer serializer = ExtensionLoader.getExtensionLoader(Serializer.class).getExtension();
 
     private Class<T> clazz;
 
-    public Encoder(Class<T> clazz) {
+    public NettyEncoder(Class<T> clazz) {
         this.clazz = clazz;
     }
 

@@ -31,8 +31,6 @@ import io.netty.util.concurrent.DefaultThreadFactory;
 import org.opencron.common.Constants;
 import org.opencron.common.job.Request;
 import org.opencron.common.job.Response;
-import org.opencron.common.serialize.Decoder;
-import org.opencron.common.serialize.Encoder;
 import org.opencron.common.util.HttpUtils;
 import org.opencron.rpc.Client;
 import org.opencron.rpc.ClientAsyncCallback;
@@ -88,8 +86,8 @@ public class NettyClient implements Client {
                     @Override
                     public void initChannel(SocketChannel channel) throws Exception {
                         channel.pipeline().addLast(
-                                new Decoder(Response.class, 1024 * 1024, 2, 4),
-                                new Encoder(Request.class),
+                                new NettyDecoder(Response.class, 1024 * 1024, 2, 4),
+                                new NettyEncoder(Request.class),
                                 nettyClientHandler
                         );
                     }

@@ -1,4 +1,5 @@
 netty=org.opencron.rpc.netty.NettyServer
+mina=org.opencron.rpc.mina.MinaServer
 
 #default NettyServer
-def=org.opencron.rpc.netty.NettyServer
+def=org.opencron.rpc.mina.MinaServer

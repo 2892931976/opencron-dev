@@ -33,9 +33,6 @@ import org.opencron.common.Constants;
 import org.opencron.common.job.Request;
 import org.opencron.common.job.Response;
 import org.opencron.common.logging.LoggerFactory;
-import org.opencron.common.serialize.Decoder;
-import org.opencron.common.serialize.Encoder;
-import org.opencron.common.util.ExceptionUtils;
 import org.opencron.rpc.ServerHandler;
 import org.opencron.rpc.Server;
 import org.slf4j.Logger;
@@ -56,7 +53,7 @@ public class NettyServer implements Server {
     }
 
     @Override
-    public void start(final int prot, ServerHandler serverHandler) {
+    public void start(final int port, ServerHandler serverHandler) {
 
         final NettyServerHandler handler = new NettyServerHandler(serverHandler);
 
@@ -72,21 +69,21 @@ public class NettyServer implements Server {
                 .childHandler(new ChannelInitializer<SocketChannel>() {
                     protected void initChannel(SocketChannel channel) throws Exception {
                         channel.pipeline().addLast(
-                                new Decoder(Request.class, 1024 * 1024, 2, 4),
-                                new Encoder(Response.class),
+                                new NettyDecoder(Request.class, 1024 * 1024, 2, 4),
+                                new NettyEncoder(Response.class),
                                 handler
                         );
                     }
                 });
         try {
 
-           this.bootstrap.bind(prot).sync().addListener(new ChannelFutureListener() {
+           this.bootstrap.bind(port).sync().addListener(new ChannelFutureListener() {
                 @Override
                 public void operationComplete(ChannelFuture future) throws Exception {
                     if (future.isSuccess()) {
-                        logger.info("[opencron]NettyServer start at address:{} success", prot);
+                        logger.info("[opencron]NettyServer start at address:{} success", port);
                     } else {
-                        logger.error("[opencron]NettyServer start at address:{} failure", prot);
+                        logger.error("[opencron]NettyServer start at address:{} failure", port);
                     }
                 }
             }).channel().closeFuture().sync();

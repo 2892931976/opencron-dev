@@ -18,12 +18,14 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.opencron.common.serialize;
+package org.opencron.rpc.netty;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
+import org.opencron.common.Constants;
 import org.opencron.common.ext.ExtensionLoader;
+import org.opencron.common.serialize.Serializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,24 +34,23 @@ import java.io.IOException;
 /**
  * @author benjobs
  */
-public class Decoder<T> extends LengthFieldBasedFrameDecoder {
+public class NettyDecoder<T> extends LengthFieldBasedFrameDecoder {
 
     private Logger logger = LoggerFactory.getLogger(getClass());
 
     //判断传送客户端传送过来的数据是否按照协议传输，头部信息的大小应该是 byte+byte+int = 1+1+4 = 6
-    private static final int HEADER_SIZE = 6;
 
     private Serializer serializer = ExtensionLoader.getExtensionLoader(Serializer.class).getExtension();
     private Class<T> clazz;
 
-    public Decoder(Class<T> clazz, int maxFrameLength, int lengthFieldOffset, int lengthFieldLength) throws IOException {
+    public NettyDecoder(Class<T> clazz, int maxFrameLength, int lengthFieldOffset, int lengthFieldLength) throws IOException {
         super(maxFrameLength, lengthFieldOffset, lengthFieldLength);
         this.clazz = clazz;
     }
 
     @Override
-    protected Object decode(ChannelHandlerContext ctx, ByteBuf in) throws Exception {
-        if (in.readableBytes() < HEADER_SIZE) {
+    public Object decode(ChannelHandlerContext ctx, ByteBuf in) throws Exception {
+        if (in.readableBytes() < Constants.HEADER_SIZE) {
             return null;
         }
         in.markReaderIndex();
