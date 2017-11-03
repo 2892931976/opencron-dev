@@ -86,8 +86,13 @@ public final class ExtensionLoader<T> {
     private void loadFile() {
         String fileName = Constants.META_INF_DIR + this.type.getName();
         try {
+            //for AppClassLoader
             Enumeration<URL> urls = ClassLoader.getSystemResources(fileName);
             if (urls != null) {
+                if (!urls.hasMoreElements()) {
+                    //for WebAppClassLoader
+                   urls = this.loader.getResources(fileName);
+                }
                 while (urls.hasMoreElements()) {
                     URL url = urls.nextElement();
                     Scanner scanner = null;
