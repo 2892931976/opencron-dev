@@ -86,7 +86,7 @@ public class NettyClient implements Client {
                     @Override
                     public void initChannel(SocketChannel channel) throws Exception {
                         channel.pipeline().addLast(
-                                NettyCodecAdapter.getCodecAdapter().getDecoder(Response.class, 1024 * 1024, 2, 4),
+                                NettyCodecAdapter.getCodecAdapter().getDecoder(Response.class),
                                 NettyCodecAdapter.getCodecAdapter().getEncoder(Request.class),
                                 nettyClientHandler
                         );

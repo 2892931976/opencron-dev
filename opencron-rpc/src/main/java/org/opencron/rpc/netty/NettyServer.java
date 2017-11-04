@@ -27,6 +27,7 @@ import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.util.HashedWheelTimer;
 import io.netty.util.concurrent.DefaultThreadFactory;
 import org.opencron.common.Constants;
@@ -69,7 +70,8 @@ public class NettyServer implements Server {
                 .childHandler(new ChannelInitializer<SocketChannel>() {
                     protected void initChannel(SocketChannel channel) throws Exception {
                         channel.pipeline().addLast(
-                                NettyCodecAdapter.getCodecAdapter().getDecoder(Request.class, 1024 * 1024, 2, 4),
+                                new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE,0,4,0,0),
+                                NettyCodecAdapter.getCodecAdapter().getDecoder(Request.class),
                                 NettyCodecAdapter.getCodecAdapter().getEncoder(Response.class),
                                 handler
                         );

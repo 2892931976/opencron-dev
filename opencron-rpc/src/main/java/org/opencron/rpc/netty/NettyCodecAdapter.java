@@ -2,7 +2,7 @@ package org.opencron.rpc.netty;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
+import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
 import org.opencron.common.Constants;
 import org.opencron.common.ext.ExtensionLoader;
@@ -11,6 +11,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.List;
+
+import static org.opencron.common.util.ExceptionUtils.stackTrace;
 
 public class NettyCodecAdapter<T> {
 
@@ -18,7 +21,7 @@ public class NettyCodecAdapter<T> {
 
     private static Serializer serializer = ExtensionLoader.getExtensionLoader(Serializer.class).getExtension();
 
-    public static NettyCodecAdapter getCodecAdapter(){
+    public static NettyCodecAdapter getCodecAdapter() {
         return new NettyCodecAdapter();
     }
 
@@ -26,13 +29,13 @@ public class NettyCodecAdapter<T> {
         return new Encoder(type);
     }
 
-    public Decoder getDecoder(Class<T> type, int maxFrameLength, int lengthFieldOffset, int lengthFieldLength) throws IOException {
-        return new Decoder(type,maxFrameLength,lengthFieldOffset,lengthFieldLength);
+    public Decoder getDecoder(Class<T> type) throws IOException {
+        return new Decoder(type);
     }
 
     private class Encoder<T> extends MessageToByteEncoder {
 
-        private Class<T> type;
+        private Class<?> type = null;
 
         public Encoder(Class<T> type) {
             this.type = type;
@@ -41,50 +44,48 @@ public class NettyCodecAdapter<T> {
         @Override
         protected void encode(ChannelHandlerContext ctx, Object msg, ByteBuf out) throws Exception {
             try {
-                byte[] data = serializer.encode(msg);
-                out.writeInt(data.length);
-                out.writeBytes(data);
+                if (type.isInstance(msg)) {
+                    byte[] data = serializer.encode(msg);
+                    out.writeInt(data.length);
+                    out.writeBytes(data);
+                }else {
+                    logger.error("[opencron] NettyCodecAdapter encode error: this encode target is not instanceOf {}",this.type.getName());
+                }
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.error("[opencron] NettyCodecAdapter encode error:", stackTrace(e));
             }
 
         }
-
     }
 
-    private class Decoder<T> extends LengthFieldBasedFrameDecoder {
+    private class Decoder<T> extends ByteToMessageDecoder {
 
         private Class<T> type;
 
-        public Decoder(Class<T> type, int maxFrameLength, int lengthFieldOffset, int lengthFieldLength) throws IOException {
-            super(maxFrameLength, lengthFieldOffset, lengthFieldLength);
+        public Decoder(Class<T> type) {
             this.type = type;
         }
 
         @Override
-        public Object decode(ChannelHandlerContext ctx, ByteBuf in) throws Exception {
-            if (in.readableBytes() < Constants.HEADER_SIZE) {
-                return null;
-            }
-            in.markReaderIndex();
-            int dataLength = in.readInt();
-            if (in.readableBytes() < dataLength) {
-                logger.error("[opencron]serializer error!body length < {}", dataLength);
-                in.resetReaderIndex();
-                return null;
-            }
-
-            byte[] data = new byte[dataLength];
-            in.readBytes(data);
-
+        protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
             try {
-                return serializer.decode(data, type);
-            } catch (Exception e) {
-                e.printStackTrace();
-                throw new RuntimeException("[opencron]serializer decode error");
+                if (in.readableBytes() < Constants.HEADER_SIZE) {
+                    return;
+                }
+                in.markReaderIndex();
+                int dataLength = in.readInt();
+                if (in.readableBytes() < dataLength) {
+                    in.resetReaderIndex();
+                    return;
+                }
+                byte[] data = new byte[dataLength];
+                in.readBytes(data);
+                Object object = serializer.decode(data, type);
+                out.add(object);
+            }catch (Exception e) {
+                logger.error("[opencron] NettyCodecAdapter decode error:", stackTrace(e));
             }
         }
-
     }
 
 }

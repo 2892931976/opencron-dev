@@ -44,26 +44,24 @@ public class MinaCodecAdapter implements ProtocolCodecFactory {
         }
 
         @Override
-        protected boolean doDecode(IoSession session, IoBuffer in, ProtocolDecoderOutput out) throws Exception {
-            if (in.remaining() < Constants.HEADER_SIZE) {
+        public boolean doDecode(IoSession session, IoBuffer in, ProtocolDecoderOutput out) throws Exception {
+            if (in.limit()<= 0 || in.remaining() < Constants.HEADER_SIZE) {
                 return false;
             }
-            in.mark();	// mark 2 reset, reset call rollback to mark place
-            int dataLength = in.getInt();	// data length
+            in.mark();
+            int dataLength = in.getInt();
 
             if (in.remaining() < dataLength) {
-                logger.error("[opencron]serializer error!body length < {}", dataLength);
+                //logger.warn("[opencron]serializer error!body length < {}", dataLength);
                 in.reset();
                 return false;
             }
-
-            byte[] datas = new byte[dataLength];	// data
-            in.get(datas);
-            Object obj = serializer.decode(datas,type);
+            byte[] data = new byte[dataLength];
+            in.get(data);
+            Object obj = serializer.decode(data,type);
             out.write(obj);
             return true;
         }
-
     }
 
     final class MinaEncoder<T> implements ProtocolEncoder {
@@ -75,15 +73,14 @@ public class MinaCodecAdapter implements ProtocolCodecFactory {
         }
 
         @Override
-        public void encode(IoSession session, Object message, ProtocolEncoderOutput out) throws Exception {
-            if (type.isInstance(message)) {
-                byte[] datas = serializer.encode(message);
+        public void encode(IoSession session, Object msg, ProtocolEncoderOutput out) throws Exception {
+            if (type.isInstance(msg)) {
+                byte[] data = serializer.encode(msg);
                 IoBuffer buffer = IoBuffer.allocate(100);
                 buffer.setAutoExpand(true);
                 buffer.setAutoShrink(true);
-                buffer.putInt(datas.length);
-                buffer.put(datas);
-
+                buffer.putInt(data.length);
+                buffer.put(data);
                 buffer.flip();
                 session.write(buffer);
             }
