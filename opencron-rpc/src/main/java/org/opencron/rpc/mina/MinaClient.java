@@ -25,6 +25,10 @@ public class MinaClient implements Client {
 
     private NioSocketConnector connector;
 
+    public MinaClient() {
+        this.connect();
+    }
+
     @Override
     public void connect() {
 
