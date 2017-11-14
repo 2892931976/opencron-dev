@@ -44,7 +44,7 @@ public class MinaClient implements Client {
 
         connector = new NioSocketConnector();
         connector.getFilterChain().addLast("codec", new ProtocolCodecFilter(new MinaCodecAdapter(Request.class,Response.class)));
-        connector.setHandler(new MinaClientHandler());
+        connector.setHandler(new MinaClientHandler(this));
         connector.setConnectTimeoutMillis(5000);
 
         DefaultSocketSessionConfig sessionConfiguration = (DefaultSocketSessionConfig) connector.getSessionConfig();
@@ -168,12 +168,17 @@ public class MinaClient implements Client {
             return connectWrapper.getConnectFuture();
         }
 
+        if (connectWrapper!=null) {
+            connectWrapper.close();
+        }
+
         synchronized (this){
             // 发起异步连接操作
             ConnectFuture connectFuture = connector.connect(HttpUtils.parseSocketAddress(request.getAddress()));
             connectWrapper = new ConnectWrapper(connectFuture);
             this.connectTable.put(request.getAddress(), connectWrapper);
         }
+
         if (connectWrapper != null) {
             ConnectFuture connectFuture = connectWrapper.getConnectFuture();
             long timeout = 5000;
