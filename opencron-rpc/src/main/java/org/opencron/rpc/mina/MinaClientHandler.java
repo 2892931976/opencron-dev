@@ -11,21 +11,21 @@ public class MinaClientHandler extends IoHandlerAdapter {
 
     private static final Logger logger = LoggerFactory.getLogger(MinaClientHandler.class);
 
-    private MinaClient minaClient;
+    private RpcFuture.Getter rpcFutureGetter;
 
-    public MinaClientHandler(MinaClient minaClient) {
-        this.minaClient = minaClient;
+    public MinaClientHandler(RpcFuture.Getter rpcFutureGetter) {
+        this.rpcFutureGetter = rpcFutureGetter;
     }
 
     @Override
     public void messageReceived(IoSession session, Object message) throws Exception {
         Response response = (Response) message;
         logger.info("Rpc client receive response id:{}", response.getId());
-        RpcFuture future = minaClient.futureTable.get(response.getId());
-        future.setResult(response);
-        if (future.isAsync()) {   //异步调用
+        RpcFuture rpcFuture = rpcFutureGetter.getFuture(response.getId());
+        rpcFuture.setResult(response);
+        if (rpcFuture.isAsync()) {   //异步调用
             logger.info("Rpc client async callback invoke");
-            future.execCallback();
+            rpcFuture.execCallback();
         }
     }
 

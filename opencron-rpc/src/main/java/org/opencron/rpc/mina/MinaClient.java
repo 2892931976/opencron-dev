@@ -44,7 +44,13 @@ public class MinaClient implements Client {
 
         connector = new NioSocketConnector();
         connector.getFilterChain().addLast("codec", new ProtocolCodecFilter(new MinaCodecAdapter(Request.class,Response.class)));
-        connector.setHandler(new MinaClientHandler(this));
+        connector.setHandler(new MinaClientHandler(new RpcFuture.Getter() {
+            @Override
+            public RpcFuture getFuture(Integer id) {
+                return futureTable.get(id);
+            }
+        }));
+
         connector.setConnectTimeoutMillis(5000);
 
         DefaultSocketSessionConfig sessionConfiguration = (DefaultSocketSessionConfig) connector.getSessionConfig();

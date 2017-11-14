@@ -76,7 +76,12 @@ public class NettyClient implements Client {
     @Override
     public void connect() {
 
-        final NettyClientHandler nettyClientHandler = new NettyClientHandler(this);
+        final NettyClientHandler nettyClientHandler = new NettyClientHandler(new RpcFuture.Getter() {
+            @Override
+            public RpcFuture getFuture(Integer id) {
+                return futureTable.get(id);
+            }
+        });
 
         bootstrap.group(nioEventLoopGroup)
                 .option(ChannelOption.SO_KEEPALIVE, true)

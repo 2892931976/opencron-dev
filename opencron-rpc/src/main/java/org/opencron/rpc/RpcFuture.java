@@ -179,4 +179,7 @@ public class RpcFuture {
         return unit.toMillis(timeout);
     }
 
+    public interface Getter {
+        RpcFuture getFuture(Integer id);
+    }
 }
