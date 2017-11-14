@@ -5,7 +5,6 @@ import org.apache.mina.core.session.IoSession;
 import org.opencron.common.job.Response;
 import org.opencron.common.logging.LoggerFactory;
 import org.opencron.rpc.RpcFuture;
-import org.opencron.rpc.netty.NettyClient;
 import org.slf4j.Logger;
 
 public class MinaClientHandler extends IoHandlerAdapter {
