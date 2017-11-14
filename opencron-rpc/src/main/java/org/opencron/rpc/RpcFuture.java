@@ -18,10 +18,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.opencron.rpc.netty;
+package org.opencron.rpc;
 
 import org.opencron.common.job.Response;
-import org.opencron.rpc.InvokeCallback;
 
 import java.io.IOException;
 import java.util.concurrent.*;
@@ -29,7 +28,7 @@ import java.util.concurrent.*;
 /**
  * @author benjobs
  */
-public class NettyFuture {
+public class RpcFuture {
 
     private static final CancellationException CANCELLED = new CancellationException();
     private volatile boolean sendRequestSuccess = true;
@@ -48,14 +47,14 @@ public class NettyFuture {
     //异步回调
     private InvokeCallback callback;
 
-    public NettyFuture() {
+    public RpcFuture() {
     }
 
-    public NettyFuture(Integer timeout) {
+    public RpcFuture(Integer timeout) {
         this.timeout = timeout == null?Integer.MAX_VALUE:timeout;
     }
 
-    public NettyFuture(Integer timeout, InvokeCallback callback) {
+    public RpcFuture(Integer timeout, InvokeCallback callback) {
         this.timeout =  timeout == null?Integer.MAX_VALUE:timeout;
         this.unit = TimeUnit.SECONDS;
         this.callback = callback;

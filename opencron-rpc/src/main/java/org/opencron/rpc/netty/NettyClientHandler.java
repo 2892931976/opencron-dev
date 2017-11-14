@@ -5,6 +5,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import org.opencron.common.job.Response;
 import org.opencron.common.logging.LoggerFactory;
+import org.opencron.rpc.RpcFuture;
 import org.slf4j.Logger;
 
 
@@ -22,7 +23,7 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<Response> {
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, Response response) throws Exception {
         logger.info("Rpc client receive response id:{}", response.getId());
-        NettyFuture future = nettyClient.futureTable.get(response.getId());
+        RpcFuture future = nettyClient.futureTable.get(response.getId());
         future.setResult(response);
         if (future.isAsync()) {   //异步调用
             logger.info("Rpc client async callback invoke");
