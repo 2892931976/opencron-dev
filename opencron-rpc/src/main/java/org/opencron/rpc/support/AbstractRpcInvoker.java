@@ -27,7 +27,7 @@ import org.opencron.common.job.Response;
 import org.opencron.common.job.RpcType;
 import org.opencron.rpc.Client;
 import org.opencron.rpc.InvokeCallback;
-import org.opencron.rpc.ClientInvoker;
+import org.opencron.rpc.RpcInvoker;
 
 
 /**
@@ -36,7 +36,7 @@ import org.opencron.rpc.ClientInvoker;
  * @date 2016-03-27
  */
 
-public class AbstractClientInvoker implements ClientInvoker {
+public class AbstractRpcInvoker implements RpcInvoker {
 
     private Client client = ExtensionLoader.load(Client.class);
 

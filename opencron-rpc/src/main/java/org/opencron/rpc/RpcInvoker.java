@@ -27,7 +27,7 @@ import org.opencron.common.job.Response;
 
 
 @SPI
-public interface ClientInvoker {
+public interface RpcInvoker {
 
     Response sentSync(Request request) throws Exception  ;
 
