@@ -23,7 +23,7 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<Response> {
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, Response response) throws Exception {
         logger.info("Rpc client receive response id:{}", response.getId());
-        RpcFuture rpcFuture = rpcFutureGetter.getFuture(response.getId());
+        RpcFuture rpcFuture = rpcFutureGetter.getRpcFuture(response.getId());
         rpcFuture.setResult(response);
         if (rpcFuture.isAsync()) {   //异步调用
             logger.info("Rpc client async callback invoke");

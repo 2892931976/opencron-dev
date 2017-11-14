@@ -21,7 +21,7 @@ public class MinaClientHandler extends IoHandlerAdapter {
     public void messageReceived(IoSession session, Object message) throws Exception {
         Response response = (Response) message;
         logger.info("Rpc client receive response id:{}", response.getId());
-        RpcFuture rpcFuture = rpcFutureGetter.getFuture(response.getId());
+        RpcFuture rpcFuture = rpcFutureGetter.getRpcFuture(response.getId());
         rpcFuture.setResult(response);
         if (rpcFuture.isAsync()) {   //异步调用
             logger.info("Rpc client async callback invoke");

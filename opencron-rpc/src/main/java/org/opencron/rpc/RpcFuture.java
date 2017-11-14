@@ -180,6 +180,6 @@ public class RpcFuture {
     }
 
     public interface Getter {
-        RpcFuture getFuture(Integer id);
+        RpcFuture getRpcFuture(Integer id);
     }
 }

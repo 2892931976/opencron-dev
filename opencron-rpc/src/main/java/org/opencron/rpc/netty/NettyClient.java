@@ -78,7 +78,7 @@ public class NettyClient implements Client {
 
         final NettyClientHandler nettyClientHandler = new NettyClientHandler(new RpcFuture.Getter() {
             @Override
-            public RpcFuture getFuture(Integer id) {
+            public RpcFuture getRpcFuture(Integer id) {
                 return futureTable.get(id);
             }
         });

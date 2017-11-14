@@ -46,7 +46,7 @@ public class MinaClient implements Client {
         connector.getFilterChain().addLast("codec", new ProtocolCodecFilter(new MinaCodecAdapter(Request.class,Response.class)));
         connector.setHandler(new MinaClientHandler(new RpcFuture.Getter() {
             @Override
-            public RpcFuture getFuture(Integer id) {
+            public RpcFuture getRpcFuture(Integer id) {
                 return futureTable.get(id);
             }
         }));
