@@ -12,7 +12,7 @@ import org.opencron.common.job.Response;
 import org.opencron.common.logging.LoggerFactory;
 import org.opencron.common.util.HttpUtils;
 import org.opencron.rpc.Client;
-import org.opencron.rpc.ClientAsyncCallback;
+import org.opencron.rpc.InvokeCallback;
 import org.slf4j.Logger;
 
 import java.util.concurrent.CountDownLatch;
@@ -84,7 +84,7 @@ public class MinaClient implements Client {
     }
 
     @Override
-    public void sentAsync(Request request, ClientAsyncCallback callback) throws Exception {
+    public void sentAsync(Request request, InvokeCallback callback) throws Exception {
 
     }
 

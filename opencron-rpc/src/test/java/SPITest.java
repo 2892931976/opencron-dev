@@ -9,10 +9,10 @@ public class SPITest {
 
     @Test
     public void testSpi() throws IOException {
-        Server server = ExtensionLoader.getExtensionLoader(Server.class).getExtension();
+        Server server = ExtensionLoader.load(Server.class);
         System.out.println(server.getClass());
 
-        Client client = ExtensionLoader.getExtensionLoader(Client.class).getExtension();
+        Client client = ExtensionLoader.load(Client.class);
         System.out.println(client.getClass());
     }
 

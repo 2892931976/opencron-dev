@@ -33,6 +33,6 @@ public interface ClientInvoker {
 
     void sentOneway(Request request) throws Exception  ;
 
-    void sentAsync(Request request, ClientAsyncCallback callback) throws Exception  ;
+    void sentAsync(Request request, InvokeCallback callback) throws Exception  ;
 
 }

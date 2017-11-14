@@ -14,7 +14,7 @@ public class MinaCodecAdapter implements ProtocolCodecFactory {
 
     private Logger logger = LoggerFactory.getLogger(getClass());
 
-    private Serializer serializer = ExtensionLoader.getExtensionLoader(Serializer.class).getExtension();
+    private Serializer serializer = ExtensionLoader.load(Serializer.class);
 
     private Class<?> encodeClass;
 

@@ -30,30 +30,55 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import static org.opencron.common.util.AssertUtils.checkNotNull;
 
 /**
  * @author benjobs...
  */
-public final class ExtensionLoader<T> {
+public class ExtensionLoader<T> {
 
     private Logger logger = LoggerFactory.getLogger(ExtensionLoader.class);
 
-    private final Class<T> type;
+    private Class<T> type;
+
+    private ClassLoader loader;
 
     private Class<T> instanceType = null;
 
     private SPI spi;
 
-    private final ClassLoader loader;
+    private static final ConcurrentMap<Class<?>, ExtensionLoader<?>> EXTENSION_LOADERS = new ConcurrentHashMap<Class<?>, ExtensionLoader<?>>();
 
-    public static <T> ExtensionLoader<T> getExtensionLoader(Class<T> type) {
-        return ExtensionLoader.getExtensionLoader(type, Thread.currentThread().getContextClassLoader());
+    public static <T>T load(Class<T> type) {
+        return getExtensionLoader(type).getExtension();
     }
 
-    public static <T> ExtensionLoader<T> getExtensionLoader(Class<T> type, ClassLoader loader) {
-        return new ExtensionLoader(type, loader);
+    private static <T> ExtensionLoader<T> getExtensionLoader(Class<T> type) {
+        ExtensionLoader<T> loader = (ExtensionLoader<T>) EXTENSION_LOADERS.get(type);
+        if (loader == null) {
+            EXTENSION_LOADERS.putIfAbsent(type, new ExtensionLoader(type, Thread.currentThread().getContextClassLoader()));
+            loader = (ExtensionLoader<T>) EXTENSION_LOADERS.get(type);
+        }
+        return loader;
+    }
+
+    public ExtensionLoader(Class<T> type, ClassLoader loader) {
+        if (type == null) {
+            throw new IllegalArgumentException("Extension type == null");
+        }
+        if (!type.isInterface()) {
+            throw new IllegalArgumentException("Extension type(" + type + ") is not interface!");
+        }
+        if (!withExtensionAnnotation(type)) {
+            throw new IllegalArgumentException("Extension type(" + type + ") is not extension, because WITHOUT @" + SPI.class.getSimpleName() + " Annotation!");
+        }
+        this.type = checkNotNull(type, "type interface cannot be null");
+        this.loader = checkNotNull( loader,"Extension loader == null");
+        this.spi = this.type.getAnnotation(SPI.class);
+        loadFile();
     }
 
     public T getExtension() {
@@ -67,21 +92,6 @@ public final class ExtensionLoader<T> {
             throw new IllegalArgumentException(e);
         }
         throw new IllegalArgumentException(this.type.getName() + " impl could not be found");
-    }
-
-    private ExtensionLoader(Class<T> type, ClassLoader loader) {
-        if (type == null)
-            throw new IllegalArgumentException("Extension type == null");
-        if (!type.isInterface()) {
-            throw new IllegalArgumentException("Extension type(" + type + ") is not interface!");
-        }
-        if (!withExtensionAnnotation(type)) {
-            throw new IllegalArgumentException("Extension type(" + type + ") is not extension, because WITHOUT @" + SPI.class.getSimpleName() + " Annotation!");
-        }
-        this.type = checkNotNull(type, "type interface cannot be null");
-        this.spi = this.type.getAnnotation(SPI.class);
-        this.loader = (loader == null) ? ClassLoader.getSystemClassLoader() : loader;
-        loadFile();
     }
 
     private void loadFile() {

@@ -19,7 +19,7 @@ public class NettyCodecAdapter<T> {
 
     private static Logger logger = LoggerFactory.getLogger(NettyCodecAdapter.class);
 
-    private static Serializer serializer = ExtensionLoader.getExtensionLoader(Serializer.class).getExtension();
+    private static Serializer serializer = ExtensionLoader.load(Serializer.class);
 
     public static NettyCodecAdapter getCodecAdapter() {
         return new NettyCodecAdapter();

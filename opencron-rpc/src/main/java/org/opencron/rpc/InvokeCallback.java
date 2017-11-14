@@ -25,10 +25,10 @@ import org.opencron.common.job.Response;
 /**
  * @author benjobs
  */
-public interface ClientAsyncCallback {
+public interface InvokeCallback {
 
-    void onSuccess(Response response);
+    void success(Response response);
 
-    void onFailure(Throwable err);
+    void failure(Throwable err);
 
 }

@@ -33,7 +33,7 @@ import org.opencron.common.job.Request;
 import org.opencron.common.job.Response;
 import org.opencron.common.util.HttpUtils;
 import org.opencron.rpc.Client;
-import org.opencron.rpc.ClientAsyncCallback;
+import org.opencron.rpc.InvokeCallback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -145,7 +145,7 @@ public class NettyClient implements Client {
     }
 
     @Override
-    public void sentAsync(final Request request,final ClientAsyncCallback callback) throws Exception {
+    public void sentAsync(final Request request,final InvokeCallback callback) throws Exception {
 
         Channel channel = getOrCreateChannel(request);
 
@@ -168,7 +168,7 @@ public class NettyClient implements Client {
                         nettyFuture.setSendRequestSuccess(false);
                         nettyFuture.setFailure(future.cause());
                         //回调
-                        callback.onFailure(future.cause());
+                        callback.failure(future.cause());
                     }
                 }
             });

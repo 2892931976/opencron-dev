@@ -8,10 +8,10 @@ public class SPITest {
 
     @Test
     public void testSpi() throws IOException {
-        Serializer serializer = ExtensionLoader.getExtensionLoader(Serializer.class).getExtension();
+        Serializer serializer = ExtensionLoader.load(Serializer.class);
         byte[] str = serializer.encode("benjobs");
         System.out.println(str);
-        ExtensionLoader.getExtensionLoader(Serializer.class).getExtension();
+        ExtensionLoader.load(Serializer.class);
         System.out.println("xxx");
     }
 

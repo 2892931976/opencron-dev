@@ -57,12 +57,12 @@ public class Bootstrap implements Serializable {
     /**
      * rpc server
      */
-    private Server server = ExtensionLoader.getExtensionLoader(Server.class).getExtension();
+    private Server server = ExtensionLoader.load(Server.class);
 
     /**
      * rpc handler...
      */
-    private ServerHandler handler = ExtensionLoader.getExtensionLoader(ServerHandler.class).getExtension();
+    private ServerHandler handler = ExtensionLoader.load(ServerHandler.class);
 
     /**
      * agent port

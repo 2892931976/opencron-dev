@@ -26,7 +26,7 @@ import org.opencron.common.job.Request;
 import org.opencron.common.job.Response;
 import org.opencron.common.job.RpcType;
 import org.opencron.rpc.Client;
-import org.opencron.rpc.ClientAsyncCallback;
+import org.opencron.rpc.InvokeCallback;
 import org.opencron.rpc.ClientInvoker;
 
 
@@ -38,7 +38,7 @@ import org.opencron.rpc.ClientInvoker;
 
 public class AbstractClientInvoker implements ClientInvoker {
 
-    private Client client = ExtensionLoader.getExtensionLoader(Client.class).getExtension();
+    private Client client = ExtensionLoader.load(Client.class);
 
     //同步调用
     public Response sentSync(Request request) {
@@ -60,7 +60,7 @@ public class AbstractClientInvoker implements ClientInvoker {
     }
 
     //异步调用...
-    public void sentAsync(Request request, ClientAsyncCallback callback) {
+    public void sentAsync(Request request, InvokeCallback callback) {
         try {
             client.sentAsync(request.setRpcType(RpcType.ASYNC),callback);
         } catch (Exception e) {

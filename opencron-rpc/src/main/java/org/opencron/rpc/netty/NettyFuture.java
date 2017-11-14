@@ -21,7 +21,7 @@
 package org.opencron.rpc.netty;
 
 import org.opencron.common.job.Response;
-import org.opencron.rpc.ClientAsyncCallback;
+import org.opencron.rpc.InvokeCallback;
 
 import java.io.IOException;
 import java.util.concurrent.*;
@@ -46,7 +46,7 @@ public class NettyFuture {
     private TimeUnit unit;
 
     //异步回调
-    private ClientAsyncCallback callback;
+    private InvokeCallback callback;
 
     public NettyFuture() {
     }
@@ -55,7 +55,7 @@ public class NettyFuture {
         this.timeout = timeout == null?Integer.MAX_VALUE:timeout;
     }
 
-    public NettyFuture(Integer timeout, ClientAsyncCallback callback) {
+    public NettyFuture(Integer timeout, InvokeCallback callback) {
         this.timeout =  timeout == null?Integer.MAX_VALUE:timeout;
         this.unit = TimeUnit.SECONDS;
         this.callback = callback;
@@ -64,9 +64,9 @@ public class NettyFuture {
     public void execCallback(){
         if(isDone()){
             if(this.exc != null) {
-                this.callback.onFailure(this.exc);
+                this.callback.failure(this.exc);
             } else {
-                this.callback.onSuccess(this.result);
+                this.callback.success(this.result);
             }
         }
     }

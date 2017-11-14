@@ -329,7 +329,7 @@ public class AgentProcessor implements ServerHandler,AgentJob {
     public Response proxy(Request request) {
 
         if (this.client == null) {
-            this.client = ExtensionLoader.getExtensionLoader(Client.class).getExtension();
+            this.client = ExtensionLoader.load(Client.class);
         }
 
         String proxyHost = request.getParams().get(Constants.PARAM_PROXYHOST_KEY);
