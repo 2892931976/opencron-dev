@@ -28,7 +28,6 @@ package org.opencron.agent;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.opencron.common.Constants;
 import org.opencron.common.ext.ExtensionLoader;
-import org.opencron.common.util.Constant;
 import org.opencron.common.util.IOUtils;
 import org.opencron.common.logging.LoggerFactory;
 import org.opencron.common.util.SystemPropertyUtils;
