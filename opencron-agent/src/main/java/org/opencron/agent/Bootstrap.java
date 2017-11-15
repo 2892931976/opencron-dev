@@ -28,6 +28,7 @@ package org.opencron.agent;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.opencron.common.Constants;
 import org.opencron.common.ext.ExtensionLoader;
+import org.opencron.common.util.Constant;
 import org.opencron.common.util.IOUtils;
 import org.opencron.common.logging.LoggerFactory;
 import org.opencron.common.util.SystemPropertyUtils;
@@ -67,17 +68,13 @@ public class Bootstrap implements Serializable {
     /**
      * agent port
      */
-    private int port;
+    private Integer port;
 
     /**
      * agent password
      */
     private String password;
 
-    /**
-     * charset...
-     */
-    private final String CHARSET = "UTF-8";
     /**
      * bootstrap instance....
      */
@@ -148,13 +145,13 @@ public class Bootstrap implements Serializable {
         if (notEmpty(inputPassword)) {
             Constants.OPENCRON_PASSWORD_FILE.delete();
             this.password = DigestUtils.md5Hex(inputPassword).toLowerCase();
-            IOUtils.writeText(Constants.OPENCRON_PASSWORD_FILE, this.password, CHARSET);
+            IOUtils.writeText(Constants.OPENCRON_PASSWORD_FILE, this.password, Constants.CHARSET_UTF8);
         } else {
             boolean writeDefault = false;
             //.password file already exists
             if (Constants.OPENCRON_PASSWORD_FILE.exists()) {
                 //read password from .password file
-                String filePassowrd = IOUtils.readText(Constants.OPENCRON_PASSWORD_FILE, CHARSET).trim().toLowerCase();
+                String filePassowrd = IOUtils.readText(Constants.OPENCRON_PASSWORD_FILE, Constants.CHARSET_UTF8).trim().toLowerCase();
                 if (notEmpty(filePassowrd)) {
                     this.password = filePassowrd;
                 }else {
@@ -165,18 +162,18 @@ public class Bootstrap implements Serializable {
             }
 
             if (writeDefault) {
-                this.password = DigestUtils.md5Hex(AgentProperties.getProperty("opencorn.password")).toLowerCase();
+                this.password = DigestUtils.md5Hex(AgentProperties.getProperty(Constants.PARAM_OPENCRON_PASSWORD_KEY)).toLowerCase();
                 Constants.OPENCRON_PASSWORD_FILE.delete();
-                IOUtils.writeText(Constants.OPENCRON_PASSWORD_FILE, this.password, CHARSET);
+                IOUtils.writeText(Constants.OPENCRON_PASSWORD_FILE, this.password, Constants.CHARSET_UTF8);
             }
         }
-        SystemPropertyUtils.setProperty("opencron.port",this.port+"");
-        SystemPropertyUtils.setProperty("opencron.password",this.password);
+        SystemPropertyUtils.setProperty(Constants.PARAM_OPENCRON_PORT_KEY,this.port.toString());
+        SystemPropertyUtils.setProperty(Constants.PARAM_OPENCRON_PASSWORD_KEY,this.password);
     }
 
     private void start() throws Exception {
         try {
-            final int port = SystemPropertyUtils.getInt("opencron.port",1577);
+            final int port = SystemPropertyUtils.getInt(Constants.PARAM_OPENCRON_PORT_KEY,1577);
             //new thread to start for netty server
             new Thread(new Runnable() {
                 @Override
@@ -188,7 +185,7 @@ public class Bootstrap implements Serializable {
             /**
              * write pid to pidfile...
              */
-            IOUtils.writeText(Constants.OPENCRON_PID_FILE, getPid(), CHARSET);
+            IOUtils.writeText(Constants.OPENCRON_PID_FILE, getPid(), Constants.CHARSET_UTF8);
 
             logger.info("[opencron]agent started @ port:{},pid:{}", port, getPid());
 
@@ -217,7 +214,7 @@ public class Bootstrap implements Serializable {
             return;
         }
 
-        Integer shutdownPort = Integer.valueOf(AgentProperties.getProperty("opencron.shutdown"));
+        Integer shutdownPort = Integer.valueOf(AgentProperties.getProperty(Constants.PARAM_OPENCRON_SHUTDOWN_KEY));
 
         // Set up a server socket to wait on
         try {
@@ -320,7 +317,7 @@ public class Bootstrap implements Serializable {
 
         String address = "localhost";
 
-        Integer shutdownPort = Integer.valueOf(AgentProperties.getProperty("opencron.shutdown"));
+        Integer shutdownPort = Integer.valueOf(AgentProperties.getProperty(Constants.PARAM_OPENCRON_SHUTDOWN_KEY));
 
         // Stop the existing server
         try  {

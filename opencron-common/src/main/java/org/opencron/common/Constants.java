@@ -45,71 +45,73 @@ public class Constants {
 
     //============================== param ==============================//
 
-    public static final String PARAM_PROXYHOST_KEY              = "proxyHost";
+    public static final String PARAM_PROXYHOST_KEY                   = "proxyHost";
 
-    public static final String PARAM_PROXYPORT_KEY              = "proxyPort";
+    public static final String PARAM_PROXYPORT_KEY                   = "proxyPort";
 
-    public static final String PARAM_PROXYACTION_KEY            = "proxyAction";
+    public static final String PARAM_PROXYACTION_KEY                 = "proxyAction";
 
-    public static final String PARAM_PROXYPASSWORD_KEY          = "proxyPassword";
+    public static final String PARAM_PROXYPASSWORD_KEY               = "proxyPassword";
 
-    public static final String PARAM_PROXYPARAMS_KEY            = "proxyParams";
+    public static final String PARAM_PROXYPARAMS_KEY                 = "proxyParams";
 
-    public static final String PARAM_MONITORPORT_KEY            = "opencorn.monitorPort";
+    public static final String PARAM_MONITORPORT_KEY                 = "opencorn.monitorPort";
 
-    public static final String PARAM_NEWPASSWORD_KEY            = "newPassword";
+    public static final String PARAM_NEWPASSWORD_KEY                 = "newPassword";
 
-    public static final String PARAM_PID_KEY                    = "pid";
+    public static final String PARAM_PID_KEY                         = "pid";
 
-    public static final String PARAM_COMMAND_KEY                = "command";
+    public static final String PARAM_COMMAND_KEY                     = "command";
 
-    public static final String PARAM_TIMEOUT_KEY                = "timeout";
+    public static final String PARAM_TIMEOUT_KEY                     = "timeout";
 
-    public static final String PARAM_RUNAS_KEY                  = "runAs";
+    public static final String PARAM_RUNAS_KEY                       = "runAs";
 
-    public static final String PARAM_SUCCESSEXIT_KEY            = "successExit";
+    public static final String PARAM_SUCCESSEXIT_KEY                 = "successExit";
 
-    public static final String PARAM_AUTOREGKEY_KEY             = "opencron.autoRegKey";
+    public static final String PARAM_OPENCRON_AUTOREGKEY_KEY         = "opencron.autoRegKey";
 
-    public static final String PARAM_KEYPATH_KEY                = "opencron.keypath";
+    public static final String PARAM_OPENCRON_KEYPATH_KEY            = "opencron.keypath";
 
-    public static final String PARAM_SINGLELOGIN_KEY            = "opencron.singlelogin";
+    public static final String PARAM_OPENCRON_SINGLELOGIN_KEY        = "opencron.singlelogin";
 
-    public static final String PARAM_PASSWORD_KEY               = "opencron.password";
+    public static final String PARAM_OPENCRON_PASSWORD_KEY           = "opencron.password";
 
-    public static final String PARAM_DEF_PASSWORD_KEY           = "opencron";
+    public static final String PARAM_OPENCRON_SHUTDOWN_KEY           = "opencron.shutdown";
 
-    public static final String PARAM_OPENCRON_HOME_KEY          = "opencron.home";
+    public static final String PARAM_DEF_PASSWORD_KEY                = "opencron";
 
-    public static final String PARAM_OPENCRON_PORT_KEY          = "opencron.port";
+    public static final String PARAM_OPENCRON_HOME_KEY               = "opencron.home";
 
-    public static final String PARAM_DEF_OPENCRON_PORT_KEY      = "1577";
+    public static final String PARAM_OPENCRON_PORT_KEY               = "opencron.port";
 
-    public static final String PARAM_CACHED_AGENT_ID_KEY        = "opencron_agent";
+    public static final String PARAM_DEF_OPENCRON_PORT_KEY           = "1577";
 
-    public static final String PARAM_CACHED_JOB_ID_KEY          = "opencron_job";
+    public static final String PARAM_CACHED_AGENT_ID_KEY             = "opencron_agent";
 
-    public static final String PARAM_LOGIN_USER_KEY             = "opencron_user";
+    public static final String PARAM_CACHED_JOB_ID_KEY               = "opencron_job";
 
-    public static final String PARAM_LOGIN_USER_ID_KEY          = "opencron_user_id";
+    public static final String PARAM_LOGIN_USER_KEY                  = "opencron_user";
 
-    public static final String PARAM_PERMISSION_KEY             = "permission";
+    public static final String PARAM_LOGIN_USER_ID_KEY               = "opencron_user_id";
 
-    public static final String PARAM_SSH_SESSION_ID_KEY         = "ssh_session_id";
+    public static final String PARAM_PERMISSION_KEY                  = "permission";
 
-    public static final String PARAM_HTTP_SESSION_ID_KEY        = "http_session_id";
+    public static final String PARAM_SSH_SESSION_ID_KEY              = "ssh_session_id";
 
-    public static final String PARAM_CSRF_NAME_KEY              = "csrf";
+    public static final String PARAM_HTTP_SESSION_ID_KEY             = "http_session_id";
+                                                                    
+    public static final String PARAM_CSRF_NAME_KEY                   = "csrf";
 
-    public static final String PARAM_LOGIN_MSG_KEY              = "loginMsg";
+    public static final String PARAM_LOGIN_MSG_KEY                   = "loginMsg";
 
-    public static final String PARAM_CONTEXT_PATH_NAME_KEY      = "contextPath";
+    public static final String PARAM_CONTEXT_PATH_NAME_KEY           = "contextPath";
 
-    public static final String PARAM_SKIN_NAME_KEY              = "skin";
+    public static final String PARAM_SKIN_NAME_KEY                   = "skin";
 
-    public static final String CHARSET_UTF8                     = "utf-8";
+    public static final String CHARSET_UTF8                          = "utf-8";
 
-    public static final String CHARSET_ISO88591                 = "iso-8859-1";
+    public static final String CHARSET_ISO88591                      = "iso-8859-1";
 
     //============================== param end ==============================//
     /**
@@ -124,7 +126,7 @@ public class Constants {
     /**
      * password
      */
-    public static final String OPENCRON_PASSWORD = SystemPropertyUtils.get(PARAM_PASSWORD_KEY,PARAM_DEF_PASSWORD_KEY);
+    public static final String OPENCRON_PASSWORD = SystemPropertyUtils.get(PARAM_OPENCRON_PASSWORD_KEY,PARAM_DEF_PASSWORD_KEY);
 
     /**
      * serverurl

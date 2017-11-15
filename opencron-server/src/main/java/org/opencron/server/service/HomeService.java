@@ -71,7 +71,7 @@ public class HomeService {
                 httpSession.setAttribute(Constants.PARAM_PERMISSION_KEY, false);
             }
 
-            String singlelogin = PropertyPlaceholder.get(Constants.PARAM_SINGLELOGIN_KEY);
+            String singlelogin = PropertyPlaceholder.get(Constants.PARAM_OPENCRON_SINGLELOGIN_KEY);
             if (singlelogin != null && singlelogin.trim().equalsIgnoreCase("true")) {
                 Boolean logined = SingleLoginListener.logined(user);
                 if (logined) {

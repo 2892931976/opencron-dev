@@ -12,9 +12,11 @@
         function showContact() {
             $(".contact").show()
         }
+
         function hideContact() {
             $(".contact").hide()
         }
+
         function showProxy() {
             $(".proxy").show();
             $("#proxy1").prop("checked", true);
@@ -25,6 +27,7 @@
             $("#proxy0").parent().removeClass("checked");
             $("#proxy0").parent().attr("aria-checked", false);
         }
+
         function hideProxy() {
             $(".proxy").hide();
             $("#proxy").val(0);
@@ -741,15 +744,9 @@
                                     <i aria-hidden="true" class="fa fa-plus-square-o"></i>
                                 </a>&nbsp;&nbsp;
                                 <c:if test="${permission eq true}">
-                                    <a href="#" onclick="edit('${w.agentId}')" title="编辑">
-                                        <i aria-hidden="true" class="fa fa-edit"></i>
-                                    </a>&nbsp;&nbsp;
-                                    <a href="#" onclick="editPwd('${w.agentId}')" title="修改密码">
-                                        <i aria-hidden="true" class="fa fa-lock"></i>
-                                    </a>&nbsp;&nbsp;
-                                    <a href="#" onclick="remove('${w.agentId}')" title="删除">
-                                        <i aria-hidden="true" class="fa fa-times"></i>
-                                    </a>&nbsp;&nbsp;
+                                    <a href="#" onclick="edit('${w.agentId}')" title="编辑"><i aria-hidden="true" class="fa fa-edit"></i></a>&nbsp;&nbsp;
+                                    <a href="#" onclick="editPwd('${w.agentId}')" title="修改密码"><i aria-hidden="true" class="fa fa-lock"></i></a>&nbsp;&nbsp;
+                                    <a href="#" onclick="remove('${w.agentId}')" title="删除"><i aria-hidden="true" class="fa fa-times"></i></a>&nbsp;&nbsp;
                                 </c:if>
                                 <a href="${contextPath}/agent/detail/${w.agentId}.htm?csrf=${csrf}" title="查看详情">
                                     <i aria-hidden="true" class="fa fa-eye"></i>
@@ -778,10 +775,9 @@
                 <div class="modal-body">
                     <form class="form-horizontal" role="form" id="agentform">
                         <input type="hidden" name="csrf" value="${csrf}">
-                        <input type="hidden" id="id" name="id"><input type="hidden" id="password" name="password"><input
-                            type="hidden" id="status" name="status">
+                        <input type="hidden" id="id" name="id"><input type="hidden" id="password" name="password"><input type="hidden" id="status" name="status">
                         <div class="form-group" style="margin-bottom: 4px;">
-                            <label for="host" class="col-lab control-label" title="必填项,执行器Host为IP地址,或者可以连接到该Agent的网址">机&nbsp;&nbsp;器&nbsp;&nbsp;Host：</label>
+                            <label for="host" class="col-lab control-label" title="必填项,执行器Host为IP地址,或者可以连接到该Agent的网址">机器Host：</label>
                             <div class="col-md-9">
                                 <input type="text" class="form-control " id="host" readonly>&nbsp;
                             </div>
@@ -790,23 +786,14 @@
                         <div class="form-group" style="">
                             <label for="name" class="col-lab control-label" title="执行器名称必填">执行器名：</label>
                             <div class="col-md-9">
-                                <input type="text" class="form-control " id="name">&nbsp;&nbsp;<label
-                                    id="checkName"></label>
+                                <input type="text" class="form-control " id="name">&nbsp;&nbsp;<label id="checkName"></label>
                             </div>
                         </div>
 
-
                         <div class="form-group">
                             <label class="col-lab control-label" title="执行器通信不正常时是否发信息报警">连接类型：</label>&nbsp;&nbsp;
-                            <label onclick="hideProxy()" for="proxy0" class="radio-label"><input type="radio"
-                                                                                                 onclick="hideProxy()"
-                                                                                                 name="proxy" value="0"
-                                                                                                 id="proxy0">直连</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                            <label onclick="showProxy()" for="proxy1" class="radio-label"><input type="radio"
-                                                                                                 onclick="showProxy()"
-                                                                                                 name="proxy" value="1"
-                                                                                                 id="proxy1">代理&nbsp;&nbsp;&nbsp;
-                            </label>
+                            <label onclick="hideProxy()" for="proxy0" class="radio-label"><input type="radio" onclick="hideProxy()" name="proxy" value="0"  id="proxy0">直连</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            <label onclick="showProxy()" for="proxy1" class="radio-label"><input type="radio" onclick="showProxy()" name="proxy" value="1" id="proxy1">代理&nbsp;&nbsp;&nbsp;</label>
                         </div>
 
                         <div class="form-group proxy" style="display: none;margin-top: 20px;">
@@ -814,8 +801,7 @@
                             <div class="col-md-9">
                                 <select id="proxyAgent" name="proxyAgent" class="form-control">
                                     <c:forEach var="d" items="${connAgents}">
-                                        <option value="${d.agentId}" id="agent_${d.agentId}">${d.host}&nbsp;(${d.name})
-                                        </option>
+                                        <option value="${d.agentId}" id="agent_${d.agentId}">${d.host}&nbsp;(${d.name})</option>
                                     </c:forEach>
                                 </select>
                             </div>
@@ -825,23 +811,14 @@
                         <div class="form-group">
                             <label for="port" class="col-lab control-label" title="执行器端口号只能是数字,且不超过4位">端&nbsp;&nbsp;口&nbsp;&nbsp;号：</label>
                             <div class="col-md-9">
-                                <input type="text" class="form-control " id="port" style="margin-bottom: 5px;"/>&nbsp;&nbsp;<a
-                                    href="#" onclick="pingCheck()">
-                                <i class="glyphicon glyphicon-signal"></i>&nbsp;检测通信</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<label
-                                    id="pingResult"></label>
+                                <input type="text" class="form-control " id="port" style="margin-bottom: 5px;"/>&nbsp;&nbsp;<a href="#" onclick="pingCheck()">
+                                <i class="glyphicon glyphicon-signal"></i>&nbsp;检测通信</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<label id="pingResult"></label>
                             </div>
                         </div>
                         <div class="form-group" style="margin-top: 15px;margin-bottom: 20px">
                             <label class="col-lab control-label" title="执行器通信不正常时是否发信息报警">失联报警：</label>&nbsp;&nbsp;
-                            <label onclick="showContact()" for="warning1" class="radio-label"><input type="radio"
-                                                                                                     name="warning"
-                                                                                                     value="1"
-                                                                                                     id="warning1">是&nbsp;&nbsp;&nbsp;
-                            </label>
-                            <label onclick="hideContact()" for="warning0" class="radio-label"><input type="radio"
-                                                                                                     name="warning"
-                                                                                                     value="0"
-                                                                                                     id="warning0">否</label>
+                            <label onclick="showContact()" for="warning1" class="radio-label"><input type="radio" name="warning" value="1" id="warning1">是&nbsp;&nbsp;&nbsp;</label>
+                            <label onclick="hideContact()" for="warning0" class="radio-label"><input type="radio" name="warning" value="0" id="warning0">否</label>
                         </div>
                         <div class="form-group contact">
                             <label for="mobiles" class="col-lab control-label" title="执行器通信不正常时将发送短信给此手机">报警手机：</label>

@@ -134,7 +134,7 @@ public class AgentController extends BaseController {
         }
 
         //验证Key是否与服务器端一致
-        String serverAutoRegKey = PropertyPlaceholder.get(Constants.PARAM_AUTOREGKEY_KEY);
+        String serverAutoRegKey = PropertyPlaceholder.get(Constants.PARAM_OPENCRON_AUTOREGKEY_KEY);
         if (CommonUtils.notEmpty(serverAutoRegKey)) {
             if (CommonUtils.isEmpty(key) || !key.equals(serverAutoRegKey)) {
                 writeJson(response, String.format(format,400,"auto register key error!"));
