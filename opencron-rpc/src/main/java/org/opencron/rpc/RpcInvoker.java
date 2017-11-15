@@ -21,12 +21,10 @@
 
 package org.opencron.rpc;
 
-import org.opencron.common.ext.SPI;
 import org.opencron.common.job.Request;
 import org.opencron.common.job.Response;
 
 
-@SPI
 public interface RpcInvoker {
 
     Response sentSync(Request request) throws Exception  ;

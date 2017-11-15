@@ -30,7 +30,7 @@ import java.util.Map;
 public class Request implements Serializable {
 
     private RpcType rpcType = RpcType.ASYNC;//默认异步调用
-    private String hostName;
+    private String host;
     private Integer id;
     private Integer port;
     private String address;
@@ -45,9 +45,9 @@ public class Request implements Serializable {
 
     }
 
-    public static Request request(String hostName, Integer port, Action action, String password, Integer timeOut,Long proxyAgent) {
+    public static Request request(String host, Integer port, Action action, String password, Integer timeOut,Long proxyAgent) {
         return new Request()
-                .setHostName(hostName)
+                .setHost(host)
                 .setPort(port)
                 .setAction(action)
                 .setPassword(password)
@@ -64,12 +64,12 @@ public class Request implements Serializable {
         return this;
     }
 
-    public String getHostName() {
-        return hostName;
+    public String getHost() {
+        return host;
     }
 
-    public Request setHostName(String hostName) {
-        this.hostName = hostName;
+    public Request setHost(String host) {
+        this.host = host;
         return this;
     }
 
@@ -128,8 +128,8 @@ public class Request implements Serializable {
     }
 
     public String getAddress() {
-        if (CommonUtils.notEmpty(this.hostName,this.port)) {
-            this.address = this.hostName+":"+this.port;
+        if (CommonUtils.notEmpty(this.host,this.port)) {
+            this.address = this.host +":"+this.port;
         }
         return this.address;
     }
