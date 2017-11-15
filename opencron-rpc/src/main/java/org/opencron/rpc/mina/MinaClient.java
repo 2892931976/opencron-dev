@@ -54,12 +54,8 @@ public class MinaClient implements Client {
         connector.setConnectTimeoutMillis(5000);
 
         DefaultSocketSessionConfig sessionConfiguration = (DefaultSocketSessionConfig) connector.getSessionConfig();
-        sessionConfiguration.setReadBufferSize(1024);
-        sessionConfiguration.setSendBufferSize(512);
-        sessionConfiguration.setReuseAddress(true);
         sessionConfiguration.setTcpNoDelay(true);
         sessionConfiguration.setKeepAlive(true);
-        sessionConfiguration.setSoLinger(-1);
         sessionConfiguration.setWriteTimeout(5);
 
         this.scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(5, new ThreadFactory() {

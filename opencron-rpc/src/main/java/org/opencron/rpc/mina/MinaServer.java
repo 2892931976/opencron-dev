@@ -37,14 +37,7 @@ public class MinaServer implements Server {
         acceptor.getFilterChain().addLast("threadPool", new ExecutorFilter(Executors.newCachedThreadPool()));
         acceptor.getFilterChain().addLast("codec", new ProtocolCodecFilter(new MinaCodecAdapter(Response.class,Request.class)));
         acceptor.setHandler(serverHandler);
-
         try {
-            SocketSessionConfig config = acceptor.getSessionConfig();
-            config.setReuseAddress(true);
-            config.setTcpNoDelay(true);
-            config.setSoLinger(0);
-            config.setReadBufferSize(1024 * 2);
-            config.setIdleTime(IdleStatus.BOTH_IDLE, 10);
             acceptor.bind(this.socketAddress);
             logger.info("[opencron]MinaServer start at address:{} success", port);
         } catch (IOException e) {
