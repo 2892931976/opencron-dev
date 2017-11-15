@@ -58,7 +58,7 @@ public class AgentProcessor implements ServerHandler,AgentJob {
     private String password;
 
     public AgentProcessor() {
-        this.password = SystemPropertyUtils.get(Constants.PARAM_OPENCRON_PASSWORD_KEY,Constants.PARAM_DEF_PASSWORD_KEY);
+        this.password = DigestUtils.md5Hex(SystemPropertyUtils.get(Constants.PARAM_OPENCRON_PASSWORD_KEY,Constants.PARAM_DEF_PASSWORD_KEY));
     }
 
     @Override
