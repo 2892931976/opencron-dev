@@ -75,6 +75,16 @@ public class Constants {
 
     public static final String PARAM_SINGLELOGIN_KEY            = "opencron.singlelogin";
 
+    public static final String PARAM_PASSWORD_KEY               = "opencron.password";
+
+    public static final String PARAM_DEF_PASSWORD_KEY           = "opencron";
+
+    public static final String PARAM_OPENCRON_HOME_KEY          = "opencron.home";
+
+    public static final String PARAM_OPENCRON_PORT_KEY          = "opencron.port";
+
+    public static final String PARAM_DEF_OPENCRON_PORT_KEY      = "1577";
+
     public static final String PARAM_CACHED_AGENT_ID_KEY        = "opencron_agent";
 
     public static final String PARAM_CACHED_JOB_ID_KEY          = "opencron_job";
@@ -105,16 +115,16 @@ public class Constants {
     /**
      * Name of the system property containing
      */
-    public static final String OPENCRON_HOME = SystemPropertyUtils.get("opencron.home");
+    public static final String OPENCRON_HOME = SystemPropertyUtils.get(PARAM_OPENCRON_HOME_KEY);
 
     /**
      * port
      */
-    public static final Integer OPENCRON_PORT =  Integer.valueOf(SystemPropertyUtils.get("opencron.port","1577")) ;
+    public static final Integer OPENCRON_PORT =  Integer.valueOf(SystemPropertyUtils.get(PARAM_OPENCRON_PORT_KEY,PARAM_DEF_OPENCRON_PORT_KEY)) ;
     /**
      * password
      */
-    public static final String OPENCRON_PASSWORD = SystemPropertyUtils.get("opencron.password","opencron");
+    public static final String OPENCRON_PASSWORD = SystemPropertyUtils.get(PARAM_PASSWORD_KEY,PARAM_DEF_PASSWORD_KEY);
 
     /**
      * serverurl

@@ -58,7 +58,7 @@ public class AgentProcessor implements ServerHandler,AgentJob {
     private String password;
 
     public AgentProcessor() {
-        this.password = SystemPropertyUtils.get("opencron.password","opencron");
+        this.password = SystemPropertyUtils.get(Constants.PARAM_PASSWORD_KEY,"opencron");
     }
 
     @Override
