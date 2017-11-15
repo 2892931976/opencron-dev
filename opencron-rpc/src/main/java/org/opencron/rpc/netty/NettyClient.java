@@ -34,7 +34,7 @@ import org.opencron.common.job.Response;
 import org.opencron.common.util.HttpUtils;
 import org.opencron.rpc.Client;
 import org.opencron.rpc.InvokeCallback;
-import org.opencron.rpc.RpcFuture;
+import org.opencron.rpc.Promise;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,7 +63,7 @@ public class NettyClient implements Client {
 
     private Bootstrap bootstrap = new Bootstrap();
 
-    protected final ConcurrentHashMap<Integer, RpcFuture> futureTable =  new ConcurrentHashMap<Integer, RpcFuture>(256);
+    protected final ConcurrentHashMap<Integer, Promise> promiseTable =  new ConcurrentHashMap<Integer, Promise>(256);
 
     private final ConcurrentHashMap<String, ChannelWrapper> channelTable = new ConcurrentHashMap<String, ChannelWrapper>();
 
@@ -76,10 +76,10 @@ public class NettyClient implements Client {
     @Override
     public void connect() {
 
-        final NettyClientHandler nettyClientHandler = new NettyClientHandler(new RpcFuture.Getter() {
+        final NettyClientHandler nettyClientHandler = new NettyClientHandler(new Promise.Getter() {
             @Override
-            public RpcFuture getRpcFuture(Integer id) {
-                return futureTable.get(id);
+            public Promise getPromise(Integer id) {
+                return promiseTable.get(id);
             }
         });
 
@@ -110,14 +110,14 @@ public class NettyClient implements Client {
         this.scheduledThreadPoolExecutor.scheduleAtFixedRate(new Runnable() {
             @Override
             public void run() {
-                scanRpcFutureTable();
+                scanPromiseTable();
             }
         }, 500, 500, TimeUnit.MILLISECONDS);
     }
 
     @Override
     public void disconnect() {
-        this.futureTable.clear();
+        this.promiseTable.clear();
         this.channelTable.clear();
         this.scheduledThreadPoolExecutor.shutdown();
     }
@@ -126,25 +126,25 @@ public class NettyClient implements Client {
     public Response sentSync(final Request request) throws Exception {
         Channel channel = getOrCreateChannel(request);
         if (channel != null && channel.isActive()) {
-            final RpcFuture rpcFuture = new RpcFuture(request.getTimeOut());
-            this.futureTable.put(request.getId(), rpcFuture);
+            final Promise promise = new Promise(request.getTimeOut());
+            this.promiseTable.put(request.getId(), promise);
             //写数据
             channel.writeAndFlush(request).addListener(new ChannelFutureListener() {
                 @Override
                 public void operationComplete(ChannelFuture future) throws Exception {
                     if (future.isSuccess()) {
                         logger.info("send success, request id:{}", request.getId());
-                        rpcFuture.setSendRequestSuccess(true);
+                        promise.setSendRequestSuccess(true);
                         return;
                     } else {
                         logger.info("send failure, request id:{}", request.getId());
-                        futureTable.remove(request.getId());
-                        rpcFuture.setSendRequestSuccess(false);
-                        rpcFuture.setFailure(future.cause());
+                        promiseTable.remove(request.getId());
+                        promise.setSendRequestSuccess(false);
+                        promise.setFailure(future.cause());
                     }
                 }
             });
-            return rpcFuture.get();
+            return promise.get();
         } else {
             throw new IllegalArgumentException("channel not active. request id:"+request.getId());
         }
@@ -157,21 +157,21 @@ public class NettyClient implements Client {
 
         if (channel != null && channel.isActive()) {
 
-            final RpcFuture rpcFuture = new RpcFuture(request.getTimeOut(),callback);
-            this.futureTable.put(request.getId(), rpcFuture);
+            final Promise promise = new Promise(request.getTimeOut(),callback);
+            this.promiseTable.put(request.getId(), promise);
             //写数据
             channel.writeAndFlush(request).addListener(new ChannelFutureListener() {
                 @Override
                 public void operationComplete(ChannelFuture future) throws Exception {
                     if (future.isSuccess()) {
                         logger.info("send success, request id:{}", request.getId());
-                        rpcFuture.setSendRequestSuccess(true);
+                        promise.setSendRequestSuccess(true);
                         return;
                     } else {
                         logger.info("send failure, request id:{}", request.getId());
-                        futureTable.remove(request.getId());
-                        rpcFuture.setSendRequestSuccess(false);
-                        rpcFuture.setFailure(future.cause());
+                        promiseTable.remove(request.getId());
+                        promise.setSendRequestSuccess(false);
+                        promise.setFailure(future.cause());
                         //回调
                         callback.failure(future.cause());
                     }
@@ -233,11 +233,11 @@ public class NettyClient implements Client {
     }
 
     /**定时清理超时Future**/
-    private void scanRpcFutureTable() {
-        Iterator<Map.Entry<Integer, RpcFuture>> it = this.futureTable.entrySet().iterator();
+    private void scanPromiseTable() {
+        Iterator<Map.Entry<Integer, Promise>> it = this.promiseTable.entrySet().iterator();
         while (it.hasNext()) {
-            Map.Entry<Integer, RpcFuture> next = it.next();
-            RpcFuture rep = next.getValue();
+            Map.Entry<Integer, Promise> next = it.next();
+            Promise rep = next.getValue();
 
             if ((rep.getBeginTimestamp() + rep.getTimeoutMillis() + 1000) <= System.currentTimeMillis()) {  //超时
                 it.remove();

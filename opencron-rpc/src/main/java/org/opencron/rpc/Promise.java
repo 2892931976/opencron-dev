@@ -28,7 +28,7 @@ import java.util.concurrent.*;
 /**
  * @author benjobs
  */
-public class RpcFuture {
+public class Promise {
 
     private static final CancellationException CANCELLED = new CancellationException();
     private volatile boolean sendRequestSuccess = true;
@@ -47,14 +47,14 @@ public class RpcFuture {
     //异步回调
     private InvokeCallback callback;
 
-    public RpcFuture() {
+    public Promise() {
     }
 
-    public RpcFuture(Integer timeout) {
+    public Promise(Integer timeout) {
         this.timeout = timeout == null?Integer.MAX_VALUE:timeout;
     }
 
-    public RpcFuture(Integer timeout, InvokeCallback callback) {
+    public Promise(Integer timeout, InvokeCallback callback) {
         this.timeout =  timeout == null?Integer.MAX_VALUE:timeout;
         this.unit = TimeUnit.SECONDS;
         this.callback = callback;
@@ -180,6 +180,6 @@ public class RpcFuture {
     }
 
     public interface Getter {
-        RpcFuture getRpcFuture(Integer id);
+        Promise getPromise(Integer id);
     }
 }

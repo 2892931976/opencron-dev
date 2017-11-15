@@ -12,7 +12,7 @@ import org.opencron.common.logging.LoggerFactory;
 import org.opencron.common.util.HttpUtils;
 import org.opencron.rpc.Client;
 import org.opencron.rpc.InvokeCallback;
-import org.opencron.rpc.RpcFuture;
+import org.opencron.rpc.Promise;
 import org.slf4j.Logger;
 
 import java.util.Iterator;
@@ -29,7 +29,7 @@ public class MinaClient implements Client {
 
     private NioSocketConnector connector;
 
-    protected final ConcurrentHashMap<Integer, RpcFuture> futureTable =  new ConcurrentHashMap<Integer, RpcFuture>(256);
+    protected final ConcurrentHashMap<Integer, Promise> promiseTable =  new ConcurrentHashMap<Integer, Promise>(256);
 
     private final ConcurrentHashMap<String, ConnectWrapper> connectTable = new ConcurrentHashMap<String, ConnectWrapper>();
 
@@ -44,10 +44,10 @@ public class MinaClient implements Client {
 
         connector = new NioSocketConnector();
         connector.getFilterChain().addLast("codec", new ProtocolCodecFilter(new MinaCodecAdapter(Request.class,Response.class)));
-        connector.setHandler(new MinaClientHandler(new RpcFuture.Getter() {
+        connector.setHandler(new MinaClientHandler(new Promise.Getter() {
             @Override
-            public RpcFuture getRpcFuture(Integer id) {
-                return futureTable.get(id);
+            public Promise getPromise(Integer id) {
+                return promiseTable.get(id);
             }
         }));
 
@@ -69,7 +69,7 @@ public class MinaClient implements Client {
         this.scheduledThreadPoolExecutor.scheduleAtFixedRate(new Runnable() {
             @Override
             public void run() {
-                scanRpcFutureTable();
+                scanPromiseTable();
             }
         }, 500, 500, TimeUnit.MILLISECONDS);
     }
@@ -86,26 +86,26 @@ public class MinaClient implements Client {
     public Response sentSync(final Request request) throws Exception {
         final ConnectFuture connect = getOrCreateConnect(request);
         if (connect != null && connect.isConnected()) {
-            final RpcFuture rpcFuture = new RpcFuture(request.getTimeOut());
-            this.futureTable.put(request.getId(), rpcFuture);
+            final Promise promise = new Promise(request.getTimeOut());
+            this.promiseTable.put(request.getId(), promise);
             //写数据
             connect.addListener(new IoFutureListener() {
                 @Override
                 public void operationComplete(IoFuture future) {
                     if (future.isDone()) {
                         logger.info("send success, request id:{}", request.getId());
-                        rpcFuture.setSendRequestSuccess(true);
+                        promise.setSendRequestSuccess(true);
                         return;
                     } else {
                         logger.info("send failure, request id:{}", request.getId());
-                        futureTable.remove(request.getId());
-                        rpcFuture.setSendRequestSuccess(false);
-                        rpcFuture.setFailure(connect.getException());
+                        promiseTable.remove(request.getId());
+                        promise.setSendRequestSuccess(false);
+                        promise.setFailure(connect.getException());
                     }
                 }
             });
             connect.getSession().write(request);
-            return rpcFuture.get();
+            return promise.get();
         } else {
             throw new IllegalArgumentException("channel not active. request id:"+request.getId());
         }
@@ -135,21 +135,21 @@ public class MinaClient implements Client {
     public void sentAsync(final Request request,final InvokeCallback callback) throws Exception {
         final ConnectFuture connect = getOrCreateConnect(request);
         if (connect != null && connect.isConnected()) {
-            final RpcFuture rpcFuture = new RpcFuture(request.getTimeOut(),callback);
-            this.futureTable.put(request.getId(), rpcFuture);
+            final Promise promise = new Promise(request.getTimeOut(),callback);
+            this.promiseTable.put(request.getId(), promise);
             //写数据
             connect.addListener(new IoFutureListener<IoFuture>() {
                 @Override
                 public void operationComplete(IoFuture future) {
                     if (future.isDone()) {
                         logger.info("send success, request id:{}", request.getId());
-                        rpcFuture.setSendRequestSuccess(true);
+                        promise.setSendRequestSuccess(true);
                         return;
                     } else {
                         logger.info("send failure, request id:{}", request.getId());
-                        futureTable.remove(request.getId());
-                        rpcFuture.setSendRequestSuccess(false);
-                        rpcFuture.setFailure(connect.getException());
+                        promiseTable.remove(request.getId());
+                        promise.setSendRequestSuccess(false);
+                        promise.setFailure(connect.getException());
                         //回调
                         callback.failure(connect.getException());
                     }
@@ -199,11 +199,11 @@ public class MinaClient implements Client {
     }
 
     /**定时清理超时Future**/
-    private void scanRpcFutureTable() {
-        Iterator<Map.Entry<Integer, RpcFuture>> it = this.futureTable.entrySet().iterator();
+    private void scanPromiseTable() {
+        Iterator<Map.Entry<Integer, Promise>> it = this.promiseTable.entrySet().iterator();
         while (it.hasNext()) {
-            Map.Entry<Integer, RpcFuture> next = it.next();
-            RpcFuture rep = next.getValue();
+            Map.Entry<Integer, Promise> next = it.next();
+            Promise rep = next.getValue();
 
             if ((rep.getBeginTimestamp() + rep.getTimeoutMillis() + 1000) <= System.currentTimeMillis()) {  //超时
                 it.remove();
