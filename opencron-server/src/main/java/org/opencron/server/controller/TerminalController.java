@@ -21,6 +21,7 @@
 
 package org.opencron.server.controller;
 
+import org.opencron.common.Constants;
 import org.opencron.common.util.CommonUtils;
 import org.opencron.server.domain.Terminal;
 import org.opencron.server.domain.User;
@@ -150,7 +151,7 @@ public class TerminalController extends BaseController {
         if (terminal != null) {
             token = CommonUtils.uuid();
             TerminalContext.put(token, terminal);
-            session.setAttribute(OpencronTools.SSH_SESSION_ID, token);
+            session.setAttribute(Constants.PARAM_SSH_SESSION_ID_KEY, token);
             return "redirect:/terminal/open.htm?token=" + token + "&csrf=" + OpencronTools.getCSRF(session);
         }
         return "/terminal/error";

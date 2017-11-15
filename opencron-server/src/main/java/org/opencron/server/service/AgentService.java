@@ -24,6 +24,7 @@ package org.opencron.server.service;
 
 import java.util.*;
 
+import org.opencron.common.Constants;
 import org.opencron.common.job.Opencron;
 import org.opencron.common.util.CommonUtils;
 import org.opencron.server.dao.QueryDao;
@@ -70,16 +71,16 @@ public class AgentService {
     }
 
     public List<Agent> getAll() {
-        List<Agent> agents = OpencronTools.CACHE.get(OpencronTools.CACHED_AGENT_ID, List.class);
+        List<Agent> agents = OpencronTools.CACHE.get(Constants.PARAM_CACHED_AGENT_ID_KEY, List.class);
         if (CommonUtils.isEmpty(agents)) {
             flushAgent();
         }
-        return OpencronTools.CACHE.get(OpencronTools.CACHED_AGENT_ID, List.class);
+        return OpencronTools.CACHE.get(Constants.PARAM_CACHED_AGENT_ID_KEY, List.class);
     }
 
 
     private synchronized void flushAgent() {
-        OpencronTools.CACHE.put(OpencronTools.CACHED_AGENT_ID, queryDao.sqlQuery(Agent.class, "SELECT * FROM T_AGENT WHERE deleted=0"));
+        OpencronTools.CACHE.put(Constants.PARAM_CACHED_AGENT_ID_KEY, queryDao.sqlQuery(Agent.class, "SELECT * FROM T_AGENT WHERE deleted=0"));
     }
 
     public List<Agent> getAgentByConnStatus(Opencron.ConnStatus status) {

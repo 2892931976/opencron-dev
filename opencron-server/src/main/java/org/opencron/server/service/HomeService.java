@@ -21,6 +21,7 @@
 
 package org.opencron.server.service;
 
+import org.opencron.common.Constants;
 import org.opencron.common.job.Opencron;
 import org.opencron.common.util.DigestUtils;
 import org.opencron.common.util.PropertyPlaceholder;
@@ -65,12 +66,12 @@ public class HomeService {
 
         if (saltPassword.equals(user.getPassword())) {
             if (user.getRoleId() == 999L) {
-                httpSession.setAttribute(OpencronTools.PERMISSION, true);
+                httpSession.setAttribute(Constants.PARAM_PERMISSION_KEY, true);
             } else {
-                httpSession.setAttribute(OpencronTools.PERMISSION, false);
+                httpSession.setAttribute(Constants.PARAM_PERMISSION_KEY, false);
             }
 
-            String singlelogin = PropertyPlaceholder.get("opencron.singlelogin");
+            String singlelogin = PropertyPlaceholder.get(Constants.PARAM_SINGLELOGIN_KEY);
             if (singlelogin != null && singlelogin.trim().equalsIgnoreCase("true")) {
                 Boolean logined = SingleLoginListener.logined(user);
                 if (logined) {

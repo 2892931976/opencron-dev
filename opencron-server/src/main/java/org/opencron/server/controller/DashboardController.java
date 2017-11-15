@@ -302,7 +302,7 @@ public class DashboardController extends BaseController {
             String imgPath = contextPath + "/upload/" + picName + "?" + System.currentTimeMillis();
             user.setHeaderPath(imgPath);
             user.setHeaderpic(null);
-            httpSession.setAttribute(OpencronTools.LOGIN_USER, user);
+            httpSession.setAttribute(Constants.PARAM_LOGIN_USER_KEY, user);
 
             writeJson(response, String.format(successFormat, imgPath));
             logger.info(" upload file successful @ " + picName);

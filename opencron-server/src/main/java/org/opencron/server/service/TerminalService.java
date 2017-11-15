@@ -22,6 +22,7 @@
 package org.opencron.server.service;
 
 import com.jcraft.jsch.*;
+import org.opencron.common.Constants;
 import org.opencron.common.util.CommonUtils;
 import org.opencron.common.util.DigestUtils;
 import org.opencron.server.dao.QueryDao;
@@ -45,9 +46,6 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static org.opencron.common.util.CommonUtils.notEmpty;
-import static org.opencron.server.job.OpencronTools.HTTP_SESSION_ID;
-import static org.opencron.server.job.OpencronTools.SSH_SESSION_ID;
-
 
 /**
  * @author <a href="mailto:benjobs@qq.com">benjobs@qq.com</a>
@@ -212,9 +210,9 @@ public class TerminalService {
         public TerminalClient(WebSocketSession webSocketSession, Terminal terminal) {
             this.webSocketSession = webSocketSession;
             this.terminal = terminal;
-            this.httpSessionId = (String) webSocketSession.getAttributes().get(HTTP_SESSION_ID);
+            this.httpSessionId = (String) webSocketSession.getAttributes().get(Constants.PARAM_HTTP_SESSION_ID_KEY);
             ;
-            this.clientId = (String) webSocketSession.getAttributes().get(SSH_SESSION_ID);
+            this.clientId = (String) webSocketSession.getAttributes().get(Constants.PARAM_SSH_SESSION_ID_KEY);
             this.sendTempCmdId = this.clientId + this.httpSessionId;
             this.jSch = new JSch();
         }

@@ -28,6 +28,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import com.alibaba.fastjson.JSON;
+import org.opencron.common.Constants;
 import org.opencron.common.job.Opencron;
 import org.opencron.common.util.CommonUtils;
 import org.opencron.common.util.PropertyPlaceholder;
@@ -133,7 +134,7 @@ public class AgentController extends BaseController {
         }
 
         //验证Key是否与服务器端一致
-        String serverAutoRegKey = PropertyPlaceholder.get("opencron.autoRegKey");
+        String serverAutoRegKey = PropertyPlaceholder.get(Constants.PARAM_AUTOREGKEY_KEY);
         if (CommonUtils.notEmpty(serverAutoRegKey)) {
             if (CommonUtils.isEmpty(key) || !key.equals(serverAutoRegKey)) {
                 writeJson(response, String.format(format,400,"auto register key error!"));

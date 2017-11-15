@@ -69,7 +69,7 @@ public class NoticeService {
         File file = new File(servletContext.getRealPath("/WEB-INF/layouts"));
         configuration.setDirectoryForTemplateLoading(file);
         configuration.setDefaultEncoding("UTF-8");
-        this.template = configuration.getTemplate("email.template");
+        this.template = configuration.getTemplate("email.html");
     }
 
     public void notice(Agent agent) {

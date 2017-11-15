@@ -23,6 +23,7 @@
 package org.opencron.server.handler;
 
 
+import org.opencron.common.Constants;
 import org.opencron.common.util.CommonUtils;
 import org.opencron.common.util.CookieUtils;
 import org.opencron.common.util.StringUtils;
@@ -56,11 +57,11 @@ public class SecurityHandlerInterceptor extends HandlerInterceptorAdapter {
 
         HttpSession session = request.getSession();
 
-        if (session.getAttribute(OpencronTools.SKIN_NAME)==null) {
-            Cookie cookie = CookieUtils.getCookie(request, OpencronTools.SKIN_NAME);
+        if (session.getAttribute(Constants.PARAM_SKIN_NAME_KEY)==null) {
+            Cookie cookie = CookieUtils.getCookie(request,Constants.PARAM_SKIN_NAME_KEY);
             if (cookie!=null) {
                 String skin = cookie.getValue();
-                session.setAttribute(OpencronTools.SKIN_NAME, skin);
+                session.setAttribute(Constants.PARAM_SKIN_NAME_KEY, skin);
             }
         }
 

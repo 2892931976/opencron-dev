@@ -34,6 +34,7 @@ public class Constants {
     public static final String META_INF_DIR = "META-INF/opencron/";
 
     public static final String ZK_REGISTRY_PATH = "/registry";
+
     public static final String ZK_DATA_PATH = ZK_REGISTRY_PATH + "/data";
 
     public static final Pattern COMMA_SPLIT_PATTERN = Pattern.compile("\\s*[,]+\\s*");
@@ -42,34 +43,65 @@ public class Constants {
 
     public static final int DEFAULT_IO_THREADS = Math.min(Runtime.getRuntime().availableProcessors() + 1, 32);
 
-    public static final String PARAM_PROXYHOST_KEY = "proxyHost";
+    //============================== param ==============================//
 
-    public static final String PARAM_PROXYPORT_KEY = "proxyPort";
+    public static final String PARAM_PROXYHOST_KEY              = "proxyHost";
 
-    public static final String PARAM_PROXYACTION_KEY = "proxyAction";
+    public static final String PARAM_PROXYPORT_KEY              = "proxyPort";
 
-    public static final String PARAM_PROXYPASSWORD_KEY = "proxyPassword";
+    public static final String PARAM_PROXYACTION_KEY            = "proxyAction";
 
-    public static final String PARAM_PROXYPARAMS_KEY = "proxyParams";
+    public static final String PARAM_PROXYPASSWORD_KEY          = "proxyPassword";
 
-    public static final String PARAM_MONITORPORT_KEY = "opencorn.monitorPort";
+    public static final String PARAM_PROXYPARAMS_KEY            = "proxyParams";
 
-    public static final String PARAM_NEWPASSWORD_KEY = "newPassword";
+    public static final String PARAM_MONITORPORT_KEY            = "opencorn.monitorPort";
 
-    public static final String PARAM_PID_KEY = "pid";
+    public static final String PARAM_NEWPASSWORD_KEY            = "newPassword";
 
-    public static final String PARAM_COMMAND_KEY = "command";
+    public static final String PARAM_PID_KEY                    = "pid";
 
-    public static final String PARAM_TIMEOUT_KEY = "timeout";
+    public static final String PARAM_COMMAND_KEY                = "command";
 
-    public static final String PARAM_RUNAS_KEY = "runAs";
+    public static final String PARAM_TIMEOUT_KEY                = "timeout";
 
-    public static final String PARAM_SUCCESSEXIT_KEY = "successExit";
+    public static final String PARAM_RUNAS_KEY                  = "runAs";
 
-    public static final String CHARSET_UTF8 = "utf-8";
+    public static final String PARAM_SUCCESSEXIT_KEY            = "successExit";
 
-    public static final String CHARSET_ISO88591 = "iso-8859-1 ";
+    public static final String PARAM_AUTOREGKEY_KEY             = "opencron.autoRegKey";
 
+    public static final String PARAM_KEYPATH_KEY                = "opencron.keypath";
+
+    public static final String PARAM_SINGLELOGIN_KEY            = "opencron.singlelogin";
+
+    public static final String PARAM_CACHED_AGENT_ID_KEY        = "opencron_agent";
+
+    public static final String PARAM_CACHED_JOB_ID_KEY          = "opencron_job";
+
+    public static final String PARAM_LOGIN_USER_KEY             = "opencron_user";
+
+    public static final String PARAM_LOGIN_USER_ID_KEY          = "opencron_user_id";
+
+    public static final String PARAM_PERMISSION_KEY             = "permission";
+
+    public static final String PARAM_SSH_SESSION_ID_KEY         = "ssh_session_id";
+
+    public static final String PARAM_HTTP_SESSION_ID_KEY        = "http_session_id";
+
+    public static final String PARAM_CSRF_NAME_KEY              = "csrf";
+
+    public static final String PARAM_LOGIN_MSG_KEY              = "loginMsg";
+
+    public static final String PARAM_CONTEXT_PATH_NAME_KEY      = "contextPath";
+
+    public static final String PARAM_SKIN_NAME_KEY              = "skin";
+
+    public static final String CHARSET_UTF8                     = "utf-8";
+
+    public static final String CHARSET_ISO88591                 = "iso-8859-1";
+
+    //============================== param end ==============================//
     /**
      * Name of the system property containing
      */

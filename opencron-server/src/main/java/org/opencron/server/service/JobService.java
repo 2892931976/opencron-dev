@@ -29,6 +29,7 @@ import java.util.List;
 
 import static org.opencron.common.job.Opencron.*;
 
+import org.opencron.common.Constants;
 import org.opencron.common.job.Opencron;
 import org.opencron.server.dao.QueryDao;
 import org.opencron.server.domain.Job;
@@ -134,15 +135,15 @@ public class JobService {
     }
 
     public List<Job> getAll() {
-        List<Job> jobs = OpencronTools.CACHE.get(OpencronTools.CACHED_JOB_ID, List.class);
+        List<Job> jobs = OpencronTools.CACHE.get(Constants.PARAM_CACHED_JOB_ID_KEY, List.class);
         if (CommonUtils.isEmpty(jobs)) {
             flushJob();
         }
-        return OpencronTools.CACHE.get(OpencronTools.CACHED_JOB_ID, List.class);
+        return OpencronTools.CACHE.get(Constants.PARAM_CACHED_JOB_ID_KEY, List.class);
     }
 
     private synchronized void flushJob() {
-        OpencronTools.CACHE.put(OpencronTools.CACHED_JOB_ID, queryDao.sqlQuery(Job.class, "SELECT * FROM T_JOB WHERE deleted=0"));
+        OpencronTools.CACHE.put(Constants.PARAM_CACHED_JOB_ID_KEY, queryDao.sqlQuery(Job.class, "SELECT * FROM T_JOB WHERE deleted=0"));
     }
 
     public PageBean<JobVo> getJobVos(HttpSession session, PageBean pageBean, JobVo job) {

@@ -22,6 +22,7 @@
 package org.opencron.server.job;
 
 
+import org.opencron.common.Constants;
 import org.opencron.common.util.*;
 import org.opencron.server.domain.User;
 import org.opencron.server.service.TerminalService;
@@ -36,34 +37,12 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public final class OpencronTools {
 
-    public static final String CACHED_AGENT_ID = "opencron_agent";
-
-    public static final String CACHED_JOB_ID = "opencron_job";
-
-    public static final String LOGIN_USER = "opencron_user";
-
-    public static final String LOGIN_USER_ID = "opencron_user_id";
-
-    public static final String PERMISSION = "permission";
-
-    public static final String SSH_SESSION_ID = "ssh_session_id";
-
-    public static final String HTTP_SESSION_ID = "http_session_id";
-
-    public static final String CSRF_NAME = "csrf";
-
-    public static final String LOGIN_MSG = "loginMsg";
-
-    public static final String CONTEXT_PATH_NAME = "contextPath";
-
-    public static final String SKIN_NAME = "skin";
-
     private static String resourceId;
 
     private static Logger logger = LoggerFactory.getLogger(OpencronTools.class);
 
     public static boolean isPermission(HttpSession session) {
-        Object obj = session.getAttribute(PERMISSION);
+        Object obj = session.getAttribute(Constants.PARAM_PERMISSION_KEY);
         if (obj == null) {
             return false;
         }
@@ -72,55 +51,55 @@ public final class OpencronTools {
 
     public static void logined(HttpServletRequest request, User user) {
         HttpSession session = request.getSession();
-        session.setAttribute(HTTP_SESSION_ID, session.getId());
-        session.setAttribute(LOGIN_USER, user);
-        session.setAttribute(LOGIN_USER_ID, user.getUserId());
-        session.setAttribute(CONTEXT_PATH_NAME, WebUtils.getWebUrlPath(request));
+        session.setAttribute(Constants.PARAM_HTTP_SESSION_ID_KEY, session.getId());
+        session.setAttribute(Constants.PARAM_LOGIN_USER_KEY, user);
+        session.setAttribute(Constants.PARAM_LOGIN_USER_ID_KEY, user.getUserId());
+        session.setAttribute(Constants.PARAM_CONTEXT_PATH_NAME_KEY, WebUtils.getWebUrlPath(request));
     }
 
     public static User getUser(HttpSession session) {
-        return (User) session.getAttribute(LOGIN_USER);
+        return (User) session.getAttribute(Constants.PARAM_LOGIN_USER_KEY);
     }
 
     public static Long getUserId(HttpSession session) {
-        return (Long) session.getAttribute(LOGIN_USER_ID);
+        return (Long) session.getAttribute(Constants.PARAM_LOGIN_USER_ID_KEY);
     }
 
     public static void invalidSession(HttpSession session) throws Exception {
-        session.removeAttribute(LOGIN_USER);
-        session.removeAttribute(LOGIN_USER_ID);
-        session.removeAttribute(PERMISSION);
-        session.removeAttribute(HTTP_SESSION_ID);
-        session.removeAttribute(SSH_SESSION_ID);
-        session.removeAttribute(CSRF_NAME);
+        session.removeAttribute(Constants.PARAM_LOGIN_USER_KEY);
+        session.removeAttribute(Constants.PARAM_LOGIN_USER_ID_KEY);
+        session.removeAttribute(Constants.PARAM_PERMISSION_KEY);
+        session.removeAttribute(Constants.PARAM_HTTP_SESSION_ID_KEY);
+        session.removeAttribute(Constants.PARAM_SSH_SESSION_ID_KEY);
+        session.removeAttribute(Constants.PARAM_CSRF_NAME_KEY);
         TerminalService.TerminalSession.exit(session.getId());
-        session.removeAttribute(LOGIN_MSG);
-        session.removeAttribute(CONTEXT_PATH_NAME);
+        session.removeAttribute(Constants.PARAM_LOGIN_MSG_KEY);
+        session.removeAttribute(Constants.PARAM_CONTEXT_PATH_NAME_KEY);
         session.invalidate();
     }
 
     public static String getCSRF(HttpSession session) {
         String token;
         synchronized (session) {
-            token = (String) session.getAttribute(CSRF_NAME);
+            token = (String) session.getAttribute(Constants.PARAM_CSRF_NAME_KEY);
             if (null == token) {
                 token = CommonUtils.uuid();
-                session.setAttribute(CSRF_NAME, token);
+                session.setAttribute(Constants.PARAM_CSRF_NAME_KEY, token);
             }
         }
         return token;
     }
 
     public static String getCSRF(HttpServletRequest request) {
-        String csrf = request.getHeader(CSRF_NAME);
+        String csrf = request.getHeader(Constants.PARAM_CSRF_NAME_KEY);
         if (csrf == null) {
-            csrf = request.getParameter(CSRF_NAME);
+            csrf = request.getParameter(Constants.PARAM_CSRF_NAME_KEY);
         }
         return csrf;
     }
 
     public static void setSshSessionId(HttpSession session, String sshSessionId) {
-        session.setAttribute(SSH_SESSION_ID, sshSessionId);
+        session.setAttribute(Constants.PARAM_SSH_SESSION_ID_KEY, sshSessionId);
     }
 
     public static String getResourceId() {
@@ -155,8 +134,6 @@ public final class OpencronTools {
     public static class Auth {
         public static String publicKey = null;
         public static String privateKey = null;
-        private static final String charset = "UTF-8";
-
         public static String KEY_PATH = null;
         public static String PRIVATE_KEY_PATH = null;
         public static String PUBLIC_KEY_PATH = null;
@@ -173,8 +150,8 @@ public final class OpencronTools {
                     privateKey = RSAUtils.getPrivateKey(keyMap);
                     File pubFile = new File(getPublicKeyPath());
                     File prvFile = new File(getPrivateKeyPath());
-                    IOUtils.writeText(pubFile, publicKey, charset);
-                    IOUtils.writeText(prvFile, privateKey, charset);
+                    IOUtils.writeText(pubFile, publicKey, Constants.CHARSET_UTF8);
+                    IOUtils.writeText(prvFile, privateKey, Constants.CHARSET_UTF8);
                 } catch (Exception e) {
                     logger.error("[opencron] error:{}" + e.getMessage());
                     throw new RuntimeException("init RSA'publicKey and privateKey error!");
@@ -195,13 +172,13 @@ public final class OpencronTools {
             if (file.exists()) {
                 switch (type) {
                     case PUBLIC:
-                        publicKey = IOUtils.readText(file, charset);
+                        publicKey = IOUtils.readText(file, Constants.CHARSET_UTF8);
                         if (CommonUtils.isEmpty(publicKey)) {
                             generateKey();
                         }
                         break;
                     case PRIVATE:
-                        privateKey = IOUtils.readText(file, charset);
+                        privateKey = IOUtils.readText(file, Constants.CHARSET_UTF8);
                         if (CommonUtils.isEmpty(privateKey)) {
                             generateKey();
                         }
@@ -218,7 +195,7 @@ public final class OpencronTools {
                 KEY_PATH = System.getProperties().getProperty("user.home") + File.separator + ".opencron";
                 // 从config.properties配置都读取用户手动设置的keypath的位置,配置文件里默认没有,不建议用户指定
                 // 如果指定了位置可能会导致之前所有已可ssh登录的机器无法登陆,需要再次输入用户名密码
-                String path = PropertyPlaceholder.get("opencron.keypath");
+                String path = PropertyPlaceholder.get(Constants.PARAM_KEYPATH_KEY);
                 if (path != null) {
                     KEY_PATH = path;
                 }

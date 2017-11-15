@@ -20,6 +20,7 @@
  */
 package org.opencron.server.job;
 
+import org.opencron.common.Constants;
 import org.opencron.server.service.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,8 +52,8 @@ public class OpencronTask implements InitializingBean {
     }
 
     private void clearCache() {
-        OpencronTools.CACHE.remove(OpencronTools.CACHED_AGENT_ID);
-        OpencronTools.CACHE.remove(OpencronTools.CACHED_JOB_ID);
+        OpencronTools.CACHE.remove(Constants.PARAM_CACHED_AGENT_ID_KEY);
+        OpencronTools.CACHE.remove(Constants.PARAM_CACHED_JOB_ID_KEY);
     }
 
 }

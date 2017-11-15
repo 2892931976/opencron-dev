@@ -21,6 +21,7 @@
 
 package org.opencron.server.controller;
 
+import org.opencron.common.Constants;
 import org.opencron.common.util.DigestUtils;
 import org.opencron.server.domain.Config;
 import org.opencron.server.job.OpencronTools;
@@ -86,8 +87,8 @@ public class ConfigController extends BaseController {
 
     @RequestMapping(value = "skin.do",method= RequestMethod.POST)
     @ResponseBody
-    public boolean skin(String skin, HttpServletRequest request, HttpServletResponse response, HttpSession session) {
-        session.setAttribute(OpencronTools.SKIN_NAME,skin);
+    public boolean skin(String skin,HttpSession session) {
+        session.setAttribute(Constants.PARAM_SKIN_NAME_KEY,skin);
         return true;
     }
 
