@@ -441,7 +441,10 @@ public class ExecuteService implements Job {
                                         job.getPassword(),
                                         Constants.RPC_TIMEOUT,
                                         job.getAgent().getProxyAgent()
-                        ).putParam(Constants.PARAM_PID_KEY, cord.getPid()));
+                        ).putParam(
+                                Constants.PARAM_PID_KEY,
+                                cord.getPid())
+                        );
 
                         cord.setStatus(RunStatus.STOPED.getStatus());
                         cord.setEndTime(new Date());
@@ -553,7 +556,7 @@ public class ExecuteService implements Job {
                     agent.getPassword(),
                     null,
                     agent.getProxyAgent()
-            ).putParam("serverPort", "1577"));
+            ));
 
             return response!=null && response.isSuccess();
         } catch (Exception e) {
@@ -609,7 +612,10 @@ public class ExecuteService implements Job {
                     agent.getPassword(),
                     Constants.RPC_TIMEOUT,
                     agent.getProxyAgent()
-            ).putParam(Constants.PARAM_NEWPASSWORD_KEY, newPassword));
+            ).putParam(
+                    Constants.PARAM_NEWPASSWORD_KEY,
+                    newPassword)
+            );
             ping = response.isSuccess();
         } catch (Exception e) {
             e.printStackTrace();
