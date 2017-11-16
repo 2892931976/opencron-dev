@@ -166,11 +166,10 @@ public class MinaClient implements Client {
 
         ConnectWrapper connectWrapper = this.connectTable.get(request.getAddress());
 
-        if (connectWrapper != null && connectWrapper.isActive()) {
-            return connectWrapper.getConnectFuture();
-        }
-
         if (connectWrapper!=null) {
+            if(connectWrapper.isActive()){
+                return connectWrapper.getConnectFuture();
+            }
             connectWrapper.close();
         }
 

@@ -32,6 +32,7 @@ import org.opencron.common.Constants;
 import org.opencron.common.job.Request;
 import org.opencron.common.job.Response;
 import org.opencron.common.util.HttpUtils;
+import org.opencron.common.util.IdGenerator;
 import org.opencron.rpc.Client;
 import org.opencron.rpc.InvokeCallback;
 import org.opencron.rpc.Promise;
@@ -100,10 +101,9 @@ public class NettyClient implements Client {
                 });
 
         this.scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(5, new ThreadFactory() {
-            private final AtomicInteger idGenerator = new AtomicInteger(0);
             @Override
             public Thread newThread(Runnable r) {
-                return new Thread(r, "nettyRpc "+ this.idGenerator.incrementAndGet());
+                return new Thread(r, "nettyRpc "+ IdGenerator.getId());
             }
         });
 
