@@ -22,11 +22,11 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<Response> {
 
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, Response response) throws Exception {
-        logger.info("Rpc client receive response id:{}", response.getId());
+        logger.info("[opencron] nettyRpc client receive response id:{}", response.getId());
         Promise promise = promiseGetter.getPromise(response.getId());
         promise.setResult(response);
         if (promise.isAsync()) {   //异步调用
-            logger.info("Rpc client async callback invoke");
+            logger.info("[opencron] nettyRpc client async callback invoke");
             promise.execCallback();
         }
     }

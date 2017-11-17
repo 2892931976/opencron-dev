@@ -39,7 +39,7 @@ public class MinaServer implements Server {
         acceptor.setHandler(serverHandler);
         try {
             acceptor.bind(this.socketAddress);
-            logger.info("[opencron]MinaServer start at address:{} success", port);
+            logger.info("[opencron] MinaServer start at address:{} success", port);
         } catch (IOException e) {
             logger.error("[opencron] MinaServer start failure: {}", stackTrace(e));
         }
