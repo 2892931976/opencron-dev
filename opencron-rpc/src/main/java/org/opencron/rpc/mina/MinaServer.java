@@ -1,10 +1,8 @@
 package org.opencron.rpc.mina;
 
 
-import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.filter.executor.ExecutorFilter;
-import org.apache.mina.transport.socket.SocketSessionConfig;
 import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 import org.opencron.common.job.Request;
 import org.opencron.common.job.Response;
@@ -49,10 +47,11 @@ public class MinaServer implements Server {
     public void destroy() throws Throwable {
         try {
             if (acceptor != null) {
-                acceptor.unbind(this.socketAddress);
+                acceptor.dispose();
             }
+            logger.info("[opencron] MinaServer stoped!");
         } catch (Throwable e) {
-            logger.warn(e.getMessage(), e);
+            logger.error("[opencron] MinaServer stop error:{}",stackTrace(e));
         }
     }
 

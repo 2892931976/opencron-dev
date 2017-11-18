@@ -62,7 +62,7 @@ public class MinaClient implements Client {
             private final AtomicInteger idGenerator = new AtomicInteger(0);
             @Override
             public Thread newThread(Runnable r) {
-                return new Thread(r, "minaRpc "+ this.idGenerator.incrementAndGet());
+                return new Thread(r, "MinaRPC "+ this.idGenerator.incrementAndGet());
             }
         });
 
@@ -93,11 +93,11 @@ public class MinaClient implements Client {
                 @Override
                 public void operationComplete(IoFuture future) {
                     if (future.isDone()) {
-                        logger.info("[opencron] minaRpc sentSync success, request id:{}", request.getId());
+                        logger.info("[opencron] MinaRPC sentSync success, request id:{}", request.getId());
                         promise.setSendRequestSuccess(true);
                         return;
                     } else {
-                        logger.info("[opencron] minaRpc sentSync failure, request id:{}", request.getId());
+                        logger.info("[opencron] MinaRPC sentSync failure, request id:{}", request.getId());
                         promiseTable.remove(request.getId());
                         promise.setSendRequestSuccess(false);
                         promise.setFailure(connect.getException());
@@ -107,7 +107,7 @@ public class MinaClient implements Client {
             connect.getSession().write(request);
             return promise.get();
         } else {
-            throw new IllegalArgumentException("[opencron] minaRpc channel not active. request id:"+request.getId());
+            throw new IllegalArgumentException("[opencron] MinaRPC channel not active. request id:"+request.getId());
         }
     }
 
@@ -119,15 +119,15 @@ public class MinaClient implements Client {
                 @Override
                 public void operationComplete(IoFuture future) {
                     if (future.isDone()) {
-                        logger.info("[opencron] minaRpc sentOneway success, request id:{}", request.getId());
+                        logger.info("[opencron] MinaRPC sentOneway success, request id:{}", request.getId());
                     } else {
-                        logger.info("[opencron] minaRpc sentOneway failure, request id:{}", request.getId(), future);
+                        logger.info("[opencron] MinaRPC sentOneway failure, request id:{}", request.getId(), future);
                     }
                 }
             });
             connect.getSession().write(request);
         } else {
-            throw new IllegalArgumentException("[opencron] minaRpc channel not active. request id:"+request.getId());
+            throw new IllegalArgumentException("[opencron] MinaRPC channel not active. request id:"+request.getId());
         }
     }
 
@@ -142,11 +142,11 @@ public class MinaClient implements Client {
                 @Override
                 public void operationComplete(IoFuture future) {
                     if (future.isDone()) {
-                        logger.info("[opencron] minaRpc sentAsync success, request id:{}", request.getId());
+                        logger.info("[opencron] MinaRPC sentAsync success, request id:{}", request.getId());
                         promise.setSendRequestSuccess(true);
                         return;
                     } else {
-                        logger.info("[opencron] minaRpc sentAsync failure, request id:{}", request.getId());
+                        logger.info("[opencron] MinaRPC sentAsync failure, request id:{}", request.getId());
                         promiseTable.remove(request.getId());
                         promise.setSendRequestSuccess(false);
                         promise.setFailure(connect.getException());
@@ -157,7 +157,7 @@ public class MinaClient implements Client {
             });
             connect.getSession().write(request);
         } else {
-            throw new IllegalArgumentException("[opencron] minaRpc sentAsync channel not active. request id:"+request.getId());
+            throw new IllegalArgumentException("[opencron] MinaRPC sentAsync channel not active. request id:"+request.getId());
         }
     }
 
@@ -185,13 +185,13 @@ public class MinaClient implements Client {
             long timeout = 5000;
             if (connectFuture.awaitUninterruptibly(timeout)) {
                 if (connectWrapper.isActive()) {
-                    logger.info("[opencron] minaRpc getOrCreateConnect: connect remote host[{}] success, {}", request.getAddress(), connectFuture.toString());
+                    logger.info("[opencron] MinaRPC getOrCreateConnect: connect remote host[{}] success, {}", request.getAddress(), connectFuture.toString());
                     return connectWrapper.getConnectFuture();
                 } else {
-                    logger.warn("[opencron] minaRpc getOrCreateConnect: connect remote host[" + request.getAddress() + "] failed, " + connectFuture.toString(), connectFuture.getException());
+                    logger.warn("[opencron] MinaRPC getOrCreateConnect: connect remote host[" + request.getAddress() + "] failed, " + connectFuture.toString(), connectFuture.getException());
                 }
             } else {
-                logger.warn("[opencron] minaRpc getOrCreateConnect: connect remote host[{}] timeout {}ms, {}", request.getAddress(), timeout, connectFuture);
+                logger.warn("[opencron] MinaRPC getOrCreateConnect: connect remote host[{}] timeout {}ms, {}", request.getAddress(), timeout, connectFuture);
             }
         }
         return null;

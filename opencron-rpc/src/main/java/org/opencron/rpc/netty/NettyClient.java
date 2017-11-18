@@ -102,7 +102,7 @@ public class NettyClient implements Client {
         this.scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(5, new ThreadFactory() {
             @Override
             public Thread newThread(Runnable r) {
-                return new Thread(r, "nettyRpc "+ IdGenerator.getId());
+                return new Thread(r, "NettyRPC "+ IdGenerator.getId());
             }
         });
 
@@ -132,11 +132,11 @@ public class NettyClient implements Client {
                 @Override
                 public void operationComplete(ChannelFuture future) throws Exception {
                     if (future.isSuccess()) {
-                        logger.info("[opencron] nettyRpc sentSync success, request id:{}", request.getId());
+                        logger.info("[opencron] NettyRPC sentSync success, request id:{}", request.getId());
                         promise.setSendRequestSuccess(true);
                         return;
                     } else {
-                        logger.info("[opencron] nettyRpc sentSync failure, request id:{}", request.getId());
+                        logger.info("[opencron] NettyRPC sentSync failure, request id:{}", request.getId());
                         promiseTable.remove(request.getId());
                         promise.setSendRequestSuccess(false);
                         promise.setFailure(future.cause());
@@ -145,7 +145,7 @@ public class NettyClient implements Client {
             });
             return promise.get();
         } else {
-            throw new IllegalArgumentException("[opencron] nettyRpc sentSync channel not active. request id:"+request.getId());
+            throw new IllegalArgumentException("[opencron] NettyRPC sentSync channel not active. request id:"+request.getId());
         }
     }
 
@@ -163,11 +163,11 @@ public class NettyClient implements Client {
                 @Override
                 public void operationComplete(ChannelFuture future) throws Exception {
                     if (future.isSuccess()) {
-                        logger.info("[opencron] nettyRpc sentAsync success, request id:{}", request.getId());
+                        logger.info("[opencron] NettyRPC sentAsync success, request id:{}", request.getId());
                         promise.setSendRequestSuccess(true);
                         return;
                     } else {
-                        logger.info("[opencron] nettyRpc sentAsync failure, request id:{}", request.getId());
+                        logger.info("[opencron] NettyRPC sentAsync failure, request id:{}", request.getId());
                         promiseTable.remove(request.getId());
                         promise.setSendRequestSuccess(false);
                         promise.setFailure(future.cause());
@@ -177,7 +177,7 @@ public class NettyClient implements Client {
                 }
             });
         } else {
-            throw new IllegalArgumentException("[opencron] nettyRpc sentAsync channel not active. request id:"+request.getId());
+            throw new IllegalArgumentException("[opencron] NettyRPC sentAsync channel not active. request id:"+request.getId());
         }
     }
 
@@ -189,14 +189,14 @@ public class NettyClient implements Client {
                 @Override
                 public void operationComplete(ChannelFuture future) throws Exception {
                     if (future.isSuccess()) {
-                        logger.info("[opencron] nettyRpc sentAsync sentOneway success, request id:{}", request.getId());
+                        logger.info("[opencron] NettyRPC sentAsync sentOneway success, request id:{}", request.getId());
                     } else {
-                        logger.info("[opencron] nettyRpc sentAsync sentOneway failure, request id:{}", request.getId(), future);
+                        logger.info("[opencron] NettyRPC sentAsync sentOneway failure, request id:{}", request.getId(), future);
                     }
                 }
             });
         } else {
-            throw new IllegalArgumentException("[opencron] nettyRpc sentAsync sentOneway channel not active. request id:"+request.getId());
+            throw new IllegalArgumentException("[opencron] NettyRPC sentAsync sentOneway channel not active. request id:"+request.getId());
         }
     }
 
@@ -219,13 +219,13 @@ public class NettyClient implements Client {
             long timeout = 5000;
             if (channelFuture.awaitUninterruptibly(timeout)) {
                 if (channelWrapper.isActive()) {
-                    logger.info("[opencron] nettyRpc createChannel: connect remote host[{}] success, {}", request.getAddress(), channelFuture.toString());
+                    logger.info("[opencron] NettyRPC createChannel: connect remote host[{}] success, {}", request.getAddress(), channelFuture.toString());
                     return channelWrapper.getChannel();
                 } else {
-                    logger.warn("[opencron] nettyRpc createChannel: connect remote host[" + request.getAddress() + "] failed, " + channelFuture.toString(), channelFuture.cause());
+                    logger.warn("[opencron] NettyRPC createChannel: connect remote host[" + request.getAddress() + "] failed, " + channelFuture.toString(), channelFuture.cause());
                 }
             } else {
-                logger.warn("[opencron] nettyRpc createChannel: connect remote host[{}] timeout {}ms, {}", request.getAddress(), timeout, channelFuture);
+                logger.warn("[opencron] NettyRPC createChannel: connect remote host[{}] timeout {}ms, {}", request.getAddress(), timeout, channelFuture);
             }
         }
         return null;
