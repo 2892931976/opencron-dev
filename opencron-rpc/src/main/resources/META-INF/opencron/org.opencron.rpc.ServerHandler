@@ -1,1 +1,1 @@
-def=org.opencron.agent.AgentProcessor
+org.opencron.agent.AgentProcessor

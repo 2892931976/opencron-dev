@@ -46,13 +46,13 @@ public class ExtensionLoader<T> {
 
     private ClassLoader loader;
 
-    private Class<T> instanceType = null;
+    private Class<T> instanceClass = null;
 
     private SPI spi;
 
     private static final ConcurrentMap<Class<?>, ExtensionLoader<?>> EXTENSION_LOADERS = new ConcurrentHashMap<Class<?>, ExtensionLoader<?>>();
 
-    public static <T>T load(Class<T> type) {
+    public static <T> T load(Class<T> type) {
         return getExtensionLoader(type).getExtension();
     }
 
@@ -76,15 +76,15 @@ public class ExtensionLoader<T> {
             throw new IllegalArgumentException("Extension type(" + type + ") is not extension, because WITHOUT @" + SPI.class.getSimpleName() + " Annotation!");
         }
         this.type = checkNotNull(type, "type interface cannot be null");
-        this.loader = checkNotNull( loader,"Extension loader == null");
+        this.loader = checkNotNull(loader, "Extension loader == null");
         this.spi = this.type.getAnnotation(SPI.class);
         loadFile();
     }
 
     public T getExtension() {
         try {
-            if (instanceType != null) {
-                T instance = instanceType.newInstance();
+            if (instanceClass != null) {
+                T instance = instanceClass.newInstance();
                 this.type.cast(instance);
                 return instance;
             }
@@ -102,7 +102,7 @@ public class ExtensionLoader<T> {
             if (urls != null) {
                 if (!urls.hasMoreElements()) {
                     //for WebAppClassLoader
-                   urls = this.loader.getResources(fileName);
+                    urls = this.loader.getResources(fileName);
                 }
                 while (urls.hasMoreElements()) {
                     URL url = urls.nextElement();
@@ -112,7 +112,7 @@ public class ExtensionLoader<T> {
                         while (scanner.hasNextLine()) {
                             String line = scanner.nextLine();
                             if (CommonUtils.notEmpty(line)) {
-                                //已经注释或者不是K=V结构的统统跳过.
+                                //已经注释的结构的统统跳过.
                                 if (line.indexOf("#") == 0) {
                                     continue;
                                 }
@@ -120,22 +120,36 @@ public class ExtensionLoader<T> {
                                 line = line.trim();
                                 try {
                                     String[] args = line.split("=");
-                                    if (args.length != 2) {
+                                    String spiImplName = null;
+
+                                    if (args.length == 1) {
+                                        if (this.spi.value() == null) {
+                                            //default SpiImpl...
+                                            spiImplName = args[0].trim();
+                                        }
+                                    }else if(args.length == 2) {
+                                        if (this.spi.value()!=null) {
+                                            String name = args[0].trim();
+                                            line = args[1].trim();
+                                            if (CommonUtils.notEmpty(name, line)) {
+                                                if (name.equals(this.spi.value())) {
+                                                    spiImplName = line;
+                                                }
+                                            }
+                                        }
+                                    }else {
                                         throw new IllegalStateException("invalid SPI configuration:" + line + "please check config: " + url);
                                     }
-                                    String name = args[0].trim();
-                                    line = args[1].trim();
-                                    if (CommonUtils.notEmpty(name, line)) {
-                                        if (name.equals(this.spi.value())) {
-                                            Class clazz = Class.forName(line, false, this.loader);
-                                            if (!this.type.isAssignableFrom(clazz)) {
-                                                throw new IllegalStateException("Error when load extension class(interface: " +
-                                                        this.type + ", class line: " + clazz.getName() + "), class "
-                                                        + clazz.getName() + "is not subtype of interface.");
-                                            }
-                                            this.instanceType = clazz;
-                                            break;
+
+                                    if (spiImplName != null) {
+                                        Class clazz = Class.forName(spiImplName, false, this.loader);
+                                        if (!this.type.isAssignableFrom(clazz)) {
+                                            throw new IllegalStateException("Error when load extension class(interface: " +
+                                                    this.type + ", class line: " + clazz.getName() + "), class "
+                                                    + clazz.getName() + "is not subtype of interface.");
                                         }
+                                        this.instanceClass = clazz;
+                                        break;
                                     }
                                 } catch (Throwable t) {
                                     throw new IllegalStateException("Failed to load extension class(interface: " + type + ", class line: " + line + ") in " + url + ", cause: " + t.getMessage(), t);
