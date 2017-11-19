@@ -81,7 +81,7 @@ public class NettyServer implements Server {
 
            this.bootstrap.bind(port).sync().addListener(new ChannelFutureListener() {
                 @Override
-                public void operationComplete(ChannelFuture future) throws Exception {
+                public void operationComplete(ChannelFuture future) {
                     if (future.isSuccess()) {
                         logger.info("[opencron] NettyServer start at address:{} success", port);
                     } else {
