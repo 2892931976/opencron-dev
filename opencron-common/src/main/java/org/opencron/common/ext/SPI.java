@@ -41,6 +41,6 @@ public @interface SPI {
     /**
      * 缺省扩展点名。
      */
-    String value();
+    String value() default "";
 
 }

@@ -123,12 +123,12 @@ public class ExtensionLoader<T> {
                                     String spiImplName = null;
 
                                     if (args.length == 1) {
-                                        if (this.spi.value() == null) {
+                                        if ( CommonUtils.isEmpty(this.spi.value()) ) {
                                             //default SpiImpl...
                                             spiImplName = args[0].trim();
                                         }
                                     }else if(args.length == 2) {
-                                        if (this.spi.value()!=null) {
+                                        if (CommonUtils.notEmpty(this.spi.value())) {
                                             String name = args[0].trim();
                                             line = args[1].trim();
                                             if (CommonUtils.notEmpty(name, line)) {
