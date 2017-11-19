@@ -22,7 +22,6 @@
 package org.opencron.rpc.netty;
 
 import io.netty.bootstrap.Bootstrap;
-import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
@@ -45,6 +44,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 /**
@@ -75,7 +75,6 @@ public class NettyClient implements Client {
 
     @Override
     public void connect() {
-
         final NettyClientHandler nettyClientHandler = new NettyClientHandler(new Promise.Getter() {
             @Override
             public Promise getPromise(Integer id) {
@@ -84,10 +83,9 @@ public class NettyClient implements Client {
         });
 
         bootstrap.group(nioEventLoopGroup)
-                .option(ChannelOption.SO_KEEPALIVE, Boolean.TRUE)
-                .option(ChannelOption.TCP_NODELAY, Boolean.TRUE)//压榨性能
-                .option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
                 .channel(NioSocketChannel.class)
+                .option(ChannelOption.TCP_NODELAY, Boolean.TRUE)//压榨性能
+                .option(ChannelOption.SO_KEEPALIVE, Boolean.TRUE)
                 .handler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     public void initChannel(SocketChannel channel) throws Exception {
