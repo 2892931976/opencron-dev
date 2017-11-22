@@ -600,6 +600,28 @@ public class ExecuteService implements Job {
     }
 
     /**
+     * 扫描agenet机器上已有的crontab任务列表
+     * @param agent
+     * @return
+     */
+    public String scan(Agent agent) {
+        try {
+            Response response = caller.sentSync(Request.request(
+                    agent.getHost(),
+                    agent.getPort(),
+                    Action.CRONTAB,
+                    agent.getPassword(),
+                    null,
+                    null)
+            );
+            return response.getMessage();
+        } catch (Exception e) {
+            logger.error("[opencron]scan failed,host:{},port:{}", agent.getHost(), agent.getPort());
+            return null;
+        }
+    }
+
+    /**
      * 修改密码
      */
     public boolean password(Agent agent, final String newPassword) {
@@ -665,5 +687,4 @@ public class ExecuteService implements Job {
         logger.error(errorInfo, e);
         return errorInfo;
     }
-
 }

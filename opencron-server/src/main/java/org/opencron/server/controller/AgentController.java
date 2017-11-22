@@ -104,7 +104,7 @@ public class AgentController extends BaseController {
     }
 
     @RequestMapping(value = "add.do",method= RequestMethod.POST)
-    public String add(HttpSession session, Agent agent) throws Exception {
+    public String add(HttpServletRequest request,HttpSession session, Agent agent) throws Exception {
         if (!agent.getWarning()) {
             agent.setMobiles(null);
             agent.setEmailAddress(null);
@@ -120,9 +120,10 @@ public class AgentController extends BaseController {
         agent.setDeleted(false);
         agent.setUpdateTime(new Date());
         agentService.merge(agent);
-
+        request.setAttribute("scanAgent",agent.getName());
         return "redirect:/agent/view.htm?csrf=" + OpencronTools.getCSRF(session);
     }
+
 
     @RequestMapping(value = "autoreg.do",method= RequestMethod.POST)
     public synchronized void autoReg(HttpServletRequest request, HttpServletResponse response, Agent agent, String key) {

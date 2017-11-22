@@ -25,6 +25,8 @@ import java.util.*;
 
 import com.alibaba.fastjson.JSON;
 import org.opencron.common.job.Opencron;
+import org.opencron.common.job.Response;
+import org.opencron.common.util.CommandUtils;
 import org.opencron.common.util.DigestUtils;
 import org.opencron.common.util.StringUtils;
 import org.opencron.server.domain.Job;
@@ -33,6 +35,7 @@ import org.opencron.server.service.*;
 import org.opencron.server.tag.PageBean;
 import org.opencron.common.util.CommonUtils;
 import org.opencron.server.domain.Agent;
+import org.opencron.server.vo.CrontabVo;
 import org.opencron.server.vo.JobVo;
 import org.quartz.SchedulerException;
 import org.springframework.beans.BeanUtils;
@@ -309,6 +312,52 @@ public class JobController extends BaseController {
         return true;
     }
 
+
+    @RequestMapping(value = "scan.do",method= RequestMethod.POST)
+    @ResponseBody
+    public List<CrontabVo> scan(Long agentId) {
+
+        Agent agent = agentService.getAgent(agentId);
+
+        String crontab = executeService.scan(agent);
+
+        List<CrontabVo> crontabs = new ArrayList<CrontabVo>(0);
+
+        if (crontab!=null) {
+
+            Scanner scanner = new Scanner(crontab);
+            while (scanner.hasNext()) {
+                String line = scanner.nextLine();
+                if (CommonUtils.notEmpty(line)) {
+                    line = line.trim();
+                    //已注释打头...
+                    if (line.startsWith("#")) {
+                        continue;
+                    }
+
+                    String cron[] = line.split("\\s+");
+                    //无效的crontab表达式
+                    if (cron.length<5) {
+                        continue;
+                    }
+                    StringBuilder cronbuilder = new StringBuilder();
+                    StringBuilder cmdBuilder = new StringBuilder();
+
+                    for(int i=0;i<cron.length;i++){
+                        if (i<=4) {
+                            cronbuilder.append(cron[i]).append(" ");
+                        }else {
+                            cmdBuilder.append(cron[i]).append(" ");
+                        }
+                    }
+                    CrontabVo crontabVo = new CrontabVo(cronbuilder.toString(),cmdBuilder.toString());
+                    crontabs.add(crontabVo);
+                }
+            }
+        }
+        return crontabs;
+    }
+
     @RequestMapping("goexec.htm")
     public String goExec(HttpSession session, Model model) {
         model.addAttribute("agents", agentService.getOwnerAgents(session));
@@ -342,6 +391,5 @@ public class JobController extends BaseController {
         model.addAttribute("job", jobVo);
         return "/job/detail";
     }
-
 
 }
