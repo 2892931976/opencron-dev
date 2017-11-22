@@ -39,6 +39,34 @@
         }
 
         $(document).ready(function () {
+
+            if( '${"scanAgent"}' ) {
+
+                swal({
+                    title: "",
+                    text: "要扫描添加执行器[${scanAgent}]crontab里的任务到系统吗？",
+                    type: "warning",
+                    showCancelButton: true,
+                    closeOnConfirm: false,
+                    confirmButtonText: "扫描"
+                }, function() {
+                    $.ajax({
+                        headers:{"csrf":"${csrf}"},
+                        type:"POST",
+                        url:"${contextPath}/job/scan.do",
+                        data:{"agentId":id},
+                        success:function (data) {
+                            var template = $("#crontab_template").html();
+                            var html = "";
+                            $.each(data,function (i,n) {
+                                html += template.replace("#exp#",$(n).exp).replace("#cmd#",$(n).cmd);
+                            });
+                            $("#cronLine").html(html).modal("show");
+                        }
+                    });
+                });
+            }
+
             $("#size").change(function () {
                 var pageSize = $("#size").val();
                 window.location.href = "${contextPath}/agent/view.htm?pageSize=" + pageSize+"&csrf=${csrf}";
@@ -617,6 +645,13 @@
 
     </script>
 
+     <script type="text/html" id="crontab_template">
+         <label for="cronexp" class="col-lab control-label"><i class="glyphicon glyphicon-filter"></i>表达式</label>
+         <div class="col-md-2"><input type="text" class="form-control" id="cronexp" placeholder="crontab表达式" value="#exp#"></div>
+         <label for="croncmd" class="col-lab control-label"><i class="glyphicon glyphicon-th-large"></i>命令</label>
+         <div class="col-md-9"> <input type="text" class="form-control " id="croncmd" placeholder="执行命令" value="#cmd#"></div>
+      </script>
+
     <style type="text/css">
         .visible-md i {
             font-size: 15px;
@@ -905,6 +940,32 @@
             </div>
         </div>
     </div>
+
+    <div class="modal fade" id="crontabModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button class="close btn-float" data-dismiss="modal" aria-hidden="true"><i class="md md-close"></i></button>
+                    <h4>新增CRONTAB</h4>
+                </div>
+                <div class="modal-body">
+                    <form class="form-horizontal" role="form">
+                        <div class="form-group" style="margin-bottom: 4px;">
+                            <div id="cronLine"></div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <center>
+                        <button type="button" class="btn btn-sm" onclick="saveCron()">保存</button>
+                        &nbsp;&nbsp;
+                        <button type="button" class="btn btn-sm"  onclick="inputCron()" data-dismiss="modal">关闭</button>
+                    </center>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
 </section>
 
