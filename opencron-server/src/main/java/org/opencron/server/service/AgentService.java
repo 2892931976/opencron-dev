@@ -124,7 +124,7 @@ public class AgentService {
     }
 
 
-    public void merge(Agent agent) {
+    public Agent merge(Agent agent) {
         /**
          * 修改过agent
          */
@@ -135,7 +135,7 @@ public class AgentService {
 
             //已经删除的过滤掉..
             if (dbAgent.getDeleted()) {
-                return;
+                return agent;
             }
             update = true;
         }
@@ -148,7 +148,7 @@ public class AgentService {
          *
          */
         if (update) {
-            queryDao.merge(agent);
+            agent = (Agent) queryDao.merge(agent);
             /**
              * 获取该执行器下所有的自动执行,并且是quartz类型的作业
              */
@@ -162,13 +162,15 @@ public class AgentService {
                 throw new RuntimeException(e.getCause());
             }
         } else {
-            queryDao.merge(agent);
+           agent = (Agent) queryDao.merge(agent);
         }
 
         /**
          * 同步缓存...
          */
         flushAgent();
+
+        return agent;
 
     }
 

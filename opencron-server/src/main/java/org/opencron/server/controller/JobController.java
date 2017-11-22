@@ -108,19 +108,19 @@ public class JobController extends BaseController {
      * @param agentId
      * @param name
      */
-    @RequestMapping(value = "checkname.do",method= RequestMethod.POST)
+    @RequestMapping(value = "checkname.do", method = RequestMethod.POST)
     @ResponseBody
     public boolean checkName(Long jobId, Long agentId, String name) {
         return !jobService.existsName(jobId, agentId, name);
     }
 
-    @RequestMapping(value = "checkdel.do",method= RequestMethod.POST)
+    @RequestMapping(value = "checkdel.do", method = RequestMethod.POST)
     @ResponseBody
     public String checkDelete(Long id) {
         return jobService.checkDelete(id);
     }
 
-    @RequestMapping(value = "delete.do",method= RequestMethod.POST)
+    @RequestMapping(value = "delete.do", method = RequestMethod.POST)
     @ResponseBody
     public boolean delete(Long id) {
         try {
@@ -143,7 +143,7 @@ public class JobController extends BaseController {
         return "/job/add";
     }
 
-    @RequestMapping(value = "save.do",method= RequestMethod.POST)
+    @RequestMapping(value = "save.do", method = RequestMethod.POST)
     public String save(HttpSession session, Job job, HttpServletRequest request) throws SchedulerException {
         job.setCommand(DigestUtils.passBase64(job.getCommand()));
         job.setDeleted(false);
@@ -154,7 +154,7 @@ public class JobController extends BaseController {
             /**
              * 将数据库中持久化的作业和当前修改的合并,当前修改的属性覆盖持久化的属性...
              */
-            BeanUtils.copyProperties(job1, job, "jobName", "cronType", "cronExp", "command", "execType", "comment","runAs","successExit", "redo", "runCount", "jobType", "runModel", "warning", "mobiles", "emailAddress", "timeout");
+            BeanUtils.copyProperties(job1, job, "jobName", "cronType", "cronExp", "command", "execType", "comment", "runAs", "successExit", "redo", "runCount", "jobType", "runModel", "warning", "mobiles", "emailAddress", "timeout");
         }
 
         //单任务
@@ -248,9 +248,9 @@ public class JobController extends BaseController {
     }
 
 
-    @RequestMapping(value = "edit.do",method= RequestMethod.POST)
+    @RequestMapping(value = "edit.do", method = RequestMethod.POST)
     @ResponseBody
-    public boolean edit(HttpSession session,Job job) throws SchedulerException {
+    public boolean edit(HttpSession session, Job job) throws SchedulerException {
         Job dbJob = jobService.getJob(job.getJobId());
         if (!jobService.checkJobOwner(session, dbJob.getUserId())) return false;
         dbJob.setExecType(job.getExecType());
@@ -275,9 +275,9 @@ public class JobController extends BaseController {
         return true;
     }
 
-    @RequestMapping(value = "editcmd.do",method= RequestMethod.POST)
+    @RequestMapping(value = "editcmd.do", method = RequestMethod.POST)
     @ResponseBody
-    public boolean editCmd(HttpSession session,Long jobId, String command) throws SchedulerException {
+    public boolean editCmd(HttpSession session, Long jobId, String command) throws SchedulerException {
         command = DigestUtils.passBase64(command);
         Job dbJob = jobService.getJob(jobId);
         if (!jobService.checkJobOwner(session, dbJob.getUserId())) return false;
@@ -288,13 +288,13 @@ public class JobController extends BaseController {
         return true;
     }
 
-    @RequestMapping(value = "canrun.do",method= RequestMethod.POST)
+    @RequestMapping(value = "canrun.do", method = RequestMethod.POST)
     @ResponseBody
     public boolean canRun(Long id) {
         return recordService.isRunning(id);
     }
 
-    @RequestMapping(value = "execute.do",method= RequestMethod.POST)
+    @RequestMapping(value = "execute.do", method = RequestMethod.POST)
     @ResponseBody
     public boolean remoteExecute(HttpSession session, Long id) {
         JobVo job = jobService.getJobVoById(id);//找到要执行的任务
@@ -313,7 +313,7 @@ public class JobController extends BaseController {
     }
 
 
-    @RequestMapping(value = "scan.do",method= RequestMethod.POST)
+    @RequestMapping(value = "scan.do", method = RequestMethod.POST)
     @ResponseBody
     public List<CrontabVo> scan(Long agentId) {
 
@@ -323,9 +323,10 @@ public class JobController extends BaseController {
 
         List<CrontabVo> crontabs = new ArrayList<CrontabVo>(0);
 
-        if (crontab!=null) {
+        if (crontab != null) {
 
             Scanner scanner = new Scanner(crontab);
+            int index = 0;
             while (scanner.hasNext()) {
                 String line = scanner.nextLine();
                 if (CommonUtils.notEmpty(line)) {
@@ -335,22 +336,28 @@ public class JobController extends BaseController {
                         continue;
                     }
 
-                    String cron[] = line.split("\\s+");
+                    String args[] = line.split("\\s+");
                     //无效的crontab表达式
-                    if (cron.length<5) {
+                    if (args.length < 5) {
                         continue;
                     }
-                    StringBuilder cronbuilder = new StringBuilder();
+                    StringBuilder cronBuilder = new StringBuilder();
                     StringBuilder cmdBuilder = new StringBuilder();
 
-                    for(int i=0;i<cron.length;i++){
-                        if (i<=4) {
-                            cronbuilder.append(cron[i]).append(" ");
-                        }else {
-                            cmdBuilder.append(cron[i]).append(" ");
+                    for (int i = 0; i < args.length; i++) {
+                        if (i <= 4) {
+                            cronBuilder.append(args[i]).append(" ");
+                        } else {
+                            cmdBuilder.append(args[i]).append(" ");
                         }
                     }
-                    CrontabVo crontabVo = new CrontabVo(cronbuilder.toString(),cmdBuilder.toString());
+
+                    String cmd = cmdBuilder.toString().trim();
+                    if (cmd.startsWith("#")) {
+                        continue;
+                    }
+                    String cron = cronBuilder.toString().trim();
+                    CrontabVo crontabVo = new CrontabVo(++index,cron, cmd);
                     crontabs.add(crontabVo);
                 }
             }
@@ -364,7 +371,7 @@ public class JobController extends BaseController {
         return "/job/exec";
     }
 
-    @RequestMapping(value = "batchexec.do",method= RequestMethod.POST)
+    @RequestMapping(value = "batchexec.do", method = RequestMethod.POST)
     @ResponseBody
     public boolean batchExec(HttpSession session, String command, String agentIds) {
         if (notEmpty(agentIds) && notEmpty(command)) {
@@ -380,7 +387,7 @@ public class JobController extends BaseController {
     }
 
     @RequestMapping("detail/{id}.htm")
-    public String showDetail(HttpSession session, Model model,@PathVariable("id") Long id) {
+    public String showDetail(HttpSession session, Model model, @PathVariable("id") Long id) {
         JobVo jobVo = jobService.getJobVoById(id);
         if (jobVo == null) {
             return "/error/404";

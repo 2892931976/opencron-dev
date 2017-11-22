@@ -40,11 +40,11 @@
 
         $(document).ready(function () {
 
-            if( '${"scanAgent"}' ) {
+            if( "${scanAgent}" ) {
 
                 swal({
                     title: "",
-                    text: "要扫描添加执行器[${scanAgent}]crontab里的任务到系统吗？",
+                    text: "要扫描添加执行器[${scanAgent.name}]已有的crontab里的任务到系统吗？",
                     type: "warning",
                     showCancelButton: true,
                     closeOnConfirm: false,
@@ -54,14 +54,24 @@
                         headers:{"csrf":"${csrf}"},
                         type:"POST",
                         url:"${contextPath}/job/scan.do",
-                        data:{"agentId":id},
+                        data:{"agentId":"${scanAgent.agentId}"},
                         success:function (data) {
-                            var template = $("#crontab_template").html();
-                            var html = "";
-                            $.each(data,function (i,n) {
-                                html += template.replace("#exp#",$(n).exp).replace("#cmd#",$(n).cmd);
-                            });
-                            $("#cronLine").html(html).modal("show");
+                            if (data.length == 0){
+                                alert("执行器[${scanAgent.name}]未扫描到有效的CRONTAB任务!");
+                            }else {
+                                $("div[class^='sweet-']").remove();
+                                $(".modal-backdrop").remove();
+                                var template = $("#crontab_template").html();
+                                var line = "";
+                                $.each(data,function (i,n) {
+                                    line += template.replace("#exp#",n.exp).replace("#cmd#",n.cmd);
+                                });
+
+                                var html = $("#crontabModal").attr("data");
+                                html = html.replace("#crontab#",line)
+                                $("#crontabForm").html(html);
+                                $("#crontabModal").modal("show");
+                            }
                         }
                     });
                 });
@@ -646,10 +656,10 @@
     </script>
 
      <script type="text/html" id="crontab_template">
-         <label for="cronexp" class="col-lab control-label"><i class="glyphicon glyphicon-filter"></i>表达式</label>
-         <div class="col-md-2"><input type="text" class="form-control" id="cronexp" placeholder="crontab表达式" value="#exp#"></div>
-         <label for="croncmd" class="col-lab control-label"><i class="glyphicon glyphicon-th-large"></i>命令</label>
-         <div class="col-md-9"> <input type="text" class="form-control " id="croncmd" placeholder="执行命令" value="#cmd#"></div>
+         <tr>
+             <td><input type="text" class="form-control" placeholder="crontab表达式" value="#exp#"></td>
+             <td><input type="text" class="form-control" placeholder="执行命令" value="#cmd#"></td>
+         </tr>
       </script>
 
     <style type="text/css">
@@ -941,7 +951,8 @@
         </div>
     </div>
 
-    <div class="modal fade" id="crontabModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal fade" id="crontabModal" tabindex="-1" role="dialog" aria-hidden="true"
+         data="<table class='table'><tbody><thead><td class='col-md-3'>表达式</td><td <td class='col-md-9'>命令</td></thead>#crontab#</table>">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -949,11 +960,7 @@
                     <h4>新增CRONTAB</h4>
                 </div>
                 <div class="modal-body">
-                    <form class="form-horizontal" role="form">
-                        <div class="form-group" style="margin-bottom: 4px;">
-                            <div id="cronLine"></div>
-                        </div>
-                    </form>
+                    <form class="form-horizontal" role="form" id="crontabForm"></form>
                 </div>
                 <div class="modal-footer">
                     <center>

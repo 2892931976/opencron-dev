@@ -5,12 +5,22 @@ import java.io.Serializable;
 
 public class CrontabVo implements Serializable {
 
+    private Integer id;
     private String exp;
     private String cmd;
 
-    public CrontabVo(String exp, String cmd) {
-        this.exp = exp == null?null:exp.trim();
-        this.cmd = cmd == null?null:cmd.trim();
+    public CrontabVo(Integer id, String exp, String cmd) {
+        this.id = id;
+        this.exp = exp;
+        this.cmd = cmd;
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     public String getExp() {

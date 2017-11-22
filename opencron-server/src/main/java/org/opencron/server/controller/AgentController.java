@@ -60,8 +60,10 @@ public class AgentController extends BaseController {
     private ExecuteService executeService;
 
     @RequestMapping("view.htm")
-    public String queryAllAgent(HttpSession session, Model model, PageBean pageBean) {
+    public String queryAllAgent(HttpSession session,HttpServletRequest request, Model model, PageBean pageBean) {
         agentService.getOwnerAgent(session, pageBean);
+        request.setAttribute("scanAgent",session.getAttribute("scanAgent"));
+        session.removeAttribute("scanAgent");
         model.addAttribute("connAgents", agentService.getAgentByConnType(Opencron.ConnType.CONN));
         return "/agent/view";
     }
@@ -119,8 +121,8 @@ public class AgentController extends BaseController {
         agent.setStatus(true);
         agent.setDeleted(false);
         agent.setUpdateTime(new Date());
-        agentService.merge(agent);
-        request.setAttribute("scanAgent",agent.getName());
+        agent = agentService.merge(agent);
+        session.setAttribute("scanAgent",agent);
         return "redirect:/agent/view.htm?csrf=" + OpencronTools.getCSRF(session);
     }
 
