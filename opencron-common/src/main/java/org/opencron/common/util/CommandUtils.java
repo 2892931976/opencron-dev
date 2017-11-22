@@ -101,6 +101,32 @@ public abstract class CommandUtils implements Serializable {
         }
     }
 
+
+    public static String executeScript(String scriptText) {
+        String info = null;
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        try {
+            CommandLine commandLine = CommandLine.parse(scriptText);
+            DefaultExecutor exec = new DefaultExecutor();
+            exec.setExitValues(null);
+            PumpStreamHandler streamHandler = new PumpStreamHandler(outputStream, outputStream);
+            exec.setStreamHandler(streamHandler);
+
+            exec.execute(commandLine);
+            info = outputStream.toString().trim();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                outputStream.flush();
+                outputStream.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return info;
+        }
+    }
+
 }
 
 

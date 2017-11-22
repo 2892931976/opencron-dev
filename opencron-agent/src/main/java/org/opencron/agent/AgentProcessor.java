@@ -91,9 +91,12 @@ public class AgentProcessor implements ServerHandler,AgentJob {
                 return proxy(request);
             case MONITOR:
                 return monitor(request);
+            case CRONTAB:
+                return scanCrontab(request);
             case RESTART:
                 restart(request);
                 break;
+
         }
         return null;
     }
@@ -381,12 +384,16 @@ public class AgentProcessor implements ServerHandler,AgentJob {
         return response.setSuccess(false).setExitCode(Opencron.StatusCode.ERROR_EXIT.getValue());
     }
 
+    @Override
+    public Response scanCrontab(Request request) {
+        String crontab = CommandUtils.executeScript("crontab -l");
+        return Response.response(request).setMessage(crontab).end();
+    }
 
     /**
      *重启前先检查密码,密码不正确返回Response,密码正确则直接执行重启
      * @param request
      * @return
-     * @throws TException
      * @throws InterruptedException
      */
     @Override
