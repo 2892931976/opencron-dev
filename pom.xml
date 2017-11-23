@@ -13,6 +13,7 @@
        <!-- <module>opencron-config</module>-->
         <module>opencron-rpc</module>
       <!--  <module>opencron-examples</module>-->
+        <module>opencron-api</module>
         <module>opencron-agent</module>
         <module>opencron-server</module>
     </modules>
@@ -89,6 +90,12 @@
             <dependency>
                 <groupId>org.opencron</groupId>
                 <artifactId>opencron-common</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.opencron</groupId>
+                <artifactId>opencron-api</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
