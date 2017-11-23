@@ -22,7 +22,7 @@
 package org.opencron.server.job;
 
 import it.sauronsoftware.cron4j.*;
-import org.opencron.common.job.Opencron;
+import org.opencron.common.Constants;
 import org.opencron.common.util.CommonUtils;
 import org.opencron.server.service.ExecuteService;
 import org.opencron.server.service.JobService;
@@ -67,7 +67,7 @@ public class OpencronCollector implements TaskCollector {
                     @Override
                     public void execute(TaskExecutionContext context) throws RuntimeException {
                         //自动执行
-                        job.setExecType(Opencron.ExecType.AUTO.getStatus());
+                        job.setExecType(Constants.ExecType.AUTO.getStatus());
                         executeService.executeJob(job);
                     }
                 });
@@ -87,7 +87,7 @@ public class OpencronCollector implements TaskCollector {
             @Override
             public void execute(TaskExecutionContext context) throws RuntimeException {
                 //自动执行
-                job.setExecType(Opencron.ExecType.AUTO.getStatus());
+                job.setExecType(Constants.ExecType.AUTO.getStatus());
                 executeService.executeJob(job);
             }
         });

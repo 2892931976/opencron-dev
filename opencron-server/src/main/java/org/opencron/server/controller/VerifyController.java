@@ -21,7 +21,7 @@
 
 package org.opencron.server.controller;
 
-import org.opencron.common.job.Opencron;
+import org.opencron.common.Constants;
 import org.opencron.server.domain.Agent;
 import it.sauronsoftware.cron4j.SchedulingPattern;
 import org.opencron.server.service.AgentService;
@@ -67,8 +67,8 @@ public class VerifyController extends BaseController {
         agent.setPort(port);
         agent.setPassword(password);
 
-        if (proxy == Opencron.ConnType.PROXY.getType()) {
-            agent.setProxy(Opencron.ConnType.CONN.getType());
+        if (proxy == Constants.ConnType.PROXY.getType()) {
+            agent.setProxy(Constants.ConnType.CONN.getType());
             if (proxyId != null) {
                 Agent proxyAgent = agentService.getAgent(proxyId);
                 if (proxyAgent == null) {
@@ -76,7 +76,7 @@ public class VerifyController extends BaseController {
                 }
                 agent.setProxyAgent(proxyId);
                 //需要代理..
-                agent.setProxy(Opencron.ConnType.PROXY.getType());
+                agent.setProxy(Constants.ConnType.PROXY.getType());
             }
         }
         boolean ping = executeService.ping(agent);
@@ -96,8 +96,8 @@ public class VerifyController extends BaseController {
         agent.setPort(port);
         agent.setPassword(password);
 
-        if (proxy == Opencron.ConnType.PROXY.getType()) {
-            agent.setProxy(Opencron.ConnType.CONN.getType());
+        if (proxy == Constants.ConnType.PROXY.getType()) {
+            agent.setProxy(Constants.ConnType.CONN.getType());
             if (proxyId != null) {
                 Agent proxyAgent = agentService.getAgent(proxyId);
                 if (proxyAgent == null) {
@@ -105,7 +105,7 @@ public class VerifyController extends BaseController {
                 }
                 agent.setProxyAgent(proxyId);
                 //需要代理..
-                agent.setProxy(Opencron.ConnType.PROXY.getType());
+                agent.setProxy(Constants.ConnType.PROXY.getType());
             }
         }
        return executeService.guid(agent);

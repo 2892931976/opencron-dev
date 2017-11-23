@@ -22,7 +22,7 @@
 
 package org.opencron.server.service;
 
-import org.opencron.common.job.Opencron;
+import org.opencron.common.Constants;
 import org.opencron.server.job.OpencronCollector;
 import org.opencron.server.vo.JobVo;
 import org.quartz.*;
@@ -143,8 +143,8 @@ public final class SchedulerService {
 
         job.setAgent(agentService.getAgent(job.getAgentId()));
         //自动执行
-        if (Opencron.ExecType.AUTO.getStatus().equals(job.getExecType())) {
-            if (Opencron.CronType.QUARTZ.getType().equals(job.getCronType())) {
+        if (Constants.ExecType.AUTO.getStatus().equals(job.getExecType())) {
+            if (Constants.CronType.QUARTZ.getType().equals(job.getCronType())) {
                 /**
                  * 将作业加到quartz任务计划
                  */
@@ -171,7 +171,7 @@ public final class SchedulerService {
     public void initQuartz(Job jobExecutor) throws SchedulerException {
         //quartz job
         logger.info("[opencron] init quartzJob...");
-        List<JobVo> jobs = jobService.getJobVo(Opencron.ExecType.AUTO, Opencron.CronType.QUARTZ);
+        List<JobVo> jobs = jobService.getJobVo(Constants.ExecType.AUTO, Constants.CronType.QUARTZ);
         for (JobVo job : jobs) {
             try {
                 put(job, jobExecutor);

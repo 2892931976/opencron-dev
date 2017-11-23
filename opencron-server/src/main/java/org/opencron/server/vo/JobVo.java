@@ -22,7 +22,7 @@
 
 package org.opencron.server.vo;
 
-import org.opencron.common.job.Opencron;
+import org.opencron.common.Constants;
 import org.opencron.server.domain.User;
 import org.opencron.server.domain.Agent;
 
@@ -97,7 +97,7 @@ public class JobVo implements Serializable {
         this.jobName = agent.getName()+"-batchJob";
         this.userId = userId;
         this.command = command;
-        this.execType = Opencron.ExecType.BATCH.getStatus();
+        this.execType = Constants.ExecType.BATCH.getStatus();
         this.agent = agent;
         this.agentId = agent.getAgentId();
         this.host = agent.getHost();

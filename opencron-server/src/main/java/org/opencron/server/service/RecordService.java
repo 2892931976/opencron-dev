@@ -22,7 +22,7 @@
 
 package org.opencron.server.service;
 
-import org.opencron.common.job.Opencron;
+import org.opencron.common.Constants;
 import org.opencron.server.dao.QueryDao;
 import org.opencron.server.domain.Record;
 import org.opencron.server.job.OpencronTools;
@@ -106,17 +106,17 @@ public class RecordService {
                     "ORDER BY R.startTime ASC ";
 
             //单一任务有重跑记录的，查出后并把最后一条重跑记录的执行结果记作整个任务的成功、失败状态
-            if (parentRecord.getJobType() == Opencron.JobType.SINGLETON.getCode() && parentRecord.getRedoCount() > 0) {
+            if (parentRecord.getJobType() == Constants.JobType.SINGLETON.getCode() && parentRecord.getRedoCount() > 0) {
                 List<RecordVo> records = queryDao.sqlQuery(RecordVo.class, sql, parentRecord.getRecordId());
                 parentRecord.setSuccess(records.get(records.size() - 1).getSuccess());
                 parentRecord.setChildRecord(records);
             }
             //流程任务，先查出父任务的重跑记录，再查出各个子任务，最后查询子任务的重跑记录，并以最后一条记录的执行结果记作整个流程任务的成功、失败状态
-            if (parentRecord.getJobType() == Opencron.JobType.FLOW.getCode()) {
+            if (parentRecord.getJobType() == Constants.JobType.FLOW.getCode()) {
                 if (parentRecord.getRedoCount() != 0) {
                     List<RecordVo> records = queryDao.sqlQuery(RecordVo.class, sql, parentRecord.getRecordId());
                     //流程任务不能保证子任务也有记录，先给父任务一个成功、失败状态
-                    parentRecord.setSuccess(Opencron.ResultStatus.FAILED.getStatus());
+                    parentRecord.setSuccess(Constants.ResultStatus.FAILED.getStatus());
                     parentRecord.setChildRecord(records);
                 }
                 sql = "SELECT R.recordId,R.jobId,R.jobType,R.startTime,R.endTime,R.execType,R.status,R.redoCount,R.command,R.success,R.groupId,T.jobName,T.lastChild,D.name as agentName,D.password,D.host,T.cronExp,U.userName AS operateUname FROM T_RECORD AS R " +
@@ -158,7 +158,7 @@ public class RecordService {
                             parentRecord.setSuccess(lastJob.getSuccess());
                         }
                     } else {
-                        parentRecord.setSuccess(Opencron.ResultStatus.FAILED.getStatus());
+                        parentRecord.setSuccess(Constants.ResultStatus.FAILED.getStatus());
                     }
                 }
             }
@@ -264,7 +264,7 @@ public class RecordService {
     @Transactional
     public synchronized void flowJobDone(Record record) {
         String sql = "UPDATE T_RECORD SET status=? WHERE groupId=?";
-        queryDao.createSQLQuery(sql, Opencron.RunStatus.DONE.getStatus(), record.getGroupId()).executeUpdate();
+        queryDao.createSQLQuery(sql, Constants.RunStatus.DONE.getStatus(), record.getGroupId()).executeUpdate();
     }
 
     public List<Record> getRunningFlowJob(Long recordId) {
@@ -272,7 +272,7 @@ public class RecordService {
         return queryDao.sqlQuery(Record.class, sql, recordId);
     }
 
-    public Long getRecords(HttpSession session, int status, Opencron.ExecType execType) {
+    public Long getRecords(HttpSession session, int status, Constants.ExecType execType) {
         String sql;
         if (status == 1) {
             sql = "SELECT COUNT(1) FROM T_RECORD WHERE success=? AND execType=? AND STATUS IN (?,?,?) AND (FLOWNUM IS NULL OR flowNum=1)";
@@ -283,7 +283,7 @@ public class RecordService {
             User user = OpencronTools.getUser(session);
             sql += " AND userId = " + user.getUserId() + " AND agentid IN (" + user.getAgentIds() + ")";
         }
-        return queryDao.getCountBySql(sql, 1, execType.getStatus(), Opencron.RunStatus.STOPED.getStatus(),Opencron.RunStatus.DONE.getStatus(),Opencron.RunStatus.RERUNDONE.getStatus());
+        return queryDao.getCountBySql(sql, 1, execType.getStatus(), Constants.RunStatus.STOPED.getStatus(),Constants.RunStatus.DONE.getStatus(),Constants.RunStatus.RERUNDONE.getStatus());
     }
 
     @Transactional

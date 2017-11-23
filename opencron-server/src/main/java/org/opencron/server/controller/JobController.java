@@ -24,9 +24,7 @@ package org.opencron.server.controller;
 import java.util.*;
 
 import com.alibaba.fastjson.JSON;
-import org.opencron.common.job.Opencron;
-import org.opencron.common.job.Response;
-import org.opencron.common.util.CommandUtils;
+import org.opencron.common.Constants;
 import org.opencron.common.util.DigestUtils;
 import org.opencron.common.util.StringUtils;
 import org.opencron.server.domain.Job;
@@ -158,7 +156,7 @@ public class JobController extends BaseController {
         }
 
         //单任务
-        if (Opencron.JobType.SINGLETON.getCode().equals(job.getJobType())) {
+        if (Constants.JobType.SINGLETON.getCode().equals(job.getJobType())) {
             job.setUserId(OpencronTools.getUserId(session));
             job.setUpdateTime(new Date());
             job.setLastChild(false);
@@ -190,7 +188,7 @@ public class JobController extends BaseController {
                 child.setJobName(StringUtils.htmlEncode((String) jobName[i]));
                 child.setAgentId(Long.parseLong((String) agentId[i]));
                 child.setCommand(DigestUtils.passBase64((String) command[i]));
-                child.setJobType(Opencron.JobType.FLOW.getCode());
+                child.setJobType(Constants.JobType.FLOW.getCode());
                 child.setComment(StringUtils.htmlEncode((String) comment[i]));
                 child.setRunAs(StringUtils.htmlEncode((String) runAs[i]));
                 child.setSuccessExit(StringUtils.htmlEncode((String) successExit[i]));
@@ -284,7 +282,7 @@ public class JobController extends BaseController {
         dbJob.setCommand(command);
         dbJob.setUpdateTime(new Date());
         jobService.merge(dbJob);
-        schedulerService.syncJobTigger(Opencron.JobType.FLOW.getCode().equals(dbJob.getJobType()) ? dbJob.getFlowId() : dbJob.getJobId(), executeService);
+        schedulerService.syncJobTigger(Constants.JobType.FLOW.getCode().equals(dbJob.getJobType()) ? dbJob.getFlowId() : dbJob.getJobId(), executeService);
         return true;
     }
 
@@ -302,7 +300,7 @@ public class JobController extends BaseController {
         //手动执行
         Long userId = OpencronTools.getUserId(session);
         job.setUserId(userId);
-        job.setExecType(Opencron.ExecType.OPERATOR.getStatus());
+        job.setExecType(Constants.ExecType.OPERATOR.getStatus());
         job.setAgent(agentService.getAgent(job.getAgentId()));
         try {
             this.executeService.executeJob(job);

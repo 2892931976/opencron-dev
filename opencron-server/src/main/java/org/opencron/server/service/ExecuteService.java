@@ -48,7 +48,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.Semaphore;
 
-import static org.opencron.common.job.Opencron.*;
+import static org.opencron.common.Constants.*;
 
 @Service
 public class ExecuteService implements Job {

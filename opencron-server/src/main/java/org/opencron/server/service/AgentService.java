@@ -25,7 +25,6 @@ package org.opencron.server.service;
 import java.util.*;
 
 import org.opencron.common.Constants;
-import org.opencron.common.job.Opencron;
 import org.opencron.common.util.CommonUtils;
 import org.opencron.server.dao.QueryDao;
 import org.opencron.server.domain.User;
@@ -66,7 +65,7 @@ public class AgentService {
     @Autowired
     private ConfigService configService;
 
-    public List<Agent> getAgentByConnType(Opencron.ConnType connType) {
+    public List<Agent> getAgentByConnType(Constants.ConnType connType) {
         return queryDao.sqlQuery(Agent.class, "SELECT * FROM T_AGENT WHERE deleted=0 AND status = 1 AND proxy = " + connType.getType());
     }
 
@@ -83,12 +82,12 @@ public class AgentService {
         OpencronTools.CACHE.put(Constants.PARAM_CACHED_AGENT_ID_KEY, queryDao.sqlQuery(Agent.class, "SELECT * FROM T_AGENT WHERE deleted=0"));
     }
 
-    public List<Agent> getAgentByConnStatus(Opencron.ConnStatus status) {
+    public List<Agent> getAgentByConnStatus(Constants.ConnStatus status) {
         String sql = "SELECT * FROM T_AGENT WHERE deleted=0 AND status=?";
         return queryDao.sqlQuery(Agent.class, sql, status.getValue());
     }
 
-    public List<Agent> getOwnerAgentByConnStatus(HttpSession session, Opencron.ConnStatus status) {
+    public List<Agent> getOwnerAgentByConnStatus(HttpSession session, Constants.ConnStatus status) {
         String sql = "SELECT * FROM T_AGENT WHERE deleted=0 AND status=?";
         if ( !OpencronTools.isPermission(session)) {
             User user = OpencronTools.getUser(session);
@@ -152,7 +151,7 @@ public class AgentService {
             /**
              * 获取该执行器下所有的自动执行,并且是quartz类型的作业
              */
-            List<JobVo> jobVos = jobService.getJobVoByAgentId(agent, Opencron.ExecType.AUTO, Opencron.CronType.QUARTZ);
+            List<JobVo> jobVos = jobService.getJobVoByAgentId(agent, Constants.ExecType.AUTO, Constants.CronType.QUARTZ);
             try {
                 schedulerService.put(jobVos, this.executeService);
             } catch (SchedulerException e) {

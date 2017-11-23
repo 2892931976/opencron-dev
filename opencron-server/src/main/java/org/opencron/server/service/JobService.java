@@ -27,10 +27,9 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import static org.opencron.common.job.Opencron.*;
+import static org.opencron.common.Constants.*;
 
 import org.opencron.common.Constants;
-import org.opencron.common.job.Opencron;
 import org.opencron.server.dao.QueryDao;
 import org.opencron.server.domain.Job;
 import org.opencron.server.domain.User;
@@ -131,7 +130,7 @@ public class JobService {
 
     public List<JobVo> getCrontabJob() {
         logger.info("[opencron] init quartzJob...");
-        return getJobVo(Opencron.ExecType.AUTO, Opencron.CronType.CRONTAB);
+        return getJobVo(Constants.ExecType.AUTO, Constants.CronType.CRONTAB);
     }
 
     public List<Job> getAll() {

@@ -23,7 +23,7 @@ package org.opencron.server.controller;
 
 import javax.servlet.http.HttpSession;
 
-import org.opencron.common.job.Opencron;
+import org.opencron.common.Constants;
 import org.opencron.server.domain.Record;
 import org.opencron.server.service.*;
 import org.opencron.server.tag.PageBean;
@@ -139,9 +139,9 @@ public class RecordController extends BaseController {
     @ResponseBody
     public boolean kill(HttpSession session, Long recordId) {
         Record record = recordService.get(recordId);
-        if (Opencron.RunStatus.RERUNNING.getStatus().equals(record.getStatus())) {
+        if (Constants.RunStatus.RERUNNING.getStatus().equals(record.getStatus())) {
             //父记录临时改为停止中
-            record.setStatus(Opencron.RunStatus.STOPPING.getStatus());
+            record.setStatus(Constants.RunStatus.STOPPING.getStatus());
             recordService.merge(record);
             //得到当前正在重跑的子记录
             record = recordService.getReRunningSubJob(recordId);

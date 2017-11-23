@@ -21,7 +21,7 @@
 
 package org.opencron.server.domain;
 
-import org.opencron.common.job.Opencron;
+import org.opencron.common.Constants;
 import org.opencron.common.util.CommonUtils;
 import org.opencron.server.vo.JobVo;
 
@@ -89,8 +89,8 @@ public class Record implements Serializable {
         this.setRedo(jobVo.getRedo());//失败是否重新执行
         this.setRunCount(jobVo.getRunCount());//失败后重新执行次数
         this.setRedoCount(0);//运行次数
-        this.setSuccess(Opencron.ResultStatus.SUCCESSFUL.getStatus());
-        this.setStatus(Opencron.RunStatus.RUNNING.getStatus());//任务还未完成
+        this.setSuccess(Constants.ResultStatus.SUCCESSFUL.getStatus());
+        this.setStatus(Constants.RunStatus.RUNNING.getStatus());//任务还未完成
         this.setPid(CommonUtils.uuid());
     }
 

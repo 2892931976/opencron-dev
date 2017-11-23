@@ -1,7 +1,5 @@
-package org.opencron.agent;
+package org.opencron.common.job;
 
-import org.opencron.common.job.Request;
-import org.opencron.common.job.Response;
 
 public interface AgentJob {
 

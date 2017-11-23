@@ -29,7 +29,6 @@ import javax.servlet.http.HttpSession;
 
 import com.alibaba.fastjson.JSON;
 import org.opencron.common.Constants;
-import org.opencron.common.job.Opencron;
 import org.opencron.common.util.CommonUtils;
 import org.opencron.common.util.PropertyPlaceholder;
 import org.opencron.server.job.OpencronTools;
@@ -64,7 +63,7 @@ public class AgentController extends BaseController {
         agentService.getOwnerAgent(session, pageBean);
         request.setAttribute("scanAgent",session.getAttribute("scanAgent"));
         session.removeAttribute("scanAgent");
-        model.addAttribute("connAgents", agentService.getAgentByConnType(Opencron.ConnType.CONN));
+        model.addAttribute("connAgents", agentService.getAgentByConnType(Constants.ConnType.CONN));
         return "/agent/view";
     }
 
@@ -100,7 +99,7 @@ public class AgentController extends BaseController {
 
     @RequestMapping("add.htm")
     public String addPage(Model model) {
-        List<Agent> agentList = agentService.getAgentByConnType(Opencron.ConnType.CONN);
+        List<Agent> agentList = agentService.getAgentByConnType(Constants.ConnType.CONN);
         model.addAttribute("connAgents", agentList);
         return "/agent/add";
     }
@@ -113,7 +112,7 @@ public class AgentController extends BaseController {
         }
 
         //直联
-        if (Opencron.ConnType.CONN.getType().equals(agent.getProxy())) {
+        if (Constants.ConnType.CONN.getType().equals(agent.getProxy())) {
             agent.setProxyAgent(null);
         }
 
@@ -163,7 +162,7 @@ public class AgentController extends BaseController {
             agent.setWarning(false);
             agent.setMobiles(null);
             agent.setEmailAddress(null);
-            agent.setProxy(Opencron.ConnType.CONN.getType());
+            agent.setProxy(Constants.ConnType.CONN.getType());
             agent.setProxyAgent(null);
             agent.setStatus(true);
             agent.setDeleted(false);
@@ -189,7 +188,7 @@ public class AgentController extends BaseController {
         Agent agent1 = agentService.getAgent(agent.getAgentId());
         agent1.setName(agent.getName());
         agent1.setProxy(agent.getProxy());
-        if (Opencron.ConnType.CONN.getType().equals(agent.getProxy())) {
+        if (Constants.ConnType.CONN.getType().equals(agent.getProxy())) {
             agent1.setProxyAgent(null);
         } else {
             agent1.setProxyAgent(agent.getProxyAgent());
@@ -224,7 +223,7 @@ public class AgentController extends BaseController {
     @RequestMapping(value = "getConnAgents.do",method= RequestMethod.POST)
     @ResponseBody
     public List<Agent> getConnAgents() {
-       return agentService.getAgentByConnType(Opencron.ConnType.CONN);
+       return agentService.getAgentByConnType(Constants.ConnType.CONN);
     }
 
     @RequestMapping(value = "path.do",method= RequestMethod.POST)

@@ -24,6 +24,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.exec.*;
 import org.opencron.common.Constants;
+import org.opencron.common.api.AgentJob;
 import org.opencron.common.ext.ExtensionLoader;
 import org.opencron.common.job.*;
 import org.opencron.common.logging.LoggerFactory;
@@ -69,8 +70,8 @@ public class AgentProcessor implements ServerHandler,AgentJob {
         if (!password.equalsIgnoreCase(request.getPassword())) {
             return Response.response(request)
                     .setSuccess(false)
-                    .setExitCode(Opencron.StatusCode.ERROR_PASSWORD.getValue())
-                    .setMessage(Opencron.StatusCode.ERROR_PASSWORD.getDescription())
+                    .setExitCode(Constants.StatusCode.ERROR_PASSWORD.getValue())
+                    .setMessage(Constants.StatusCode.ERROR_PASSWORD.getDescription())
                     .end();
         }
 
@@ -103,21 +104,21 @@ public class AgentProcessor implements ServerHandler,AgentJob {
 
     @Override
     public Response ping(Request request) {
-        return Response.response(request).setSuccess(true).setExitCode(Opencron.StatusCode.SUCCESS_EXIT.getValue()).end();
+        return Response.response(request).setSuccess(true).setExitCode(Constants.StatusCode.SUCCESS_EXIT.getValue()).end();
     }
 
     @Override
     public Response path(Request request) {
         //返回密码文件的路径...
         return Response.response(request).setSuccess(true)
-                .setExitCode(Opencron.StatusCode.SUCCESS_EXIT.getValue())
+                .setExitCode(Constants.StatusCode.SUCCESS_EXIT.getValue())
                 .setMessage(Constants.OPENCRON_HOME)
                 .end();
     }
 
     @Override
     public Response monitor(Request request) {
-        Opencron.ConnType connType = Opencron.ConnType.getByName(request.getParams().get("connType"));
+        Constants.ConnType connType = Constants.ConnType.getByName(request.getParams().get("connType"));
         Response response = Response.response(request);
         switch (connType) {
             case PROXY:
@@ -195,7 +196,7 @@ public class AgentProcessor implements ServerHandler,AgentJob {
                             request.setAction(Action.KILL);
                             try {
                                 kill(request);
-                                response.setExitCode(Opencron.StatusCode.TIME_OUT.getValue());
+                                response.setExitCode(Constants.StatusCode.TIME_OUT.getValue());
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
@@ -228,9 +229,9 @@ public class AgentProcessor implements ServerHandler,AgentJob {
             if (e instanceof ExecuteException) {
                 exitValue = ((ExecuteException) e).getExitValue();
             } else {
-                exitValue = Opencron.StatusCode.ERROR_EXEC.getValue();
+                exitValue = Constants.StatusCode.ERROR_EXEC.getValue();
             }
-            if (Opencron.StatusCode.KILL.getValue().equals(exitValue)) {
+            if (Constants.StatusCode.KILL.getValue().equals(exitValue)) {
                 if (timeoutFlag) {
                     timer.cancel();
                     watchdog.stop();
@@ -262,11 +263,11 @@ public class AgentProcessor implements ServerHandler,AgentJob {
                 }
             }
 
-            if (Opencron.StatusCode.TIME_OUT.getValue() == response.getExitCode()) {
+            if (Constants.StatusCode.TIME_OUT.getValue() == response.getExitCode()) {
                 response.setSuccess(false).end();
             } else {
                 if (CommonUtils.isEmpty(successExit)) {
-                    response.setExitCode(exitValue).setSuccess(exitValue == Opencron.StatusCode.SUCCESS_EXIT.getValue()).end();
+                    response.setExitCode(exitValue).setSuccess(exitValue == Constants.StatusCode.SUCCESS_EXIT.getValue()).end();
                 }else {
                     response.setExitCode(exitValue).setSuccess(successExit.equals(exitValue.toString())).end();
                 }
@@ -292,13 +293,13 @@ public class AgentProcessor implements ServerHandler,AgentJob {
         Response response = Response.response(request);
 
         if (isEmpty(newPassword)) {
-            return response.setSuccess(false).setExitCode(Opencron.StatusCode.SUCCESS_EXIT.getValue()).setMessage("密码不能为空").end();
+            return response.setSuccess(false).setExitCode(Constants.StatusCode.SUCCESS_EXIT.getValue()).setMessage("密码不能为空").end();
         }
 
         this.password = newPassword.toLowerCase().trim();
         SystemPropertyUtils.setProperty("opencron.password",password);
         IOUtils.writeText(Constants.OPENCRON_PASSWORD_FILE, password, "UTF-8");
-        return response.setSuccess(true).setExitCode(Opencron.StatusCode.SUCCESS_EXIT.getValue()).end();
+        return response.setSuccess(true).setExitCode(Constants.StatusCode.SUCCESS_EXIT.getValue()).end();
     }
 
     @Override
@@ -320,7 +321,7 @@ public class AgentProcessor implements ServerHandler,AgentJob {
             }
         }
 
-        response.setExitCode(Opencron.StatusCode.ERROR_EXIT.getValue().equals(exitVal) ? Opencron.StatusCode.ERROR_EXIT.getValue() : Opencron.StatusCode.SUCCESS_EXIT.getValue())
+        response.setExitCode(Constants.StatusCode.ERROR_EXIT.getValue().equals(exitVal) ? Constants.StatusCode.ERROR_EXIT.getValue() : Constants.StatusCode.SUCCESS_EXIT.getValue())
                 .setMessage(message)
                 .end();
 
@@ -355,7 +356,7 @@ public class AgentProcessor implements ServerHandler,AgentJob {
         } catch (Exception e) {
             e.printStackTrace();
             response = Response.response(request);
-            response.setExitCode(Opencron.StatusCode.ERROR_EXIT.getValue())
+            response.setExitCode(Constants.StatusCode.ERROR_EXIT.getValue())
                     .setMessage("[opencron]:proxy error:"+e.getLocalizedMessage())
                     .setSuccess(false)
                     .end();
@@ -379,9 +380,9 @@ public class AgentProcessor implements ServerHandler,AgentJob {
 
         Response response = Response.response(request).end();
         if (notEmpty(macId)) {
-            return response.setMessage(macId).setSuccess(true).setExitCode(Opencron.StatusCode.SUCCESS_EXIT.getValue());
+            return response.setMessage(macId).setSuccess(true).setExitCode(Constants.StatusCode.SUCCESS_EXIT.getValue());
         }
-        return response.setSuccess(false).setExitCode(Opencron.StatusCode.ERROR_EXIT.getValue());
+        return response.setSuccess(false).setExitCode(Constants.StatusCode.ERROR_EXIT.getValue());
     }
 
     @Override

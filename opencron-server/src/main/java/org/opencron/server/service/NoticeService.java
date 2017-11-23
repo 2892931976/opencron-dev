@@ -22,7 +22,7 @@
 
 package org.opencron.server.service;
 
-import org.opencron.common.job.Opencron;
+import org.opencron.common.Constants;
 import org.opencron.server.domain.Config;
 import org.opencron.server.domain.Log;
 import org.opencron.server.domain.User;
@@ -118,7 +118,7 @@ public class NoticeService {
         //发送邮件
         if (CommonUtils.notEmpty(emailAddress)) {
             try {
-                log.setType(Opencron.MsgType.EMAIL.getValue());
+                log.setType(Constants.MsgType.EMAIL.getValue());
                 HtmlEmail email = new HtmlEmail();
                 email.setCharset("UTF-8");
                 email.setHostName(config.getSmtpHost());
@@ -147,7 +147,7 @@ public class NoticeService {
                 log.setResult(message);
                 logger.info(message);
                 log.setReceiver(mobiles);
-                log.setType(Opencron.MsgType.SMS.getValue());
+                log.setType(Constants.MsgType.SMS.getValue());
                 log.setSendTime(new Date());
                 homeService.saveLog(log);
             }
@@ -156,7 +156,7 @@ public class NoticeService {
         }
 
         //发送站内信
-        log.setType(Opencron.MsgType.WEBSITE.getValue());
+        log.setType(Constants.MsgType.WEBSITE.getValue());
         for(User user:users) {
             //一一发送站内信
             log.setUserId(user.getUserId());

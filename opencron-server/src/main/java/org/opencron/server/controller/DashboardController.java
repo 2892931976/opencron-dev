@@ -23,7 +23,6 @@ package org.opencron.server.controller;
 
 import com.alibaba.fastjson.JSON;
 import org.opencron.common.Constants;
-import org.opencron.common.job.Opencron;
 import org.opencron.common.job.Response;
 import org.opencron.common.util.*;
 import org.opencron.server.domain.Agent;
@@ -95,8 +94,8 @@ public class DashboardController extends BaseController {
         /**
          * agent...
          */
-        List<Agent> success = agentService.getOwnerAgentByConnStatus(session, Opencron.ConnStatus.CONNECTED);
-        List<Agent> failed = agentService.getOwnerAgentByConnStatus(session, Opencron.ConnStatus.DISCONNECTED);
+        List<Agent> success = agentService.getOwnerAgentByConnStatus(session, Constants.ConnStatus.CONNECTED);
+        List<Agent> failed = agentService.getOwnerAgentByConnStatus(session, Constants.ConnStatus.DISCONNECTED);
         model.addAttribute("success", success.size());
         model.addAttribute("failed", failed.size());
 
@@ -106,8 +105,8 @@ public class DashboardController extends BaseController {
         /**
          * job
          */
-        List<Job> singleton = jobService.getJobsByJobType(session, Opencron.JobType.SINGLETON);
-        List<Job> flow = jobService.getJobsByJobType(session, Opencron.JobType.FLOW);
+        List<Job> singleton = jobService.getJobsByJobType(session, Constants.JobType.SINGLETON);
+        List<Job> flow = jobService.getJobsByJobType(session, Constants.JobType.FLOW);
 
         model.addAttribute("singleton", singleton.size());
         model.addAttribute("flow", flow.size());
@@ -116,8 +115,8 @@ public class DashboardController extends BaseController {
         /**
          * 成功作业,自动执行
          */
-        Long successAutoRecord = recordService.getRecords(session, 1, Opencron.ExecType.AUTO);
-        Long successOperRecord = recordService.getRecords(session, 1, Opencron.ExecType.OPERATOR);
+        Long successAutoRecord = recordService.getRecords(session, 1, Constants.ExecType.AUTO);
+        Long successOperRecord = recordService.getRecords(session, 1, Constants.ExecType.OPERATOR);
 
         model.addAttribute("successAutoRecord", successAutoRecord);
         model.addAttribute("successOperRecord", successOperRecord);
@@ -126,8 +125,8 @@ public class DashboardController extends BaseController {
         /**
          * 失败作业
          */
-        Long failedAutoRecord = recordService.getRecords(session, 0, Opencron.ExecType.AUTO);
-        Long failedOperRecord = recordService.getRecords(session, 0, Opencron.ExecType.OPERATOR);
+        Long failedAutoRecord = recordService.getRecords(session, 0, Constants.ExecType.AUTO);
+        Long failedOperRecord = recordService.getRecords(session, 0, Constants.ExecType.OPERATOR);
         model.addAttribute("failedAutoRecord", failedAutoRecord);
         model.addAttribute("failedOperRecord", failedOperRecord);
         model.addAttribute("failedRecord", failedAutoRecord + failedOperRecord);
@@ -176,7 +175,7 @@ public class DashboardController extends BaseController {
         /**
          * 直联
          */
-        if (agent.getProxy().equals(Opencron.ConnType.CONN.getType())) {
+        if (agent.getProxy().equals(Constants.ConnType.CONN.getType())) {
             final String url = String.format("http://%s:%s", agent.getHost(), PropertyPlaceholder.get(Constants.PARAM_MONITORPORT_KEY));
             return new HashMap<String,Serializable>(){{
                 put("connType",agent.getProxy());
