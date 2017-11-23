@@ -16,8 +16,7 @@
 			http://www.springframework.org/schema/aop
 			http://www.springframework.org/schema/aop/spring-aop.xsd
 			http://www.springframework.org/schema/websocket
-			http://www.springframework.org/schema/websocket/spring-websocket.xsd"
-       default-lazy-init="true">
+			http://www.springframework.org/schema/websocket/spring-websocket.xsd" default-lazy-init="true">
 
     <description>opencron server</description>
 
