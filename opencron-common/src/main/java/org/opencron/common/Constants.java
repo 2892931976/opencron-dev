@@ -34,15 +34,26 @@ public class Constants {
 
     public static final String META_INF_DIR = "META-INF/opencron/";
 
-    public static final String ZK_REGISTRY_PATH = "/registry";
+    public static final String ZK_REGISTRY_PATH = "/opencron";
 
     public static final String ZK_DATA_PATH = ZK_REGISTRY_PATH + "/data";
+
+    /**
+     * 注册中心是否同步存储文件，默认异步
+     */
+    public static final String REGISTRY_FILESAVE_SYNC_KEY = "save.file";
+
+    public static final String FILE_KEY = "file";
+
+    public static final String EMPTY_PROTOCOL = "empty";
 
     public static final Pattern COMMA_SPLIT_PATTERN = Pattern.compile("\\s*[,]+\\s*");
 
     public static final int HEADER_SIZE = 4;
 
     public static final int DEFAULT_IO_THREADS = Math.min(Runtime.getRuntime().availableProcessors() + 1, 32);
+
+    public static final String DEFAULT_KEY_PREFIX = "default.";
 
     //============================== param ==============================//
 
@@ -158,7 +169,6 @@ public class Constants {
      * kill file
      */
     public static final File OPENCRON_KILL_SHELL = new File(OPENCRON_HOME + "/bin/kill.sh");
-
 
 
     public enum StatusCode implements Serializable {
