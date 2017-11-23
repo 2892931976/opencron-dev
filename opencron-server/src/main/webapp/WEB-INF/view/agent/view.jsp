@@ -44,7 +44,7 @@
 
                 swal({
                     title: "",
-                    text: "要扫描添加执行器[${scanAgent.name}]已有的crontab里的任务到系统吗？",
+                    text: "要扫描执行器[${scanAgent.name}]crontab里定义的任务到系统吗？",
                     type: "warning",
                     showCancelButton: true,
                     closeOnConfirm: false,
@@ -54,24 +54,23 @@
                         headers:{"csrf":"${csrf}"},
                         type:"POST",
                         url:"${contextPath}/job/scan.do",
-                        data:{"agentId":"${scanAgent.agentId}"},
-                        success:function (data) {
-                            if (data.length == 0){
-                                alert("执行器[${scanAgent.name}]未扫描到有效的CRONTAB任务!");
-                            }else {
-                                $("div[class^='sweet-']").remove();
-                                $(".modal-backdrop").remove();
-                                var template = $("#crontab_template").html();
-                                var line = "";
-                                $.each(data,function (i,n) {
-                                    line += template.replace("#exp#",n.exp).replace("#cmd#",n.cmd);
-                                });
+                        data:{"agentId":"${scanAgent.agentId}"}
+                    }).done(function (data) {
+                        if (data.length == 0){
+                            alert("执行器[${scanAgent.name}]未扫描到有效的crontab任务!");
+                        }else {
+                            $("div[class^='sweet-']").remove();
+                            $(".modal-backdrop").remove();
+                            var template = $("#crontab_template").html();
+                            var line = "";
+                            $.each(data,function (i,n) {
+                                line += template.replace("#exp#",n.exp).replace("#cmd#",n.cmd);
+                            });
 
-                                var html = $("#crontabModal").attr("data");
-                                html = html.replace("#crontab#",line)
-                                $("#crontabForm").html(html);
-                                $("#crontabModal").modal("show");
-                            }
+                            var html = $("#crontabModal").attr("template");
+                            html = html.replace("#crontab#",line);
+                            $("#crontabForm").html(html);
+                            $("#crontabModal").modal("show");
                         }
                     });
                 });
@@ -952,7 +951,7 @@
     </div>
 
     <div class="modal fade" id="crontabModal" tabindex="-1" role="dialog" aria-hidden="true"
-         data="<table class='table'><tbody><thead><td class='col-md-3'>表达式</td><td <td class='col-md-9'>命令</td></thead>#crontab#</table>">
+    template="<table class='table'><thead><tr><td class='col-md-3'>表达式</td><td class='col-md-9'>命令</td></tr></thead><tbody>#crontab#</tbody></table>">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -960,7 +959,8 @@
                     <h4>新增CRONTAB</h4>
                 </div>
                 <div class="modal-body">
-                    <form class="form-horizontal" role="form" id="crontabForm"></form>
+                    <form class="form-horizontal" role="form" id="crontabForm">
+                    </form>
                 </div>
                 <div class="modal-footer">
                     <center>
