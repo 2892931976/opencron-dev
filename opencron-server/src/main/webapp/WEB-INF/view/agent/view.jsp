@@ -9,33 +9,38 @@
     <script type="text/javascript" src="${contextPath}/static/js/clipboard.js?resId=${resourceId}"></script> <!-- jQuery Library -->
 
     <script type="text/javascript">
-        function showContact() {
-            $(".contact").show()
-        }
 
-        function hideContact() {
-            $(".contact").hide()
-        }
+        var toggle = {
+            contact:{
+                show:function () {
+                    $(".contact").show()
+                },
+                hide:function () {
+                    $(".contact").hide()
+                }
+            },
+            proxy:{
+                show:function () {
+                    $(".proxy").show();
+                    $("#proxy1").prop("checked", true);
+                    $("#proxy").val(1);
+                    $("#proxy1").parent().removeClass("checked").addClass("checked");
+                    $("#proxy1").parent().attr("aria-checked", true);
+                    $("#proxy1").parent().bind("click",toggle.contact.show);
+                    $("#proxy0").parent().removeClass("checked");
+                    $("#proxy0").parent().attr("aria-checked", false);
+                },
+                hide:function () {
+                    $(".proxy").hide();
+                    $("#proxy").val(0);
+                    $("#proxy0").prop("checked", true);
+                    $("#proxy0").parent().removeClass("checked").addClass("checked");
+                    $("#proxy0").parent().attr("aria-checked", true);
+                    $("#proxy1").parent().removeClass("checked");
+                    $("#proxy1").parent().attr("aria-checked", false);
+                }
+            }
 
-        function showProxy() {
-            $(".proxy").show();
-            $("#proxy1").prop("checked", true);
-            $("#proxy").val(1);
-            $("#proxy1").parent().removeClass("checked").addClass("checked");
-            $("#proxy1").parent().attr("aria-checked", true);
-            $("#proxy1").parent().prop("onclick", "showContact()");
-            $("#proxy0").parent().removeClass("checked");
-            $("#proxy0").parent().attr("aria-checked", false);
-        }
-
-        function hideProxy() {
-            $(".proxy").hide();
-            $("#proxy").val(0);
-            $("#proxy0").prop("checked", true);
-            $("#proxy0").parent().removeClass("checked").addClass("checked");
-            $("#proxy0").parent().attr("aria-checked", true);
-            $("#proxy1").parent().removeClass("checked");
-            $("#proxy1").parent().attr("aria-checked", false);
         }
 
         $(document).ready(function () {
@@ -105,14 +110,13 @@
                         "order":"${pageBean.order}",
                         "orderBy":"${pageBean.orderBy}"
                     },
-                    dataType: "html",
-                    success: function (data) {
-                        //解决子页面登录失联,不能跳到登录页面的bug
-                        if (data.indexOf("login") > -1) {
-                            window.location.href = "${contextPath}";
-                        } else {
-                            $("#tableContent").html(data);
-                        }
+                    dataType: "html"
+                }).done(function (data) {
+                    //解决子页面登录失联,不能跳到登录页面的bug
+                    if (data.indexOf("login") > -1) {
+                        window.location.href = "${contextPath}";
+                    } else {
+                        $("#tableContent").html(data);
                     }
                 });
             }, 1000 * 10);
@@ -141,20 +145,18 @@
                     data: {
                         "id": $("#id").val(),
                         "name": $("#name").val()
-                    },
-                    success: function (data) {
-                        if (data) {
-                            $("#checkName").html("<font color='green'>" + '<i class="glyphicon glyphicon-ok-sign"></i>&nbsp;执行器名可用' + "</font>");
-                            return false;
-                        } else {
-                            $("#checkName").html("<font color='red'>" + '<i class="glyphicon glyphicon-remove-sign"></i>&nbsp;执行器名已存在' + "</font>");
-                            return false;
-                        }
-                    },
-                    error: function () {
-                        alert("网络繁忙请刷新页面重试!");
+                    }
+                }).done(function () {
+                    if (data) {
+                        $("#checkName").html("<font color='green'>" + '<i class="glyphicon glyphicon-ok-sign"></i>&nbsp;执行器名可用' + "</font>");
+                        return false;
+                    } else {
+                        $("#checkName").html("<font color='red'>" + '<i class="glyphicon glyphicon-remove-sign"></i>&nbsp;执行器名已存在' + "</font>");
                         return false;
                     }
+                }).fail(function () {
+                    alert("网络繁忙请刷新页面重试!");
+                    return false;
                 });
             });
 
@@ -172,8 +174,8 @@
                 }
             });
 
-            $("#proxy1").attr("onclick", "showProxy()").next().attr("onclick", "showProxy()");
-            $("#proxy0").attr("onclick", "hideProxy()").next().attr("onclick", "hideProxy()");
+            $("#proxy1").bind("click",toggle.proxy.show).next().bind("click",toggle.proxy.show);
+            $("#proxy0").bind("click",toggle.proxy.hide).next().bind("click",toggle.proxy.hide);
 
         });
 
@@ -182,57 +184,55 @@
                 headers:{"csrf":"${csrf}"},
                 type: "POST",
                 url: "${contextPath}/agent/get.do",
-                data: {"id": id},
-                success: function (obj) {
-                    $("#agentform")[0].reset();
-                    if (obj != null) {
-                        $("#checkName").html("");
-                        $("#pingResult").html("");
-                        $("#id").val(obj.agentId);
-                        $("#password").val(obj.password);
-                        if (obj.status == true) {
-                            $("#status").val("1");
-                        } else {
-                            $("#status").val("0");
-                        }
-                        $("#name").val(obj.name);
-                        $("#host").val(obj.host);
-                        $("#port").val(obj.port);
-                        if (obj.proxy == 1) {
-                            showProxy();
-                            $("#agent_" + obj.agentId).attr("selected", true);
-                        } else {
-                            hideProxy();
-                        }
-
-                        $("#warning1").next().attr("onclick", "showContact()");
-                        $("#warning0").next().attr("onclick", "hideContact()");
-                        if (obj.warning == true) {
-                            showContact();
-                            $("#warning1").prop("checked", true);
-                            $("#warning1").parent().removeClass("checked").addClass("checked");
-                            $("#warning1").parent().attr("aria-checked", true);
-                            $("#warning1").parent().prop("onclick", "showContact()");
-                            $("#warning0").parent().removeClass("checked");
-                            $("#warning0").parent().attr("aria-checked", false);
-                        } else {
-                            hideContact();
-                            $("#warning0").prop("checked", true);
-                            $("#warning0").parent().removeClass("checked").addClass("checked");
-                            $("#warning0").parent().attr("aria-checked", true);
-                            $("#warning1").parent().removeClass("checked");
-                            $("#warning1").parent().attr("aria-checked", false);
-                        }
-                        $("#mobiles").val(obj.mobiles);
-                        $("#email").val(obj.emailAddress);
-                        $("#comment").val(obj.comment);
-                        $("#agentModal").modal("show");
-
+                data: {"id": id}
+            }).done(function (obj) {
+                $("#agentform")[0].reset();
+                if (obj != null) {
+                    $("#checkName").html("");
+                    $("#pingResult").html("");
+                    $("#id").val(obj.agentId);
+                    $("#password").val(obj.password);
+                    if (obj.status == true) {
+                        $("#status").val("1");
+                    } else {
+                        $("#status").val("0");
                     }
-                },
-                error: function () {
-                    alert("网络繁忙请刷新页面重试!");
+                    $("#name").val(obj.name);
+                    $("#host").val(obj.host);
+                    $("#port").val(obj.port);
+                    if (obj.proxy == 1) {
+                        toggle.proxy.show();
+                        $("#agent_" + obj.agentId).attr("selected", true);
+                    } else {
+                        toggle.proxy.hide();
+                    }
+
+                    $("#warning1").next().bind("click",toggle.contact.show);
+                    $("#warning0").next().bind("click",toggle.contact.hide);
+                    if (obj.warning == true) {
+                        toggle.contact.show();
+                        $("#warning1").prop("checked", true);
+                        $("#warning1").parent().removeClass("checked").addClass("checked");
+                        $("#warning1").parent().attr("aria-checked", true);
+                        $("#warning1").parent().bind("click",toggle.contact.show);
+                        $("#warning0").parent().removeClass("checked");
+                        $("#warning0").parent().attr("aria-checked", false);
+                    } else {
+                        toggle.contact.hide();
+                        $("#warning0").prop("checked", true);
+                        $("#warning0").parent().removeClass("checked").addClass("checked");
+                        $("#warning0").parent().attr("aria-checked", true);
+                        $("#warning1").parent().removeClass("checked");
+                        $("#warning1").parent().attr("aria-checked", false);
+                    }
+                    $("#mobiles").val(obj.mobiles);
+                    $("#email").val(obj.emailAddress);
+                    $("#comment").val(obj.comment);
+                    $("#agentModal").modal("show");
+
                 }
+            }).fail(function () {
+                alert("网络繁忙请刷新页面重试!");
             });
         }
 
@@ -836,8 +836,8 @@
 
                         <div class="form-group">
                             <label class="col-lab control-label" title="执行器通信不正常时是否发信息报警">连接类型：</label>&nbsp;&nbsp;
-                            <label onclick="hideProxy()" for="proxy0" class="radio-label"><input type="radio" onclick="hideProxy()" name="proxy" value="0"  id="proxy0">直连</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                            <label onclick="showProxy()" for="proxy1" class="radio-label"><input type="radio" onclick="showProxy()" name="proxy" value="1" id="proxy1">代理&nbsp;&nbsp;&nbsp;</label>
+                            <label onclick="toggle.proxy.hide()" for="proxy0" class="radio-label"><input type="radio" onclick="toggle.proxy.hide()" name="proxy" value="0"  id="proxy0">直连</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            <label onclick="toggle.proxy.show()" for="proxy1" class="radio-label"><input type="radio" onclick="toggle.proxy.show()" name="proxy" value="1" id="proxy1">代理&nbsp;&nbsp;&nbsp;</label>
                         </div>
 
                         <div class="form-group proxy" style="display: none;margin-top: 20px;">
@@ -861,8 +861,8 @@
                         </div>
                         <div class="form-group" style="margin-top: 15px;margin-bottom: 20px">
                             <label class="col-lab control-label" title="执行器通信不正常时是否发信息报警">失联报警：</label>&nbsp;&nbsp;
-                            <label onclick="showContact()" for="warning1" class="radio-label"><input type="radio" name="warning" value="1" id="warning1">是&nbsp;&nbsp;&nbsp;</label>
-                            <label onclick="hideContact()" for="warning0" class="radio-label"><input type="radio" name="warning" value="0" id="warning0">否</label>
+                            <label onclick="toggle.contact.show()" for="warning1" class="radio-label"><input type="radio" name="warning" value="1" id="warning1">是&nbsp;&nbsp;&nbsp;</label>
+                            <label onclick="toggle.contact.hide()" for="warning0" class="radio-label"><input type="radio" name="warning" value="0" id="warning0">否</label>
                         </div>
                         <div class="form-group contact">
                             <label for="mobiles" class="col-lab control-label" title="执行器通信不正常时将发送短信给此手机">报警手机：</label>
@@ -972,7 +972,6 @@
             </div>
         </div>
     </div>
-
 
 </section>
 
