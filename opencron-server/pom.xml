@@ -21,6 +21,10 @@
             <artifactId>opencron-registry</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>org.opencron</groupId>
+            <artifactId>opencron-registry</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>org.opencron</groupId>
@@ -56,10 +60,28 @@
             <scope>provided</scope>
         </dependency>
 
+
+
+
+        <dependency>
+            <groupId>jstl</groupId>
+            <artifactId>jstl</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.sitemesh</groupId>
+            <artifactId>sitemesh</artifactId>
+        </dependency>
+
         <!--jetty-->
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-util</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-server</artifactId>
         </dependency>
 
         <dependency>
@@ -74,27 +96,12 @@
 
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-server</artifactId>
+            <artifactId>jetty-jsp-2.1</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>jstl</groupId>
-            <artifactId>jstl</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.sitemesh</groupId>
-            <artifactId>sitemesh</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.opencron</groupId>
-            <artifactId>opencron-rpc</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.opencron</groupId>
-            <artifactId>opencron-registry</artifactId>
+            <groupId>org.mortbay.jetty</groupId>
+            <artifactId>jsp-2.1-glassfish</artifactId>
         </dependency>
 
     </dependencies>
