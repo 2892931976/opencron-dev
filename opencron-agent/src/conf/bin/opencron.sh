@@ -177,7 +177,7 @@ OPENCRON_PIDDIR="/var/run";
 OPENCRON_PID="$OPENCRON_PIDDIR/opencron.pid";
 
 #opencron version
-OPENCRON_VERSION="1.1.0-RELEASE"
+OPENCRON_VERSION="1.2.0-RELEASE"
 
 # Add bootstrap.jar to classpath
 if [ ! -z "$CLASSPATH" ] ; then

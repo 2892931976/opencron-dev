@@ -54,10 +54,7 @@ public class NettyServer implements Server {
     }
 
     @Override
-    public void start(final int port, ServerHandler serverHandler) {
-
-        final NettyServerHandler handler = new NettyServerHandler(serverHandler);
-
+    public void start(final int port,final ServerHandler serverHandler) {
         this.bootstrap = new ServerBootstrap();
         this.bossGroup = new NioEventLoopGroup(1, new DefaultThreadFactory("NettyServerBoss", true));
         this.workerGroup = new NioEventLoopGroup(Constants.DEFAULT_IO_THREADS, new DefaultThreadFactory("NettyServerWorker", true));
@@ -73,7 +70,7 @@ public class NettyServer implements Server {
                                 new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE,0,4,0,0),
                                 NettyCodecAdapter.getCodecAdapter().getDecoder(Request.class),
                                 NettyCodecAdapter.getCodecAdapter().getEncoder(Response.class),
-                                handler
+                                new NettyServerHandler(serverHandler)
                         );
                     }
                 });

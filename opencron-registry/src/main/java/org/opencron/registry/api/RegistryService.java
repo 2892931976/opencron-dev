@@ -23,8 +23,6 @@ package org.opencron.registry.api;
 
 import org.opencron.registry.URL;
 
-import java.util.List;
-
 /**
  *
  * @author benjobs

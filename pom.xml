@@ -7,7 +7,7 @@
 
     <groupId>org.opencron</groupId>
     <artifactId>opencron</artifactId>
-    <version>1.1.0-RELEASE</version>
+    <version>1.2.0-RELEASE</version>
     <modules>
         <module>opencron-common</module>
        <!-- <module>opencron-config</module>-->

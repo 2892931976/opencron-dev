@@ -74,13 +74,6 @@ public class NettyClient implements Client {
 
     @Override
     public void connect() {
-        final NettyClientHandler nettyClientHandler = new NettyClientHandler(new Promise.Getter() {
-            @Override
-            public Promise getPromise(Integer id) {
-                return promiseTable.get(id);
-            }
-        });
-
         bootstrap.group(nioEventLoopGroup)
                 .channel(NioSocketChannel.class)
                 .option(ChannelOption.TCP_NODELAY, Boolean.TRUE)//压榨性能
@@ -91,7 +84,12 @@ public class NettyClient implements Client {
                         channel.pipeline().addLast(
                                 NettyCodecAdapter.getCodecAdapter().getDecoder(Response.class),
                                 NettyCodecAdapter.getCodecAdapter().getEncoder(Request.class),
-                                nettyClientHandler
+                                new NettyClientHandler(new Promise.Getter() {
+                                    @Override
+                                    public Promise getPromise(Integer id) {
+                                        return promiseTable.get(id);
+                                    }
+                                })
                         );
                     }
                 });
