@@ -14,7 +14,7 @@ public class Startup {
 
     private final static String artifactName = "opencron-server";
 
-    private static int startPort = 8080;
+    private static int startPort = 8090;
 
     public static void main(String[] args) {
 
@@ -42,7 +42,7 @@ public class Startup {
             appContext.setResourceBase(baseDir + "/src/main/webapp");
         }
         appContext.setThrowUnavailableOnStartupException(true);	// 在启动过程中允许抛出异常终止启动并退出 JVM
-        appContext.setContextPath("/");
+        appContext.setContextPath(".");
         appContext.setInitParameter("org.eclipse.jetty.servlet.Default.dirAllowed", "false");
         appContext.setInitParameter("org.eclipse.jetty.servlet.Default.useFileMappedBuffer", "false");
 

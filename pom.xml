@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
@@ -10,10 +10,10 @@
     <version>1.2.0-RELEASE</version>
     <modules>
         <module>opencron-common</module>
-       <!-- <module>opencron-config</module>-->
+        <!-- <module>opencron-config</module>-->
         <module>opencron-registry</module>
         <module>opencron-rpc</module>
-      <!--  <module>opencron-examples</module>-->
+        <!--  <module>opencron-examples</module>-->
         <module>opencron-api</module>
         <module>opencron-agent</module>
         <module>opencron-server</module>
@@ -316,6 +316,12 @@
             </dependency>
 
             <dependency>
+                <groupId>taglibs</groupId>
+                <artifactId>standard</artifactId>
+                <version>1.1.2</version>
+            </dependency>
+
+            <dependency>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-util</artifactId>
                 <version>9.4.7.v20170914</version>
@@ -325,42 +331,48 @@
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-webapp</artifactId>
                 <version>9.4.7.v20170914</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>javax.servlet</groupId>
+                        <artifactId>javax.servlet-api</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
             <dependency>
                 <groupId>org.eclipse.jetty.websocket</groupId>
                 <artifactId>websocket-server</artifactId>
                 <version>9.4.7.v20170914</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>javax.servlet</groupId>
+                        <artifactId>javax.servlet-api</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
             <dependency>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-server</artifactId>
                 <version>9.4.7.v20170914</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.eclipse.jetty</groupId>
-                <artifactId>jetty-jsp-2.1</artifactId>
-                <version>7.5.4.v20111024</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>javax.servlet</groupId>
+                        <artifactId>javax.servlet-api</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
             <dependency>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-jsp</artifactId>
-                <version>9.2.21.v20170120</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.mortbay.jetty</groupId>
-                <artifactId>jsp-2.1-jetty</artifactId>
-                <version>6.1.26.hwx</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.mortbay.jetty</groupId>
-                <artifactId>jsp-2.1-glassfish</artifactId>
-                <version>2.1.v20100127</version>
+                <version>9.2.22.v20170606</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.glassfish.web</groupId>
+                        <artifactId>javax.servlet.jsp.jstl</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
             <dependency>
