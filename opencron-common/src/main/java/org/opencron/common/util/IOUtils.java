@@ -378,4 +378,10 @@ public abstract class IOUtils implements Serializable {
 
         return  ((File)file).exists();
     }
+
+    public static String getCurrentPath(Class type) {
+        AssertUtils.notNull(type);
+        return  type.getProtectionDomain().getCodeSource().getLocation().getFile();
+    }
+
 }
