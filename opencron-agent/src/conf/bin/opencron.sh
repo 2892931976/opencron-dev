@@ -127,10 +127,6 @@ case $OPENCRON_BASE in
 esac
 
 
-
-
-
-
 # For OS400
 if $os400; then
   # Set job priority to standard for interactive (interactive - 6) by using
