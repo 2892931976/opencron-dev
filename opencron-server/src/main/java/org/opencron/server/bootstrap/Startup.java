@@ -78,8 +78,8 @@ public class Startup {
 
     private static class JspStarter extends AbstractLifeCycle implements ServletContextHandler.ServletContainerInitializerCaller {
 
-        JettyJasperInitializer jasperInitializer;
-        ServletContextHandler context;
+        private JettyJasperInitializer jasperInitializer;
+        private ServletContextHandler context;
 
         public JspStarter(ServletContextHandler context) {
             this.jasperInitializer = new JettyJasperInitializer();
@@ -98,6 +98,7 @@ public class Startup {
                 Thread.currentThread().setContextClassLoader(old);
             }
         }
+
     }
 
 }
