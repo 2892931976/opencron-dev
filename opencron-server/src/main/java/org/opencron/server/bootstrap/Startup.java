@@ -1,6 +1,5 @@
 package org.opencron.server.bootstrap;
 
-
 import org.apache.tomcat.util.scan.StandardJarScanner;
 import org.eclipse.jetty.apache.jsp.JettyJasperInitializer;
 import org.eclipse.jetty.jsp.JettyJspServlet;
@@ -15,9 +14,9 @@ import java.io.File;
 
 public class Startup {
 
-    private final static String warName = "opencron-server.war";
+    private static final String warName = "opencron-server.war";
 
-    private final static String artifactName = "opencron-server";
+    private static final String artifactName = "opencron-server";
 
     private static int startPort = 8090;
 
