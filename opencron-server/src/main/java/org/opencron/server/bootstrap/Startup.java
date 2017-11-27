@@ -25,7 +25,7 @@ public class Startup {
 
     public static void main(String[] args) {
 
-        System.setProperty("catalina.home","./".concat(artifactName));
+        System.setProperty("catalina.home", "./".concat(artifactName));
 
         Logger logger = LoggerFactory.getLogger(Startup.class);
 
@@ -37,15 +37,15 @@ public class Startup {
         //add jetty jar...
         ExtClasspathLoader.loadJarByPath("/Users/benjobs/GitHub/opencron-dev/opencron-server/lib");
 
-        if ( CommonUtils.notEmpty(args) ) {
+        if (CommonUtils.notEmpty(args)) {
             Integer port = CommonUtils.toInt(args[0]);
             if (port == null || NetUtils.isInvalidPort(port)) {
-                throw new IllegalArgumentException("[opencron] server port error: " + port );
+                throw new IllegalArgumentException("[opencron] server port error: " + port);
             }
             startPort = port;
-            logger.info("[opencron]Server At port {} Starting...",startPort);
-        }else {
-            logger.info("[opencron]Server At default port {} Starting...",startPort);
+            logger.info("[opencron]Server At port {} Starting...", startPort);
+        } else {
+            logger.info("[opencron]Server At default port {} Starting...", startPort);
         }
 
         Server server = new Server(startPort);
@@ -55,7 +55,7 @@ public class Startup {
         appContext.setWar(warFile.getAbsolutePath());
 
         //init param
-        appContext.setThrowUnavailableOnStartupException(true);	// 在启动过程中允许抛出异常终止启动并退出 JVM
+        appContext.setThrowUnavailableOnStartupException(true);    // 在启动过程中允许抛出异常终止启动并退出 JVM
         appContext.setInitParameter("org.eclipse.jetty.servlet.Default.dirAllowed", "false");
         appContext.setInitParameter("org.eclipse.jetty.servlet.Default.useFileMappedBuffer", "false");
 
