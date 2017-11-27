@@ -10,7 +10,6 @@
     <packaging>war</packaging>
     <name>opencron-server</name>
     <dependencies>
-
         <dependency>
             <groupId>org.opencron</groupId>
             <artifactId>opencron-common</artifactId>
@@ -98,11 +97,18 @@
             <scope>provided</scope>
         </dependency>
 
-       <dependency>
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-servlet</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <!--和tomcat有冲突.-->
+        <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>apache-jsp</artifactId>
-           <scope>provided</scope>
-       </dependency>
+            <scope>provided</scope>
+        </dependency>
 
     </dependencies>
 
