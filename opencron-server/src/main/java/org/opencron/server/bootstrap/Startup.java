@@ -47,10 +47,11 @@ public class Startup {
             appContext.setResourceBase(baseDir + "/src/main/webapp");
         }
 
-        // JSP 相关
+        //for jsp support
         appContext.addBean(new JspStarter(appContext));
         appContext.addServlet(JettyJspServlet.class, "*.jsp");
 
+        //init param
         appContext.setThrowUnavailableOnStartupException(true);	// 在启动过程中允许抛出异常终止启动并退出 JVM
         appContext.setInitParameter("org.eclipse.jetty.servlet.Default.dirAllowed", "false");
         appContext.setInitParameter("org.eclipse.jetty.servlet.Default.useFileMappedBuffer", "false");
@@ -70,11 +71,11 @@ public class Startup {
 
     private static class JspStarter extends AbstractLifeCycle implements ServletContextHandler.ServletContainerInitializerCaller {
 
-        JettyJasperInitializer sci;
+        JettyJasperInitializer jasperInitializer;
         ServletContextHandler context;
 
         public JspStarter(ServletContextHandler context) {
-            this.sci = new JettyJasperInitializer();
+            this.jasperInitializer = new JettyJasperInitializer();
             this.context = context;
             this.context.setAttribute("org.apache.tomcat.JarScanner", new StandardJarScanner());
         }
@@ -84,7 +85,7 @@ public class Startup {
             ClassLoader old = Thread.currentThread().getContextClassLoader();
             Thread.currentThread().setContextClassLoader(context.getClassLoader());
             try {
-                sci.onStartup(null, context.getServletContext());
+                jasperInitializer.onStartup(null, context.getServletContext());
                 super.doStart();
             } finally {
                 Thread.currentThread().setContextClassLoader(old);
