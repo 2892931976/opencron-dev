@@ -79,6 +79,7 @@
         <zookeeper.version>3.4.11</zookeeper.version>
         <curator.version>4.0.0</curator.version>
         <zkclient.version>0.10</zkclient.version>
+        <jetty.version>9.4.7.v20170914</jetty.version>
     </properties>
 
     <dependencies>
@@ -319,16 +320,17 @@
                 <version>1.1.2</version>
             </dependency>
 
+            <!--jetty-->
             <dependency>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-util</artifactId>
-                <version>9.4.3.v20170317</version>
+                <version>${jetty.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-webapp</artifactId>
-                <version>9.4.3.v20170317</version>
+                <version>${jetty.version}</version>
                 <exclusions>
                     <exclusion>
                         <groupId>javax.servlet</groupId>
@@ -340,7 +342,7 @@
             <dependency>
                 <groupId>org.eclipse.jetty.websocket</groupId>
                 <artifactId>websocket-server</artifactId>
-                <version>9.4.3.v20170317</version>
+                <version>${jetty.version}</version>
                 <exclusions>
                     <exclusion>
                         <groupId>javax.servlet</groupId>
@@ -352,13 +354,13 @@
             <dependency>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-unixsocket</artifactId>
-                <version>9.4.3.v20170317</version>
+                <version>${jetty.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-server</artifactId>
-                <version>9.4.3.v20170317</version>
+                <version>${jetty.version}</version>
                 <exclusions>
                     <exclusion>
                         <groupId>javax.servlet</groupId>
@@ -370,13 +372,13 @@
             <dependency>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>apache-jsp</artifactId>
-                <version>9.4.3.v20170317</version>
+                <version>${jetty.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-servlet</artifactId>
-                <version>9.4.3.v20170317</version>
+                <version>${jetty.version}</version>
             </dependency>
 
             <dependency>
