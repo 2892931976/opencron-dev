@@ -184,8 +184,8 @@ do
   CLASSPATH="$CLASSPATH":"$jar"
 done
 
-EXT_LIB=$WORKDIR/$APP_ARTIFACT/lib
-for jar in $EXT_LIB/*
+JETTY_LIB="$WORKDIR"/$APP_ARTIFACT/jettylib
+for jar in $JETTY_LIB/*
 do
   CLASSPATH="$CLASSPATH":"$jar"
 done
