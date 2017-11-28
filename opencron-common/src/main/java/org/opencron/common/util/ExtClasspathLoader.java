@@ -70,7 +70,7 @@ public final class ExtClasspathLoader {
         }
     }
 
-    public static void loadJarByPath(String path) {
+    public static void loadJar(String path) {
         File jarDir = new File(path);
         if (!jarDir.exists()) {
             throw new IllegalArgumentException("[opencron] jarPath is not exists");

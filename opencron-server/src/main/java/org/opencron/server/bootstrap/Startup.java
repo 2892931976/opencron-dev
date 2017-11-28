@@ -24,7 +24,7 @@ public class Startup {
         //add jetty jar...
         String jettyJarPath = "./"+artifactName+"/target/jettylib";
 
-        ExtClasspathLoader.loadJarByPath(jettyJarPath);
+        ExtClasspathLoader.loadJar(jettyJarPath);
 
         JettyLauncher jettyLauncher = new JettyLauncher();
         jettyLauncher.start(warFile.getPath(),args);
