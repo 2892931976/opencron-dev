@@ -21,7 +21,7 @@ public class JettyLauncher {
 
     private static int startPort = 8080;
 
-    public void start(String artifactName,File warFile, String[] args) {
+    public void start(String artifact,File warFile,boolean launcher, String[] args) {
 
         if (CommonUtils.notEmpty(args)) {
             Integer port = CommonUtils.toInt(args[0]);
@@ -39,12 +39,17 @@ public class JettyLauncher {
         WebAppContext appContext = new WebAppContext();
 
         //war存在
-        if (warFile.exists()) {
+        if (CommonUtils.notEmpty(warFile)) {
             appContext.setWar(warFile.getAbsolutePath());
         }else {
-            String baseDir = "./".concat(artifactName);
-            appContext.setDescriptor(baseDir + "/src/main/webapp/WEB-INF/web.xml");
-            appContext.setResourceBase(baseDir + "/src/main/webapp");
+            if (launcher) {
+                appContext.setDescriptor("./WEB-INF/web.xml");
+                appContext.setResourceBase("./");
+            }else {
+                String baseDir = "./".concat(artifact);
+                appContext.setDescriptor(baseDir + "/src/main/webapp/WEB-INF/web.xml");
+                appContext.setResourceBase(baseDir + "/src/main/webapp");
+            }
         }
 
         //init param

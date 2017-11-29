@@ -161,40 +161,40 @@ APP_ARTIFACT=opencron-server
 
 APP_VERSION="1.2.0-RELEASE";
 
-APP_NAME=$APP_ARTIFACT-$APP_VERSION
+APP_WAR_NAME=${APP_ARTIFACT}.war
 
-APP_PATH="$WORKDIR"/$APP_ARTIFACT/target/$APP_NAME
+MAVEN_TARGET_WAR="${WORKDIR}"/${APP_ARTIFACT}/target/${APP_WAR_NAME}
 
-if [ ! -d "$APP_PATH" ];then
-   echo_r "[opencron] please build project first!"
-   exit 1;
+DIST_PATH=${WORKDIR}/dist/
+
+[ ! -d "${DIST_PATH}" ] && mkdir -p "${DIST_PATH}"
+
+DEPLOY_PATH=${WORKDIR}/dist/opencron-server
+
+STARTUP_SHELL=${WORKDIR}/${APP_ARTIFACT}/startup.sh
+
+#先检查dist下是否有war包
+if [ ! -f "${DIST_PATH}/${APP_WAR_NAME}" ] ; then
+    #dist下没有war包则检查server的target下是否有war包.
+   if [ ! -f "${MAVEN_TARGET_WAR}" ] ; then
+      echo_w "[opencron] please build project first!"
+      exit 0;
+   else
+      cp ${MAVEN_TARGET_WAR} ${DIST_PATH};
+   fi
 fi
 
-LIB_PATH="$APP_PATH"/WEB-INF/lib
+[ -d "${DEPLOY_PATH}" ] && rm -rf ${DEPLOY_PATH}/* || mkdir -p ${DEPLOY_PATH}
 
-# Add jars to classpath
-if [ ! -z "$CLASSPATH" ] ; then
-  CLASSPATH="$CLASSPATH":
-fi
-CLASSPATH="$CLASSPATH""$APP_PATH"/WEB-INF/classes
+#将target下的war包解到dist下
+cp ${DIST_PATH}/${APP_WAR_NAME} ${DEPLOY_PATH} && cd ${DEPLOY_PATH} && jar xvf ${APP_WAR_NAME} && rm -rf ${DEPLOY_PATH}/${APP_WAR_NAME}
 
-for jar in $LIB_PATH/*
-do
-  CLASSPATH="$CLASSPATH":"$jar"
-done
+#copy jettyJar
+mkdir ${DEPLOY_PATH}/jetty && cp ${WORKDIR}/${APP_ARTIFACT}/jetty/*.jar ${DEPLOY_PATH}/jetty
 
-LOG_PATH="$WORKDIR"/$APP_ARTIFACT/logs
+#copy startup.sh
+cp  ${STARTUP_SHELL} ${DEPLOY_PATH}
 
-#start JettyServer....
-echo_g "[opencron] server Starting...."
-
-eval "\"$RUNJAVA\"" \
-        -classpath "\"$CLASSPATH\"" \
-        org.opencron.server.bootstrap.Startup $1 \
-        >/dev/null 2>&1 "&";
-
-echo_g "[opencron] please see log for more detail: $LOG_PATH/opencron.out "
-
-exit $?
-
+#startup
+/bin/bash +x "${DEPLOY_PATH}/startup.sh" "$@"
 

@@ -2,27 +2,33 @@ package org.opencron.server.bootstrap;
 
 import org.opencron.common.util.ExtClasspathLoader;
 import org.opencron.common.util.MavenUtils;
+
 import java.io.File;
 
 public class Startup {
 
     public static void main(String[] args) {
 
-        MavenUtils mavenUtils = MavenUtils.get(Startup.class.getClassLoader());
+        MavenUtils mavenUtils = MavenUtils.get(Thread.currentThread().getContextClassLoader());
 
-        String artifactName = mavenUtils.getArtifactId();
+        String launcher = System.getProperty("server.launcher");
 
-        System.setProperty("catalina.home", "./".concat(artifactName));
+        String artifact = null;
+        String jettyJarPath = null;
+        File warFile = null;
 
-        //add jetty jar...
-        String jettyJarPath = "./"+artifactName+"/jetty-lib";
-
+        if (launcher == null) {
+            artifact = mavenUtils.getArtifactId();
+            jettyJarPath = "./".concat(artifact).concat("/jetty");
+            warFile = new File( "./".concat(artifact).concat("/target/").concat(artifact).concat(".war") );
+            System.setProperty("catalina.home","./".concat(artifact));
+        }else if (launcher.equals("jetty")){
+            jettyJarPath = "./jetty";
+            System.setProperty("catalina.home","./");
+        }
         ExtClasspathLoader.scanJar(jettyJarPath);
-
-        File warFile = new File("./".concat(artifactName).concat("/target/").concat(artifactName.concat(".war")));
-
         JettyLauncher jettyLauncher = new JettyLauncher();
-        jettyLauncher.start(artifactName,warFile,args);
+        jettyLauncher.start(artifact,warFile,launcher!=null,args);
 
     }
 

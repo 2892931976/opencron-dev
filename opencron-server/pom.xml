@@ -223,7 +223,7 @@
                         </dependency>
 
                     </artifactItems>
-                    <outputDirectory>${project.build.directory}/../jetty-lib</outputDirectory>
+                    <outputDirectory>${project.build.directory}/../jetty</outputDirectory>
                 </configuration>
             </plugin>
 
