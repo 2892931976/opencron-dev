@@ -42,10 +42,12 @@ public class JettyLauncher {
         if (CommonUtils.notEmpty(warFile)) {
             appContext.setWar(warFile.getAbsolutePath());
         }else {
+            //通过脚本启动器启动的服务
             if (launcher) {
                 appContext.setDescriptor("./WEB-INF/web.xml");
                 appContext.setResourceBase("./");
             }else {
+                //开发者模式...
                 String baseDir = "./".concat(artifact);
                 appContext.setDescriptor(baseDir + "/src/main/webapp/WEB-INF/web.xml");
                 appContext.setResourceBase(baseDir + "/src/main/webapp");
