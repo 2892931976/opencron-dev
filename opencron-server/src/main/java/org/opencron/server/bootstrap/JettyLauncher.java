@@ -13,13 +13,15 @@ import org.opencron.common.util.NetUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+
 public class JettyLauncher {
 
     private  Logger logger = LoggerFactory.getLogger(Startup.class);
 
     private static int startPort = 8080;
 
-    public void start(String warPath,String[] args) {
+    public void start(String artifactName,File warFile, String[] args) {
 
         if (CommonUtils.notEmpty(args)) {
             Integer port = CommonUtils.toInt(args[0]);
@@ -36,7 +38,14 @@ public class JettyLauncher {
 
         WebAppContext appContext = new WebAppContext();
 
-        appContext.setWar(warPath);
+        //war存在
+        if (warFile.exists()) {
+            appContext.setWar(warFile.getAbsolutePath());
+        }else {
+            String baseDir = "./".concat(artifactName);
+            appContext.setDescriptor(baseDir + "/src/main/webapp/WEB-INF/web.xml");
+            appContext.setResourceBase(baseDir + "/src/main/webapp");
+        }
 
         //init param
         appContext.setThrowUnavailableOnStartupException(true);    // 在启动过程中允许抛出异常终止启动并退出 JVM

@@ -12,22 +12,17 @@ public class Startup {
 
         String artifactName = mavenUtils.getArtifactId();
 
-        String warName = artifactName.concat(".war");
-
         System.setProperty("catalina.home", "./".concat(artifactName));
 
-        File warFile = new File("./".concat(artifactName).concat("/target/").concat(warName));
-        if (!warFile.exists()) {
-            throw new IllegalArgumentException("[opencron] start server error,please build project with maven first!");
-        }
-
         //add jetty jar...
-        String jettyJarPath = "./"+artifactName+"/target/jettylib";
+        String jettyJarPath = "./"+artifactName+"/jetty-lib";
 
-        ExtClasspathLoader.loadJar(jettyJarPath);
+        ExtClasspathLoader.scanJar(jettyJarPath);
+
+        File warFile = new File("./".concat(artifactName).concat("/target/").concat(artifactName.concat(".war")));
 
         JettyLauncher jettyLauncher = new JettyLauncher();
-        jettyLauncher.start(warFile.getPath(),args);
+        jettyLauncher.start(artifactName,warFile,args);
 
     }
 

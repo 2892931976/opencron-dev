@@ -129,7 +129,6 @@ if [ $? -ne 1 ];then
   exit 1;
 fi
 
-
 # OS specific support.  $var _must_ be set to either true or false.
 cygwin=false
 darwin=false
@@ -180,12 +179,6 @@ fi
 CLASSPATH="$CLASSPATH""$APP_PATH"/WEB-INF/classes
 
 for jar in $LIB_PATH/*
-do
-  CLASSPATH="$CLASSPATH":"$jar"
-done
-
-JETTY_LIB="$WORKDIR"/$APP_ARTIFACT/jettylib
-for jar in $JETTY_LIB/*
 do
   CLASSPATH="$CLASSPATH":"$jar"
 done
