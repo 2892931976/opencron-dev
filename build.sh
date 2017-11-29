@@ -149,7 +149,7 @@ $MVN clean install -Dmaven.test.skip=true;
 retval=$?
 
 if [ ${retval} -eq 0 ] ; then
-    [ ! -d "${DIST_HOME}" ] && mkdir ${DIST_HOME};
+    [ ! -d "${DIST_HOME}" ] && mkdir ${DIST_HOME} || rm -rf  ${DIST_HOME}/* ;
     cp ${WORKDIR}/opencron-agent/target/opencron-agent-${OPENCRON_VERSION}.tar.gz ${DIST_HOME}
     cp ${WORKDIR}/opencron-server/target/opencron-server.war ${DIST_HOME}
     echo -e "[${GREEN_COLOR}opencron${RES}] ${WHITE_COLOR}build opencron @ Version ${BLUE_COLOR}${OPENCRON_VERSION}${RES} successfully! please goto${RES} ${GREEN_COLOR}${DIST_HOME}${RES}"
