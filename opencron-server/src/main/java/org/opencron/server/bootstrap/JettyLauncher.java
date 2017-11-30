@@ -9,7 +9,6 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.util.component.AbstractLifeCycle;
 import org.eclipse.jetty.webapp.WebAppContext;
 import org.opencron.common.util.CommonUtils;
-import org.opencron.common.util.NetUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,20 +18,7 @@ public class JettyLauncher {
 
     private  Logger logger = LoggerFactory.getLogger(Startup.class);
 
-    private static int startPort = 8080;
-
-    public void start(String artifact,File warFile,boolean launcher, String[] args) {
-
-        if (CommonUtils.notEmpty(args)) {
-            Integer port = CommonUtils.toInt(args[0]);
-            if (port == null || NetUtils.isInvalidPort(port)) {
-                throw new IllegalArgumentException("[opencron] server port error: " + port);
-            }
-            startPort = port;
-            logger.info("[opencron]Server At port {} Starting...", startPort);
-        } else {
-            logger.info("[opencron]Server At default port {} Starting...", startPort);
-        }
+    public void start(String artifact,File warFile,boolean launcher, int startPort) {
 
         Server server = new Server(startPort);
 
