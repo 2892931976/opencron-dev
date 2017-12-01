@@ -1,5 +1,6 @@
 package org.opencron.server.bootstrap;
 
+import org.opencron.common.ext.ExtensionLoader;
 import org.opencron.common.util.ExtClasspathLoader;
 import org.opencron.common.util.MavenUtils;
 
@@ -15,60 +16,45 @@ public class Startup {
 
     private static boolean devMode = true;
 
-    private static Launcher launcher;
+    public static void main(String[] args) throws Exception {
 
-    public static void main(String[] args)throws Exception {
-
-        String portParam = System.getProperty("port");
+        String portParam = System.getProperty("server.port");
 
         if (portParam == null ) {
-            System.out.printf("[opencron]Server At default port {} Starting...", startPort);
+            System.out.printf("[opencron]Server At default port %d Starting...", startPort);
         }else {
             try {
                 startPort = Integer.parseInt(portParam);
                 if (startPort <= MIN_PORT || startPort > MAX_PORT) {
                     throw new IllegalArgumentException("[opencron] server port error: " + portParam);
                 }
-                System.out.printf("[opencron]TomcatServer At port {} Starting...", startPort);
+                System.out.printf("[opencron]server At port %d Starting...", startPort);
             }catch (NumberFormatException e) {
                 throw new IllegalArgumentException("[opencron] server port error: " + portParam);
             }
         }
 
-        String dev = System.getProperty("dev");
+        String launcher = System.getProperty("server.launcher");
 
-        devMode =  ( dev == null || dev.trim().equals("false") ) ? false : true;
+        devMode =  ( launcher == null ) ? true : false;
 
-        String startLauncher = System.getProperty("launcher");
+        launcher = (launcher == null||launcher.trim().equals("tomcat")) ? "tomcat":"jetty";
 
-        startLauncher = (startLauncher == null||startLauncher.trim().equals("tomcat")) ? "tomcat":"jetty";
-
-        initEnv(startLauncher);
-
-        launcher.start(devMode,startPort);
-
-    }
-
-    private static void initEnv(String startLauncher) {
-        String jarPath = null;
+        String jarPath;
         if (devMode) {
             String artifact =  MavenUtils.get(Thread.currentThread().getContextClassLoader()).getArtifactId();
-            if (startLauncher.equals("jetty")) {
-                jarPath = "./".concat(artifact).concat("/jetty");
-            }else {//tomcat...
-                jarPath = "./".concat(artifact).concat("/tomcat");
-            }
+            jarPath = "./".concat(artifact).concat("/").concat(launcher);
             System.setProperty("catalina.home","./".concat(artifact));
         }else {
-            if (startLauncher.equals("jetty")) {
-                jarPath = "./jetty";
-            }else {//tomcat
-                jarPath = "./tomcat";
-            }
+            jarPath = "./".concat(launcher);
             System.setProperty("catalina.home","./");
         }
         //load jars.
         ExtClasspathLoader.scanJar(jarPath);
+
+        Launcher startLauncher = ExtensionLoader.load(Launcher.class,launcher);
+
+        startLauncher.start(devMode,startPort);
 
     }
 

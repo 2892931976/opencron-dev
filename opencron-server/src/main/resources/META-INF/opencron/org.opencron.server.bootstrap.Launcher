@@ -1,0 +1,2 @@
+jetty=org.opencron.server.bootstrap.JettyLauncher
+tomcat=org.opencron.server.bootstrap.TomcatLauncher

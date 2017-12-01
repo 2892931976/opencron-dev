@@ -4,16 +4,24 @@ package org.opencron.server.bootstrap;
 import org.apache.catalina.core.AprLifecycleListener;
 import org.apache.catalina.core.StandardServer;
 import org.apache.catalina.startup.Tomcat;
+import org.opencron.common.util.MavenUtils;
 
 import java.io.File;
 
-public class TomcatLauncher implements Launcher{
+public class TomcatLauncher implements Launcher {
 
-    public void startup(String artifct,int startPort) throws Exception {
+    @Override
+    public void start(boolean devMode,int port) throws Exception {
 
         //get webapp path...
-        String webappPath = "./".concat(artifct).concat("/src/main/webapp/");
-        File webApp = new File(webappPath);
+        File webApp = new File("./");
+        String baseDir = ".";
+        if (devMode) {
+            String artifact = MavenUtils.get(Thread.currentThread().getContextClassLoader()).getArtifactId();
+            baseDir = "./".concat(artifact);
+            String webAppPath = baseDir.concat("/src/main/webapp/");
+            webApp = new File(webAppPath);
+        }
 
         //appBase
         String appBase = System.getProperty("user.dir") + File.separator + ".";
@@ -21,8 +29,8 @@ public class TomcatLauncher implements Launcher{
         Tomcat tomcat = new Tomcat();
 
         tomcat.setHostname("localhost");
-        tomcat.setPort(startPort);
-        tomcat.setBaseDir(".");
+        tomcat.setPort(port);
+        tomcat.setBaseDir(baseDir);
 
         StandardServer server = (StandardServer) tomcat.getServer();
         AprLifecycleListener listener = new AprLifecycleListener();
@@ -32,11 +40,6 @@ public class TomcatLauncher implements Launcher{
 
         tomcat.start();
         tomcat.getServer().await();
-    }
-
-    @Override
-    public void start(boolean devMode,int port) {
-
     }
 
     @Override

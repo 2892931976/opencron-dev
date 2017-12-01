@@ -8,13 +8,9 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.util.component.AbstractLifeCycle;
 import org.eclipse.jetty.webapp.WebAppContext;
-import org.opencron.common.util.CommonUtils;
-import org.opencron.common.util.ExtClasspathLoader;
 import org.opencron.common.util.MavenUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.File;
 
 public class JettyLauncher implements Launcher{
 
@@ -22,40 +18,19 @@ public class JettyLauncher implements Launcher{
 
     public void start(boolean devMode,int port) {
 
-
         Server server = new Server(port);
 
         WebAppContext appContext = new WebAppContext();
 
-
-        File warFile = null;
-        String artifact = null;
-
+        //开发者模式
         if (devMode) {
-            artifact =  MavenUtils.get(Thread.currentThread().getContextClassLoader()).getArtifactId();
-            warFile = new File( "./".concat(artifact).concat("/target/").concat(artifact).concat(".war") );
-            if (CommonUtils.notEmpty(warFile)) {
-                appContext.setWar(warFile.getAbsolutePath());
-            }
+            String artifact = MavenUtils.get(Thread.currentThread().getContextClassLoader()).getArtifactId();
+            String baseDir = "./".concat(artifact);
+            appContext.setDescriptor(baseDir + "/src/main/webapp/WEB-INF/web.xml");
+            appContext.setResourceBase(baseDir + "/src/main/webapp");
         }else {
-
-        }
-
-
-
-        //war存在
-        if (CommonUtils.notEmpty(warFile)) {
-            appContext.setWar(warFile.getAbsolutePath());
-        }else {
-            if (devMode) {
-                //开发者模式...
-                String baseDir = "./".concat(artifact);
-                appContext.setDescriptor(baseDir + "/src/main/webapp/WEB-INF/web.xml");
-                appContext.setResourceBase(baseDir + "/src/main/webapp");
-            }else {
-                appContext.setDescriptor("./WEB-INF/web.xml");
-                appContext.setResourceBase("./");
-            }
+            appContext.setDescriptor("./WEB-INF/web.xml");
+            appContext.setResourceBase("./");
         }
 
         //init param
@@ -74,6 +49,7 @@ public class JettyLauncher implements Launcher{
         server.setStopAtShutdown(true);
         server.setHandler(appContext);
         try {
+            logger.info("[opencron] JettyLauncher starting...");
             server.start();
         } catch (Exception e) {
             e.printStackTrace();
