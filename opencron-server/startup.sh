@@ -182,10 +182,10 @@ eval "\"$RUNJAVA\"" \
         -classpath "\"$CLASSPATH\"" \
         -Dserver.launcher=tomcat \
         org.opencron.server.bootstrap.Startup $1 \
-        #>/dev/null 2>&1 "&";
+        >/dev/null 2>&1 "&";
 
-#echo_g "[opencron] please see log for more detail: $LOG_PATH/opencron.out "
+echo_g "[opencron] please see log for more detail: $LOG_PATH/opencron.out "
 
-#exit $?
+exit $?
 
 
