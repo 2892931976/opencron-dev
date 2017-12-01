@@ -9,34 +9,52 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.util.component.AbstractLifeCycle;
 import org.eclipse.jetty.webapp.WebAppContext;
 import org.opencron.common.util.CommonUtils;
+import org.opencron.common.util.ExtClasspathLoader;
+import org.opencron.common.util.MavenUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 
-public class JettyLauncher {
+public class JettyLauncher implements Launcher{
 
     private  Logger logger = LoggerFactory.getLogger(Startup.class);
 
-    public void start(String artifact,File warFile,boolean launcher, int startPort) {
+    public void start(boolean devMode,int port) {
 
-        Server server = new Server(startPort);
+
+        Server server = new Server(port);
 
         WebAppContext appContext = new WebAppContext();
+
+
+        File warFile = null;
+        String artifact = null;
+
+        if (devMode) {
+            artifact =  MavenUtils.get(Thread.currentThread().getContextClassLoader()).getArtifactId();
+            warFile = new File( "./".concat(artifact).concat("/target/").concat(artifact).concat(".war") );
+            if (CommonUtils.notEmpty(warFile)) {
+                appContext.setWar(warFile.getAbsolutePath());
+            }
+        }else {
+
+        }
+
+
 
         //war存在
         if (CommonUtils.notEmpty(warFile)) {
             appContext.setWar(warFile.getAbsolutePath());
         }else {
-            //通过脚本启动器启动的服务
-            if (launcher) {
-                appContext.setDescriptor("./WEB-INF/web.xml");
-                appContext.setResourceBase("./");
-            }else {
+            if (devMode) {
                 //开发者模式...
                 String baseDir = "./".concat(artifact);
                 appContext.setDescriptor(baseDir + "/src/main/webapp/WEB-INF/web.xml");
                 appContext.setResourceBase(baseDir + "/src/main/webapp");
+            }else {
+                appContext.setDescriptor("./WEB-INF/web.xml");
+                appContext.setResourceBase("./");
             }
         }
 
@@ -60,6 +78,10 @@ public class JettyLauncher {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+    @Override
+    public void stop() {
+
     }
 
     private static class JettyJspParser extends AbstractLifeCycle implements ServletContextHandler.ServletContainerInitializerCaller {

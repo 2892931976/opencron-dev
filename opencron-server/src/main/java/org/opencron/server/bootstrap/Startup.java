@@ -13,6 +13,10 @@ public class Startup {
 
     private static int startPort = 8080;
 
+    private static boolean devMode = true;
+
+    private static Launcher launcher;
+
     public static void main(String[] args)throws Exception {
 
         String portParam = System.getProperty("port");
@@ -31,45 +35,41 @@ public class Startup {
             }
         }
 
-        String artifact = MavenUtils.get(Thread.currentThread().getContextClassLoader()).getArtifactId();;
-        String jarPath = null;
-        File warFile = null;
-
         String dev = System.getProperty("dev");
 
-        //dev model
-        if (dev == null || dev.trim().equals("true")) {
-            //start jetty...
-            jarPath = "./".concat(artifact).concat("/jetty");
-            warFile = new File( "./".concat(artifact).concat("/target/").concat(artifact).concat(".war") );
-            System.setProperty("catalina.home","./".concat(artifact));
-            ExtClasspathLoader.scanJar(jarPath);
+        devMode =  ( dev == null || dev.trim().equals("false") ) ? false : true;
 
-            JettyLauncher jettyLauncher = new JettyLauncher();
-            jettyLauncher.start(artifact,warFile,false,startPort);
-        }else {
-            //server.sh脚本启动的...
-            String launcher = System.getProperty("server.launcher");
+        String startLauncher = System.getProperty("launcher");
 
-            if (launcher.equals("jetty")) {
-                System.setProperty("catalina.home","./");
+        startLauncher = (startLauncher == null||startLauncher.trim().equals("tomcat")) ? "tomcat":"jetty";
 
-                jarPath = "./jetty";
-                ExtClasspathLoader.scanJar(jarPath);
+        initEnv(startLauncher);
 
-                JettyLauncher jettyLauncher = new JettyLauncher();
-                jettyLauncher.start(artifact,warFile,true,startPort);
-            }else if(launcher.equals("tomcat")){
-                System.setProperty("catalina.home","./".concat(artifact));
+        launcher.start(devMode,startPort);
 
-                jarPath = "./tomcat";
-                ExtClasspathLoader.scanJar(jarPath);
+    }
 
-                TomcatLauncher tomcatLauncher = new TomcatLauncher();
-                tomcatLauncher.startup(artifact,startPort);
+    private static void initEnv(String startLauncher) {
+        String jarPath = null;
+        if (devMode) {
+            String artifact =  MavenUtils.get(Thread.currentThread().getContextClassLoader()).getArtifactId();
+            if (startLauncher.equals("jetty")) {
+                jarPath = "./".concat(artifact).concat("/jetty");
+            }else {//tomcat...
+                jarPath = "./".concat(artifact).concat("/tomcat");
             }
-
+            System.setProperty("catalina.home","./".concat(artifact));
+        }else {
+            if (startLauncher.equals("jetty")) {
+                jarPath = "./jetty";
+            }else {//tomcat
+                jarPath = "./tomcat";
+            }
+            System.setProperty("catalina.home","./");
         }
+        //load jars.
+        ExtClasspathLoader.scanJar(jarPath);
+
     }
 
 }

@@ -7,7 +7,7 @@ import org.apache.catalina.startup.Tomcat;
 
 import java.io.File;
 
-public class TomcatLauncher {
+public class TomcatLauncher implements Launcher{
 
     public void startup(String artifct,int startPort) throws Exception {
 
@@ -34,4 +34,13 @@ public class TomcatLauncher {
         tomcat.getServer().await();
     }
 
+    @Override
+    public void start(int port) {
+
+    }
+
+    @Override
+    public void stop() {
+
+    }
 }
