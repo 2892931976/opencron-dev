@@ -34,7 +34,7 @@ public class JettyLauncher implements Launcher{
         }
 
         //init param
-        appContext.setThrowUnavailableOnStartupException(true);    // 在启动过程中允许抛出异常终止启动并退出 JVM
+        appContext.setThrowUnavailableOnStartupException(true);
         appContext.setInitParameter("org.eclipse.jetty.servlet.Default.dirAllowed", "false");
         appContext.setInitParameter("org.eclipse.jetty.servlet.Default.useFileMappedBuffer", "false");
 
