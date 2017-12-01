@@ -180,7 +180,7 @@ echo_g "[opencron] server Starting...."
 
 eval "\"$RUNJAVA\"" \
         -classpath "\"$CLASSPATH\"" \
-        -Dserver.launcher=tomcat \
+        -Dserver.launcher=jetty \
         org.opencron.server.bootstrap.Startup $1 \
         >/dev/null 2>&1 "&";
 

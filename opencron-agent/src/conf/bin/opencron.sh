@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # Licensed to the Apache Software Foundation (ASF) under one or more
 # contributor license agreements.  See the NOTICE file distributed with
@@ -39,7 +39,7 @@
 #                   used
 # -----------------------------------------------------------------------------
 
-# opencron logo...
+#echo color
 GREEN_COLOR="\E[1;32m";
 RES="\E[0m";
 
