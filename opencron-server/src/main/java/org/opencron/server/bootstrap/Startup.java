@@ -4,8 +4,6 @@ import org.opencron.common.ext.ExtensionLoader;
 import org.opencron.common.util.ExtClasspathLoader;
 import org.opencron.common.util.MavenUtils;
 
-import java.io.File;
-
 public class Startup {
 
     private static final int MIN_PORT = 0;
