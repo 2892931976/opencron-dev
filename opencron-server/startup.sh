@@ -130,6 +130,12 @@ if [ $? -ne 1 ];then
   exit 1;
 fi
 
+#check openjdk
+if [ "`${RUNJAVA} -version 2>&1 | head -1|grep "java"|wc -l`"x == "1"x ]; then
+  echo_r "ERROR: please uninstall OpenJDK and install jdk first"
+  exit 1;
+fi
+
 # OS specific support.  $var _must_ be set to either true or false.
 cygwin=false
 darwin=false
@@ -173,7 +179,7 @@ do
   CLASSPATH="$CLASSPATH":"$jar"
 done
 
-LOG_PATH="$WORKDIR"/logs
+LOG_PATH="$WORKDIR"/work/logs
 
 #start JettyServer....
 echo_g "[opencron] server Starting...."
