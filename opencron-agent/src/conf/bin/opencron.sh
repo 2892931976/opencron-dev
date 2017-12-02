@@ -156,6 +156,20 @@ else
   fi
 fi
 
+#check java exists.
+$RUNJAVA >/dev/null 2>&1
+
+if [ $? -ne 1 ];then
+  echo_r "ERROR: java is not install,please install java first!"
+  exit 1;
+fi
+
+#check openjdk
+if [ "`${RUNJAVA} -version 2>&1 | head -1|grep "openjdk"|wc -l`"x == "1"x ]; then
+  echo_r "ERROR: please uninstall OpenJDK and install jdk first"
+  exit 1;
+fi
+
 
 if [ -z "$OPENCRON_OUT" ] ; then
   OPENCRON_OUT="$OPENCRON_BASE"/logs/opencron.out
