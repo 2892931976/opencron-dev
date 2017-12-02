@@ -14,11 +14,11 @@ public class Startup {
 
     private static final int MAX_PORT = 65535;
 
+    private static final String workspace = "work";
+
     private static int startPort = 20501;
 
     private static boolean devMode = true;
-
-    private static String workspace = "work";
 
     public static void main(String[] args) throws Exception {
 

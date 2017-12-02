@@ -6,6 +6,8 @@ import org.apache.catalina.core.StandardThreadExecutor;
 import org.apache.catalina.startup.Tomcat;
 import org.opencron.common.Constants;
 import org.opencron.common.util.MavenUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 
@@ -13,19 +15,18 @@ public class TomcatLauncher implements Launcher {
 
     private static final String currentPath = "";
 
+    private Logger logger = LoggerFactory.getLogger(JettyLauncher.class);
+
     @Override
     public void start(boolean devMode,int port) throws Exception {
 
-        //get webapp path...
-        File webApp = null;
-        String baseDir = null;
+        String baseDir =  currentPath;
+        File webApp = new File(currentPath);
+
         if (devMode) {
             String artifact = MavenUtils.get(Thread.currentThread().getContextClassLoader()).getArtifactId();
             baseDir = artifact;
             webApp = new File(baseDir+"/src/main/webapp/");
-        }else {
-            baseDir = currentPath;
-            webApp = new File(currentPath);
         }
 
         Tomcat tomcat = new Tomcat();
@@ -44,8 +45,10 @@ public class TomcatLauncher implements Launcher {
         tomcat.getConnector().getService().addExecutor(executor);
         tomcat.getServer().addLifecycleListener(new AprLifecycleListener());
 
+        logger.info("[opencron] TomcatLauncher starting...");
         tomcat.start();
         tomcat.getServer().await();
+
     }
 
     @Override

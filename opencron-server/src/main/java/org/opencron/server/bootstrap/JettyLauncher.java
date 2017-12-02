@@ -17,25 +17,21 @@ import org.opencron.common.util.MavenUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-
 public class JettyLauncher implements Launcher {
 
-    private Logger logger = LoggerFactory.getLogger(Startup.class);
+    private Logger logger = LoggerFactory.getLogger(JettyLauncher.class);
 
-    public void start(boolean devMode, int port) throws IOException {
+    public void start(boolean devMode, int port) throws Exception {
 
         Server server = new Server(new QueuedThreadPool(Constants.WEB_THREADPOOL_SIZE));
 
         WebAppContext appContext = new WebAppContext();
 
+        String resourceBasePath = "";
         //开发者模式
-        String resourceBasePath = null;
         if (devMode) {
             String artifact = MavenUtils.get(Thread.currentThread().getContextClassLoader()).getArtifactId();
             resourceBasePath = artifact + "/src/main/webapp";
-        } else {
-            resourceBasePath = "";
         }
         appContext.setDescriptor(resourceBasePath + "WEB-INF/web.xml");
         appContext.setResourceBase(resourceBasePath);
@@ -67,12 +63,8 @@ public class JettyLauncher implements Launcher {
         server.setDumpBeforeStop(false);
         server.setStopAtShutdown(true);
         server.setHandler(appContext);
-        try {
-            logger.info("[opencron] JettyLauncher starting...");
-            server.start();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        logger.info("[opencron] JettyLauncher starting...");
+        server.start();
     }
 
     @Override
