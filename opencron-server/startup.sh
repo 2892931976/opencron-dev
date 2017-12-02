@@ -130,7 +130,7 @@ if [ $? -ne 1 ];then
 fi
 
 #check openjdk
-if [ "`${RUNJAVA} -version 2>&1 | head -1|grep "java"|wc -l`"x == "1"x ]; then
+if [ "`${RUNJAVA} -version 2>&1 | head -1|grep "openjdk"|wc -l`"x == "1"x ]; then
   echo_r "ERROR: please uninstall OpenJDK and install jdk first"
   exit 1;
 fi
