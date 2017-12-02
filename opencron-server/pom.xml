@@ -166,10 +166,10 @@
                             <outputDirectory>${project.build.directory}/../work/jetty</outputDirectory>
                         </dependency>
 
-                       <dependency>
+                        <dependency>
                             <groupId>org.eclipse.jetty.websocket</groupId>
                             <artifactId>websocket-server</artifactId>
-                           <outputDirectory>${project.build.directory}/../work/jetty</outputDirectory>
+                            <outputDirectory>${project.build.directory}/../work/jetty</outputDirectory>
                         </dependency>
 
                         <dependency>
@@ -184,10 +184,10 @@
                             <outputDirectory>${project.build.directory}/../work/jetty</outputDirectory>
                         </dependency>
 
-                       <dependency>
+                        <dependency>
                             <groupId>org.eclipse.jetty.websocket</groupId>
                             <artifactId>websocket-api</artifactId>
-                           <outputDirectory>${project.build.directory}/../work/jetty</outputDirectory>
+                            <outputDirectory>${project.build.directory}/../work/jetty</outputDirectory>
                         </dependency>
 
                         <dependency>

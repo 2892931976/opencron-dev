@@ -25,7 +25,6 @@ cat<<EOT
 EOT
 echo -ne "${RES}";
 
-
 echo_r () {
     # Color red: Error, Failed
     [ $# -ne 1 ] && return 1
@@ -168,20 +167,20 @@ APP_ARTIFACT=opencron-server
 
 LIB_PATH="$WORKDIR"/WEB-INF/lib
 
+LOG_PATH="$WORKDIR"/work/logs
+
 # Add jars to classpath
 if [ ! -z "$CLASSPATH" ] ; then
   CLASSPATH="$CLASSPATH":
 fi
 CLASSPATH="$CLASSPATH""$WORKDIR"/WEB-INF/classes
 
-for jar in $LIB_PATH/*
+for jar in ${LIB_PATH}/*
 do
   CLASSPATH="$CLASSPATH":"$jar"
 done
 
-LOG_PATH="$WORKDIR"/work/logs
-
-#start JettyServer....
+#start server....
 echo_g "[opencron] server Starting...."
 
 eval "\"$RUNJAVA\"" \

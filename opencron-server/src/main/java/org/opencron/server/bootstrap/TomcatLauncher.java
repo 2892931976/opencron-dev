@@ -18,15 +18,15 @@ public class TomcatLauncher implements Launcher {
     private Logger logger = LoggerFactory.getLogger(JettyLauncher.class);
 
     @Override
-    public void start(boolean devMode,int port) throws Exception {
+    public void start(boolean devMode, int port) throws Exception {
 
-        String baseDir =  currentPath;
+        String baseDir = currentPath;
         File webApp = new File(currentPath);
 
         if (devMode) {
             String artifact = MavenUtils.get(Thread.currentThread().getContextClassLoader()).getArtifactId();
             baseDir = artifact;
-            webApp = new File(baseDir+"/src/main/webapp/");
+            webApp = new File(baseDir + "/src/main/webapp/");
         }
 
         Tomcat tomcat = new Tomcat();
