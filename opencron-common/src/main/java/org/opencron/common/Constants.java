@@ -20,6 +20,7 @@
  */
 package org.opencron.common;
 
+import org.opencron.common.util.CommonUtils;
 import org.opencron.common.util.SystemPropertyUtils;
 
 import java.io.File;
@@ -125,6 +126,8 @@ public class Constants {
                                                                     
     public static final String CHARSET_ISO88591                      = "iso-8859-1";
 
+    public static final int WEB_THREADPOOL_SIZE                     =  500;
+
     //============================== param end ==============================//
     /**
      * Name of the system property containing
@@ -171,7 +174,7 @@ public class Constants {
     public static final File OPENCRON_KILL_SHELL = new File(OPENCRON_HOME + "/bin/kill.sh");
 
 
-    public enum StatusCode implements Serializable {
+    public static enum StatusCode implements Serializable {
         SUCCESS_EXIT(0x0, "正常退出"),
         ERROR_EXIT(0x1, "异常退出"),
         ERROR_PING(-0x63, "连接失败,ping不通"),
@@ -206,7 +209,7 @@ public class Constants {
         }
     }
 
-    public enum ExecType implements Serializable {
+    public static enum ExecType implements Serializable {
 
         AUTO(0x0, "auto", "自动模式,系统调用"),
         OPERATOR(0x1, "operator", "手动模式,手动调用"),
@@ -257,7 +260,7 @@ public class Constants {
         }
     }
 
-    public enum ConnStatus implements Serializable {
+    public static enum ConnStatus implements Serializable {
         CONNECTED(0x1,"通信成功"),
         DISCONNECTED(0x0,"通信失败");
 
@@ -296,7 +299,7 @@ public class Constants {
         }
     }
 
-    public enum CronType implements Serializable {
+    public static enum CronType implements Serializable {
 
         CRONTAB(0x0, "crontab", "crontab表达式"),
         QUARTZ(0x1, "quartz", "quartz表达式");
@@ -345,7 +348,7 @@ public class Constants {
         }
     }
 
-    public enum ResultStatus {
+    public static enum ResultStatus {
         FAILED(0x0, "失败"),
         SUCCESSFUL(0x1, "成功"),
         KILLED(0x2, "被杀"),
@@ -376,7 +379,7 @@ public class Constants {
         }
     }
 
-    public enum RunStatus implements Serializable {
+    public static enum RunStatus implements Serializable {
 
         RUNNING(0x0, "running", "正在运行"),
         DONE(0x1, "done", "已完成"),
@@ -421,7 +424,7 @@ public class Constants {
         }
     }
 
-    public enum JobType implements Serializable {
+    public static enum JobType implements Serializable {
         SINGLETON(0x0, "单一任务"),
         FLOW(0x1, "流程任务");
 
@@ -460,7 +463,7 @@ public class Constants {
         }
     }
 
-    public enum MsgType {
+    public static enum MsgType {
         EMAIL(0x0, "邮件"),
         SMS(0x1, "短信"),
         WEBSITE(0x2, "站内信");
@@ -490,7 +493,7 @@ public class Constants {
         }
     }
 
-    public enum RunModel {
+    public static enum RunModel {
         SEQUENCE(0x0, "串行"),
         SAMETIME(0x1, "并行");
         private Integer value;
@@ -527,7 +530,7 @@ public class Constants {
         }
     }
 
-    public enum ConnType {
+    public static enum ConnType {
         CONN(0x0, "conn", "直连"),
         PROXY(0x1, "proxy", "代理");
 
@@ -585,4 +588,45 @@ public class Constants {
 
     }
 
+    public static enum LauncherType {
+        TOMCAT("tomcat"),
+        JETTY("jetty");
+
+        private String name;
+
+        LauncherType(String name) {
+            this.name = name;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public static ConnType getByName(String name) {
+            for (ConnType connType : ConnType.values()) {
+                if (connType.getName().equals(name)) {
+                    return connType;
+                }
+            }
+            return null;
+        }
+
+        public static boolean isTomcat(String name){
+            if (CommonUtils.isEmpty(name)) {
+                return false;
+            }
+            return TOMCAT.getName().equalsIgnoreCase(name.trim());
+        }
+
+        public static boolean isJetty(String name){
+            if (CommonUtils.isEmpty(name)) {
+                return false;
+            }
+            return JETTY.getName().equalsIgnoreCase(name.trim());
+        }
+    }
 }

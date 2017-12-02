@@ -169,13 +169,13 @@ fi
 
 [ -d "${DEPLOY_PATH}" ] && rm -rf ${DEPLOY_PATH}/* || mkdir -p ${DEPLOY_PATH}
 
-#将target下的war包解到dist下
+# unpackage war to dist
 cp ${DIST_PATH}/${APP_WAR_NAME} ${DEPLOY_PATH} && cd ${DEPLOY_PATH} && jar xvf ${APP_WAR_NAME} >/dev/null 2>&1 && rm -rf ${DEPLOY_PATH}/${APP_WAR_NAME}
 
 #copy jettyJar
-mkdir ${DEPLOY_PATH}/jetty && cp ${WORKDIR}/${APP_ARTIFACT}/jetty/*.jar ${DEPLOY_PATH}/jetty
+mkdir ${DEPLOY_PATH}/work/jetty && cp ${WORKDIR}/${APP_ARTIFACT}/jetty/*.jar ${DEPLOY_PATH}/work/jetty
 
-mkdir ${DEPLOY_PATH}/tomcat && cp ${WORKDIR}/${APP_ARTIFACT}/tomcat/*.jar ${DEPLOY_PATH}/tomcat
+mkdir ${DEPLOY_PATH}/work/tomcat && cp ${WORKDIR}/${APP_ARTIFACT}/tomcat/*.jar ${DEPLOY_PATH}/work/tomcat
 
 #copy startup.sh
 cp  ${STARTUP_SHELL} ${DEPLOY_PATH}

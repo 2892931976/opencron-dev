@@ -389,7 +389,7 @@ public abstract class CommonUtils implements Serializable {
 
     //是否为Window系统
     public static boolean isWindowOs() {
-        return getOsName().toUpperCase().startsWith("WIN");
+        return getOsName().toUpperCase().startsWith("WINDOWS");
     }
 
     /**
