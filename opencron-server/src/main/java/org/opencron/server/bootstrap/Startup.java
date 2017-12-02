@@ -14,7 +14,7 @@ public class Startup {
 
     private static final int MAX_PORT = 65535;
 
-    private static int startPort = 8080;
+    private static int startPort = 20501;
 
     private static boolean devMode = true;
 

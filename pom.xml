@@ -80,6 +80,7 @@
         <curator.version>4.0.0</curator.version>
         <zkclient.version>0.10</zkclient.version>
         <jetty.version>9.4.7.v20170914</jetty.version>
+        <tomcat.version>8.0.28</tomcat.version>
     </properties>
 
     <dependencies>
@@ -434,37 +435,37 @@
             <dependency>
                 <groupId>org.apache.tomcat.embed</groupId>
                 <artifactId>tomcat-embed-core</artifactId>
-                <version>8.0.28</version>
+                <version>${tomcat.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>org.apache.tomcat.embed</groupId>
                 <artifactId>tomcat-embed-el</artifactId>
-                <version>8.0.28</version>
+                <version>${tomcat.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>org.apache.tomcat.embed</groupId>
                 <artifactId>tomcat-embed-jasper</artifactId>
-                <version>8.0.28</version>
+                <version>${tomcat.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>org.apache.tomcat.embed</groupId>
                 <artifactId>tomcat-embed-websocket</artifactId>
-                <version>8.0.28</version>
+                <version>${tomcat.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>org.apache.tomcat.embed</groupId>
                 <artifactId>tomcat-embed-logging-juli</artifactId>
-                <version>8.0.28</version>
+                <version>${tomcat.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>org.apache.tomcat.embed</groupId>
                 <artifactId>tomcat-embed-logging-log4j</artifactId>
-                <version>8.0.28</version>
+                <version>${tomcat.version}</version>
             </dependency>
             <!--tomcat end-->
 
