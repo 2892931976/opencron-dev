@@ -51,7 +51,7 @@ public class ImageUtils {
             imageUtils.dealedImage = imageUtils.bufferedImage;
             return imageUtils;
         }else{
-            throw new FileNotFoundException("图片文件文件不存在");
+            throw new FileNotFoundException("image file not exists");
         }
     }
 
