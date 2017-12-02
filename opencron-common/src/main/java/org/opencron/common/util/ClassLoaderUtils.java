@@ -1,3 +1,23 @@
+/**
+ * Copyright (c) 2015 The Opencron Project
+ * <p>
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package org.opencron.common.util;
 
 
@@ -6,7 +26,10 @@ import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
 
-public final class ExtClasspathLoader {
+/**
+ *@author benjobs
+ */
+public final class ClassLoaderUtils {
 
     /** URLClassLoader的addURL方法 */
     private static Method addURL = initAddMethod();
@@ -81,7 +104,7 @@ public final class ExtClasspathLoader {
         loadPath(jarFile.getAbsolutePath());
     }
 
-    public static void scanJar(String path) {
+    public static void loadJars(String path) {
         File jarDir = new File(path);
         if (!jarDir.exists()) {
             throw new IllegalArgumentException("[opencron] jarPath:"+path+" is not exists");
