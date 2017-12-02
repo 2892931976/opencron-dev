@@ -59,8 +59,6 @@ MAVEN_NAME="apache-maven-3.5.2-bin"
 
 UNPKG_MAVEN_NAME="apache-maven-3.5.2";
 
-
-
 OPENCRON_VERSION="1.2.0-RELEASE";
 
 MAVEN_PATH="/tmp";
@@ -104,6 +102,12 @@ java >/dev/null 2>&1
 
 if [ $? -ne 1 ];then
   echo_r "ERROR: java is not install,please install java first!"
+  exit 1;
+fi
+
+#check openjdk
+if [ "`java -version 2>&1 | head -1|grep "java"|wc -l`"x == "1"x ]; then
+  echo_r "ERROR: please uninstall OpenJDK and install jdk first"
   exit 1;
 fi
 
