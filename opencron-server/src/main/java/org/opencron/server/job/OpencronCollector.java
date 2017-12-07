@@ -24,6 +24,7 @@ package org.opencron.server.job;
 import it.sauronsoftware.cron4j.*;
 import org.opencron.common.Constants;
 import org.opencron.common.util.CommonUtils;
+import org.opencron.server.domain.Job;
 import org.opencron.server.service.ExecuteService;
 import org.opencron.server.service.JobService;
 import org.opencron.server.vo.JobVo;

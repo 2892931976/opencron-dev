@@ -458,7 +458,6 @@
 
         });
 
-
         function doUrl() {
             var pageSize = $("#size").val();
             var agentId = $("#agentId").val();
@@ -467,6 +466,46 @@
             var execType = $("#execType").val();
             var redo = $("#redo").val();
             window.location.href = "${contextPath}/job/view.htm?agentId=" + agentId + "&cronType=" + cronType + "&jobType=" + jobType + "&execType=" + execType + "&redo=" + redo + "&pageSize=" + pageSize + "&csrf=${csrf}";
+        }
+
+        function pauseJob(id,status) {
+            var msg = status?"暂停":"恢复";
+            swal({
+                title: "",
+                text: "您确定要"+msg+"这个作业吗？",
+                type: "warning",
+                showCancelButton: true,
+                closeOnConfirm: false,
+                confirmButtonText: msg
+            }, function () {
+                $.ajax({
+                    headers: {"csrf": "${csrf}"},
+                    type: "POST",
+                    url: "${contextPath}/job/pause.do",
+                    data: {
+                        "jobId": id,
+                        "pause":status
+                    }
+                }).done(function (data) {
+                    var pauseElem = $("#pause_"+id);
+                    if(data) {
+                        if (status){
+                            pauseElem.attr("title","恢复");
+                            pauseElem.click(function () {
+                                pauseJob(id,false);
+                            });
+                            pauseElem.find("i").removeClass("fa-pause-circle-o").addClass("fa-history");
+                        }else {
+                            pauseElem.attr("title","暂停");
+                            pauseElem.click(function () {
+                                pauseJob(id,true);
+                            });
+                            pauseElem.find("i").addClass("fa-pause-circle-o").removeClass("fa-history");
+                        }
+                        alert(msg+"成功!");
+                    }
+                });
+            });
         }
 
         function executeJob(id) {
@@ -807,20 +846,40 @@
                                         <i class="glyphicon glyphicon-pencil"></i>
                                     </a>
                                 </c:if>
+
                                 <c:if test="${r.jobType eq 1}">
                                     <a title="编辑" href="${contextPath}/job/editflow.htm?id=${r.jobId}&csrf=${csrf}">
                                         <i class="glyphicon glyphicon-pencil"></i>
                                     </a>
-                                </c:if>
-                                &nbsp;&nbsp;
+                                </c:if>&nbsp;
+
+                                <c:choose>
+                                    <c:when test="${r.pause eq false}">
+                                        <span>
+                                        <a id="pause_${r.jobId}" href="#" title="暂停" onclick="pauseJob('${r.jobId}',true)">
+                                           <i aria-hidden="true" class="fa fa-pause-circle-o"></i>
+                                        </a>
+                                        </span>
+                                    </c:when>
+                                    <c:otherwise>
+                                       <span>
+                                        <a id="pause_${r.jobId}" href="#" title="恢复" onclick="pauseJob('${r.jobId}',false)">
+                                           <i aria-hidden="true" class="fa fa-history"></i>
+                                        </a>
+                                        </span>
+                                    </c:otherwise>
+                                </c:choose>&nbsp;
+
                                 <span id="execButton_${r.jobId}">
                                     <a href="#" title="执行" onclick="executeJob('${r.jobId}')">
-                                       <i aria-hidden="true" class="fa fa-play-circle"></i>
-                                    </a>&nbsp;&nbsp;
-                                </span>
+                                       <i aria-hidden="true" class="fa fa-play"></i>
+                                    </a>
+                                </span>&nbsp;
+
                                 <a href="#" onclick="remove('${r.jobId}')" title="删除">
                                     <i aria-hidden="true" class="fa fa-times"></i>
-                                </a>&nbsp;&nbsp;
+                                </a>&nbsp;
+
                                 <a href="${contextPath}/job/detail/${r.jobId}.htm?csrf=${csrf}" title="查看详情">
                                     <i class="glyphicon glyphicon-eye-open"></i>
                                 </a>

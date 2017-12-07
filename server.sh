@@ -179,7 +179,7 @@ fi
 cp ${DIST_PATH}/${APP_WAR_NAME} ${DEPLOY_PATH} && cd ${DEPLOY_PATH} && jar xvf ${APP_WAR_NAME} >/dev/null 2>&1 && rm -rf ${DEPLOY_PATH}/${APP_WAR_NAME}
 
 #copy jars...
-cp -r ${WORKDIR}/${APP_ARTIFACT}/work ${DEPLOY_PATH}
+cp -r ${WORKDIR}/${APP_ARTIFACT}/lib ${DEPLOY_PATH}
 
 #copy startup.sh
 cp  ${STARTUP_SHELL} ${DEPLOY_PATH}

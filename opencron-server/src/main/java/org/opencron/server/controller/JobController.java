@@ -131,7 +131,7 @@ public class JobController extends BaseController {
     }
 
     @RequestMapping("add.htm")
-    public String addpage(HttpSession session, Model model, Long id) {
+    public String add(HttpSession session, Model model, Long id) {
         if (notEmpty(id)) {
             Agent agent = agentService.getAgent(id);
             model.addAttribute("agent", agent);
@@ -367,6 +367,12 @@ public class JobController extends BaseController {
     public String goExec(HttpSession session, Model model) {
         model.addAttribute("agents", agentService.getOwnerAgents(session));
         return "/job/exec";
+    }
+
+    @RequestMapping(value = "pause.do", method = RequestMethod.POST)
+    @ResponseBody
+    public boolean pause(Job jobBean) {
+        return jobService.pauseJob(jobBean);
     }
 
     @RequestMapping(value = "batchexec.do", method = RequestMethod.POST)
