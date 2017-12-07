@@ -69,6 +69,8 @@ public class Job implements Serializable {
 
     private String mobiles;
 
+    private Boolean pause;//任务是否暂停(true:已经暂停,false:未暂停)
+
     @Lob
     @Column(columnDefinition="TEXT")
     private String emailAddress;
@@ -245,6 +247,14 @@ public class Job implements Serializable {
 
     public void setMobiles(String mobiles) {
         this.mobiles = mobiles;
+    }
+
+    public Boolean getPause() {
+        return pause;
+    }
+
+    public void setPause(Boolean pause) {
+        this.pause = pause;
     }
 
     public String getEmailAddress() {

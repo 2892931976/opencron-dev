@@ -47,8 +47,8 @@ public class OpencronTask implements InitializingBean {
         configService.initDataBase();
         //检测所有的agent...
         clearCache();
-        schedulerService.initQuartz(executeService);
-        schedulerService.initCrontab();
+        //schedulerService.initQuartz(executeService);
+        //schedulerService.initCrontab();
     }
 
     private void clearCache() {

@@ -21,7 +21,9 @@
 package org.opencron.server.bootstrap;
 
 
-import org.apache.catalina.core.AprLifecycleListener;
+import org.apache.catalina.Lifecycle;
+import org.apache.catalina.LifecycleEvent;
+import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.core.StandardThreadExecutor;
 import org.apache.catalina.startup.Tomcat;
 import org.opencron.common.Constants;
@@ -38,7 +40,7 @@ public class TomcatLauncher implements Launcher {
 
     private static final String currentPath = "";
 
-    private Logger logger = LoggerFactory.getLogger(JettyLauncher.class);
+    private Logger logger = LoggerFactory.getLogger(TomcatLauncher.class);
 
     @Override
     public void start(boolean devMode, int port) throws Exception {
@@ -66,12 +68,19 @@ public class TomcatLauncher implements Launcher {
         executor.setNamePrefix("opencron-tomcat-");
 
         tomcat.getConnector().getService().addExecutor(executor);
-        tomcat.getServer().addLifecycleListener(new AprLifecycleListener());
-
-        logger.info("[opencron] TomcatLauncher starting...");
+        tomcat.getServer().addLifecycleListener(new LifecycleListener() {
+            @Override
+            public void lifecycleEvent(LifecycleEvent event) {
+                if (event.getLifecycle().equals(Lifecycle.START_EVENT)) {
+                    logger.info("[opencron] TomcatLauncher starting...");
+                }
+                if (event.getLifecycle().equals(Lifecycle.STOP_EVENT)) {
+                    logger.info("[opencron] TomcatLauncher stopping...");
+                }
+            }
+        });
         tomcat.start();
         tomcat.getServer().await();
-
     }
 
     @Override

@@ -79,6 +79,8 @@ public class JobVo implements Serializable {
 
     private Boolean warning;
 
+    private Boolean pause;//任务是否暂停(true:已经暂停,false:未暂停)
+
     private String mobiles;
 
     private String emailAddress;
@@ -370,5 +372,13 @@ public class JobVo implements Serializable {
 
     public void setDeleted(Boolean deleted) {
         this.deleted = deleted;
+    }
+
+    public Boolean getPause() {
+        return pause;
+    }
+
+    public void setPause(Boolean pause) {
+        this.pause = pause;
     }
 }
