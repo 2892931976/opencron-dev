@@ -588,7 +588,7 @@ public class Constants {
 
     }
 
-    public static enum LauncherType {
+    public enum LauncherType {
         TOMCAT("tomcat"),
         JETTY("jetty");
 
