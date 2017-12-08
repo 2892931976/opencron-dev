@@ -180,7 +180,7 @@
                 <th>联系方式</th>
                 <th>电子邮箱</th>
                 <th>QQ号码</th>
-                <th><center>操作</center></th>
+                <th class="text-center">操作</th>
             </tr>
             </thead>
 
@@ -194,8 +194,7 @@
                     <td>${u.contact}</td>
                     <td>${u.email}</td>
                     <td>${u.qq}</td>
-                    <td>
-                        <center>
+                    <td class="text-center">
                             <a href="#" onclick="editPwd('${u.userId}')" title="修改密码">
                                 <i class="glyphicon glyphicon-lock"></i>
                             </a>&nbsp;&nbsp;
@@ -205,7 +204,6 @@
                             <a href="${contextPath}/user/detail/${u.userId}.htm?csrf=${csrf}" title="查看详情">
                                 <i class="glyphicon glyphicon-eye-open"></i>
                             </a>
-                        </center>
                     </td>
                 </tr>
             </c:forEach>
@@ -247,11 +245,9 @@
                         </div>
                     </form>
                 </div>
-                <div class="modal-footer">
-                    <center>
+                <div class="modal-footer text-center">
                         <button type="button" class="btn btn-sm"  onclick="savePwd()">保存</button>&nbsp;&nbsp;
                         <button type="button" class="btn btn-sm"  data-dismiss="modal">关闭</button>
-                    </center>
                 </div>
             </div>
         </div>

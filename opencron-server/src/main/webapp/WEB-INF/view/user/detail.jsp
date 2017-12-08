@@ -225,11 +225,9 @@
                         </div>
                     </form>
                 </div>
-                <div class="modal-footer">
-                    <center>
+                <div class="modal-footer text-center">
                         <button type="button" class="btn btn-sm"  onclick="savePwd()">保存</button>&nbsp;&nbsp;
                         <button type="button" class="btn btn-sm"  data-dismiss="modal">关闭</button>
-                    </center>
                 </div>
             </div>
         </div>

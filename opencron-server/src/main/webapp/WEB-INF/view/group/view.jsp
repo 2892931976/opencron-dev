@@ -47,7 +47,7 @@
                 <th>创建人</th>
                 <th>创建时间</th>
                 <th>备注信息</th>
-                <th><center>操作</center></th>
+                <th class="text-center">操作</th>
             </tr>
             </thead>
 
@@ -59,15 +59,13 @@
                         <td>${g.userName}</td>
                         <td><fmt:formatDate value="${g.createTime}" pattern="yyyy-MM-dd HH:mm:ss"/></td>
                         <td>${g.comment}</td>
-                        <td>
-                            <center>
+                        <td class="text-center">
                                 <a href="${contextPath}/group/edit/${g.groupId}.htm?csrf=${csrf}" title="编辑">
                                     <i class="glyphicon glyphicon-pencil"></i>
                                 </a>&nbsp;&nbsp;
                                 <a href="${contextPath}/group/detail/${g.groupId}.htm?csrf=${csrf}" title="查看详情">
                                     <i class="glyphicon glyphicon-eye-open"></i>
                                 </a>
-                            </center>
                         </td>
                     </tr>
                 </c:forEach>

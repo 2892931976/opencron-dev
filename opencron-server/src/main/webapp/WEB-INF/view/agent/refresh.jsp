@@ -30,8 +30,7 @@
             <c:if test="${w.proxy eq 0}">直连</c:if>
             <c:if test="${w.proxy eq 1}">代理</c:if>
         </td>
-        <td>
-            <center>
+        <td class="text-center">
                 <div class="visible-md visible-lg hidden-sm hidden-xs action-buttons">
                     <a href="${contextPath}/job/add.htm?id=${w.agentId}&csrf=${csrf}" title="新任务">
                         <i aria-hidden="true" class="fa fa-plus-square-o"></i>
@@ -51,7 +50,6 @@
                         <i aria-hidden="true" class="fa fa-eye"></i>
                     </a>
                 </div>
-            </center>
         </td>
     </tr>
 </c:forEach>

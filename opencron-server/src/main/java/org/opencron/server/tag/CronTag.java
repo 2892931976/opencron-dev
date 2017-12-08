@@ -50,6 +50,9 @@ public class CronTag {
             str = str + "";
         }
         int len = str.length();
+        if (StringUtils.isChinese(str)) {
+            end = end/3;
+        }
         if (len > end && index < end) {
             return str.substring(index, end) + tempStr;
         }
@@ -149,6 +152,7 @@ public class CronTag {
         }
 
     }
+
 
     public static void main(String[] args) {
         System.out.println(substr("201511071755326105", 0, 12, "..."));

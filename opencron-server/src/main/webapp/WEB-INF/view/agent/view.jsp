@@ -752,9 +752,7 @@
                 <th>通信状态</th>
                 <th>失联报警</th>
                 <th>连接类型</th>
-                <th>
-                    <center>操作</center>
-                </th>
+                <th class="text-center">操作</th>
             </tr>
             </thead>
 
@@ -781,8 +779,7 @@
                         <c:if test="${w.proxy eq 0}">直连</c:if>
                         <c:if test="${w.proxy eq 1}">代理</c:if>
                     </td>
-                    <td>
-                        <center>
+                    <td class="text-center">
                             <div class="visible-md visible-lg hidden-sm hidden-xs action-buttons">
                                 <a href="${contextPath}/job/add.htm?id=${w.agentId}&csrf=${csrf}" title="新任务">
                                     <i aria-hidden="true" class="fa fa-plus-square-o"></i>
@@ -796,7 +793,6 @@
                                     <i aria-hidden="true" class="fa fa-eye"></i>
                                 </a>
                             </div>
-                        </center>
                     </td>
                 </tr>
             </c:forEach>
@@ -886,12 +882,10 @@
 
                     </form>
                 </div>
-                <div class="modal-footer">
-                    <center>
+                <div class="modal-footer text-center">
                         <button type="button" class="btn btn-sm" onclick="save()">保存</button>
                         &nbsp;&nbsp;
                         <button type="button" class="btn btn-sm" data-dismiss="modal">关闭</button>
-                    </center>
                 </div>
             </div>
         </div>
@@ -939,12 +933,10 @@
                         </div>
                     </form>
                 </div>
-                <div class="modal-footer">
-                    <center>
+                <div class="modal-footer text-center">
                         <button type="button" class="btn btn-sm" onclick="savePwd()">保存</button>
                         &nbsp;&nbsp;
                         <button type="button" class="btn btn-sm"  onclick="inputPwd()" data-dismiss="modal">关闭</button>
-                    </center>
                 </div>
             </div>
         </div>
@@ -962,12 +954,10 @@
                     <form class="form-horizontal" role="form" id="crontabForm">
                     </form>
                 </div>
-                <div class="modal-footer">
-                    <center>
+                <div class="modal-footer text-center">
                         <button type="button" class="btn btn-sm" onclick="saveCron()">保存</button>
                         &nbsp;&nbsp;
                         <button type="button" class="btn btn-sm"  onclick="inputCron()" data-dismiss="modal">关闭</button>
-                    </center>
                 </div>
             </div>
         </div>

@@ -43,7 +43,7 @@
             <c:if test="${r.jobType eq 1}">流程作业</c:if>
             <c:if test="${r.jobType eq 0}">单一作业</c:if>
         </td>
-        <td><center>
+        <td class="text-center">
             <div class="visible-md visible-lg hidden-sm hidden-xs action-buttons">
                 <a href="#" onclick="killJob('${r.recordId}')" title="kill">
                     <i class="glyphicon glyphicon-stop"></i>
@@ -54,9 +54,7 @@
                         <i class="glyphicon glyphicon-refresh"></i>
                     </a>&nbsp;&nbsp;
                 </c:if>
-
             </div>
-        </center>
         </td>
     </tr>
 </c:forEach>

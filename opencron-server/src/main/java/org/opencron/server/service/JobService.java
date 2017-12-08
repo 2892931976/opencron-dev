@@ -384,48 +384,47 @@ public class JobService {
 
         Job job = this.getJob(jobBean.getJobId());
 
-        if (CommonUtils.notEmpty(job.getPause(),jobBean.getPause())) {
-            if (jobBean.getPause().equals(job.getPause())) {
-                return false;
-            }
+        if (jobBean.getPause()==null) return false;
 
-            CronType cronType = CronType.getByType(job.getCronType());
-
-            switch (cronType) {
-                case QUARTZ:
-                    try {
-                        if (jobBean.getPause()) {
-                            //暂停任务
-                            schedulerService.pause(jobBean.getJobId());
-                        }else {
-                            //恢复任务
-                            schedulerService.resume(jobBean.getJobId());
-                        }
-                        job.setPause(jobBean.getPause());
-                        merge(job);
-                        return true;
-                    }catch (SchedulerException e) {
-                        logger.error("[opencron] pauseQuartzJob error:{}",e.getLocalizedMessage());
-                        return false;
-                    }
-                case CRONTAB:
-                    try {
-                        if (jobBean.getPause()) {
-                            opencronCollector.removeTask(jobBean.getJobId());
-                        }else {
-                            JobVo jobVo = getJobVoById(job.getJobId());
-                            opencronCollector.addTask(jobVo);
-                        }
-                        job.setPause(jobBean.getPause());
-                        merge(job);
-                        return true;
-                    }catch (Exception e) {
-                        logger.error("[opencron] pauseCrontabJob error:{}",e.getLocalizedMessage());
-                        return false;
-                    }
-            }
-            return true;
+        if ( job.getPause()!=null && jobBean.getPause().equals(job.getPause())) {
+            return false;
         }
-        return false;
+
+        CronType cronType = CronType.getByType(job.getCronType());
+
+        switch (cronType) {
+            case QUARTZ:
+                try {
+                    if (jobBean.getPause()) {
+                        //暂停任务
+                        schedulerService.pause(jobBean.getJobId());
+                    }else {
+                        //恢复任务
+                        schedulerService.resume(jobBean.getJobId());
+                    }
+                    job.setPause(jobBean.getPause());
+                    merge(job);
+                    return true;
+                }catch (SchedulerException e) {
+                    logger.error("[opencron] pauseQuartzJob error:{}",e.getLocalizedMessage());
+                    return false;
+                }
+            case CRONTAB:
+                try {
+                    if (jobBean.getPause()) {
+                        opencronCollector.removeTask(jobBean.getJobId());
+                    }else {
+                        JobVo jobVo = getJobVoById(job.getJobId());
+                        opencronCollector.addTask(jobVo);
+                    }
+                    job.setPause(jobBean.getPause());
+                    merge(job);
+                    return true;
+                }catch (Exception e) {
+                    logger.error("[opencron] pauseCrontabJob error:{}",e.getLocalizedMessage());
+                    return false;
+                }
+        }
+        return true;
     }
 }

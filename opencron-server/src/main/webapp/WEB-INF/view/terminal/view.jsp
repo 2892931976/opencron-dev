@@ -430,9 +430,7 @@
                        <th  class="sortable sort-numeric" style="cursor: pointer" onclick="sortPage('logintime')" title="点击排序">最后登陆</th>
                    </c:when>
                </c:choose>
-                <th>
-                    <center>操作</center>
-                </th>
+                <th class="text-center">操作</th>
             </tr>
             </thead>
 
@@ -443,8 +441,7 @@
                     <td>${t.host}</td>
                     <td>${t.port}</td>
                     <td id="time_${t.id}"><fmt:formatDate value="${t.logintime}" pattern="yyyy-MM-dd HH:mm:ss"/></td>
-                    <td>
-                        <center>
+                    <td class="text-center">
                             <div class="visible-md visible-lg hidden-sm hidden-xs action-buttons">
                                 <a href="javascript:ssh('${t.id}')" title="登录">
                                     <i aria-hidden="true" class="fa fa-tv"></i>
@@ -456,7 +453,6 @@
                                     <i aria-hidden="true" class="fa fa-remove"></i>
                                 </a>&nbsp;&nbsp;
                             </div>
-                        </center>
                     </td>
                 </tr>
             </c:forEach>
@@ -520,12 +516,10 @@
                         </div>
                     </form>
                 </div>
-                <div class="modal-footer">
-                    <center>
+                <div class="modal-footer text-center">
                         <button type="button" class="btn btn-sm" id="sshbtn" onclick="save()">保存</button>
                         &nbsp;&nbsp;
                         <button type="button" class="btn btn-sm" data-dismiss="modal">关闭</button>
-                    </center>
                 </div>
             </div>
         </div>

@@ -21,7 +21,6 @@
 
 package org.opencron.common.util;
 
-import org.opencron.common.Constants;
 import org.opencron.common.io.UnsafeStringWriter;
 
 import java.io.PrintWriter;
@@ -625,6 +624,18 @@ public abstract class StringUtils {
         if (!isInteger(str))
             return 0;
         return Integer.parseInt(str);
+    }
+
+
+    public static boolean isChinese(String string){
+        int n = 0;
+        for(int i = 0; i < string.length(); i++) {
+            n = (int)string.charAt(i);
+            if((19968 <= n && n <40869)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

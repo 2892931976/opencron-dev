@@ -258,7 +258,7 @@
                 <th>运行状态</th>
                 <th>执行方式</th>
                 <th>任务类型</th>
-                <th><center>操作</center></th>
+                <th class="text-center">操作</th>
             </tr>
             </thead>
 
@@ -268,20 +268,17 @@
 
                     <tr class="tr-flow_${empty r.groupId ? "" : r.groupId}">
                         <c:if test="${r.jobType eq 0}">
-                            <td id="row_${r.recordId}" rowspan="1">
-                                <center>
+                            <td id="row_${r.recordId}" rowspan="1" class="text-center">
                                     ${empty r.jobName ? 'batchJob' : r.jobName}
                                     <c:forEach var="c" items="${r.childRecord}" varStatus="index">
                                         <div style="display: none" class="redoIndex_${r.recordId}">
                                             <div class="div-circle"><span class="span-circle">${index.count}</span></div>${c.jobName}
                                         </div>
                                     </c:forEach>
-                                </center>
                             </td>
                         </c:if>
                         <c:if test="${r.jobType eq 1}">
-                            <td id="row_${r.groupId}" rowspan="1">
-                                <center>
+                            <td id="row_${r.groupId}" rowspan="1" class="text-center">
                                     ${r.jobName}
                                     <c:if test="${r.redoCount ne 0}">
                                         <c:forEach var="rc" items="${r.childRecord}" varStatus="index">
@@ -302,7 +299,6 @@
                                             </c:forEach>
                                         </c:if>
                                     </c:forEach>
-                                </center>
                             </td>
                         </c:if>
                         <td>${r.agentName}</td>
@@ -335,8 +331,7 @@
                             <c:if test="${r.jobType eq 1}">流程任务</c:if>
                             <c:if test="${r.jobType eq 0}">单一任务</c:if>
                         </td>
-                        <td>
-                            <center>
+                        <td class="text-center">
                                 <div class="visible-md visible-lg hidden-sm hidden-xs action-buttons">
                                     <c:if test="${r.jobType eq 1 and r.childJob ne null}">
                                         <a href="#" title="流程任务" onclick="showFlow(${r.recordId},'${fn:length(r.childJob)}','${r.groupId}')">
@@ -352,7 +347,6 @@
                                         <i class="glyphicon glyphicon-eye-open"></i>
                                     </a>&nbsp;&nbsp;
                                 </div>
-                            </center>
                         </td>
                     </tr>
                     <%--父记录重跑记录--%>
@@ -384,14 +378,12 @@
                                     <c:if test="${rc.jobType eq 1}">流程任务</c:if>
                                     <c:if test="${rc.jobType eq 0}">单一任务</c:if>
                                 </td>
-                                <td class="${index.count eq 1 ? (r.redoCount eq index.count ? "redo-last" : "redo-last-top") : (r.redoCount eq index.count ? "redo-last-bottom" : "")}" >
-                                    <center>
+                                <td class="text-center ${index.count eq 1 ? (r.redoCount eq index.count ? "redo-last" : "redo-last-top") : (r.redoCount eq index.count ? "redo-last-bottom" : "")}" >
                                         <div class="visible-md visible-lg hidden-sm hidden-xs action-buttons">
                                                 <a href="${contextPath}/record/detail/${rc.recordId}.htm?csrf=${csrf}" title="查看详情">
                                                     <i class="glyphicon glyphicon-eye-open"></i>
                                                 </a>&nbsp;&nbsp;
                                         </div>
-                                    </center>
                                 </td>
                             </tr>
                         </c:forEach>
@@ -427,8 +419,7 @@
                                     <c:if test="${t.execType eq 2}"><span class="label label-warning">&nbsp;&nbsp;重&nbsp;跑&nbsp;&nbsp;</span></c:if>
                                 </td>
                                 <td>流程任务</td>
-                                <td>
-                                    <center>
+                                <td class="text-center">
                                         <div class="visible-md visible-lg hidden-sm hidden-xs action-buttons">
                                             <c:if test="${t.redoCount ne 0}">
                                                 <a href="#" title="重跑记录" onclick="showRedo('${t.recordId}','${fn:length(t.childRecord)}','${t.groupId}',${index.count+1})">
@@ -439,7 +430,6 @@
                                                 <i class="glyphicon glyphicon-eye-open"></i>
                                             </a>&nbsp;&nbsp;
                                         </div>
-                                    </center>
                                 </td>
                             </tr>
                             <%--流程子任务的重跑记录--%>
@@ -468,14 +458,12 @@
                                         </td>
                                         <td><span class="label label-warning">&nbsp;&nbsp;重&nbsp;跑&nbsp;&nbsp;</span></td>
                                         <td>流程任务</td>
-                                        <td class="${index.count eq 1 ? (t.redoCount eq index.count ? "redo-last" : "redo-last-top") : (t.redoCount eq index.count ? "redo-last-bottom" : "")}" >
-                                            <center>
+                                        <td class="text-center${index.count eq 1 ? (t.redoCount eq index.count ? "redo-last" : "redo-last-top") : (t.redoCount eq index.count ? "redo-last-bottom" : "")}" >
                                                 <div class="visible-md visible-lg hidden-sm hidden-xs action-buttons">
                                                         <a href="${contextPath}/record/detail/${tc.recordId}.htm?csrf=${csrf}" title="查看详情">
                                                             <i class="glyphicon glyphicon-eye-open"></i>
                                                         </a>&nbsp;&nbsp;
                                                 </div>
-                                            </center>
                                         </td>
                                     </tr>
                                 </c:forEach>

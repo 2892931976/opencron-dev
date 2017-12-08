@@ -37,7 +37,7 @@ public class Startup {
 
     private static final int MAX_PORT = 65535;
 
-    private static final String libDirName = "lib";
+    private static final String workspace = "work";
 
     private static int startPort = 20501;
 
@@ -70,11 +70,11 @@ public class Startup {
         String jarPath;
         if (devMode) {
             String artifact = MavenUtils.get(Thread.currentThread().getContextClassLoader()).getArtifactId();
-            jarPath = artifact + File.separator + libDirName + File.separator + launcherType.getName();
-            System.setProperty("catalina.home", artifact + File.separator + libDirName);
+            jarPath = artifact + File.separator + workspace + File.separator + launcherType.getName();
+            System.setProperty("catalina.home", artifact + File.separator + workspace);
         } else {
-            jarPath = libDirName + File.separator + launcherType.getName();
-            System.setProperty("catalina.home", libDirName);
+            jarPath = workspace + File.separator + launcherType.getName();
+            System.setProperty("catalina.home", workspace);
         }
 
         //load jars.

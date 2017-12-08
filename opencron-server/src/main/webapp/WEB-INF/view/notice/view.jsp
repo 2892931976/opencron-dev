@@ -94,12 +94,10 @@
                     <td title="${log.receiver}">${cron:substr(log.receiver,0,20,"...")}</td>
                     <td title="${cron:escapeHtml(log.message)}">${cron:escapeHtml(cron:substr(log.message,0,60,"..."))}</td>
                     <td>${log.sendTime}</td>
-                    <td>
-                        <center>
+                    <td class="text-center">
                             <a href="${contextPath}/notice/detail/${log.logId}.htm?csrf=${csrf}" title="查看详情">
                                 <i class="glyphicon glyphicon-eye-open"></i>
                             </a>
-                        </center>
                     </td>
                 </tr>
             </c:forEach>
