@@ -47,8 +47,6 @@
             $("#agentId").change(function(){doUrl();});
             $("#jobId").change(function(){doUrl();});
             $("#execType").change(function(){doUrl();});
-            rewidth();
-            $(window).resize(rewidth);
         });
 
         function doUrl() {
@@ -62,7 +60,6 @@
         }
 
         function showRedo(id,length,groupId,count){
-
             try {
                 hideRedo();
                 if (redoRecord && redoRecord.id==id){
@@ -279,26 +276,26 @@
                         </c:if>
                         <c:if test="${r.jobType eq 1}">
                             <td id="row_${r.groupId}" rowspan="1" class="text-center">
-                                    ${r.jobName}
-                                    <c:if test="${r.redoCount ne 0}">
-                                        <c:forEach var="rc" items="${r.childRecord}" varStatus="index">
-                                            <div class="redoIndex_${r.recordId} groupIndex_${r.groupId}" style="display: none">
-                                                <div class="div-circle"><span class="span-circle">${index.count}</span></div>${rc.jobName}
+                                ${r.jobName}
+                                <c:if test="${r.redoCount ne 0}">
+                                    <c:forEach var="rc" items="${r.childRecord}" varStatus="index">
+                                        <div class="redoIndex_${r.recordId} groupIndex_${r.groupId}" style="display: none">
+                                            <div class="div-circle"><span class="span-circle">${index.count}</span></div>${rc.jobName}
+                                        </div>
+                                    </c:forEach>
+                                </c:if>
+                                <c:forEach var="t" items="${r.childJob}" varStatus="index">
+                                    <div class="flowIndex_${r.recordId} " style="display: none">
+                                        <div class="down"><i class="fa fa-arrow-down" style="font-size:14px" aria-hidden="true"></i></div>${t.jobName}
+                                    </div>
+                                    <c:if test="${t.redoCount ne 0}">
+                                        <c:forEach var="tc" items="${t.childRecord}" varStatus="count">
+                                            <div class="redoIndex_${t.recordId} groupIndex_${r.groupId}" style="display: none">
+                                                <div class="div-circle"><span class="span-circle">${count.count}</span></div>${tc.jobName}
                                             </div>
                                         </c:forEach>
                                     </c:if>
-                                    <c:forEach var="t" items="${r.childJob}" varStatus="index">
-                                        <div class="flowIndex_${r.recordId} " style="display: none">
-                                            <div class="down"><i class="fa fa-arrow-down" style="font-size:14px" aria-hidden="true"></i></div>${t.jobName}
-                                        </div>
-                                        <c:if test="${t.redoCount ne 0}">
-                                            <c:forEach var="tc" items="${t.childRecord}" varStatus="count">
-                                                <div class="redoIndex_${t.recordId} groupIndex_${r.groupId}" style="display: none">
-                                                    <div class="div-circle"><span class="span-circle">${count.count}</span></div>${tc.jobName}
-                                                </div>
-                                            </c:forEach>
-                                        </c:if>
-                                    </c:forEach>
+                                </c:forEach>
                             </td>
                         </c:if>
                         <td>${r.agentName}</td>
@@ -332,21 +329,21 @@
                             <c:if test="${r.jobType eq 0}">单一任务</c:if>
                         </td>
                         <td class="text-center">
-                                <div class="visible-md visible-lg hidden-sm hidden-xs action-buttons">
-                                    <c:if test="${r.jobType eq 1 and r.childJob ne null}">
-                                        <a href="#" title="流程任务" onclick="showFlow(${r.recordId},'${fn:length(r.childJob)}','${r.groupId}')">
-                                            <i aria-hidden="true" class="fa fa-angle-double-down" style="font-size:15px;" childOpen="off" id="flowIcon_${r.recordId}"></i>
-                                        </a>&nbsp;&nbsp;
-                                    </c:if>
-                                    <c:if test="${r.redoCount ne 0}">
-                                        <a href="#" title="重跑记录" onclick="showRedo('${r.recordId}','${fn:length(r.childRecord)}',${empty r.groupId ? false : r.groupId},'1')">
-                                            <i aria-hidden="true" class="fa fa-chevron-down groupIcon_${r.groupId}" redoOpen="off" id="redoIcon_${r.recordId}"></i>
-                                        </a>&nbsp;&nbsp;
-                                    </c:if>
-                                    <a href="${contextPath}/record/detail/${r.recordId}.htm?csrf=${csrf}" title="查看详情">
-                                        <i class="glyphicon glyphicon-eye-open"></i>
+                            <div class="visible-md visible-lg hidden-sm hidden-xs action-buttons">
+                                <c:if test="${r.jobType eq 1 and r.childJob ne null}">
+                                    <a href="#" title="流程任务" onclick="showFlow(${r.recordId},'${fn:length(r.childJob)}','${r.groupId}')">
+                                        <i aria-hidden="true" class="fa fa-angle-double-down" style="font-size:15px;" childOpen="off" id="flowIcon_${r.recordId}"></i>
                                     </a>&nbsp;&nbsp;
-                                </div>
+                                </c:if>
+                                <c:if test="${r.redoCount ne 0}">
+                                    <a href="#" title="重跑记录" onclick="showRedo('${r.recordId}','${fn:length(r.childRecord)}',${empty r.groupId ? false : r.groupId},'1')">
+                                        <i aria-hidden="true" class="fa fa-chevron-down groupIcon_${r.groupId}" redoOpen="off" id="redoIcon_${r.recordId}"></i>
+                                    </a>&nbsp;&nbsp;
+                                </c:if>
+                                <a href="${contextPath}/record/detail/${r.recordId}.htm?csrf=${csrf}" title="查看详情">
+                                    <i class="glyphicon glyphicon-eye-open"></i>
+                                </a>&nbsp;&nbsp;
+                            </div>
                         </td>
                     </tr>
                     <%--父记录重跑记录--%>
@@ -379,11 +376,11 @@
                                     <c:if test="${rc.jobType eq 0}">单一任务</c:if>
                                 </td>
                                 <td class="text-center ${index.count eq 1 ? (r.redoCount eq index.count ? "redo-last" : "redo-last-top") : (r.redoCount eq index.count ? "redo-last-bottom" : "")}" >
-                                        <div class="visible-md visible-lg hidden-sm hidden-xs action-buttons">
-                                                <a href="${contextPath}/record/detail/${rc.recordId}.htm?csrf=${csrf}" title="查看详情">
-                                                    <i class="glyphicon glyphicon-eye-open"></i>
-                                                </a>&nbsp;&nbsp;
-                                        </div>
+                                    <div class="visible-md visible-lg hidden-sm hidden-xs action-buttons">
+                                            <a href="${contextPath}/record/detail/${rc.recordId}.htm?csrf=${csrf}" title="查看详情">
+                                                <i class="glyphicon glyphicon-eye-open"></i>
+                                            </a>&nbsp;&nbsp;
+                                    </div>
                                 </td>
                             </tr>
                         </c:forEach>
@@ -459,15 +456,15 @@
                                         <td><span class="label label-warning">&nbsp;&nbsp;重&nbsp;跑&nbsp;&nbsp;</span></td>
                                         <td>流程任务</td>
                                         <td class="text-center${index.count eq 1 ? (t.redoCount eq index.count ? "redo-last" : "redo-last-top") : (t.redoCount eq index.count ? "redo-last-bottom" : "")}" >
-                                                <div class="visible-md visible-lg hidden-sm hidden-xs action-buttons">
-                                                        <a href="${contextPath}/record/detail/${tc.recordId}.htm?csrf=${csrf}" title="查看详情">
-                                                            <i class="glyphicon glyphicon-eye-open"></i>
-                                                        </a>&nbsp;&nbsp;
-                                                </div>
+                                            <div class="visible-md visible-lg hidden-sm hidden-xs action-buttons">
+                                                    <a href="${contextPath}/record/detail/${tc.recordId}.htm?csrf=${csrf}" title="查看详情">
+                                                        <i class="glyphicon glyphicon-eye-open"></i>
+                                                    </a>&nbsp;&nbsp;
+                                            </div>
                                         </td>
                                     </tr>
                                 </c:forEach>
-                            </c:if>
+                            </c:if>ƒ
                         </c:forEach>
                     </c:if>
                 </tbody>
