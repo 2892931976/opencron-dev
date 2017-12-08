@@ -28,7 +28,7 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
-public class RecordVo implements Serializable {
+public class RecordInfo implements Serializable {
 
     private Long recordId;
     private Long jobId;
@@ -64,13 +64,13 @@ public class RecordVo implements Serializable {
      */
     private Integer jobType;
 
-    private JobVo job;
+    private JobInfo job;
 
     //重跑子记录
-    private List<RecordVo> childRecord;
+    private List<RecordInfo> childRecord;
 
     //流程子任务
-    private List<RecordVo> childJob;
+    private List<RecordInfo> childJob;
 
     //是否为流程任务的最后一个子任务
     private Boolean lastChild;
@@ -267,27 +267,27 @@ public class RecordVo implements Serializable {
         this.jobType = jobType;
     }
 
-    public JobVo getJob() {
+    public JobInfo getJob() {
         return job;
     }
 
-    public void setJob(JobVo job) {
+    public void setJob(JobInfo job) {
         this.job = job;
     }
 
-    public List<RecordVo> getChildRecord() {
+    public List<RecordInfo> getChildRecord() {
         return childRecord;
     }
 
-    public void setChildRecord(List<RecordVo> childRecord) {
+    public void setChildRecord(List<RecordInfo> childRecord) {
         this.childRecord = childRecord;
     }
 
-    public List<RecordVo> getChildJob() {
+    public List<RecordInfo> getChildJob() {
         return childJob;
     }
 
-    public void setChildJob(List<RecordVo> childJob) {
+    public void setChildJob(List<RecordInfo> childJob) {
         this.childJob = childJob;
     }
 

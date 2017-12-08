@@ -30,7 +30,7 @@ import org.opencron.server.domain.User;
 import org.opencron.server.handler.SingleLoginListener;
 import org.opencron.server.job.OpencronTools;
 import org.opencron.server.tag.PageBean;
-import org.opencron.server.vo.LogVo;
+import org.opencron.server.vo.LogInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -92,7 +92,7 @@ public class HomeService {
         }
     }
 
-    public PageBean<LogVo> getLog(HttpSession session, PageBean pageBean, Long agentId, String sendTime) {
+    public PageBean<LogInfo> getLog(HttpSession session, PageBean pageBean, Long agentId, String sendTime) {
         String sql = "SELECT L.*,W.name AS agentName FROM T_LOG AS L " +
                 "LEFT JOIN T_AGENT AS W " +
                 "ON L.agentId = W.agentId " +
@@ -104,13 +104,13 @@ public class HomeService {
             sql += " AND L.sendTime LIKE '" + sendTime + "%' ";
         }
         sql += " ORDER BY L.sendTime DESC";
-        queryDao.getPageBySql(pageBean, LogVo.class, sql);
+        queryDao.getPageBySql(pageBean, LogInfo.class, sql);
         return pageBean;
     }
 
-    public List<LogVo> getUnReadMessage(HttpSession session) {
+    public List<LogInfo> getUnReadMessage(HttpSession session) {
         String sql = "SELECT * FROM T_LOG WHERE isRead=0 AND type=?  and userId = ? ORDER BY sendTime DESC LIMIT 5 ";
-        return queryDao.sqlQuery(LogVo.class, sql,Constants.MsgType.WEBSITE.getValue(),OpencronTools.getUserId(session));
+        return queryDao.sqlQuery(LogInfo.class, sql,Constants.MsgType.WEBSITE.getValue(),OpencronTools.getUserId(session));
     }
 
     public Long getUnReadCount(HttpSession session) {

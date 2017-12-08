@@ -33,8 +33,8 @@ import org.opencron.server.service.*;
 import org.opencron.server.tag.PageBean;
 import org.opencron.common.util.CommonUtils;
 import org.opencron.server.domain.Agent;
-import org.opencron.server.vo.CrontabVo;
-import org.opencron.server.vo.JobVo;
+import org.opencron.server.vo.CrontabInfo;
+import org.opencron.server.vo.JobInfo;
 import org.quartz.SchedulerException;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,7 +72,7 @@ public class JobController extends BaseController {
     private SchedulerService schedulerService;
 
     @RequestMapping("view.htm")
-    public String view(HttpSession session, HttpServletRequest request, PageBean pageBean, JobVo job, Model model) {
+    public String view(HttpSession session, HttpServletRequest request, PageBean pageBean, JobInfo job, Model model) {
 
         model.addAttribute("agents", agentService.getOwnerAgents(session));
 
@@ -92,7 +92,7 @@ public class JobController extends BaseController {
         if (notEmpty(job.getRedo())) {
             model.addAttribute("redo", job.getRedo());
         }
-        jobService.getJobVos(session, pageBean, job);
+        jobService.getJobInfoPage(session, pageBean, job);
         if (request.getParameter("refresh") != null) {
             return "/job/refresh";
         }
@@ -222,7 +222,7 @@ public class JobController extends BaseController {
 
     @RequestMapping("editsingle.do")
     public void editSingleJob(HttpSession session, HttpServletResponse response, Long id) {
-        JobVo job = jobService.getJobVoById(id);
+        JobInfo job = jobService.getJobInfoById(id);
         if (job == null) {
             write404(response);
             return;
@@ -233,7 +233,7 @@ public class JobController extends BaseController {
 
     @RequestMapping("editflow.htm")
     public String editFlowJob(HttpSession session, Model model, Long id) {
-        JobVo job = jobService.getJobVoById(id);
+        JobInfo job = jobService.getJobInfoById(id);
         if (job == null) {
             return "/error/404";
         }
@@ -295,7 +295,7 @@ public class JobController extends BaseController {
     @RequestMapping(value = "execute.do", method = RequestMethod.POST)
     @ResponseBody
     public boolean remoteExecute(HttpSession session, Long id) {
-        JobVo job = jobService.getJobVoById(id);//找到要执行的任务
+        JobInfo job = jobService.getJobInfoById(id);//找到要执行的任务
         if (!jobService.checkJobOwner(session, job.getUserId())) return false;
         //手动执行
         Long userId = OpencronTools.getUserId(session);
@@ -313,13 +313,13 @@ public class JobController extends BaseController {
 
     @RequestMapping(value = "scan.do", method = RequestMethod.POST)
     @ResponseBody
-    public List<CrontabVo> scan(Long agentId) {
+    public List<CrontabInfo> scan(Long agentId) {
 
         Agent agent = agentService.getAgent(agentId);
 
         String crontab = executeService.scan(agent);
 
-        List<CrontabVo> crontabs = new ArrayList<CrontabVo>(0);
+        List<CrontabInfo> crontabs = new ArrayList<CrontabInfo>(0);
 
         if (crontab != null) {
 
@@ -355,8 +355,8 @@ public class JobController extends BaseController {
                         continue;
                     }
                     String cron = cronBuilder.toString().trim();
-                    CrontabVo crontabVo = new CrontabVo(++index,cron, cmd);
-                    crontabs.add(crontabVo);
+                    CrontabInfo crontabInfo = new CrontabInfo(++index,cron, cmd);
+                    crontabs.add(crontabInfo);
                 }
             }
         }
@@ -392,14 +392,14 @@ public class JobController extends BaseController {
 
     @RequestMapping("detail/{id}.htm")
     public String showDetail(HttpSession session, Model model, @PathVariable("id") Long id) {
-        JobVo jobVo = jobService.getJobVoById(id);
-        if (jobVo == null) {
+        JobInfo jobInfo = jobService.getJobInfoById(id);
+        if (jobInfo == null) {
             return "/error/404";
         }
-        if (!jobService.checkJobOwner(session, jobVo.getUserId())) {
+        if (!jobService.checkJobOwner(session, jobInfo.getUserId())) {
             return "redirect:/job/view.htm?csrf=" + OpencronTools.getCSRF(session);
         }
-        model.addAttribute("job", jobVo);
+        model.addAttribute("job", jobInfo);
         return "/job/detail";
     }
 

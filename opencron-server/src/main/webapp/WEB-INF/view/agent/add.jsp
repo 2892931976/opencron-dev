@@ -28,21 +28,21 @@
                         this.status = false;
                     }else {
                         var _this = this;
-                        $.ajax({
+                        ajax({
                             headers: {"csrf": "${csrf}"},
                             url: "${contextPath}/agent/checkname.do",
                             type: "POST",
                             data: {
                                 "name": _name
                             }
-                        }).done(function (data) {
+                        },function (data) {
                             if (!data) {
                                 opencron.tipError("#name","执行器名称已存在!");
                                 _this.status = false;
                             }else{
                                 opencron.tipOk("#name");
                             }
-                        })
+                        });
                     }
                 }
             },
@@ -58,14 +58,14 @@
                         this.status = false;
                     }else{
                         var _this = this;
-                        $.ajax({
+                        ajax({
                             headers: {"csrf": "${csrf}"},
                             type: "POST",
                             url: "${contextPath}/agent/checkhost.do",
                             data: {
                                 "host": _host
                             }
-                        }).done(function (data) {
+                        },function (data) {
                             if (!data){
                                 opencron.tipError("#host","该执行器Host已存在!不能重复添加!");
                                 _this.status = false;
@@ -143,7 +143,7 @@
                     proxyId = $("#proxyAgent").val();
                 }
                 var _this = this;
-                $.ajax({
+                ajax({
                     headers: {"csrf": "${csrf}"},
                     url: "${contextPath}/verify/ping.do",
                     type: "POST",
@@ -155,10 +155,10 @@
                         "port": $("#port").val(),
                         "password": calcMD5($("#password").val())
                     }
-                }).done(function (data) {
+                },function (data) {
                     if (data) {
                         opencron.tipOk("#port");
-                        $.ajax({
+                        ajax({
                             headers: {"csrf": "${csrf}"},
                             url: "${contextPath}/verify/guid.do",
                             type: "POST",
@@ -170,7 +170,7 @@
                                 "port": $("#port").val(),
                                 "password": calcMD5($("#password").val())
                             }
-                        }).done(function (data) {
+                        },function (data) {
                             $("#machineId").val(data);
                             if(callback){
                                 callback();
@@ -180,7 +180,7 @@
                         opencron.tipError("#port","通信失败");
                         _this.status=false;
                     }
-                }).fail(function () {
+                },function () {
                     opencron.tipError("#port","通信失败");
                     _this.status=false;
                 });

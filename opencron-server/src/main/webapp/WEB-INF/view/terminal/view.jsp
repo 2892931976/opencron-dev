@@ -32,13 +32,12 @@
          *  true:用于判断登录之后是否有后续操作，true:有后续操作，false:无
          */
         function ssh(id, failCallback) {
-            $.ajax({
+            ajax({
                 headers:{"csrf":"${csrf}"},
                 url: "${contextPath}/terminal/ssh.do",
                 type: "POST",
-                data: {"id":id},
-                dataType: "json"
-            }).done(function (json) {
+                data: {"id":id}
+            },function (json) {
                 if(json&&json.toString().indexOf("login")>-1){
                     window.location.href="${contextPath}";
                 }
@@ -102,6 +101,7 @@
                     });
                 }
             });
+
         }
 
         function edit(id) {
@@ -115,13 +115,13 @@
                 $("#sshTitle").text("登陆终端");
                 $("#sshbtn").text("登陆");
             }
-            $.ajax({
+            
+            ajax({
                 headers:{"csrf":"${csrf}"},
                 url: "${contextPath}/terminal/detail.do",
                 type: "POST",
-                data: {"id":id},
-                dataType: "json"
-            }).done(function (json) {
+                data: {"id":id}
+            },function (json) {
                 $("#sshid").val(id);
                 $("#sshuser").val(json.user);
                 $("#sshname").val(unEscapeHtml(json.name));
@@ -142,20 +142,19 @@
                 closeOnConfirm: false,
                 confirmButtonText: "删除"
             },function () {
-                $.ajax({
+                ajax({
                     headers:{"csrf":"${csrf}"},
                     url: "${contextPath}/terminal/delete.do",
                     type: "POST",
-                    data: {"id":id},
-                    dataType: "json"
-                }).done(function (message) {
-                    if (message) {
+                    data: {"id":id}
+                },function (data) {
+                    if (data) {
                         alertMsg("删除成功!");
                         $("#tr_" + id).remove();
                     }else {
                         alert("删除失败!")
                     }
-                });
+                })
             });
         }
 
@@ -238,17 +237,16 @@
             var action = $("#sshform").attr("action");
 
             if (action == "add") {
-                $.ajax({
+                ajax({
                     headers:{"csrf":"${csrf}"},
                     url: "${contextPath}/terminal/exists.do",
                     type: "POST",
                     data: {
                         "host":host
-                    },
-                    dataType: "json"
-                }).done(function (status) {
-                    if(!status){
-                        $.ajax({
+                    }
+                },function (status) {
+                    if(!status) {
+                        ajax({
                             headers:{"csrf":"${csrf}"},
                             url: "${contextPath}/terminal/save.do",
                             type: "POST",
@@ -258,12 +256,11 @@
                                 "password": toBase64(pwd),
                                 "port": port,
                                 "host": host
-                            },
-                            dataType: "html"
-                        }).done(function (status) {
+                            }
+                        },function (data) {
                             $("#sshModal").modal("hide");
                             $("#sshform")[0].reset();
-                            if (status == "success") {
+                            if (data == "success") {
                                 alertMsg("恭喜你添加终端成功!");
                                 location.reload();
                             } else {
@@ -275,7 +272,7 @@
                     }
                 });
             }else {
-                $.ajax({
+                ajax({
                     headers:{"csrf":"${csrf}"},
                     type: "POST",
                     url: "${contextPath}/terminal/save.do",
@@ -286,13 +283,12 @@
                         "password": toBase64(pwd),
                         "port": port,
                         "host": host
-                    },
-                    dataType: "html"
-                }).done(function (status) {
+                    }
+                },function (data) {
                     $("#sshModal").modal("hide");
                     $("#sshform")[0].reset();
                     if(action == "login") {
-                        if (status == "success") {
+                        if (data == "success") {
                             ssh($("#sshid").val(),function () {
                                 edit(id,false);
                             });
@@ -300,7 +296,7 @@
                             alert("用户名密码错误,登陆终端失败!");
                         }
                     }else {
-                        if (status == "success") {
+                        if (data == "success") {
                             alertMsg("恭喜你修改终端成功!");
                             location.reload();
                         } else {

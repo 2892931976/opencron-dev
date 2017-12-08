@@ -261,32 +261,41 @@ public class Constants {
     }
 
     public static enum ConnStatus implements Serializable {
-        CONNECTED(0x1,"通信成功"),
-        DISCONNECTED(0x0,"通信失败");
+        CONNECTED(0x1,true,"通信成功"),
+        DISCONNECTED(0x0,false,"通信失败");
 
-        private Integer value;
+        private Integer type;
+        private boolean value;
         private String description;
 
-        ConnStatus(Integer type, String description) {
-            this.value = type;
-            this.description = description;
+        ConnStatus(Integer type,boolean value,String description) {
+            this.type = type;
+            this.value = value;
             this.description = description;
         }
 
-        public static ConnStatus getByValue(Integer value) {
+        public static ConnStatus getByType(Integer value) {
             for (ConnStatus connStatus : ConnStatus.values()) {
-                if (connStatus.getValue().equals(value)) {
+                if (connStatus.getType().equals(value)) {
                     return connStatus;
                 }
             }
             return null;
         }
 
-        public Integer getValue() {
+        public Integer getType() {
+            return type;
+        }
+
+        public void setType(Integer type) {
+            this.type = type;
+        }
+
+        public boolean isValue() {
             return value;
         }
 
-        public void setValue(Integer value) {
+        public void setValue(boolean value) {
             this.value = value;
         }
 

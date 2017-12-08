@@ -27,7 +27,7 @@
                 closeOnConfirm: false,
                 confirmButtonText: "执行"
             }, function() {
-                $.ajax({
+                ajax({
                     headers:{"csrf":"${csrf}"},
                     type:"POST",
                     url: "${contextPath}/config/clear.do",

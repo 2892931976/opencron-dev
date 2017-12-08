@@ -72,24 +72,19 @@
                     $("#checkName").html("<font color='red'>" + '<i class="glyphicon glyphicon-remove-sign"></i>&nbsp;请填写执行器组名' + "</font>");
                     return false;
                 }
-                $.ajax({
+                ajax({
                     headers: {"csrf": "${csrf}"},
                     type: "POST",
                     url: "${contextPath}/group/checkname.do",
                     data: {
                         "groupName": $("#groupName").val()
-                    },
-                    success: function (data) {
-                        if (data) {
-                            $("#checkName").html("<font color='green'>" + '<i class="glyphicon glyphicon-ok-sign"></i>&nbsp;执行器组名可用' + "</font>");
-                            return false;
-                        } else {
-                            $("#checkName").html("<font color='red'>" + '<i class="glyphicon glyphicon-remove-sign"></i>&nbsp;执行器组名已存在' + "</font>");
-                            return false;
-                        }
-                    },
-                    error: function () {
-                        alert("网络繁忙请刷新页面重试!");
+                    }
+                },function (data) {
+                    if (data) {
+                        $("#checkName").html("<font color='green'>" + '<i class="glyphicon glyphicon-ok-sign"></i>&nbsp;执行器组名可用' + "</font>");
+                        return false;
+                    } else {
+                        $("#checkName").html("<font color='red'>" + '<i class="glyphicon glyphicon-remove-sign"></i>&nbsp;执行器组名已存在' + "</font>");
                         return false;
                     }
                 });

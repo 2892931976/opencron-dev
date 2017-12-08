@@ -63,24 +63,21 @@
                 }
             }
             $("#password").val(calcMD5(password));
-            $.ajax({
+
+
+            ajax({
                 headers:{"csrf":"${csrf}"},
                 type:"POST",
                 url:"${contextPath}/user/checkname.do",
                 data:{
                     "name":name
-                },
-                success:function(data){
-                    if (data){
-                        $("#user").submit();
-                        return false;
-                    }else {
-                        alert("用户已存在!");
-                        return false;
-                    }
-                },
-                error : function() {
-                    alert("网络繁忙请刷新页面重试!");
+                }
+            },function (data) {
+                if (data){
+                    $("#user").submit();
+                    return false;
+                }else {
+                    alert("用户已存在!");
                     return false;
                 }
             });
@@ -93,24 +90,20 @@
                     $("#checkname").html("<font color='red'>" + '<i class="glyphicon glyphicon-remove-sign"></i>&nbsp;请填写用户名' + "</font>");
                     return false;
                 }
-                $.ajax({
+                
+                ajax({
                     headers:{"csrf":"${csrf}"},
                     type:"POST",
                     url:"${contextPath}/user/checkname.do",
                     data:{
                         "name":$("#name").val()
-                    },
-                    success:function(data){
-                        if (data){
-                            $("#checkname").html("<font color='green'>" + '<i class="glyphicon glyphicon-ok-sign"></i>&nbsp;用户名可用' + "</font>");
-                            return false;
-                        }else {
-                            $("#checkname").html("<font color='red'>" + '<i class="glyphicon glyphicon-remove-sign"></i>&nbsp;用户已存在' + "</font>");
-                            return false;
-                        }
-                    },
-                    error : function() {
-                        alert("网络繁忙请刷新页面重试!");
+                    }
+                },function (data) {
+                    if (data){
+                        $("#checkname").html("<font color='green'>" + '<i class="glyphicon glyphicon-ok-sign"></i>&nbsp;用户名可用' + "</font>");
+                        return false;
+                    }else {
+                        $("#checkname").html("<font color='red'>" + '<i class="glyphicon glyphicon-remove-sign"></i>&nbsp;用户已存在' + "</font>");
                         return false;
                     }
                 });

@@ -24,10 +24,9 @@ package org.opencron.server.job;
 import it.sauronsoftware.cron4j.*;
 import org.opencron.common.Constants;
 import org.opencron.common.util.CommonUtils;
-import org.opencron.server.domain.Job;
 import org.opencron.server.service.ExecuteService;
 import org.opencron.server.service.JobService;
-import org.opencron.server.vo.JobVo;
+import org.opencron.server.vo.JobInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -60,9 +59,9 @@ public class OpencronCollector implements TaskCollector {
     public synchronized TaskTable getTasks() {
         if (taskTable == null) {
             taskTable = new TaskTable();
-            List<JobVo> jobs = jobService.getCrontabJob();
+            List<JobInfo> jobs = jobService.getCrontabJob();
             for (int index = 0; index < jobs.size(); index++) {
-                final JobVo job = jobs.get(index);
+                final JobInfo job = jobs.get(index);
                 jobIndex.put(job.getJobId(), index);
                 taskTable.add(new SchedulingPattern(job.getCronExp()), new Task() {
                     @Override
@@ -82,7 +81,7 @@ public class OpencronCollector implements TaskCollector {
      *
      * @param job
      */
-    public synchronized void addTask(final JobVo job) {
+    public synchronized void addTask(final JobInfo job) {
         jobIndex.put(job.getJobId(), jobIndex.size());
         taskTable.add(new SchedulingPattern(job.getCronExp()), new Task() {
             @Override

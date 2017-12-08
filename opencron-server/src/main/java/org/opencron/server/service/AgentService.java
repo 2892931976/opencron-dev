@@ -32,7 +32,7 @@ import org.opencron.server.job.OpencronTools;
 import org.opencron.server.tag.PageBean;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.opencron.server.domain.Agent;
-import org.opencron.server.vo.JobVo;
+import org.opencron.server.vo.JobInfo;
 import org.quartz.SchedulerException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -66,7 +66,7 @@ public class AgentService {
     private ConfigService configService;
 
     public List<Agent> getAgentByConnType(Constants.ConnType connType) {
-        return queryDao.sqlQuery(Agent.class, "SELECT * FROM T_AGENT WHERE deleted=0 AND status = 1 AND proxy = " + connType.getType());
+        return queryDao.hqlQuery("FROM Agent WHERE deleted=? AND status = ? AND proxy =?",false,true,connType.getType());
     }
 
     public List<Agent> getAll() {
@@ -79,21 +79,16 @@ public class AgentService {
 
 
     private synchronized void flushAgent() {
-        OpencronTools.CACHE.put(Constants.PARAM_CACHED_AGENT_ID_KEY, queryDao.sqlQuery(Agent.class, "SELECT * FROM T_AGENT WHERE deleted=0"));
-    }
-
-    public List<Agent> getAgentByConnStatus(Constants.ConnStatus status) {
-        String sql = "SELECT * FROM T_AGENT WHERE deleted=0 AND status=?";
-        return queryDao.sqlQuery(Agent.class, sql, status.getValue());
+        OpencronTools.CACHE.put(Constants.PARAM_CACHED_AGENT_ID_KEY, queryDao.hqlQuery("FROM Agent WHERE deleted=?",false));
     }
 
     public List<Agent> getOwnerAgentByConnStatus(HttpSession session, Constants.ConnStatus status) {
-        String sql = "SELECT * FROM T_AGENT WHERE deleted=0 AND status=?";
+        String hql = "from Agent Where deleted=? AND status=?";
         if ( !OpencronTools.isPermission(session)) {
             User user = OpencronTools.getUser(session);
-            sql += " AND agentId in (" + user.getAgentIds() + ")";
+            hql += " AND agentId in (" + user.getAgentIds() + ")";
         }
-        return queryDao.sqlQuery(Agent.class, sql, status.getValue());
+        return queryDao.hqlQuery(hql,false,status.isValue());
     }
 
     public PageBean getOwnerAgent(HttpSession session, PageBean pageBean) {
@@ -151,9 +146,9 @@ public class AgentService {
             /**
              * 获取该执行器下所有的自动执行,并且是quartz类型的作业
              */
-            List<JobVo> jobVos = jobService.getJobVoByAgentId(agent, Constants.ExecType.AUTO, Constants.CronType.QUARTZ);
+            List<JobInfo> jobInfos = jobService.getJobInfoByAgentId(agent.getAgentId(), Constants.ExecType.AUTO, Constants.CronType.QUARTZ);
             try {
-                schedulerService.put(jobVos, this.executeService);
+                schedulerService.put(jobInfos, this.executeService);
             } catch (SchedulerException e) {
                 /**
                  * 创新任务列表失败,抛出异常,整个事务回滚...

@@ -24,7 +24,7 @@ package org.opencron.server.service;
 
 import org.opencron.common.Constants;
 import org.opencron.server.job.OpencronCollector;
-import org.opencron.server.vo.JobVo;
+import org.opencron.server.vo.JobInfo;
 import org.quartz.*;
 import org.quartz.Job;
 import org.quartz.Scheduler;
@@ -67,13 +67,13 @@ public final class SchedulerService {
         return quartzScheduler.checkExists(JobKey.jobKey(jobId.toString()));
     }
 
-    public void put(List<JobVo> jobs, Job jobBean) throws SchedulerException {
-        for (JobVo jobVo : jobs) {
-            put(jobVo, jobBean);
+    public void put(List<JobInfo> jobs, Job jobBean) throws SchedulerException {
+        for (JobInfo jobInfo : jobs) {
+            put(jobInfo, jobBean);
         }
     }
 
-    public void put(JobVo job, Job jobBean) throws SchedulerException {
+    public void put(JobInfo job, Job jobBean) throws SchedulerException {
         TriggerKey triggerKey = TriggerKey.triggerKey(job.getJobId().toString());
         CronTrigger cronTrigger = newTrigger().withIdentity(triggerKey).withSchedule(cronSchedule(job.getCronExp())).build();
 
@@ -128,7 +128,7 @@ public final class SchedulerService {
     }
 
     public void syncJobTigger(Long jobId, ExecuteService executeService) throws SchedulerException {
-        JobVo job = jobService.getJobVoById(jobId);
+        JobInfo job = jobService.getJobInfoById(jobId);
 
         /**
          * 从crontab或者quartz里删除任务
@@ -171,8 +171,8 @@ public final class SchedulerService {
     public void initQuartz(Job jobExecutor) throws SchedulerException {
         //quartz job
         logger.info("[opencron] init quartzJob...");
-        List<JobVo> jobs = jobService.getJobVo(Constants.ExecType.AUTO, Constants.CronType.QUARTZ);
-        for (JobVo job : jobs) {
+        List<JobInfo> jobs = jobService.getJobInfo(Constants.ExecType.AUTO, Constants.CronType.QUARTZ);
+        for (JobInfo job : jobs) {
             try {
                 put(job, jobExecutor);
             } catch (SchedulerException e) {

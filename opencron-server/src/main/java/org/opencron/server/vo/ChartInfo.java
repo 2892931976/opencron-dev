@@ -27,7 +27,7 @@ import java.io.Serializable;
 /**
  * Created by ChenHui on 2016/3/3.
  */
-public class ChartVo implements Serializable {
+public class ChartInfo implements Serializable {
 
     /**
      * 执行类型比例饼状图数据

@@ -28,8 +28,8 @@ import org.opencron.server.domain.Record;
 import org.opencron.server.job.OpencronTools;
 import org.opencron.server.domain.User;
 import org.opencron.server.tag.PageBean;
-import org.opencron.server.vo.ChartVo;
-import org.opencron.server.vo.RecordVo;
+import org.opencron.server.vo.ChartInfo;
+import org.opencron.server.vo.RecordInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,7 +46,7 @@ public class RecordService {
     @Autowired
     private QueryDao queryDao;
 
-    public PageBean query(HttpSession session, PageBean<RecordVo> pageBean, RecordVo recordVo, String queryTime, boolean status) {
+    public PageBean query(HttpSession session, PageBean<RecordInfo> pageBean, RecordInfo recordInfo, String queryTime, boolean status) {
         String sql = "SELECT R.recordId,R.jobId,R.command,R.success,R.startTime,R.status,R.redoCount,R.jobType,R.groupId," +
                 "CASE WHEN R.status IN (1,3,5,6) THEN R.endTime WHEN R.status IN (0,2,4) THEN NOW() END AS endTime," +
                 "R.execType,T.jobName,T.agentId,D.name AS agentName,D.password,D.host,T.cronExp,U.userName AS operateUname FROM T_RECORD AS R " +
@@ -59,32 +59,32 @@ public class RecordService {
                 "AND CASE R.jobType WHEN 1 THEN R.flowNum=0 WHEN 0 THEN R.parentId IS NULL END " +
                 "WHERE R.parentId is NULL " +
                 "AND R.status IN " + (status ? "(1,3,4,5,6)" : "(0,2,4)");
-        if (recordVo != null) {
-            if (notEmpty(recordVo.getSuccess())) {
-                sql += " AND R.success = " + recordVo.getSuccess() + "";
+        if (recordInfo != null) {
+            if (notEmpty(recordInfo.getSuccess())) {
+                sql += " AND R.success = " + recordInfo.getSuccess() + "";
             }
-            if (notEmpty(recordVo.getAgentId())) {
-                sql += " AND R.agentId = " + recordVo.getAgentId() + " ";
+            if (notEmpty(recordInfo.getAgentId())) {
+                sql += " AND R.agentId = " + recordInfo.getAgentId() + " ";
             }
-            if (notEmpty(recordVo.getJobId())) {
-                sql += " AND R.jobId = " + recordVo.getJobId() + " ";
+            if (notEmpty(recordInfo.getJobId())) {
+                sql += " AND R.jobId = " + recordInfo.getJobId() + " ";
             }
             if (notEmpty(queryTime)) {
                 sql += " AND date_format(R.startTime,'%Y-%m-%d')='"+queryTime+"'";
             }
-            if (notEmpty(recordVo.getExecType())) {
-                sql += " AND R.execType = " + recordVo.getExecType() + " ";
+            if (notEmpty(recordInfo.getExecType())) {
+                sql += " AND R.execType = " + recordInfo.getExecType() + " ";
             }
             if (status) {
                 sql += " AND IFNULL(R.flowNum,0) = 0 ";
             }
-            if (!OpencronTools.isPermission(session)) {
+            if (!OpencronTools.isPermission(session) ) {
                 User user = OpencronTools.getUser(session);
                 sql += " AND R.userId = " + user.getUserId() + " AND R.agentId in (" + user.getAgentIds() + ")";
             }
         }
         sql += " ORDER BY R.startTime DESC";
-        queryDao.getPageBySql(pageBean, RecordVo.class, sql);
+        queryDao.getPageBySql(pageBean, RecordInfo.class, sql);
         if (status) {
             //已完成任务的子任务及重跑记录查询
             queryChildrenAndRedo(pageBean);
@@ -92,9 +92,9 @@ public class RecordService {
         return pageBean;
     }
 
-    private void queryChildrenAndRedo(PageBean<RecordVo> pageBean) {
-        List<RecordVo> parentRecords = pageBean.getResult();
-        for (RecordVo parentRecord : parentRecords) {
+    private void queryChildrenAndRedo(PageBean<RecordInfo> pageBean) {
+        List<RecordInfo> parentRecords = pageBean.getResult();
+        for (RecordInfo parentRecord : parentRecords) {
             String sql = "SELECT R.recordId,R.jobId,R.jobType,R.startTime,R.endTime,R.execType,R.status,R.redoCount,R.command,R.success,T.jobName,D.name AS agentName,D.password,D.host,T.cronExp,U.userName AS operateUname FROM T_RECORD AS R " +
                     "INNER JOIN T_JOB AS T " +
                     "ON R.jobId = T.jobId " +
@@ -107,14 +107,14 @@ public class RecordService {
 
             //单一任务有重跑记录的，查出后并把最后一条重跑记录的执行结果记作整个任务的成功、失败状态
             if (parentRecord.getJobType() == Constants.JobType.SINGLETON.getCode() && parentRecord.getRedoCount() > 0) {
-                List<RecordVo> records = queryDao.sqlQuery(RecordVo.class, sql, parentRecord.getRecordId());
+                List<RecordInfo> records = queryDao.sqlQuery(RecordInfo.class, sql, parentRecord.getRecordId());
                 parentRecord.setSuccess(records.get(records.size() - 1).getSuccess());
                 parentRecord.setChildRecord(records);
             }
             //流程任务，先查出父任务的重跑记录，再查出各个子任务，最后查询子任务的重跑记录，并以最后一条记录的执行结果记作整个流程任务的成功、失败状态
             if (parentRecord.getJobType() == Constants.JobType.FLOW.getCode()) {
                 if (parentRecord.getRedoCount() != 0) {
-                    List<RecordVo> records = queryDao.sqlQuery(RecordVo.class, sql, parentRecord.getRecordId());
+                    List<RecordInfo> records = queryDao.sqlQuery(RecordInfo.class, sql, parentRecord.getRecordId());
                     //流程任务不能保证子任务也有记录，先给父任务一个成功、失败状态
                     parentRecord.setSuccess(Constants.ResultStatus.FAILED.getStatus());
                     parentRecord.setChildRecord(records);
@@ -130,10 +130,10 @@ public class RecordService {
                         "AND R.groupId = ? " +
                         "AND R.flowNum > 0 " +
                         "ORDER BY R.flowNum ASC ";
-                List<RecordVo> childJobs = queryDao.sqlQuery(RecordVo.class, sql, parentRecord.getGroupId());
+                List<RecordInfo> childJobs = queryDao.sqlQuery(RecordInfo.class, sql, parentRecord.getGroupId());
                 if (notEmpty(childJobs)) {
                     parentRecord.setChildJob(childJobs);
-                    for (RecordVo childJob : parentRecord.getChildJob()) {
+                    for (RecordInfo childJob : parentRecord.getChildJob()) {
                         if (childJob.getRedoCount() > 0) {
                             sql = "SELECT R.recordId,R.jobId,R.jobType,R.startTime,R.endTime,R.execType,R.status,R.redoCount,R.command,R.success,R.parentId,T.jobName,D.name AS agentName,D.password,D.host,T.cronExp,U.userName AS operateUname FROM T_RECORD AS R " +
                                     "INNER JOIN T_JOB AS T " +
@@ -144,13 +144,13 @@ public class RecordService {
                                     "ON T.userId = U.userId " +
                                     "WHERE R.parentId = ? " +
                                     "ORDER BY R.startTime ASC ";
-                            List<RecordVo> childRedo = queryDao.sqlQuery(RecordVo.class, sql, childJob.getRecordId());
+                            List<RecordInfo> childRedo = queryDao.sqlQuery(RecordInfo.class, sql, childJob.getRecordId());
                             childJob.setChildRecord(childRedo);
                         }
 
                     }
                     //判断整个流程任务最终执行的成功、失败状态
-                    RecordVo lastJob = childJobs.get(childJobs.size() - 1);
+                    RecordInfo lastJob = childJobs.get(childJobs.size() - 1);
                     if (lastJob.getLastChild()) {
                         if (notEmpty(lastJob.getChildRecord())) {
                             parentRecord.setSuccess(lastJob.getChildRecord().get(lastJob.getChildRecord().size() - 1).getSuccess());
@@ -166,9 +166,9 @@ public class RecordService {
         pageBean.setResult(parentRecords);
     }
 
-    public RecordVo getDetailById(Long id) {
+    public RecordInfo getDetailById(Long id) {
         return queryDao.sqlUniqueQuery(
-                RecordVo.class,
+                RecordInfo.class,
                 "SELECT R.recordId,R.jobType,R.jobId,R.startTime,R.endTime,R.execType,R.returnCode,R.message,R.redoCount,R.command,R.success,T.jobName,T.agentId,D.name AS agentName,D.password,D.host,T.cronExp,T.userId,U.userName AS operateUname FROM T_RECORD AS R " +
                         "LEFT JOIN T_JOB AS T " +
                         "ON R.jobId = T.jobId " +
@@ -217,7 +217,7 @@ public class RecordService {
                 "AND R.status IN (0,2,4) ", id, id) > 0L;
     }
 
-    public List<ChartVo> getRecord(HttpSession session, String startTime, String endTime) {
+    public List<ChartInfo> getRecord(HttpSession session, String startTime, String endTime) {
         String sql = "SELECT DATE_FORMAT(r.startTime,'%Y-%m-%d') AS date, " +
                 "sum(CASE r.success WHEN 0 THEN 1 ELSE 0 END) failure, " +
                 "sum(CASE r.success WHEN 1 THEN 1 ELSE 0 END) success, " +
@@ -237,10 +237,10 @@ public class RecordService {
             sql += " AND r.userId = " + user.getUserId() + " AND r.agentId in (" + user.getAgentIds() + ")";
         }
         sql += " GROUP BY DATE_FORMAT(r.startTime,'%Y-%m-%d') ORDER BY DATE_FORMAT(r.startTime,'%Y-%m-%d') ASC";
-        return queryDao.sqlQuery(ChartVo.class, sql);
+        return queryDao.sqlQuery(ChartInfo.class, sql);
     }
 
-    public ChartVo getAsProgress(HttpSession session) {
+    public ChartInfo getAsProgress(HttpSession session) {
         String sql = "SELECT " +
                 "sum(CASE R.success WHEN 0 THEN 1 ELSE 0 END) failure, " +
                 "sum(CASE R.success WHEN 1 THEN 1 ELSE 0 END) success, " +
@@ -258,7 +258,7 @@ public class RecordService {
             User user = OpencronTools.getUser(session);
             sql += " AND R.userId = " + user.getUserId() + " AND R.agentId in (" + user.getAgentIds() + ")";
         }
-        return queryDao.sqlUniqueQuery(ChartVo.class, sql);
+        return queryDao.sqlUniqueQuery(ChartInfo.class, sql);
     }
 
     @Transactional

@@ -27,7 +27,7 @@ import org.opencron.server.dao.QueryDao;
 import org.opencron.server.domain.Agent;
 import org.opencron.server.domain.Group;
 import org.opencron.server.tag.PageBean;
-import org.opencron.server.vo.AgentGroupVo;
+import org.opencron.server.vo.AgentGroupInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -83,9 +83,9 @@ public class GroupService {
 
         Map<Long,Group> groupMap = new HashMap<Long, Group>(0);
 
-        List<AgentGroupVo> agentGroupVos = queryDao.sqlQuery(AgentGroupVo.class,sql);
-        if (CommonUtils.notEmpty(agentGroupVos))  {
-            for(AgentGroupVo agentGroup:agentGroupVos){
+        List<AgentGroupInfo> agentGroupInfos = queryDao.sqlQuery(AgentGroupInfo.class,sql);
+        if (CommonUtils.notEmpty(agentGroupInfos))  {
+            for(AgentGroupInfo agentGroup: agentGroupInfos){
                 Agent agent = new Agent();
                 agent.setAgentId(agentGroup.getAgentId());
                 agent.setName(agentGroup.getAgentName());

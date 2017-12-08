@@ -33,14 +33,13 @@ import org.opencron.common.Constants;
 import org.opencron.server.dao.QueryDao;
 import org.opencron.server.domain.Job;
 import org.opencron.server.domain.User;
-import org.opencron.server.domain.Agent;
 import org.opencron.server.job.OpencronCollector;
 import org.opencron.server.job.OpencronTools;
 import org.opencron.server.tag.PageBean;
 
 
 import org.opencron.common.util.CommonUtils;
-import org.opencron.server.vo.JobVo;
+import org.opencron.server.vo.JobInfo;
 import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,7 +81,7 @@ public class JobService {
      *
      * @return
      */
-    public List<JobVo> getJobVo(ExecType execType, CronType cronType) {
+    public List<JobInfo> getJobInfo(ExecType execType, CronType cronType) {
         String sql = "SELECT T.*,D.name AS agentName,D.port,D.host,D.password FROM T_JOB AS T " +
                 "LEFT JOIN T_AGENT AS D " +
                 "ON T.agentId = D.agentId " +
@@ -90,12 +89,12 @@ public class JobService {
                 "AND cronType=? " +
                 "AND execType = ? " +
                 "AND T.deleted=0";
-        List<JobVo> jobs = queryDao.sqlQuery(JobVo.class, sql, cronType.getType(), execType.getStatus());
+        List<JobInfo> jobs = queryDao.sqlQuery(JobInfo.class, sql, cronType.getType(), execType.getStatus());
         queryJobMore(jobs);
         return jobs;
     }
 
-    public List<JobVo> getJobVoByAgentId(Agent agent, ExecType execType, CronType cronType) {
+    public List<JobInfo> getJobInfoByAgentId(Long agentId, ExecType execType, CronType cronType) {
         String sql = "SELECT T.*,D.name AS agentName,D.port,D.host,D.password FROM T_JOB AS T " +
                 "INNER JOIN T_AGENT D " +
                 "ON T.agentId = D.agentId " +
@@ -105,16 +104,16 @@ public class JobService {
                 "AND T.deleted=0 " +
                 "AND D.agentId=? ";
 
-        List<JobVo> jobs = queryDao.sqlQuery(JobVo.class, sql, cronType.getType(), execType.getStatus(), agent.getAgentId());
+        List<JobInfo> jobs = queryDao.sqlQuery(JobInfo.class, sql, cronType.getType(), execType.getStatus(), agentId);
         queryJobMore(jobs);
         return jobs;
     }
 
-    private void queryJobMore(List<JobVo> jobs) {
+    private void queryJobMore(List<JobInfo> jobs) {
         if (CommonUtils.notEmpty(jobs)) {
-            for (JobVo job : jobs) {
+            for (JobInfo job : jobs) {
                 job.setAgent(agentService.getAgent(job.getAgentId()));
-                queryChildren(job);
+                queryJobInfoChildren(job);
                 queryJobUser(job);
             }
         }
@@ -132,9 +131,9 @@ public class JobService {
         return queryDao.sqlQuery(Job.class, sql, jobType.getCode());
     }
 
-    public List<JobVo> getCrontabJob() {
+    public List<JobInfo> getCrontabJob() {
         logger.info("[opencron] init quartzJob...");
-        return getJobVo(Constants.ExecType.AUTO, Constants.CronType.CRONTAB);
+        return getJobInfo(Constants.ExecType.AUTO, Constants.CronType.CRONTAB);
     }
 
     public List<Job> getAll() {
@@ -149,7 +148,7 @@ public class JobService {
         OpencronTools.CACHE.put(Constants.PARAM_CACHED_JOB_ID_KEY, queryDao.sqlQuery(Job.class, "SELECT * FROM T_JOB WHERE deleted=0"));
     }
 
-    public PageBean<JobVo> getJobVos(HttpSession session, PageBean pageBean, JobVo job) {
+    public PageBean<JobInfo> getJobInfoPage(HttpSession session, PageBean pageBean, JobInfo job) {
         String sql = "SELECT T.*,D.name AS agentName,D.port,D.host,D.password,U.userName AS operateUname " +
                 "FROM T_JOB AS T " +
                 "LEFT JOIN T_AGENT AS D " +
@@ -179,17 +178,17 @@ public class JobService {
                 sql += " AND T.userId = " + user.getUserId() + " AND T.agentId IN (" + user.getAgentIds() + ")";
             }
         }
-        pageBean = queryDao.getPageBySql(pageBean, JobVo.class, sql);
-        List<JobVo> parentJobs = pageBean.getResult();
+        pageBean = queryDao.getPageBySql(pageBean, JobInfo.class, sql);
+        List<JobInfo> parentJobs = pageBean.getResult();
 
-        for (JobVo parentJob : parentJobs) {
-            queryChildren(parentJob);
+        for (JobInfo parentJob : parentJobs) {
+            queryJobInfoChildren(parentJob);
         }
         pageBean.setResult(parentJobs);
         return pageBean;
     }
 
-    private List<JobVo> queryChildren(JobVo job) {
+    private List<JobInfo> queryJobInfoChildren(JobInfo job) {
         if (job.getJobType().equals(JobType.FLOW.getCode())) {
             String sql = "SELECT T.*,D.name AS agentName,D.port,D.host,D.password,U.userName AS operateUname FROM T_JOB AS T " +
                     "LEFT JOIN T_AGENT AS D " +
@@ -200,10 +199,10 @@ public class JobService {
                     "AND T.flowId = ? " +
                     "AND T.flowNum>0 " +
                     "ORDER BY T.flowNum ASC";
-            List<JobVo> childJobs = queryDao.sqlQuery(JobVo.class, sql, job.getFlowId());
+            List<JobInfo> childJobs = queryDao.sqlQuery(JobInfo.class, sql, job.getFlowId());
             if (CommonUtils.notEmpty(childJobs)) {
-                for (JobVo jobVo : childJobs) {
-                    jobVo.setAgent(agentService.getAgent(jobVo.getAgentId()));
+                for (JobInfo jobInfo : childJobs) {
+                    jobInfo.setAgent(agentService.getAgent(jobInfo.getAgentId()));
                 }
             }
             job.setChildren(childJobs);
@@ -219,7 +218,7 @@ public class JobService {
         return saveJob;
     }
 
-    public JobVo getJobVoById(Long id) {
+    public JobInfo getJobInfoById(Long id) {
         String sql = "SELECT T.*,D.name AS agentName,D.port,D.host,D.password,U.username AS operateUname " +
                 " FROM T_JOB AS T " +
                 "LEFT JOIN T_AGENT AS D " +
@@ -227,7 +226,7 @@ public class JobService {
                 "LEFT JOIN T_USER AS U " +
                 "ON T.userId = U.userId " +
                 "WHERE T.jobId =?";
-        JobVo job = queryDao.sqlUniqueQuery(JobVo.class, sql, id);
+        JobInfo job = queryDao.sqlUniqueQuery(JobInfo.class, sql, id);
         if (job == null) {
             return null;
         }
@@ -235,21 +234,21 @@ public class JobService {
         return job;
     }
 
-    private void queryJobUser(JobVo job) {
+    private void queryJobUser(JobInfo job) {
         if (job != null && job.getUserId() != null) {
             User user = userService.getUserById(job.getUserId());
             job.setUser(user);
         }
     }
 
-    public List<JobVo> getJobByAgentId(Long agentId) {
+    public List<JobInfo> getJobByAgentId(Long agentId) {
         String sql = "SELECT T.*,D.name AS agentName,D.port,D.host,D.password,U.userName AS operateUname FROM T_JOB AS T " +
                 "LEFT JOIN T_USER AS U " +
                 "ON T.userId = U.userId " +
                 "LEFT JOIN T_AGENT D " +
                 "ON T.agentId = D.agentId " +
                 "WHERE T.agentId =?";
-        return queryDao.sqlQuery(JobVo.class, sql, agentId);
+        return queryDao.sqlQuery(JobInfo.class, sql, agentId);
     }
 
     public boolean existsName(Long jobId, Long agentId, String name) {
@@ -329,17 +328,17 @@ public class JobService {
             /**
              * 当前作业已有的子作业
              */
-            JobVo jobVo = new JobVo();
-            jobVo.setJobType(JobType.FLOW.getCode());
-            jobVo.setFlowId(job.getFlowId());
+            JobInfo jobInfo = new JobInfo();
+            jobInfo.setJobType(JobType.FLOW.getCode());
+            jobInfo.setFlowId(job.getFlowId());
 
             /**
              * 取差集..
              */
-            List<JobVo> hasChildren = queryChildren(jobVo);
+            List<JobInfo> hasChildren = queryJobInfoChildren(jobInfo);
             //数据库里已经存在的子集合..
             top:
-            for (JobVo hasChild : hasChildren) {
+            for (JobInfo hasChild : hasChildren) {
                 //当前页面提交过来的子集合...
                 for (Job child : children) {
                     if (child.getJobId() != null && child.getJobId().equals(hasChild.getJobId())) {
@@ -419,8 +418,8 @@ public class JobService {
                     if (jobBean.getPause()) {
                         opencronCollector.removeTask(jobBean.getJobId());
                     }else {
-                        JobVo jobVo = getJobVoById(job.getJobId());
-                        opencronCollector.addTask(jobVo);
+                        JobInfo jobInfo = getJobInfoById(job.getJobId());
+                        opencronCollector.addTask(jobInfo);
                     }
                     job.setPause(jobBean.getPause());
                     merge(job);

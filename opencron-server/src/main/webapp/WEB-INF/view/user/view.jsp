@@ -10,26 +10,21 @@
     <script type="text/javascript">
 
         function editPwd(id){
-            $.ajax({
+            ajax({
                 headers:{"csrf":"${csrf}"},
                 type:"POST",
                 url:"${contextPath}/user/get.do",
-                data:{"id":id},
-                success : function(obj) {
-                    $("#pwdform")[0].reset();
-                    if(obj!=null){
-                        $("#oldpwd").html("");
-                        $("#checkpwd").html("");
-                        $("#id").val(obj.userId);
-                        $("#pwdModal").modal("show");
-                        return;
-                    }
-                },
-                error : function() {
-                    alert("网络繁忙请刷新页面重试!");
+                data:{"id":id}
+            },function (data) {
+                $("#pwdform")[0].reset();
+                if(data!=null){
+                    $("#oldpwd").html("");
+                    $("#checkpwd").html("");
+                    $("#id").val(data.userId);
+                    $("#pwdModal").modal("show");
+                    return;
                 }
             });
-
         }
 
         function savePwd(){
@@ -65,7 +60,7 @@
                 alert("两密码不一致!");
                 return false;
             }
-            $.ajax({
+            ajax({
                 headers:{"csrf":"${csrf}"},
                 type:"POST",
                 url:"${contextPath}/user/pwd.do",
@@ -74,25 +69,19 @@
                     "pwd0":calcMD5(pwd0),
                     "pwd1":calcMD5(pwd1),
                     "pwd2":calcMD5(pwd2)
-                },
-                success:function(data){
-                    if (data == "true"){
-                        $('#pwdModal').modal('hide');
-                        alertMsg("修改成功");
-                        return false;
-                    }
-                    if(data == "one"){
-                        $("#oldpwd").html("<font color='red'>" + '<i class="glyphicon glyphicon-remove-sign"></i>&nbsp;密码不正确' + "</font>");
-                        return false;
-                    }
-                    if(data == "two"){
-                        $("#checkpwd").html("<font color='red'>" + '<i class="glyphicon glyphicon-remove-sign"></i>&nbsp;密码不一致' + "</font>");
-                        return false;
-                    }
-
-                },
-                error : function() {
-                    alert("网络繁忙请刷新页面重试!");
+                }
+            },function (data) {
+                if (data == "true"){
+                    $('#pwdModal').modal('hide');
+                    alertMsg("修改成功");
+                    return false;
+                }
+                if(data == "one"){
+                    $("#oldpwd").html("<font color='red'>" + '<i class="glyphicon glyphicon-remove-sign"></i>&nbsp;密码不正确' + "</font>");
+                    return false;
+                }
+                if(data == "two"){
+                    $("#checkpwd").html("<font color='red'>" + '<i class="glyphicon glyphicon-remove-sign"></i>&nbsp;密码不一致' + "</font>");
                     return false;
                 }
             });

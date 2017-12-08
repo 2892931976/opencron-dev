@@ -3,7 +3,7 @@ package org.opencron.server.vo;
 /**
  * Created by th on 2017/5/18.
  */
-public class AgentGroupVo {
+public class AgentGroupInfo {
 
     private Long groupId;
     private String groupName;

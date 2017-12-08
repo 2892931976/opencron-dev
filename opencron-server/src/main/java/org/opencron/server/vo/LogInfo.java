@@ -28,7 +28,7 @@ import java.util.Date;
 /**
  * Created by ChenHui on 2016/3/31.
  */
-public class LogVo implements Serializable {
+public class LogInfo implements Serializable {
 
     private Long logId;
 

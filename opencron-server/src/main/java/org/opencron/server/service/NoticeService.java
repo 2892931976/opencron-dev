@@ -33,7 +33,7 @@ import org.opencron.common.util.CommonUtils;
 import org.opencron.common.util.DateUtils;
 import org.opencron.common.util.HttpUtils;
 import org.opencron.server.domain.Agent;
-import org.opencron.server.vo.JobVo;
+import org.opencron.server.vo.JobInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -83,7 +83,7 @@ public class NoticeService {
         }
     }
 
-    public void notice(JobVo job,String msg) {
+    public void notice(JobInfo job, String msg) {
         if (!job.getWarning()) return;
         Agent agent = job.getAgent();
         String message = "执行任务:" + job.getCommand() + "(" + job.getCronExp() + ")失败,%s!";

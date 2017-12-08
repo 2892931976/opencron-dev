@@ -23,7 +23,7 @@ package org.opencron.server.domain;
 
 import org.opencron.common.Constants;
 import org.opencron.common.util.CommonUtils;
-import org.opencron.server.vo.JobVo;
+import org.opencron.server.vo.JobInfo;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -79,15 +79,15 @@ public class Record implements Serializable {
     public Record() {
     }
 
-    public Record(JobVo jobVo) {
-        this.setJobId(jobVo.getJobId());
-        this.setAgentId(jobVo.getAgentId());
-        this.setUserId(jobVo.getUserId());
-        this.setExecType( jobVo.getExecType() );
-        this.setCommand(jobVo.getCommand());//执行的命令
+    public Record(JobInfo jobInfo) {
+        this.setJobId(jobInfo.getJobId());
+        this.setAgentId(jobInfo.getAgentId());
+        this.setUserId(jobInfo.getUserId());
+        this.setExecType( jobInfo.getExecType() );
+        this.setCommand(jobInfo.getCommand());//执行的命令
         this.setStartTime(new Date());//开始执行的时间
-        this.setRedo(jobVo.getRedo());//失败是否重新执行
-        this.setRunCount(jobVo.getRunCount());//失败后重新执行次数
+        this.setRedo(jobInfo.getRedo());//失败是否重新执行
+        this.setRunCount(jobInfo.getRunCount());//失败后重新执行次数
         this.setRedoCount(0);//运行次数
         this.setSuccess(Constants.ResultStatus.SUCCESSFUL.getStatus());
         this.setStatus(Constants.RunStatus.RUNNING.getStatus());//任务还未完成

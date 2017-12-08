@@ -15,19 +15,23 @@ function alertMsg(msg){
     });
 }
 
-function ajax(params,callback) {
-    $.ajax({
-        headers: params.headers,
+function ajax(params,successCallback,errorCallBack) {
+    jQuery.ajax({
+        headers: params.headers||{},
         type:  params.type||"GET",
         url:params.url,
-        data:params.data,
+        data:params.data||{},
         success:function (data) {
-            if (callback) {
-                callback(data);
+            if (successCallback) {
+                successCallback(data);
             }
         },
         error: function () {
-            alert("网络繁忙请刷新页面重试!");
+            if (errorCallBack){
+                errorCallBack();
+            }else {
+                alert("网络繁忙请刷新页面重试!");
+            }
         }
     });
 }

@@ -27,7 +27,7 @@ import org.opencron.common.Constants;
 import org.opencron.server.domain.Record;
 import org.opencron.server.service.*;
 import org.opencron.server.tag.PageBean;
-import org.opencron.server.vo.RecordVo;
+import org.opencron.server.vo.RecordInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -58,80 +58,80 @@ public class RecordController extends BaseController {
      * 查询已完成任务列表
      *
      * @param pageBean
-     * @param recordVo
+     * @param recordInfo
      * @param model
      * @return
      */
      @RequestMapping("done.htm")
-    public String queryDone(HttpSession session, PageBean pageBean, RecordVo recordVo, String queryTime, Model model) {
+    public String queryDone(HttpSession session, PageBean pageBean, RecordInfo recordInfo, String queryTime, Model model) {
 
         model.addAttribute("agents", agentService.getOwnerAgents(session));
 
-        if (notEmpty(recordVo.getSuccess())) {
-            model.addAttribute("success", recordVo.getSuccess());
+        if (notEmpty(recordInfo.getSuccess())) {
+            model.addAttribute("success", recordInfo.getSuccess());
         }
-        if (notEmpty(recordVo.getAgentId())) {
-            model.addAttribute("agentId", recordVo.getAgentId());
+        if (notEmpty(recordInfo.getAgentId())) {
+            model.addAttribute("agentId", recordInfo.getAgentId());
         }
 
-        if (notEmpty(recordVo.getAgentId())) {
-            model.addAttribute("agentId", recordVo.getAgentId());
-            model.addAttribute("jobs", jobService.getJobByAgentId(recordVo.getAgentId()));
+        if (notEmpty(recordInfo.getAgentId())) {
+            model.addAttribute("agentId", recordInfo.getAgentId());
+            model.addAttribute("jobs", jobService.getJobByAgentId(recordInfo.getAgentId()));
         } else {
             model.addAttribute("jobs", jobService.getAll());
         }
 
-        if (notEmpty(recordVo.getJobId())) {
-            model.addAttribute("jobId", recordVo.getJobId());
+        if (notEmpty(recordInfo.getJobId())) {
+            model.addAttribute("jobId", recordInfo.getJobId());
         }
         if (notEmpty(queryTime)) {
             model.addAttribute("queryTime", queryTime);
         }
-        if (notEmpty(recordVo.getExecType())) {
-            model.addAttribute("execType", recordVo.getExecType());
+        if (notEmpty(recordInfo.getExecType())) {
+            model.addAttribute("execType", recordInfo.getExecType());
         }
-        recordService.query(session, pageBean, recordVo, queryTime, true);
+        recordService.query(session, pageBean, recordInfo, queryTime, true);
 
         return "/record/done";
     }
 
      @RequestMapping("running.htm")
-    public String queryRunning(HttpSession session, PageBean pageBean, RecordVo recordVo, String queryTime, Model model,Boolean refresh) {
+    public String queryRunning(HttpSession session, PageBean pageBean, RecordInfo recordInfo, String queryTime, Model model, Boolean refresh) {
 
         model.addAttribute("agents", agentService.getOwnerAgents(session));
 
-        if (notEmpty(recordVo.getAgentId())) {
-            model.addAttribute("agentId", recordVo.getAgentId());
-            model.addAttribute("jobs", jobService.getJobByAgentId(recordVo.getAgentId()));
+        if (notEmpty(recordInfo.getAgentId())) {
+            model.addAttribute("agentId", recordInfo.getAgentId());
+            model.addAttribute("jobs", jobService.getJobByAgentId(recordInfo.getAgentId()));
         } else {
             model.addAttribute("jobs", jobService.getAll());
         }
 
-        if (notEmpty(recordVo.getJobId())) {
-            model.addAttribute("jobId", recordVo.getJobId());
+        if (notEmpty(recordInfo.getJobId())) {
+            model.addAttribute("jobId", recordInfo.getJobId());
         }
         if (notEmpty(queryTime)) {
             model.addAttribute("queryTime", queryTime);
         }
-        if (notEmpty(recordVo.getExecType())) {
-            model.addAttribute("execType", recordVo.getExecType());
+        if (notEmpty(recordInfo.getExecType())) {
+            model.addAttribute("execType", recordInfo.getExecType());
         }
-        recordService.query(session, pageBean, recordVo, queryTime, false);
+        recordService.query(session, pageBean, recordInfo, queryTime, false);
         return refresh==null?"/record/running":"/record/refresh";
     }
 
      @RequestMapping("refresh.htm")
-    public String refresh(HttpSession session,PageBean pageBean, RecordVo recordVo, String queryTime, Model model) {
-        return this.queryRunning(session,pageBean,recordVo,queryTime,model,true);
+    public String refresh(HttpSession session, PageBean pageBean, RecordInfo recordInfo, String queryTime, Model model) {
+        return this.queryRunning(session,pageBean, recordInfo,queryTime,model,true);
     }
 
      @RequestMapping("detail/{id}.htm")
     public String showDetail(Model model,@PathVariable("id") Long id) {
-        RecordVo recordVo = recordService.getDetailById(id);
-        if (recordVo == null) {
+        RecordInfo recordInfo = recordService.getDetailById(id);
+        if (recordInfo == null) {
             return "/error/404";
         }
-        model.addAttribute("record", recordVo);
+        model.addAttribute("record", recordInfo);
         return "/record/detail";
     }
 

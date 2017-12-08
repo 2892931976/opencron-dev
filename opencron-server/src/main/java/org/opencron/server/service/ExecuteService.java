@@ -32,7 +32,7 @@ import org.opencron.server.domain.Record;
 import org.opencron.server.domain.Agent;
 import org.opencron.server.domain.User;
 import org.opencron.server.job.OpencronCaller;
-import org.opencron.server.vo.JobVo;
+import org.opencron.server.vo.JobInfo;
 import com.mysql.jdbc.PacketTooBigException;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
@@ -80,11 +80,11 @@ public class ExecuteService implements Job {
     @Override
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
         String key = jobExecutionContext.getJobDetail().getKey().getName();
-        JobVo jobVo = (JobVo) jobExecutionContext.getJobDetail().getJobDataMap().get(key);
+        JobInfo jobInfo = (JobInfo) jobExecutionContext.getJobDetail().getJobDataMap().get(key);
         try {
             ExecuteService executeService = (ExecuteService) jobExecutionContext.getJobDetail().getJobDataMap().get("jobBean");
-            boolean success = executeService.executeJob(jobVo);
-            this.loggerInfo("[opencron] job:{} at {}:{},execute:{}", jobVo, success ? "successful" : "failed");
+            boolean success = executeService.executeJob(jobInfo);
+            this.loggerInfo("[opencron] job:{} at {}:{},execute:{}", jobInfo, success ? "successful" : "failed");
         } catch (Exception e) {
             logger.error(e.getLocalizedMessage(), e);
         }
@@ -93,7 +93,7 @@ public class ExecuteService implements Job {
     /**
      * 基本方式执行任务，按任务类型区分
      */
-    public boolean executeJob(final JobVo job) {
+    public boolean executeJob(final JobInfo job) {
 
         JobType jobType = JobType.getJobType(job.getJobType());
         switch (jobType) {
@@ -109,7 +109,7 @@ public class ExecuteService implements Job {
     /**
      * 单一任务执行过程
      */
-    private boolean executeSingleJob(JobVo job, Long userId) {
+    private boolean executeSingleJob(JobInfo job, Long userId) {
 
         if (!checkJobPermission(job.getAgentId(), userId)) return false;
 
@@ -147,11 +147,11 @@ public class ExecuteService implements Job {
     /**
      * 流程任务 按流程任务处理方式区分
      */
-    private boolean executeFlowJob(JobVo job) {
+    private boolean executeFlowJob(JobInfo job) {
         if (!checkJobPermission(job.getAgentId(), job.getUserId())) return false;
 
         final long groupId = System.nanoTime() + Math.abs(new Random().nextInt());//分配一个流程组Id
-        final Queue<JobVo> jobQueue = new LinkedBlockingQueue<JobVo>();
+        final Queue<JobInfo> jobQueue = new LinkedBlockingQueue<JobInfo>();
         jobQueue.add(job);
         jobQueue.addAll(job.getChildren());
         RunModel runModel = RunModel.getRunModel(job.getRunModel());
@@ -168,9 +168,9 @@ public class ExecuteService implements Job {
     /**
      * 串行任务处理方式
      */
-    private boolean executeSequenceJob(long groupId, Queue<JobVo> jobQueue) {
-        for (JobVo jobVo : jobQueue) {
-            if (!doFlowJob(jobVo, groupId)) {
+    private boolean executeSequenceJob(long groupId, Queue<JobInfo> jobQueue) {
+        for (JobInfo jobInfo : jobQueue) {
+            if (!doFlowJob(jobInfo, groupId)) {
                 return false;
             }
         }
@@ -180,19 +180,19 @@ public class ExecuteService implements Job {
     /**
      * 并行任务处理方式
      */
-    private boolean executeSameTimeJob(final long groupId, final Queue<JobVo> jobQueue) {
+    private boolean executeSameTimeJob(final long groupId, final Queue<JobInfo> jobQueue) {
         final List<Boolean> result = new ArrayList<Boolean>(0);
 
         final Semaphore semaphore = new Semaphore(jobQueue.size());
         ExecutorService exec = Executors.newCachedThreadPool();
 
-        for (final JobVo jobVo : jobQueue) {
+        for (final JobInfo jobInfo : jobQueue) {
             Runnable task = new Runnable() {
                 @Override
                 public void run() {
                     try {
                         semaphore.acquire();
-                        result.add(doFlowJob(jobVo, groupId));
+                        result.add(doFlowJob(jobInfo, groupId));
                         semaphore.release();
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -213,7 +213,7 @@ public class ExecuteService implements Job {
     /**
      * 流程任务（通用）执行过程
      */
-    private boolean doFlowJob(JobVo job, long groupId) {
+    private boolean doFlowJob(JobInfo job, long groupId) {
         Record record = new Record(job);
         record.setGroupId(groupId);//组Id
         record.setJobType(JobType.FLOW.getCode());//流程任务
@@ -300,16 +300,16 @@ public class ExecuteService implements Job {
         ExecutorService exec = Executors.newCachedThreadPool();
         for (String agentId : arrayIds) {
             Agent agent = agentService.getAgent(Long.parseLong(agentId));
-            final JobVo jobVo = new JobVo(userId, command, agent);
-            jobVo.setRunAs("root");
-            jobVo.setSuccessExit("0");
+            final JobInfo jobInfo = new JobInfo(userId, command, agent);
+            jobInfo.setRunAs("root");
+            jobInfo.setSuccessExit("0");
 
             Runnable task = new Runnable() {
                 @Override
                 public void run() {
                     try {
                         semaphore.acquire();
-                        executeSingleJob(jobVo, userId);
+                        executeSingleJob(jobInfo, userId);
                         semaphore.release();
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -330,7 +330,7 @@ public class ExecuteService implements Job {
     /**
      * 失败任务的重执行过程
      */
-    public boolean reExecuteJob(final Record parentRecord, JobVo job, JobType jobType) {
+    public boolean reExecuteJob(final Record parentRecord, JobInfo job, JobType jobType) {
 
         if (parentRecord.getRedoCount().equals(reExecuteThreadMap.get(parentRecord.getRecordId()))) {
             return false;
@@ -425,14 +425,14 @@ public class ExecuteService implements Job {
             Runnable task = new Runnable() {
                 @Override
                 public void run() {
-                    JobVo job = null;
+                    JobInfo job = null;
                     try {
                         semaphore.acquire();
                         //临时的改成停止中...
                         cord.setStatus(RunStatus.STOPPING.getStatus());//停止中
                         cord.setSuccess(ResultStatus.KILLED.getStatus());//被杀.
                         recordService.merge(cord);
-                        job = jobService.getJobVoById(cord.getJobId());
+                        job = jobService.getJobInfoById(cord.getJobId());
                         //向远程机器发送kill指令
                         caller.sentSync( Request.request(
                                         job.getHost(),
@@ -479,7 +479,7 @@ public class ExecuteService implements Job {
     /**
      * 向执行器发送请求，并封装响应结果
      */
-    private Response responseToRecord(final JobVo job, final Record record) throws Exception {
+    private Response responseToRecord(final JobInfo job, final Record record) throws Exception {
         Response response = caller.sentSync( Request.request(
                 job.getHost(),
                 job.getPort(),
@@ -530,7 +530,7 @@ public class ExecuteService implements Job {
     /**
      * 任务执行前 检测通信
      */
-    private void checkPing(JobVo job, Record record) throws PingException {
+    private void checkPing(JobInfo job, Record record) throws PingException {
         boolean ping = ping(job.getAgent());
         if ( ! ping ) {
             record.setStatus(RunStatus.DONE.getStatus());//已完成
@@ -674,7 +674,7 @@ public class ExecuteService implements Job {
         return agentIds.contains(thisAgentId);
     }
 
-    private void loggerInfo(String str, JobVo job, String message) {
+    private void loggerInfo(String str, JobInfo job, String message) {
         if (message != null) {
             logger.info(str, job.getJobName(), job.getHost(), job.getPort(), message);
         } else {
@@ -682,7 +682,7 @@ public class ExecuteService implements Job {
         }
     }
 
-    private String loggerError(String str, JobVo job, String message, Exception e) {
+    private String loggerError(String str, JobInfo job, String message, Exception e) {
         String errorInfo = String.format(str, job.getJobName(), job.getHost(), job.getPort(), message);
         logger.error(errorInfo, e);
         return errorInfo;

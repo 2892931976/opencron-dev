@@ -34,11 +34,10 @@
                 }
 
                 //同步到session中...
-                $.ajax({
+                ajax({
                     headers:{"csrf":"${csrf}"},
                     type:"POST",
                     url: "${contextPath}/config/skin.do",
-                    dataType: "JSON",
                     data:{
                         "skin":skin
                     }
@@ -378,37 +377,34 @@
 
             var data = {username:username,password:sendpwd};
 
-            $.ajax({
+            ajax({
                 type: "POST",
                 url: "${contextPath}/login.do",
-                data: data,
-                success: function (data) {
-                    if(data.msg){
-                        $("#error_msg").html('<font color="red">'+data.msg+'</font>');
-                        $("#btnLogin").prop("disabled",false);
-                    } else {
-                        if (data.status == "success"){
-                            if(isremember()){
-                                loginCookie.set(username,sendpwd);
-                            }else {
-                                loginCookie.clean(username);
-                            }
-                            window.location.href = "${contextPath}"+data.url;
-                        }else {
-                            $("#error_msg").html('<font color="red">请修改初始密码</font>');
-                            $("#pwdform")[0].reset();
-                            $("#id").val(data.userId);
-                            $("#csrf").val(data.csrf);
-                            $('#pwdModal').modal('show');
-                        }
-                    }
-                    return false;
-                },
-                error : function (){
-                    $("#error_msg").html('<font color="red">网络繁忙请刷新页面重试!</font>');
+                data: data
+            },function (data) {
+                if(data.msg){
+                    $("#error_msg").html('<font color="red">'+data.msg+'</font>');
                     $("#btnLogin").prop("disabled",false);
+                } else {
+                    if (data.status == "success"){
+                        if(isremember()){
+                            loginCookie.set(username,sendpwd);
+                        }else {
+                            loginCookie.clean(username);
+                        }
+                        window.location.href = "${contextPath}"+data.url;
+                    }else {
+                        $("#error_msg").html('<font color="red">请修改初始密码</font>');
+                        $("#pwdform")[0].reset();
+                        $("#id").val(data.userId);
+                        $("#csrf").val(data.csrf);
+                        $('#pwdModal').modal('show');
+                    }
                 }
-
+                return false;
+            },function () {
+                $("#error_msg").html('<font color="red">网络繁忙请刷新页面重试!</font>');
+                $("#btnLogin").prop("disabled",false);
             });
             return false;
         }
@@ -442,7 +438,7 @@
                 alert("两密码不一致!");
                 return false;
             }
-            $.ajax({
+            ajax({
                 headers:{"csrf":$("#csrf").val()},
                 type:"POST",
                 url:"${contextPath}/user/pwd.do",
@@ -451,27 +447,22 @@
                     "pwd0":calcMD5($("#password").val()),
                     "pwd1":calcMD5(pwd1),
                     "pwd2":calcMD5(pwd2)
-                },
-                success:function(data){
-                    if (data == "true"){
-                        $('#pwdModal').modal('hide');
-                        alertMsg("修改成功,请重新登录");
-                        $("#btnLogin").prop("disabled",false);
-                        $("#password").val("").focus();
-                        $("#error_msg").html('<font color="green">请重新登录</font>');
-                        return false;
-                    }
-                    if(data == "one"){
-                        $("#oldpwd").html("<font color='red'>" + '<i class="glyphicon glyphicon-remove-sign"></i>&nbsp;密码不正确' + "</font>");
-                        return false;
-                    }
-                    if(data == "two"){
-                        $("#checkpwd").html("<font color='red'>" + '<i class="glyphicon glyphicon-remove-sign"></i>&nbsp;密码不一致' + "</font>");
-                        return false;
-                    }
-                },
-                error : function() {
-                    alert("网络繁忙请刷新页面重试!");
+                }
+            },function (data) {
+                if (data == "true"){
+                    $('#pwdModal').modal('hide');
+                    alertMsg("修改成功,请重新登录");
+                    $("#btnLogin").prop("disabled",false);
+                    $("#password").val("").focus();
+                    $("#error_msg").html('<font color="green">请重新登录</font>');
+                    return false;
+                }
+                if(data == "one"){
+                    $("#oldpwd").html("<font color='red'>" + '<i class="glyphicon glyphicon-remove-sign"></i>&nbsp;密码不正确' + "</font>");
+                    return false;
+                }
+                if(data == "two"){
+                    $("#checkpwd").html("<font color='red'>" + '<i class="glyphicon glyphicon-remove-sign"></i>&nbsp;密码不一致' + "</font>");
                     return false;
                 }
             });

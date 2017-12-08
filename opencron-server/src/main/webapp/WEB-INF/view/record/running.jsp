@@ -16,7 +16,7 @@
                     $(this).show();
                 });
 
-                $.ajax({
+                ajax({
                     headers:{"csrf":"${csrf}"},
                     type:"POST",
                     url:"${contextPath}/record/refresh.htm",
@@ -28,17 +28,16 @@
                         "execType":"${execType}",
                         "pageNo":${pageBean.pageNo},
                         "pageSize":${pageBean.pageSize}
-                    },
-                    dataType:"html",
-                    success:function(data){
-                        //解决子页面登录失联,不能跳到登录页面的bug
-                        if(data.indexOf("login")>-1){
-                            window.location.href="${contextPath}";
-                        }else {
-                            $("#tableContent").html(data);
-                        }
+                    }
+                },function (data) {
+                    //解决子页面登录失联,不能跳到登录页面的bug
+                    if(data.indexOf("login")>-1){
+                        window.location.href="${contextPath}";
+                    }else {
+                        $("#tableContent").html(data);
                     }
                 });
+
             },5000);
 
             $("#size").change(function(){doUrl();});
@@ -65,12 +64,12 @@
                 confirmButtonText: "结束",
             }, function() {
                 $("#process_"+id).html("停止中");
-                $.ajax({
+                ajax({
                     headers:{"csrf":"${csrf}"},
                     type:"POST",
                     url:"${contextPath}/record/kill.do",
                     data:{"recordId":id}
-                });
+                })
                 alertMsg("结束请求已发送");
             });
 
@@ -86,25 +85,23 @@
                 confirmButtonText: "重启",
             }, function() {
                 $("#process_"+id).html("停止中");
-                $.ajax({
+                ajax({
                     headers:{"csrf":"${csrf}"},
                     type:"POST",
                     url:"${contextPath}/record/kill.do",
-                    data:{"recordId":id},
-                    success:function(result){
-                        if (result){
-                            $.ajax({
-                                headers:{"csrf":"${csrf}"},
-                                type:"POST",
-                                url:"${contextPath}/job/execute.do",
-                                data:{"id":jobId}
-                            });
-                        }
+                    data:{"recordId":id}
+                },function (result) {
+                    if (result){
+                        ajax({
+                            headers:{"csrf":"${csrf}"},
+                            type:"POST",
+                            url:"${contextPath}/job/execute.do",
+                            data:{"id":jobId}
+                        })
                     }
                 });
                 alertMsg( "该作业已重启,正在执行中.");
             });
-
         }
 
     </script>

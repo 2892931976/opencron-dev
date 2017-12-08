@@ -32,7 +32,7 @@ import org.opencron.server.domain.User;
 import org.opencron.server.job.OpencronTools;
 import org.opencron.server.service.*;
 import org.opencron.server.tag.PageBean;
-import org.opencron.server.vo.ChartVo;
+import org.opencron.server.vo.ChartInfo;
 import org.opencron.server.vo.Cropper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -139,7 +139,7 @@ public class DashboardController extends BaseController {
 
     @RequestMapping("record.do")
     @ResponseBody
-    public List<ChartVo> record(HttpSession session,String startTime, String endTime) {
+    public List<ChartInfo> record(HttpSession session, String startTime, String endTime) {
         if (isEmpty(startTime)) {
             startTime = DateUtils.getCurrDayPrevDay(7);
         }
@@ -147,24 +147,24 @@ public class DashboardController extends BaseController {
             endTime = DateUtils.formatSimpleDate(new Date());
         }
         //成功失败折线图数据
-        List<ChartVo> voList = recordService.getRecord(session, startTime, endTime);
-        if (isEmpty(voList)) {
+        List<ChartInfo> infoList = recordService.getRecord(session, startTime, endTime);
+        if (isEmpty(infoList)) {
             return Collections.emptyList();
         } else {
-            return voList;
+            return infoList;
         }
     }
 
     @RequestMapping(value = "progress.do",method= RequestMethod.POST)
     @ResponseBody
-    public ChartVo progress(HttpSession session) {
+    public ChartInfo progress(HttpSession session) {
         //成功失败折线图数据
-        ChartVo chartVo = recordService.getAsProgress(session);
-        if (isEmpty(chartVo)) {
+        ChartInfo chartInfo = recordService.getAsProgress(session);
+        if (isEmpty(chartInfo)) {
             return null;
         }
 
-        return chartVo;
+        return chartInfo;
     }
 
     @RequestMapping(value = "monitor.do",method= RequestMethod.POST)

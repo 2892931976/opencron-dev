@@ -3,13 +3,13 @@ package org.opencron.server.vo;
 
 import java.io.Serializable;
 
-public class CrontabVo implements Serializable {
+public class CrontabInfo implements Serializable {
 
     private Integer id;
     private String exp;
     private String cmd;
 
-    public CrontabVo(Integer id, String exp, String cmd) {
+    public CrontabInfo(Integer id, String exp, String cmd) {
         this.id = id;
         this.exp = exp;
         this.cmd = cmd;

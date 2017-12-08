@@ -55,12 +55,12 @@
                     closeOnConfirm: false,
                     confirmButtonText: "扫描"
                 }, function() {
-                    $.ajax({
+                    ajax({
                         headers:{"csrf":"${csrf}"},
                         type:"POST",
                         url:"${contextPath}/job/scan.do",
                         data:{"agentId":"${scanAgent.agentId}"}
-                    }).done(function (data) {
+                    },function (data) {
                         if (data.length == 0){
                             alert("执行器[${scanAgent.name}]未扫描到有效的crontab任务!");
                         }else {
@@ -77,7 +77,7 @@
                             $("#crontabForm").html(html);
                             $("#crontabModal").modal("show");
                         }
-                    });
+                    })
                 });
             }
 
@@ -100,7 +100,7 @@
                     $(this).show();
                 });
 
-                $.ajax({
+                ajax({
                     headers:{"csrf":"${csrf}"},
                     type: "POST",
                     url: "${contextPath}/agent/refresh.htm",
@@ -109,9 +109,8 @@
                         "pageSize":${pageBean.pageSize},
                         "order":"${pageBean.order}",
                         "orderBy":"${pageBean.orderBy}"
-                    },
-                    dataType: "html"
-                }).done(function (data) {
+                    }
+                },function (data) {
                     //解决子页面登录失联,不能跳到登录页面的bug
                     if (data.indexOf("login") > -1) {
                         window.location.href = "${contextPath}";
@@ -138,7 +137,7 @@
                     $("#checkName").html("<font color='red'>" + '<i class="glyphicon glyphicon-remove-sign"></i>&nbsp;请填写执行器名' + "</font>");
                     return false;
                 }
-                $.ajax({
+                ajax({
                     headers:{"csrf":"${csrf}"},
                     type: "POST",
                     url: "${contextPath}/agent/checkname.do",
@@ -146,7 +145,7 @@
                         "id": $("#id").val(),
                         "name": $("#name").val()
                     }
-                }).done(function () {
+                },function (data) {
                     if (data) {
                         $("#checkName").html("<font color='green'>" + '<i class="glyphicon glyphicon-ok-sign"></i>&nbsp;执行器名可用' + "</font>");
                         return false;
@@ -154,10 +153,7 @@
                         $("#checkName").html("<font color='red'>" + '<i class="glyphicon glyphicon-remove-sign"></i>&nbsp;执行器名已存在' + "</font>");
                         return false;
                     }
-                }).fail(function () {
-                    alert("网络繁忙请刷新页面重试!");
-                    return false;
-                });
+                })
             });
 
             $("#pwd0").blur(function () {
@@ -180,12 +176,12 @@
         });
 
         function edit(id) {
-            $.ajax({
+            ajax({
                 headers:{"csrf":"${csrf}"},
                 type: "POST",
                 url: "${contextPath}/agent/get.do",
                 data: {"id": id}
-            }).done(function (obj) {
+            },function (obj) {
                 $("#agentform")[0].reset();
                 if (obj != null) {
                     $("#checkName").html("");
@@ -231,8 +227,6 @@
                     $("#agentModal").modal("show");
 
                 }
-            }).fail(function () {
-                alert("网络繁忙请刷新页面重试!");
             });
         }
 
@@ -305,60 +299,51 @@
                 alert("页面异常，请刷新重试！");
                 return false;
             }
-            $.ajax({
+
+            ajax({
                 headers:{"csrf":"${csrf}"},
                 type: "POST",
                 url: "${contextPath}/agent/checkname.do",
                 data: {
                     "id": id,
                     "name": name
-                },
-                success: function (data) {
-                    if (data) {
-                        if (status == 1) {
-                            $.ajax({
+                }
+            },function (data) {
+                if (data) {
+                    if (status == 1) {
+                        ajax({
+                            headers:{"csrf":"${csrf}"},
+                            type: "POST",
+                            url: "${contextPath}/verify/ping.do",
+                            data: {
                                 headers:{"csrf":"${csrf}"},
-                                type: "POST",
-                                url: "${contextPath}/verify/ping.do",
-                                data: {
-                                    headers:{"csrf":"${csrf}"},
-                                    "proxy": proxy,
-                                    "proxyId": $("#proxyAgent").val(),
-                                    "host": host,
-                                    "port": port,
-                                    "password": password
-                                },
-                                dataType:"JSON",
-                                success: function (data) {
-                                    if (data) {
-                                        canSave(proxy, id, name, port, warning, mobiles, email);
-                                        return false;
-                                    } else {
-                                        alert("通信失败!请检查IP和端口号");
-                                    }
-                                },
-                                error: function () {
-                                    alert("网络繁忙请刷新页面重试!");
-                                }
-                            });
-                        } else {
-                            canSave(proxy, id, name, port, warning, mobiles, email);
-                            return false;
-                        }
+                                "proxy": proxy,
+                                "proxyId": $("#proxyAgent").val(),
+                                "host": host,
+                                "port": port,
+                                "password": password
+                            }
+                        },function (data) {
+                            if (data) {
+                                canSave(proxy, id, name, port, warning, mobiles, email);
+                                return false;
+                            } else {
+                                alert("通信失败!请检查IP和端口号");
+                            }
+                        });
                     } else {
-                        alert("执行器名称已存在!");
+                        canSave(proxy, id, name, port, warning, mobiles, email);
                         return false;
                     }
-                },
-                error: function () {
-                    alert("网络繁忙请刷新页面重试!");
+                } else {
+                    alert("执行器名称已存在!");
                     return false;
                 }
-            });
+            })
         }
 
         function canSave(proxy, id, name, port, warning, mobiles, email) {
-            $.ajax({
+            ajax({
                 headers:{"csrf":"${csrf}"},
                 type: "POST",
                 url: "${contextPath}/agent/edit.do",
@@ -372,71 +357,60 @@
                     "mobiles": mobiles,
                     "emailAddress": email,
                     "comment":$("#comment").val()
-                },
-                success: function () {
-                    $('#agentModal').modal('hide');
-                    alertMsg("修改成功");
-                    $("#name_" + id).html(escapeHtml(name));
-                    $("#port_" + id).html(port);
-                    if (warning == "0") {
-                        $("#warning_" + id).html('<span class="label label-default" style="color: red;font-weight:bold">&nbsp;&nbsp;否&nbsp;&nbsp;</span>');
-                    } else {
-                        $("#warning_" + id).html('<span class="label label-warning" style="color: white;font-weight:bold">&nbsp;&nbsp;是&nbsp;&nbsp;</span>');
-                    }
-                    if (proxy == "0") {
-                        $("#connType_" + id).html("直连");
-                    } else {
-                        $("#connType_" + id).html("代理");
-                    }
-                    flushConnAgents();
-                    return false;
-
-                },
-                error: function () {
-                    alert("网络繁忙请刷新页面重试!");
-                    return false;
                 }
-            });
+            },function (data) {
+                $('#agentModal').modal('hide');
+                alertMsg("修改成功");
+                $("#name_" + id).html(escapeHtml(name));
+                $("#port_" + id).html(port);
+                if (warning == "0") {
+                    $("#warning_" + id).html('<span class="label label-default" style="color: red;font-weight:bold">&nbsp;&nbsp;否&nbsp;&nbsp;</span>');
+                } else {
+                    $("#warning_" + id).html('<span class="label label-warning" style="color: white;font-weight:bold">&nbsp;&nbsp;是&nbsp;&nbsp;</span>');
+                }
+                if (proxy == "0") {
+                    $("#connType_" + id).html("直连");
+                } else {
+                    $("#connType_" + id).html("代理");
+                }
+                flushConnAgents();
+                return false;
+            })
         }
 
         function flushConnAgents() {
-            $.ajax({
+            ajax({
                 headers:{"csrf":"${csrf}"},
                 type: "POST",
-                url: "${contextPath}/agent/getConnAgents.do",
-                success: function (obj) {
-                    if (obj != null) {
-                        $("#proxyAgent").empty();
-                        for (var i in obj) {
-                            $("#proxyAgent").append('<option value="' + obj[i].agentId + '" id="agent_' + obj[i].agentId + '">' + obj[i].host + ' (' + obj[i].name + ')</option>');
-                        }
+                url: "${contextPath}/agent/getConnAgents.do"
+            },function (obj) {
+                if (obj != null) {
+                    $("#proxyAgent").empty();
+                    for (var i in obj) {
+                        $("#proxyAgent").append('<option value="' + obj[i].agentId + '" id="agent_' + obj[i].agentId + '">' + obj[i].host + ' (' + obj[i].name + ')</option>');
                     }
                 }
-            });
+            })
         }
 
         function editPwd(id) {
             inputPwd();
-            $.ajax({
+            ajax({
                 headers:{"csrf":"${csrf}"},
                 type: "POST",
                 url: "${contextPath}/agent/get.do",
-                data: {"id": id},
-                success: function (obj) {
-                    $("#pwdform")[0].reset();
-                    if (obj != null) {
-                        $("#oldpwd").html("");
-                        $("#checkpwd").html("");
-                        $("#agentId").val(obj.agentId);
-                        window.errorAgentPwd = 0;
-                        $("#pwdModal").modal("show");
+                data: {"id": id}
+            },function (obj) {
+                $("#pwdform")[0].reset();
+                if (obj != null) {
+                    $("#oldpwd").html("");
+                    $("#checkpwd").html("");
+                    $("#agentId").val(obj.agentId);
+                    window.errorAgentPwd = 0;
+                    $("#pwdModal").modal("show");
 
-                    }
-                },
-                error: function () {
-                    alert("网络繁忙请刷新页面重试!");
                 }
-            });
+            })
         }
 
         function remove(id) {
@@ -448,33 +422,28 @@
                 closeOnConfirm: false,
                 confirmButtonText: "删除"
             }, function() {
-                $.ajax({
+                ajax({
                     headers:{"csrf":"${csrf}"},
                     type:"POST",
                     url:"${contextPath}/agent/checkdel.do",
-                    data:{"id":id},
-                    success:function (data) {
-                        if(data == "error"){
-                            alert("该执行器不存在,删除失败!")
-                        }else if (data == "false"){
-                            alert("该执行器上定义了作业,请先删除作业再尝试删除")
-                        }else {
-                            $.ajax({
-                                headers:{"csrf":"${csrf}"},
-                                type:"POST",
-                                url:"${contextPath}/agent/delete.do",
-                                data:{"id":id},
-                                success:function () {
-                                    alertMsg("删除执行器成功");
-                                    location.reload();
-                                },
-                                error:function () {
-                                    alert("删除执行器失败!")
-                                }
-                            });
-                        }
+                    data:{"id":id}
+                },function (data) {
+                    if(data == "error"){
+                        alert("该执行器不存在,删除失败!")
+                    }else if (data == "false"){
+                        alert("该执行器上定义了作业,请先删除作业再尝试删除")
+                    }else {
+                        ajax({
+                            headers:{"csrf":"${csrf}"},
+                            type:"POST",
+                            url:"${contextPath}/agent/delete.do",
+                            data:{"id":id}
+                        },function () {
+                            alertMsg("删除执行器成功");
+                            location.reload();
+                        })
                     }
-                });
+                })
             });
         }
 
@@ -503,7 +472,7 @@
                 alert("两密码不一致!");
                 return false;
             }
-            $.ajax({
+            ajax({
                 headers:{"csrf":"${csrf}"},
                 type: "POST",
                 url: "${contextPath}/agent/pwd.do",
@@ -513,51 +482,45 @@
                     "pwd0": pwd0,
                     "pwd1": pwd1,
                     "pwd2": pwd2
-                },
-                success: function (data) {
-                    if ( data == "true" ) {
-                        $('#pwdModal').modal('hide');
-                        $('#password').val(pwd0);
-                        alertMsg("修改成功");
-                        return false;
-                    }
-                    if (data == "false") {//原密码正确,但是连接失败...
-                        ++window.errorAgentPwd;
-                        if (window.errorAgentPwd>=3){
-                            inputSrcPwd(id);
-                        }else {
-                            alert("执行器原密码无效连接失败!");
-                        }
-                        return false;
-                    }
-                    if (data == "one") {//原密码错误
-                        if( window.agentStarted!=undefined && window.agentStarted == false){
-                            $("#oldpwd").html("<font color='red'>" + '<i class="glyphicon glyphicon-remove-sign"></i>&nbsp;错误! 请确保执行器端服务已经启动' + "</font>");
-                        }else {
-                            if (window.errorAgentPwd!=undefined && window.errorAgentPwd>=3) {
-                                $("#oldpwd").html("<font color='red'>" + '<i class="glyphicon glyphicon-remove-sign"></i>&nbsp;执行器密文不正确链接失败,请检查重新输入' + "</font>");
-                            }else{
-                                ++window.errorAgentPwd;
-                                if (window.errorAgentPwd>=3) {
-                                    inputSrcPwd(id);
-                                }else {
-                                    $("#oldpwd").html("<font color='red'>" + '<i class="glyphicon glyphicon-remove-sign"></i>&nbsp;原密码不正确' + "</font>");
-                                }
-                            }
-                        }
-                        return false;
-                    }
-                    if (data == "two") {
-                        $("#checkpwd").html("<font color='red'>" + '<i class="glyphicon glyphicon-remove-sign"></i>&nbsp;两次密码不一致' + "</font>");
-                        return false;
-                    }
-
-                },
-                error: function () {
-                    alert("网络繁忙请刷新页面重试!");
+                }
+            },function (data) {
+                if ( data == "true" ) {
+                    $('#pwdModal').modal('hide');
+                    $('#password').val(pwd0);
+                    alertMsg("修改成功");
                     return false;
                 }
-            });
+                if (data == "false") {//原密码正确,但是连接失败...
+                    ++window.errorAgentPwd;
+                    if (window.errorAgentPwd>=3){
+                        inputSrcPwd(id);
+                    }else {
+                        alert("执行器原密码无效连接失败!");
+                    }
+                    return false;
+                }
+                if (data == "one") {//原密码错误
+                    if( window.agentStarted!=undefined && window.agentStarted == false){
+                        $("#oldpwd").html("<font color='red'>" + '<i class="glyphicon glyphicon-remove-sign"></i>&nbsp;错误! 请确保执行器端服务已经启动' + "</font>");
+                    }else {
+                        if (window.errorAgentPwd!=undefined && window.errorAgentPwd>=3) {
+                            $("#oldpwd").html("<font color='red'>" + '<i class="glyphicon glyphicon-remove-sign"></i>&nbsp;执行器密文不正确链接失败,请检查重新输入' + "</font>");
+                        }else{
+                            ++window.errorAgentPwd;
+                            if (window.errorAgentPwd>=3) {
+                                inputSrcPwd(id);
+                            }else {
+                                $("#oldpwd").html("<font color='red'>" + '<i class="glyphicon glyphicon-remove-sign"></i>&nbsp;原密码不正确' + "</font>");
+                            }
+                        }
+                    }
+                    return false;
+                }
+                if (data == "two") {
+                    $("#checkpwd").html("<font color='red'>" + '<i class="glyphicon glyphicon-remove-sign"></i>&nbsp;两次密码不一致' + "</font>");
+                    return false;
+                }
+            })
         }
 
         function pingCheck() {
@@ -593,7 +556,7 @@
 
             $("#pingResult").html("<img src='${contextPath}/static/img/icon-loader.gif'> <font color='#2fa4e7'>检测中...</font>");
 
-            $.ajax({
+            ajax({
                 headers:{"csrf":"${csrf}"},
                 type: "POST",
                 url: "${contextPath}/verify/ping.do",
@@ -603,17 +566,12 @@
                     "host": host,
                     "port": port,
                     "password": password
-                },
-                dataType:"JSON",
-                success: function (data) {
-                    if (data) {
-                        $("#pingResult").html("<font color='green'>" + '<i class="glyphicon glyphicon-ok-sign"></i>&nbsp;通信正常' + "</font>");
-                    } else {
-                        $("#pingResult").html("<font color='red'>" + '<i class="glyphicon glyphicon-remove-sign"></i>&nbsp;通信失败' + "</font>");
-                    }
-                },
-                error: function () {
-                    alert("网络繁忙请刷新页面重试!");
+                }
+            },function (data) {
+                if (data) {
+                    $("#pingResult").html("<font color='green'>" + '<i class="glyphicon glyphicon-ok-sign"></i>&nbsp;通信正常' + "</font>");
+                } else {
+                    $("#pingResult").html("<font color='red'>" + '<i class="glyphicon glyphicon-remove-sign"></i>&nbsp;通信失败' + "</font>");
                 }
             });
         }
@@ -631,27 +589,24 @@
         }
 
         function inputSrcPwd(id) {
-            $.ajax({
+            ajax({
                 headers:{"csrf":"${csrf}"},
                 type: "POST",
                 url: "${contextPath}/agent/path.do",
-                data: { "agentId": id },
-                dataType:"html",
-                success:function(result) {
-                    if(result) {
-                        $("#pwdPath").val("more " + result);
-                        $("#oldpwd").html('');
-                        $("#pwdlable").html('<i class="glyphicon glyphicon-lock"></i>&nbsp;&nbsp;密&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;文：');
-                        $("#pwd0").attr("placeholder","请输入密文").val('');
-                        $("#pwdReset").show().val('');
-                    }else {
-                        window.agentStarted = false;
-                        alert("错误! 请确保执行器端服务已经启动");
-                    }
+                data: { "agentId": id }
+            },function (result) {
+                if(result) {
+                    $("#pwdPath").val("more " + result);
+                    $("#oldpwd").html('');
+                    $("#pwdlable").html('<i class="glyphicon glyphicon-lock"></i>&nbsp;&nbsp;密&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;文：');
+                    $("#pwd0").attr("placeholder","请输入密文").val('');
+                    $("#pwdReset").show().val('');
+                }else {
+                    window.agentStarted = false;
+                    alert("错误! 请确保执行器端服务已经启动");
                 }
-            });
+            })
         }
-
     </script>
 
      <script type="text/html" id="crontab_template">
