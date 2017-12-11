@@ -128,13 +128,15 @@ public final class SchedulerService {
     }
 
     public void syncJobTigger(Long jobId, ExecuteService executeService) throws SchedulerException {
+
         JobInfo job = jobService.getJobInfoById(jobId);
 
         /**
          * 从crontab或者quartz里删除任务
          */
         opencronCollector.removeTask(job.getJobId());
-        remove(job.getJobId());
+
+        SchedulerService.this.remove(job.getJobId());
 
         //job已经被删除..
         if (job.getDeleted()) {
@@ -142,19 +144,22 @@ public final class SchedulerService {
         }
 
         job.setAgent(agentService.getAgent(job.getAgentId()));
-        //自动执行
-        if (Constants.ExecType.AUTO.getStatus().equals(job.getExecType())) {
-            if (Constants.CronType.QUARTZ.getType().equals(job.getCronType())) {
-                /**
-                 * 将作业加到quartz任务计划
-                 */
-                put(job, executeService);
-            } else {
+
+        Constants.CronType cronType = Constants.CronType.getByType(job.getCronType());
+
+        switch (cronType) {
+            case CRONTAB:
                 /**
                  * 将作业加到crontab任务计划
                  */
                 opencronCollector.addTask(job);
-            }
+                break;
+            case QUARTZ:
+                /**
+                 * 将作业加到quartz任务计划
+                 */
+                SchedulerService.this.put(job, executeService);
+                break;
         }
     }
 

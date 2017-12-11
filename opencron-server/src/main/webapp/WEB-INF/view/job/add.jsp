@@ -24,7 +24,7 @@
 
     <script type="text/javascript">
         $(document).ready(function () {
-            opencronValidata = new Validata('${contextPath}','${csrf}');
+            window.opencronValidata = new Validata('${contextPath}','${csrf}');
         });
     </script>
 
@@ -81,16 +81,6 @@
                     <div class="col-md-10">
                         <input type="text" class="form-control input-sm" id="jobName" name="jobName">
                         <span class="tips" tip="必填项,该作业的名称">必填项,该作业的名称</span>
-                    </div>
-                </div>
-                <br>
-
-                <div class="form-group">
-                    <label class="col-lab control-label wid150"><i class="glyphicon glyphicon-info-sign"></i>&nbsp;&nbsp;运行模式&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
-                    <div class="col-md-10">
-                        <label for="execType0" class="radio-label"><input type="radio" name="execType" id="execType0" value="0" checked>自动&nbsp;&nbsp;&nbsp;</label>
-                        <label for="execType1" class="radio-label"><input type="radio" name="execType" id="execType1"  value="1">手动</label>&nbsp;&nbsp;&nbsp;
-                        <br><span class="tips" id="execTypeTip" tip="">自动模式:执行器自动执行</span>
                     </div>
                 </div>
                 <br>

@@ -50,15 +50,7 @@
                 <td class="item"><i class="glyphicon glyphicon-leaf"></i>&nbsp;执&nbsp;行&nbsp;&nbsp;器：</td>
                 <td><a href="${contextPath}/agent/detail/${job.agentId}.htm?csrf=${csrf}">${job.agentName}</a></td>
             </tr>
-            <tr>
-                <td class="item"><i class="glyphicon glyphicon-info-sign"></i>&nbsp;运行模式：</td>
-                <td>
-                    <c:if test="${job.execType eq 0}"><font color="green"><span class="span-self">自动模式</span></font></c:if>
-                    <c:if test="${job.execType eq 1}"><font color="red"><span class="span-self">手动模式</span></font></c:if>
-                </td>
-            </tr>
 
-            <c:if test="${job.execType eq 0}">
             <tr>
                 <td class="item"><i class="glyphicon glyphicon-bookmark"></i>&nbsp;规则类型：</td>
                 <td>
@@ -71,7 +63,6 @@
                 <td class="item"><i class="glyphicon glyphicon-filter"></i>&nbsp;时间规则：</td>
                 <td>${job.cronExp}</td>
             </tr>
-            </c:if>
 
             <tr>
                 <td class="item"><i class="glyphicon glyphicon-th-large"></i>&nbsp;执行命令：</td>

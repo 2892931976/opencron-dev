@@ -77,9 +77,11 @@ var opencron = {
 
     tipOk:function (el) {
         var okStyle = "";
-        if (typeof(el) == "string"){
+        if (typeof(el) == "string") {
             okStyle = $(el).parent().hasClass("col-md-9")?'right:-30px':'';
             el = $(el).next();
+        }else {
+            okStyle = el.parent().hasClass("col-md-9")?'right:-30px':'';
         }
         el.html($("<font class='big-green' color='green' style='"+okStyle+"'><i class='glyphicon glyphicon-ok-sign'></i></font>"))
     },

@@ -22,7 +22,6 @@
 
 package org.opencron.server.vo;
 
-import org.opencron.common.Constants;
 import org.opencron.server.domain.User;
 import org.opencron.server.domain.Agent;
 
@@ -39,7 +38,6 @@ public class JobInfo implements Serializable {
     private String command;
     private String runAs;
     private String successExit;
-    private Integer execType;
     private String comment;
     private Long userId;
     private Date updateTime;
@@ -99,7 +97,6 @@ public class JobInfo implements Serializable {
         this.jobName = agent.getName()+"-batchJob";
         this.userId = userId;
         this.command = command;
-        this.execType = Constants.ExecType.BATCH.getStatus();
         this.agent = agent;
         this.agentId = agent.getAgentId();
         this.host = agent.getHost();
@@ -171,14 +168,6 @@ public class JobInfo implements Serializable {
 
     public void setSuccessExit(String successExit) {
         this.successExit = successExit;
-    }
-
-    public Integer getExecType() {
-        return execType;
-    }
-
-    public void setExecType(Integer execType) {
-        this.execType = execType;
     }
 
     public String getComment() {

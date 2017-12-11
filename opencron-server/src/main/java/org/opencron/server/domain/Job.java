@@ -41,7 +41,6 @@ public class Job implements Serializable {
     @Column(columnDefinition="TEXT")
     private String command;
     
-    private Integer execType;
     private String comment;
     private String runAs;
     private String successExit;
@@ -127,14 +126,6 @@ public class Job implements Serializable {
 
     public void setCommand(String command) {
         this.command = command;
-    }
-
-    public Integer getExecType() {
-        return execType;
-    }
-
-    public void setExecType(Integer execType) {
-        this.execType = execType;
     }
 
     public String getComment() {
@@ -290,7 +281,6 @@ public class Job implements Serializable {
                 ", cronType=" + cronType +
                 ", cronExp='" + cronExp + '\'' +
                 ", command='" + command + '\'' +
-                ", execType=" + execType +
                 ", comment='" + comment + '\'' +
                 ", runAs='" + runAs + '\'' +
                 ", successExit='" + successExit + '\'' +

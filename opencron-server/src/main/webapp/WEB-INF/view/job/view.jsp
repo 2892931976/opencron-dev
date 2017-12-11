@@ -16,14 +16,7 @@
     <script type="text/javascript">
 
         var toggle = {
-            cronexp:{
-                show:function () {
-                    $(".cronExpDiv").show();
-                },
-                hide:function () {
-                    $(".cronExpDiv").hide()
-                }
-            },
+
             count:{
                 show:function () {
                     $(".countDiv").show();
@@ -59,21 +52,7 @@
                     $("#agent").val(obj.agentName + "   " + obj.host);
                     $("#cronExp").val(obj.cronExp);
                     $("#cmd").val(obj.command);
-                    if (obj.execType == 1) {
-                        toggle.cronexp.hide();
-                        $("#execType1").prop("checked", true);
-                        $("#execType1").parent().removeClass("checked").addClass("checked");
-                        $("#execType1").parent().attr("aria-checked", true);
-                        $("#execType0").parent().removeClass("checked");
-                        $("#execType0").parent().attr("aria-checked", false);
-                    } else {
-                        toggle.cronexp.show();
-                        $("#execType0").prop("checked", true);
-                        $("#execType0").parent().removeClass("checked").addClass("checked");
-                        $("#execType0").parent().attr("aria-checked", true);
-                        $("#execType1").parent().removeClass("checked");
-                        $("#execType1").parent().attr("aria-checked", false);
-                    }
+
                     if (obj.cronType == 1) {
                         $("#cronType1").prop("checked", true);
                         $("#cronType1").parent().removeClass("checked").addClass("checked");
@@ -149,23 +128,17 @@
                 return false;
             }
 
-            var execType = $('input[type="radio"][name="execType"]:checked').val();
-            if (!execType) {
-                alert("页面错误，请刷新重试!");
-                return false;
-            }
             var cronType = $('input[type="radio"][name="cronType"]:checked').val();
             if (!cronType) {
                 alert("页面错误，请刷新重试!");
                 return false;
             }
             var cronExp = $("#cronExp").val();
-            if (execType == 0) {
-                if (!cronExp) {
-                    opencron.tipError($("#checkcronExp"),"请填写时间规则!");
-                    return false;
-                }
+            if (!cronExp) {
+                opencron.tipError($("#checkcronExp"),"请填写时间规则!");
+                return false;
             }
+
             var command = $("#cmd").val();
             if (!command) {
                 alert("执行命令不能为空!");
@@ -243,7 +216,6 @@
                 "runAs":$("#runAs").val(),
                 "successExit":$("#successExit").val(),
                 "timeout": timeout,
-                "execType": execType,
                 "jobName": jobName,
                 "redo": redo,
                 "runCount": runCount,
@@ -253,27 +225,22 @@
                 "comment": $("#comment").val()
             };
 
-            //手动....
-            if (execType == 1) {
-                doSave(jobObj);
-            } else {//需要验证时间规则...
-                ajax({
-                    headers: {"csrf": "${csrf}"},
-                    type: "POST",
-                    url: "${contextPath}/verify/exp.do",
-                    data: {
-                        "cronType": cronType,
-                        "cronExp": cronExp
-                    }
-                },function (data) {
-                    if (data) {
-                        doSave(jobObj);
-                    } else {
-                        alert("时间规则语法错误!");
-                        return false;
-                    }
-                });
-            }
+            ajax({
+                headers: {"csrf": "${csrf}"},
+                type: "POST",
+                url: "${contextPath}/verify/exp.do",
+                data: {
+                    "cronType": cronType,
+                    "cronExp": cronExp
+                }
+            },function (data) {
+                if (data) {
+                    doSave(jobObj);
+                } else {
+                    alert("时间规则语法错误!");
+                    return false;
+                }
+            });
 
         }
 
@@ -300,7 +267,6 @@
                             "command": job.command,
                             "runAs": job.runAs,
                             "successExit": job.successExit,
-                            "execType": job.execType,
                             "jobName": job.jobName,
                             "redo": job.redo,
                             "runCount": job.runCount,
@@ -318,15 +284,8 @@
                             $("#jobName_" + job.jobId).html(escapeHtml(job.jobName));
                             $("#command_" + job.jobId).html(escapeHtml(passBase64(job.command)));
 
-                            if (job.execType == "0") {
-                                $("#execType_" + job.jobId).html('<span class="text-center" color="green">自动</span>');
-                                $("#cronType_" + job.jobId).html(job.cronType == "0" ? '<img class="text-center" width="70px" src="${contextPath}/static/img/crontab_ico.png">' : '<img  class="text-center" width="70px" src="${contextPath}/static/img/quartz_ico.png">');
-                                $("#cronExp_" + job.jobId).html(escapeHtml(job.cronExp));
-                            } else {
-                                $("#execType_" + job.jobId).html('<span class="text-center" color="red">手动</span>');
-                                $("#cronType_" + job.jobId).html('<div class="none text-center">--</div>');
-                                $("#cronExp_" + job.jobId).html('<div class="none text-center">--</div>');
-                            }
+                            $("#cronType_" + job.jobId).html(job.cronType == "0" ? '<img class="text-center" width="70px" src="${contextPath}/static/img/crontab_ico.png">' : '<img  class="text-center" width="70px" src="${contextPath}/static/img/quartz_ico.png">');
+                            $("#cronExp_" + job.jobId).html(escapeHtml(job.cronExp));
 
                             if (job.redo == "0") {
                                 $("#redo_" + job.jobId).html('<span color="green">否</span>');
@@ -347,8 +306,6 @@
         }
 
         $(document).ready(function () {
-            $("#execType0").next().bind("click",toggle.cronexp.show);
-            $("#execType1").next().bind("click",toggle.cronexp.hide);
             $("#redo1").next().bind("click",toggle.count.show);
             $("#redo0").next().bind("click",toggle.count.hide);
             $("#warning1").next().bind("click",toggle.contact.show);
@@ -364,9 +321,6 @@
                 doUrl();
             });
             $("#jobType").change(function () {
-                doUrl();
-            });
-            $("#execType").change(function () {
                 doUrl();
             });
             $("#redo").change(function () {
@@ -425,7 +379,7 @@
                     if (data) {
                         opencron.tipOk($("#checkcronExp"),"时间规则格式正确");
                     } else {
-                        opencron.tipOk($("#checkcronExp"),"时间规则格式错误,请填写正确的时间规则");
+                        opencron.tipError($("#checkcronExp"),"时间规则格式错误,请填写正确的时间规则");
                     }
                     return;
                 });
@@ -438,9 +392,8 @@
             var agentId = $("#agentId").val();
             var cronType = $("#cronType").val();
             var jobType = $("#jobType").val();
-            var execType = $("#execType").val();
             var redo = $("#redo").val();
-            window.location.href = "${contextPath}/job/view.htm?agentId=" + agentId + "&cronType=" + cronType + "&jobType=" + jobType + "&execType=" + execType + "&redo=" + redo + "&pageSize=" + pageSize + "&csrf=${csrf}";
+            window.location.href = "${contextPath}/job/view.htm?agentId=" + agentId + "&cronType=" + cronType + "&jobType=" + jobType + "&redo=" + redo + "&pageSize=" + pageSize + "&csrf=${csrf}";
         }
 
         function pauseJob(id,status) {
@@ -680,15 +633,6 @@
                     <option value="1" ${jobType eq 1 ? 'selected' : ''}>流程作业</option>
                 </select>
 
-                &nbsp;&nbsp;&nbsp;
-                <label for="execType">运行模式：</label>
-                <select id="execType" name="execType" class="select-opencron" style="width: 80px;">
-                    <option value="">全部</option>
-                    <option value="1" ${execType eq 1 ? 'selected' : ''}>手动</option>
-                    <option value="0" ${execType eq 0 ? 'selected' : ''}>自动</option>
-                </select>
-                &nbsp;&nbsp;&nbsp;
-
                 <label for="redo">重跑：</label>
                 <select id="redo" name="redo" class="select-opencron" style="width: 80px;">
                     <option value="">全部</option>
@@ -709,7 +653,6 @@
                 <th>作业人</th>
                 <th>执行命令</th>
                 <th>作业类型</th>
-                <th>运行模式</th>
                 <th>规则类型</th>
                 <th>时间规则</th>
                 <th class="text-center">
@@ -755,99 +698,79 @@
                             </a>
                         </div>
                     </td>
-                    <td class="text-center">
-                            <c:if test="${r.jobType eq 0}">单一作业</c:if>
-                            <c:if test="${r.jobType eq 1}">流程作业</c:if>
+                    <td>
+                        <c:if test="${r.jobType eq 0}">单一作业</c:if>
+                        <c:if test="${r.jobType eq 1}">流程作业</c:if>
                     </td>
-                    <td id="execType_${r.jobId}" class="text-center">
-                            <c:if test="${r.execType eq 1}"><font color="red">手动</font></c:if>
-                            <c:if test="${r.execType eq 0}"><font color="green">自动</font></c:if>
-                    </td>
+
                     <td id="cronType_${r.jobId}">
-                        <c:choose>
-                            <c:when test="${r.execType eq 1}">
-                                <div class="none">--</div>
-                            </c:when>
-                            <c:otherwise>
-                                <c:if test="${r.cronType eq 0}">
-                                    <img class="text-center" width="70px" src="${contextPath}/static/img/crontab_ico.png">
-                                </c:if>
-                                <c:if test="${r.cronType eq 1}">
-                                    <img class="text-center" width="70px" src="${contextPath}/static/img/quartz_ico.png">
-                                </c:if>
-                            </c:otherwise>
-                        </c:choose>
+                        <c:if test="${r.cronType eq 0}">
+                            <img class="text-center" width="70px" src="${contextPath}/static/img/crontab_ico.png">
+                        </c:if>
+                        <c:if test="${r.cronType eq 1}">
+                            <img class="text-center" width="70px" src="${contextPath}/static/img/quartz_ico.png">
+                        </c:if>
                     </td>
 
                     <td id="cronExp_${r.jobId}">
-                        <c:choose>
-                            <c:when test="${r.execType eq 1}">
-                                <div class="none">--</div>
-                            </c:when>
-                            <c:otherwise>
-                                ${r.cronExp}
-                            </c:otherwise>
-                        </c:choose>
+                        ${r.cronExp}
                     </td>
                     <td class="text-center">
-                            <div class="visible-md visible-lg hidden-sm hidden-xs action-buttons">
-                                <c:if test="${r.jobType eq 1}">
-                                    <a href="#" title="流程作业" id="job_${r.jobId}" childOpen="off" onclick="showChild('${r.jobId}','${r.flowId}')"> <i style="font-size:14px;" class="fa fa-angle-double-down" id="icon${r.jobId}"></i></a>&nbsp;&nbsp;
-                                </c:if>
-                                <c:if test="${r.jobType eq 0}">
-                                    <a href="#" title="编辑" onclick="editSingle('${r.jobId}')">
-                                        <i class="glyphicon glyphicon-pencil"></i>
-                                    </a>
-                                </c:if>
-
-                                <c:if test="${r.jobType eq 1}">
-                                    <a title="编辑" href="${contextPath}/job/editflow.htm?id=${r.jobId}&csrf=${csrf}">
-                                        <i class="glyphicon glyphicon-pencil"></i>
-                                    </a>
-                                </c:if>&nbsp;
-
-                                <c:if test="${r.execType eq 0}">
-                                    <c:choose>
-                                        <c:when test="${r.pause eq null or r.pause eq false}">
-                                        <span>
-                                        <a id="pause_${r.jobId}" href="#" title="暂停" onclick="pauseJob('${r.jobId}',true)">
-                                           <i aria-hidden="true" class="fa fa-pause-circle-o"></i>
-                                        </a>
-                                        </span>
-                                        </c:when>
-                                        <c:otherwise>
-                                       <span>
-                                        <a id="pause_${r.jobId}" href="#" title="恢复" onclick="pauseJob('${r.jobId}',false)">
-                                           <i aria-hidden="true" class="fa fa-history"></i>
-                                        </a>
-                                        </span>
-                                        </c:otherwise>
-                                    </c:choose>
-                                    &nbsp;
-                                </c:if>
-
-                                <span id="execButton_${r.jobId}">
-                                    <a href="#" title="执行" onclick="executeJob('${r.jobId}')">
-                                       <i aria-hidden="true" class="fa fa-play"></i>
-                                    </a>
-                                </span>&nbsp;
-
-                                <a href="#" onclick="remove('${r.jobId}')" title="删除">
-                                    <i aria-hidden="true" class="fa fa-times"></i>
-                                </a>&nbsp;
-
-                                <a href="${contextPath}/job/detail/${r.jobId}.htm?csrf=${csrf}" title="查看详情">
-                                    <i class="glyphicon glyphicon-eye-open"></i>
+                        <div class="visible-md visible-lg hidden-sm hidden-xs action-buttons">
+                            <c:if test="${r.jobType eq 1}">
+                                <a href="#" title="流程作业" id="job_${r.jobId}" childOpen="off" onclick="showChild('${r.jobId}','${r.flowId}')"> <i style="font-size:14px;" class="fa fa-angle-double-down" id="icon${r.jobId}"></i></a>&nbsp;&nbsp;
+                            </c:if>
+                            <c:if test="${r.jobType eq 0}">
+                                <a href="#" title="编辑" onclick="editSingle('${r.jobId}')">
+                                    <i class="glyphicon glyphicon-pencil"></i>
                                 </a>
-                            </div>
+                            </c:if>
+
+                            <c:if test="${r.jobType eq 1}">
+                                <a title="编辑" href="${contextPath}/job/editflow.htm?id=${r.jobId}&csrf=${csrf}">
+                                    <i class="glyphicon glyphicon-pencil"></i>
+                                </a>
+                            </c:if>&nbsp;
+
+                            <c:choose>
+                                <c:when test="${r.pause eq null or r.pause eq false}">
+                                <span>
+                                <a id="pause_${r.jobId}" href="#" title="暂停" onclick="pauseJob('${r.jobId}',true)">
+                                   <i aria-hidden="true" class="fa fa-pause-circle-o"></i>
+                                </a>
+                                </span>
+                                </c:when>
+                                <c:otherwise>
+                               <span>
+                                <a id="pause_${r.jobId}" href="#" title="恢复" onclick="pauseJob('${r.jobId}',false)">
+                                   <i aria-hidden="true" class="fa fa-history"></i>
+                                </a>
+                                </span>
+                                </c:otherwise>
+                            </c:choose>
+                            &nbsp;
+
+                            <span id="execButton_${r.jobId}">
+                                <a href="#" title="执行" onclick="executeJob('${r.jobId}')">
+                                   <i aria-hidden="true" class="fa fa-play"></i>
+                                </a>
+                            </span>&nbsp;
+
+                            <a href="#" onclick="remove('${r.jobId}')" title="删除">
+                                <i aria-hidden="true" class="fa fa-times"></i>
+                            </a>&nbsp;
+
+                            <a href="${contextPath}/job/detail/${r.jobId}.htm?csrf=${csrf}" title="查看详情">
+                                <i class="glyphicon glyphicon-eye-open"></i>
+                            </a>
+                        </div>
                     </td>
                 </tr>
                 <%--子作业--%>
                 <c:if test="${r.jobType eq 1}">
                     <c:forEach var="c" items="${r.children}" varStatus="index">
                         <tr class="child${r.jobId} trGroup${r.flowId}" style="display: none;">
-                            <td><a href="${contextPath}/agent/detail/${c.agentId}.htm?csrf=${csrf}">${c.agentName}</a>
-                            </td>
+                            <td><a href="${contextPath}/agent/detail/${c.agentId}.htm?csrf=${csrf}">${c.agentName}</a></td>
                             <c:if test="${permission eq true}">
                                 <td>
                                     <a href="${contextPath}/user/detail/${c.userId}.htm?csrf=${csrf}">${c.operateUname}</a>
@@ -889,7 +812,7 @@
             </tbody>
         </table>
 
-        <cron:pager href="${contextPath}/job/view.htm?agentId=${agentId}&execType=${execType}&redo=${redo}&csrf=${csrf}" id="${pageBean.pageNo}" size="${pageBean.pageSize}" total="${pageBean.totalCount}"/>
+        <cron:pager href="${contextPath}/job/view.htm?agentId=${agentId}&redo=${redo}&csrf=${csrf}" id="${pageBean.pageNo}" size="${pageBean.pageSize}" total="${pageBean.totalCount}"/>
 
     </div>
 
@@ -916,11 +839,6 @@
                             <div class="col-md-9">
                                 <input type="text" class="form-control" id="jobName">&nbsp;&nbsp;<label id="checkJobName"></label>
                             </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="col-lab control-label" title="1.手动模式: 管理员手动执行 2.自动模式: 执行器自动执行">运行模式：</label>&nbsp;&nbsp;
-                            <label for="execType1" onclick="toggle.cronexp.hide()" class="radio-label"><input type="radio" name="execType" value="1" id="execType1">手动&nbsp;&nbsp;&nbsp;</label>
-                            <label for="execType0" onclick="toggle.cronexp.show()" class="radio-label"><input type="radio" name="execType" value="0" id="execType0">自动</label>
                         </div>
                         <div class="form-group cronExpDiv">
                             <label class="col-lab control-label" title="1.crontab: unix/linux的时间格式表达式&nbsp;&nbsp;2.quartz: quartz框架的时间格式表达式">规则类型：</label>&nbsp;&nbsp;
@@ -1032,9 +950,11 @@
                         </div>
                     </form>
                 </div>
-                <div class="modal-footer text-center">
+                <div class="modal-footer">
+                    <center>
                         <button type="button" class="btn btn-sm" onclick="saveCmd()">保存</button>&nbsp;&nbsp;
                         <button type="button" class="btn btn-sm" data-dismiss="modal">关闭</button>
+                    </center>
                 </div>
             </div>
         </div>
@@ -1045,5 +965,9 @@
 </body>
 
 </html>
+
+
+
+
 
 

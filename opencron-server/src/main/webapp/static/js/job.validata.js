@@ -60,37 +60,34 @@ function Validata() {
         },
 
         cronExp: function () {
-            var execType = $('input[type="radio"][name="execType"]:checked').val();
             var cronType = $('input[type="radio"][name="cronType"]:checked').val();
             var cronExp = $("#cronExp").val();
-            if (execType == 0) {
-                if (!cronExp) {
-                    opencron.tipError("#cronExp", "时间规则不能为空!");
-                    this.status = false;
-                } else {
-                    var _this = this;
-                    $.ajax({
-                        headers: {"csrf": self.csrf},
-                        type: "POST",
-                        url: self.contextPath+"/verify/exp.do",
-                        data: {
-                            "cronType": cronType,
-                            "cronExp": cronExp
-                        }
-                    }).done(function (data) {
-                        _this.cronExpRemote = true;
-                        if (data) {
-                            opencron.tipOk($("#expTip"));
-                        } else {
-                            opencron.tipError($("#expTip"), "时间规则语法错误!");
-                            _this.status = false;
-                        }
-                    }).fail(function () {
-                        _this.cronExpRemote = true;
-                        opencron.tipError($("#expTip"), "网络请求错误,请重试!");
+            if (!cronExp) {
+                opencron.tipError("#cronExp", "时间规则不能为空!");
+                this.status = false;
+            } else {
+                var _this = this;
+                $.ajax({
+                    headers: {"csrf": self.csrf},
+                    type: "POST",
+                    url: self.contextPath+"/verify/exp.do",
+                    data: {
+                        "cronType": cronType,
+                        "cronExp": cronExp
+                    }
+                }).done(function (data) {
+                    _this.cronExpRemote = true;
+                    if (data) {
+                        opencron.tipOk($("#expTip"));
+                    } else {
+                        opencron.tipError($("#expTip"), "时间规则语法错误!");
                         _this.status = false;
-                    });
-                }
+                    }
+                }).fail(function () {
+                    _this.cronExpRemote = true;
+                    opencron.tipError($("#expTip"), "网络请求错误,请重试!");
+                    _this.status = false;
+                });
             }
         },
 
@@ -397,15 +394,6 @@ function Validata() {
     };
 
     this.toggle = {
-        cronExp: function (_toggle) {
-            if (_toggle) {
-                $(".cronExpDiv").show();
-                $("#execTypeTip").html("自动模式: 执行器自动执行");
-            } else {
-                $(".cronExpDiv").hide();
-                $("#execTypeTip").html("手动模式: 管理员手动执行");
-            }
-        },
         redo: function (_toggle) {
             $("#itemRedo").val(_toggle);
             if (_toggle == 1) {
@@ -487,19 +475,6 @@ Validata.prototype.ready = function () {
 
     var _this = this;
 
-    $("#execType0").next().click(function () {
-        _this.toggle.cronExp(true);
-    });
-    $("#execType0").parent().parent().click(function () {
-        _this.toggle.cronExp(true);
-    });
-    $("#execType1").next().click(function () {
-        _this.toggle.cronExp(false);
-    });
-    $("#execType1").parent().parent().click(function () {
-        _this.toggle.cronExp(false)
-    });
-
     $("#cronType0").next().click(function () {
         _this.toggle.cronTip(0,true);
     });
@@ -512,7 +487,6 @@ Validata.prototype.ready = function () {
     $("#cronType1").parent().parent().click(function () {
         _this.toggle.cronTip(1,true);
     });
-
 
     $("#runModel0").next().click(function () {
         _this.toggle.runModel(0);
@@ -527,7 +501,6 @@ Validata.prototype.ready = function () {
         _this.toggle.runModel(1);
     });
 
-
     $("#redo01").next().click(function () {
         _this.toggle.count(true)
     });
@@ -541,7 +514,6 @@ Validata.prototype.ready = function () {
         _this.toggle.count(false)
     });
 
-
     $("#redo1").next().click(function () {
         _this.toggle.redo(1);
     });
@@ -554,7 +526,6 @@ Validata.prototype.ready = function () {
     $("#redo0").parent().parent().click(function () {
         _this.toggle.redo(0);
     });
-
 
     $("#jobType0").next().click(function () {
         _this.toggle.subJob(0);
@@ -584,9 +555,6 @@ Validata.prototype.ready = function () {
         _this.toggle.contact(true);
     });
 
-    var execType = $('input[type="radio"][name="execType"]:checked').val();
-    _this.toggle.cronExp(execType == 0);
-
     var redo = $('input[type="radio"][name="redo"]:checked').val();
     _this.toggle.count(redo == 1);
 
@@ -608,12 +576,7 @@ Validata.prototype.ready = function () {
             var valId = setInterval(function () {
                 if (_this.validata.jobNameRemote ) {
                     var cleanFlag = false;
-                    var checkExp = $('input[type="radio"][name="execType"]:checked').val() == 0;
-                    if( checkExp ){
-                        if(_this.validata.cronExpRemote){
-                            cleanFlag = true;
-                        }
-                    }else {
+                    if(_this.validata.cronExpRemote){
                         cleanFlag = true;
                     }
                     if(cleanFlag){
@@ -632,7 +595,6 @@ Validata.prototype.ready = function () {
     $("#subjob-btn").click(function () {
         _this.subJob.verify();
     });
-
 
     $("#jobName").blur(function () {
         _this.validata.jobName();

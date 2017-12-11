@@ -79,11 +79,11 @@ public class Record implements Serializable {
     public Record() {
     }
 
-    public Record(JobInfo jobInfo) {
+    public Record(JobInfo jobInfo,Constants.ExecType execType) {
         this.setJobId(jobInfo.getJobId());
+        this.setExecType(execType.getStatus());
         this.setAgentId(jobInfo.getAgentId());
         this.setUserId(jobInfo.getUserId());
-        this.setExecType( jobInfo.getExecType() );
         this.setCommand(jobInfo.getCommand());//执行的命令
         this.setStartTime(new Date());//开始执行的时间
         this.setRedo(jobInfo.getRedo());//失败是否重新执行

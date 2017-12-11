@@ -83,7 +83,7 @@ public class ExecuteService implements Job {
         JobInfo jobInfo = (JobInfo) jobExecutionContext.getJobDetail().getJobDataMap().get(key);
         try {
             ExecuteService executeService = (ExecuteService) jobExecutionContext.getJobDetail().getJobDataMap().get("jobBean");
-            boolean success = executeService.executeJob(jobInfo);
+            boolean success = executeService.executeJob(jobInfo,ExecType.AUTO);
             this.loggerInfo("[opencron] job:{} at {}:{},execute:{}", jobInfo, success ? "successful" : "failed");
         } catch (Exception e) {
             logger.error(e.getLocalizedMessage(), e);
@@ -93,14 +93,14 @@ public class ExecuteService implements Job {
     /**
      * 基本方式执行任务，按任务类型区分
      */
-    public boolean executeJob(final JobInfo job) {
+    public boolean executeJob(final JobInfo job,Constants.ExecType execType) {
 
         JobType jobType = JobType.getJobType(job.getJobType());
         switch (jobType) {
             case SINGLETON:
-                return executeSingleJob(job, job.getUserId());//单一任务
+                return executeSingleJob(job, execType);//单一任务
             case FLOW:
-                return executeFlowJob(job);//流程任务
+                return executeFlowJob(job,execType);//流程任务
             default:
                 return false;
         }
@@ -109,11 +109,11 @@ public class ExecuteService implements Job {
     /**
      * 单一任务执行过程
      */
-    private boolean executeSingleJob(JobInfo job, Long userId) {
+    private boolean executeSingleJob(JobInfo job, ExecType execType) {
 
-        if (!checkJobPermission(job.getAgentId(), userId)) return false;
+        if (!checkJobPermission(job.getAgentId(), job.getUserId())) return false;
 
-        Record record = new Record(job);
+        Record record = new Record(job,execType);
         record.setJobType(JobType.SINGLETON.getCode());//单一任务
         try {
             //执行前先保存
@@ -147,7 +147,7 @@ public class ExecuteService implements Job {
     /**
      * 流程任务 按流程任务处理方式区分
      */
-    private boolean executeFlowJob(JobInfo job) {
+    private boolean executeFlowJob(JobInfo job,ExecType execType) {
         if (!checkJobPermission(job.getAgentId(), job.getUserId())) return false;
 
         final long groupId = System.nanoTime() + Math.abs(new Random().nextInt());//分配一个流程组Id
@@ -157,9 +157,9 @@ public class ExecuteService implements Job {
         RunModel runModel = RunModel.getRunModel(job.getRunModel());
         switch (runModel) {
             case SEQUENCE:
-                return executeSequenceJob(groupId, jobQueue);//串行任务
+                return executeSequenceJob(groupId, jobQueue,execType);//串行任务
             case SAMETIME:
-                return executeSameTimeJob(groupId, jobQueue);//并行任务
+                return executeSameTimeJob(groupId, jobQueue,execType);//并行任务
             default:
                 return false;
         }
@@ -168,9 +168,9 @@ public class ExecuteService implements Job {
     /**
      * 串行任务处理方式
      */
-    private boolean executeSequenceJob(long groupId, Queue<JobInfo> jobQueue) {
+    private boolean executeSequenceJob(long groupId, Queue<JobInfo> jobQueue,ExecType execType) {
         for (JobInfo jobInfo : jobQueue) {
-            if (!doFlowJob(jobInfo, groupId)) {
+            if (!doFlowJob(jobInfo, groupId,execType)) {
                 return false;
             }
         }
@@ -180,7 +180,7 @@ public class ExecuteService implements Job {
     /**
      * 并行任务处理方式
      */
-    private boolean executeSameTimeJob(final long groupId, final Queue<JobInfo> jobQueue) {
+    private boolean executeSameTimeJob(final long groupId, final Queue<JobInfo> jobQueue,final ExecType execType) {
         final List<Boolean> result = new ArrayList<Boolean>(0);
 
         final Semaphore semaphore = new Semaphore(jobQueue.size());
@@ -192,7 +192,7 @@ public class ExecuteService implements Job {
                 public void run() {
                     try {
                         semaphore.acquire();
-                        result.add(doFlowJob(jobInfo, groupId));
+                        result.add(doFlowJob(jobInfo, groupId,execType));
                         semaphore.release();
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -213,8 +213,8 @@ public class ExecuteService implements Job {
     /**
      * 流程任务（通用）执行过程
      */
-    private boolean doFlowJob(JobInfo job, long groupId) {
-        Record record = new Record(job);
+    private boolean doFlowJob(JobInfo job, long groupId,ExecType execType) {
+        Record record = new Record(job,execType);
         record.setGroupId(groupId);//组Id
         record.setJobType(JobType.FLOW.getCode());//流程任务
         record.setFlowNum(job.getFlowNum());
@@ -309,7 +309,7 @@ public class ExecuteService implements Job {
                 public void run() {
                     try {
                         semaphore.acquire();
-                        executeSingleJob(jobInfo, userId);
+                        executeSingleJob(jobInfo, ExecType.BATCH);
                         semaphore.release();
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -339,14 +339,13 @@ public class ExecuteService implements Job {
         }
 
         parentRecord.setStatus(RunStatus.RERUNNING.getStatus());
-        Record record = new Record(job);
+        Record record = new Record(job,ExecType.RERUN);
 
         try {
             recordService.merge(parentRecord);
             /**
              * 当前重新执行的新纪录
              */
-            job.setExecType(ExecType.RERUN.getStatus());
             record.setParentId(parentRecord.getRecordId());
             record.setGroupId(parentRecord.getGroupId());
             record.setJobType(jobType.getCode());

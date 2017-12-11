@@ -86,9 +86,6 @@ public class JobController extends BaseController {
         if (notEmpty(job.getJobType())) {
             model.addAttribute("jobType", job.getJobType());
         }
-        if (notEmpty(job.getExecType())) {
-            model.addAttribute("execType", job.getExecType());
-        }
         if (notEmpty(job.getRedo())) {
             model.addAttribute("redo", job.getRedo());
         }
@@ -152,7 +149,7 @@ public class JobController extends BaseController {
             /**
              * 将数据库中持久化的作业和当前修改的合并,当前修改的属性覆盖持久化的属性...
              */
-            BeanUtils.copyProperties(job1, job, "jobName", "cronType", "cronExp", "command", "execType", "comment", "runAs", "successExit", "redo", "runCount", "jobType", "runModel", "warning", "mobiles", "emailAddress", "timeout");
+            BeanUtils.copyProperties(job1, job, "jobName", "cronType", "cronExp", "command", "comment", "runAs", "successExit", "redo", "runCount", "jobType", "runModel", "warning", "mobiles", "emailAddress", "timeout");
         }
 
         //单任务
@@ -251,7 +248,6 @@ public class JobController extends BaseController {
     public boolean edit(HttpSession session, Job job) throws SchedulerException {
         Job dbJob = jobService.getJob(job.getJobId());
         if (!jobService.checkJobOwner(session, dbJob.getUserId())) return false;
-        dbJob.setExecType(job.getExecType());
         dbJob.setCronType(job.getCronType());
         dbJob.setCronExp(job.getCronExp());
         dbJob.setCommand(DigestUtils.passBase64(job.getCommand()));
@@ -300,10 +296,9 @@ public class JobController extends BaseController {
         //手动执行
         Long userId = OpencronTools.getUserId(session);
         job.setUserId(userId);
-        job.setExecType(Constants.ExecType.OPERATOR.getStatus());
         job.setAgent(agentService.getAgent(job.getAgentId()));
         try {
-            this.executeService.executeJob(job);
+            this.executeService.executeJob(job,Constants.ExecType.OPERATOR);
         } catch (Exception e) {
             e.printStackTrace();
         }

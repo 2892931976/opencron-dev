@@ -176,7 +176,7 @@
             $(window).resize(function () {
                 window.setTimeout(function () {
                     if (typeof(windowSize) =="undefined" ) {
-                        windowSize = {
+                        window.windowSize = {
                             width:$(window).width(),
                             height:$(window).height()
                         }
@@ -184,14 +184,14 @@
                         $("#cpu-chart").find("div").first().css("width","100%").find("canvas").first().css("width","100%");
                     }
                     if($(window).width()!=windowSize.width||$(window).height()!=windowSize.height) {
-                         windowSize = {
+                        window.windowSize = {
                              width:$(window).width(),
                              height:$(window).height()
                          }
                          opencronChart.resize();
                         $("#cpu-chart").find("div").first().css("width","100%").find("canvas").first().css("width","100%");
                     }
-                },500)
+                },500);
             });
 
             $(".count").mouseover(function () {

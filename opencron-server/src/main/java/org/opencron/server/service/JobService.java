@@ -167,9 +167,6 @@ public class JobService {
             if (notEmpty(job.getJobType())) {
                 sql += " AND T.jobType=" + job.getJobType();
             }
-            if (notEmpty(job.getExecType())) {
-                sql += " AND T.execType=" + job.getExecType();
-            }
             if (notEmpty(job.getRedo())) {
                 sql += " AND T.redo=" + job.getRedo();
             }
@@ -386,11 +383,6 @@ public class JobService {
         if (jobBean.getPause()==null) return false;
 
         if ( job.getPause()!=null && jobBean.getPause().equals(job.getPause())) {
-            return false;
-        }
-
-        //必须是自动执行.
-        if ( !job.getExecType().equals(ExecType.AUTO.getStatus()) ) {
             return false;
         }
 

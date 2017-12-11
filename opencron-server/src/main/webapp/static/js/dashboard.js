@@ -332,14 +332,14 @@ function OpencronChart() {
 
     if (!self.cpuLoad) {
         self.cpuLoad = true;
-        var overdata = [];
+        var overData = [];
         $.each(self.overviewDataArr, function (i, elem) {
             $.each(self.data, function (name, obj) {
                 if (elem.key == name) {
                     if (name == "swap") {
-                        overdata.push([elem.key, 100.00 - parseFloat(obj)]);
+                        overData.push([elem.key, 100.00 - parseFloat(obj)]);
                     } else {
-                        overdata.push([elem.key, parseFloat(obj)]);
+                        overData.push([elem.key, parseFloat(obj)]);
                     }
 
                 }
@@ -347,12 +347,12 @@ function OpencronChart() {
             var _data = $.parseJSON(self.data.cpuData);
             for (var k in _data) {
                 if (elem.key == k) {
-                    overdata.push([k, parseFloat(_data[k])]);
+                    overData.push([k, parseFloat(_data[k])]);
                 }
             }
         });
 
-        $.each(overdata, function (i, obj) {
+        $.each(overData, function (i, obj) {
             var key = obj[0];
             var val = obj[1];
             var title = "";
@@ -474,21 +474,21 @@ function OpencronChart() {
         self.cpuChartObj.setOption(option);
     } else {
         $.each(self.overviewDataArr, function (i, elem) {
-            var overelem = $("#cpu_" + elem.key);
-            if (overelem.length > 0) {
+            var overElem = $("#cpu_" + elem.key);
+            if (overElem.length > 0) {
                 $.each(self.data, function (name, obj) {
                     if (elem.key == name) {
                         if (name == "swap") {
-                            overelem.data('easyPieChart').update(100.00 - parseFloat(obj));
+                            overElem.data('easyPieChart').update(100.00 - parseFloat(obj));
                         } else {
-                            overelem.data('easyPieChart').update(parseFloat(obj));
+                            overElem.data('easyPieChart').update(parseFloat(obj));
                         }
                     }
                 });
                 var _data = $.parseJSON(self.data.cpuData);
                 for (var k in _data) {
                     if (elem.key == k) {
-                        overelem.data('easyPieChart').update(parseFloat(_data[k]));
+                        overElem.data('easyPieChart').update(parseFloat(_data[k]));
                     }
                 }
             }
