@@ -176,7 +176,7 @@ public final class SchedulerService {
     public void initQuartz(Job jobExecutor) throws SchedulerException {
         //quartz job
         logger.info("[opencron] init quartzJob...");
-        List<JobInfo> jobs = jobService.getJobInfo(Constants.ExecType.AUTO, Constants.CronType.QUARTZ);
+        List<JobInfo> jobs = jobService.getJobInfo(Constants.CronType.QUARTZ);
         for (JobInfo job : jobs) {
             try {
                 put(job, jobExecutor);

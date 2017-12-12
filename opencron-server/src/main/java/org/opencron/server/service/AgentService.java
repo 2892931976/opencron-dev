@@ -146,7 +146,7 @@ public class AgentService {
             /**
              * 获取该执行器下所有的自动执行,并且是quartz类型的作业
              */
-            List<JobInfo> jobInfos = jobService.getJobInfoByAgentId(agent.getAgentId(), Constants.ExecType.AUTO, Constants.CronType.QUARTZ);
+            List<JobInfo> jobInfos = jobService.getJobInfoByAgentId(agent.getAgentId(),Constants.CronType.QUARTZ);
             try {
                 schedulerService.put(jobInfos, this.executeService);
             } catch (SchedulerException e) {

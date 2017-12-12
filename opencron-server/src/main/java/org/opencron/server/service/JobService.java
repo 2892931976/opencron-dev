@@ -81,30 +81,28 @@ public class JobService {
      *
      * @return
      */
-    public List<JobInfo> getJobInfo(ExecType execType, CronType cronType) {
+    public List<JobInfo> getJobInfo(CronType cronType) {
         String sql = "SELECT T.*,D.name AS agentName,D.port,D.host,D.password FROM T_JOB AS T " +
                 "LEFT JOIN T_AGENT AS D " +
                 "ON T.agentId = D.agentId " +
                 "WHERE IFNULL(T.flowNum,0)=0 " +
                 "AND cronType=? " +
-                "AND execType = ? " +
                 "AND T.deleted=0";
-        List<JobInfo> jobs = queryDao.sqlQuery(JobInfo.class, sql, cronType.getType(), execType.getStatus());
+        List<JobInfo> jobs = queryDao.sqlQuery(JobInfo.class, sql, cronType.getType());
         queryJobMore(jobs);
         return jobs;
     }
 
-    public List<JobInfo> getJobInfoByAgentId(Long agentId, ExecType execType, CronType cronType) {
+    public List<JobInfo> getJobInfoByAgentId(Long agentId,CronType cronType) {
         String sql = "SELECT T.*,D.name AS agentName,D.port,D.host,D.password FROM T_JOB AS T " +
                 "INNER JOIN T_AGENT D " +
                 "ON T.agentId = D.agentId " +
                 "WHERE IFNULL(T.flowNum,0)=0 " +
                 "AND cronType=? " +
-                "AND execType = ? " +
                 "AND T.deleted=0 " +
                 "AND D.agentId=? ";
 
-        List<JobInfo> jobs = queryDao.sqlQuery(JobInfo.class, sql, cronType.getType(), execType.getStatus(), agentId);
+        List<JobInfo> jobs = queryDao.sqlQuery(JobInfo.class, sql, cronType.getType(),agentId);
         queryJobMore(jobs);
         return jobs;
     }
@@ -133,7 +131,7 @@ public class JobService {
 
     public List<JobInfo> getCrontabJob() {
         logger.info("[opencron] init quartzJob...");
-        return getJobInfo(Constants.ExecType.AUTO, Constants.CronType.CRONTAB);
+        return getJobInfo(Constants.CronType.CRONTAB);
     }
 
     public List<Job> getAll() {
