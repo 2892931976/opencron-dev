@@ -42,17 +42,18 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.*;
 import java.security.AccessControlException;
 import java.util.Random;
+import java.util.concurrent.Executors;
 
 import static org.opencron.common.util.CommonUtils.isEmpty;
 import static org.opencron.common.util.CommonUtils.notEmpty;
 
-public class Bootstrap implements Serializable {
+public class AgentBootstrap implements Serializable {
 
 
     private static final long serialVersionUID = 20150614L;
 
 
-    private static Logger logger = LoggerFactory.getLogger(Bootstrap.class);
+    private static Logger logger = LoggerFactory.getLogger(AgentBootstrap.class);
 
     /**
      * rpc server
@@ -77,7 +78,7 @@ public class Bootstrap implements Serializable {
     /**
      * bootstrap instance....
      */
-    private static Bootstrap daemon;
+    private static AgentBootstrap daemon;
 
 
     private volatile boolean stopAwait = false;
@@ -101,7 +102,7 @@ public class Bootstrap implements Serializable {
     public static void main(String[] args) {
 
         if (daemon == null) {
-            daemon = new Bootstrap();
+            daemon = new AgentBootstrap();
         }
 
         try {
@@ -170,17 +171,17 @@ public class Bootstrap implements Serializable {
         SystemPropertyUtils.setProperty(Constants.PARAM_OPENCRON_PASSWORD_KEY,this.password);
     }
 
-    private void start() throws Exception {
+    private void start() {
         try {
             final int port = SystemPropertyUtils.getInt(Constants.PARAM_OPENCRON_PORT_KEY,1577);
+
             //new thread to start for netty server
-            new Thread(new Runnable() {
+            Executors.newSingleThreadExecutor().submit(new Runnable() {
                 @Override
                 public void run() {
                     server.start(port,handler);
                 }
-            }).start();
-
+            });
             /**
              * write pid to pidfile...
              */

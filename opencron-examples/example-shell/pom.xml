@@ -214,7 +214,7 @@
                             <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>../lib</classpathPrefix>
-                            <mainClass>org.opencron.agent.Bootstrap</mainClass>
+                            <mainClass>org.opencron.agent.AgentBootstrap</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
