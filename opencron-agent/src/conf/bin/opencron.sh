@@ -251,7 +251,7 @@ if [ $have_tty -eq 1 ]; then
   else
     echo_w "Using JRE_HOME:        $JRE_HOME"
   fi
-  echo "Using CLASSPATH:       $CLASSPATH"
+  echo_w "Using CLASSPATH:       $CLASSPATH"
   if [ ! -z "$OPENCRON_PID" ]; then
     echo_w "Using OPENCRON_PID:    $OPENCRON_PID"
   fi
