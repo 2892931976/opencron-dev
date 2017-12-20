@@ -53,11 +53,6 @@ echo_w () {
 if [ -z "$RUNJAVA" ]; then
   RUNJAVA="$JRE_HOME"/bin/java
 fi
-if [ "$os400" != "true" ]; then
-  if [ -z "$_RUNJDB" ]; then
-    _RUNJDB="$JAVA_HOME"/bin/jdb
-  fi
-fi
 
 #check java exists.
 $RUNJAVA >/dev/null 2>&1

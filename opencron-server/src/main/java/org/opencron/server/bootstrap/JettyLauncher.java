@@ -77,9 +77,12 @@ public class JettyLauncher implements Launcher {
         appContext.setConfigurationDiscovered(true);
         appContext.setClassLoader(Thread.currentThread().getContextClassLoader());
 
+
+
         ServerConnector connector = new ServerConnector(server);
         connector.setHost("0.0.0.0");
         connector.setPort(port);
+
         server.setConnectors(new Connector[]{connector});
         server.setAttribute("org.eclipse.jetty.server.Request.maxFormContentSize", 1024 * 1024 * 1024);
         server.setDumpAfterStart(false);
