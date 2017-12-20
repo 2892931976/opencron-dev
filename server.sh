@@ -32,9 +32,15 @@ echo_w () {
     printf "[${BLUE_COLOR}opencron${RES}] ${WHITE_COLOR}$1${RES}\n"
 }
 
+if [ -z "$JAVA_HOME" -a -z "$JRE_HOME" ]; then
+    echo_r "Neither the JAVA_HOME nor the JRE_HOME environment variable is defined"
+    echo_r "At least one of these environment variable is needed to run this program"
+    exit 1
+fi
+
 # Set standard commands for invoking Java, if not already set.
 if [ -z "$RUNJAVA" ]; then
-  RUNJAVA="$JRE_HOME"/bin/java
+  RUNJAVA="$JAVA_HOME"/bin/java
 fi
 
 #check java exists.
