@@ -85,6 +85,12 @@
             <artifactId>tomcat-embed-core</artifactId>
             <scope>provided</scope>
         </dependency>
+
+        <dependency>
+            <groupId>org.fusesource.jansi</groupId>
+            <artifactId>jansi</artifactId>
+        </dependency>
+
     </dependencies>
 
     <build>

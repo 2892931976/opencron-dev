@@ -707,6 +707,12 @@
                 <version>3.0</version>
             </dependency>
 
+            <dependency>
+                <groupId>org.fusesource.jansi</groupId>
+                <artifactId>jansi</artifactId>
+                <version>1.16</version>
+            </dependency>
+
         </dependencies>
 
     </dependencyManagement>

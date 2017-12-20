@@ -1,35 +1,14 @@
 #!/bin/bash
 
 #echo color
-WHITE_COLOR="\E[1;37m";
 RED_COLOR="\E[1;31m";
 BLUE_COLOR='\E[1;34m';
-GREEN_COLOR="\E[1;32m";
-YELLOW_COLOR="\E[1;33m";
 RES="\E[0m";
 
 echo_r () {
     # Color red: Error, Failed
     [ $# -ne 1 ] && return 1
-    echo -e "[${GREEN_COLOR}opencron${RES}] ${RED_COLOR}$1${RES}"
-}
-
-echo_g () {
-    # Color green: Success
-    [ $# -ne 1 ] && return 1
-    echo -e "[${GREEN_COLOR}opencron${RES}] ${GREEN_COLOR}$1${RES}"
-}
-
-echo_y () {
-    # Color yellow: Warning
-    [ $# -ne 1 ] && return 1
-    echo -e "[${GREEN_COLOR}opencron${RES}] ${YELLOW_COLOR}$1${RES}"
-}
-
-echo_w () {
-    # Color yellow: White
-    [ $# -ne 1 ] && return 1
-    echo -e "[${GREEN_COLOR}opencron${RES}] ${WHITE_COLOR}$1${RES}"
+    printf "[${BLUE_COLOR}opencron${RES}] ${RED_COLOR}$1${RES}\n"
 }
 
 # OS specific support.  $var _must_ be set to either true or false.
@@ -78,7 +57,7 @@ DEPLOY_PATH=${WORKDIR}/dist/opencron-agent
 if [ ! -f "${DIST_PATH}/${APP_TAR_NAME}" ] ; then
     #dist下没有tar包则检查agent的target下是否有tar包.
    if [ ! -f "${MAVEN_TARGET_TAR}" ] ; then
-      echo_w "[opencron] please build project first!"
+      echo_r "[opencron] please build project first!"
       exit 0;
    else
       cp ${MAVEN_TARGET_TAR} ${DIST_PATH};

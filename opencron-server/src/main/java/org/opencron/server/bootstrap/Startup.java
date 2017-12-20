@@ -22,11 +22,17 @@ package org.opencron.server.bootstrap;
 
 import static org.opencron.common.Constants.LauncherType;
 
+import org.opencron.common.Constants;
 import org.opencron.common.ext.ExtensionLoader;
 import org.opencron.common.util.ClassLoaderUtils;
+import org.opencron.common.util.IOUtils;
 import org.opencron.common.util.MavenUtils;
 
+import static org.fusesource.jansi.Ansi.*;
+import static org.fusesource.jansi.Ansi.Color.*;
+
 import java.io.File;
+import java.net.URL;
 
 /**
  * @author benjobs
@@ -47,6 +53,18 @@ public class Startup {
 
         String portParam = System.getProperty("server.port");
 
+        String launcher = System.getProperty("server.launcher");
+
+        devMode = (launcher == null) ? true : false;
+
+        LauncherType launcherType = (launcher == null || LauncherType.isTomcat(launcher)) ? LauncherType.TOMCAT : LauncherType.JETTY;
+
+        URL bannerURL = Thread.currentThread().getContextClassLoader().getResource("app-banner.txt");
+        if (bannerURL!=null) {
+            String banner = IOUtils.readText(new File(bannerURL.getPath()), Constants.CHARSET_UTF8);
+            System.out.println( ansi().eraseScreen().fg(GREEN).a(banner).reset());
+        }
+
         if (portParam == null) {
             System.out.printf("[opencron]Server At default port %d Starting...\n", startPort);
         } else {
@@ -61,13 +79,8 @@ public class Startup {
             }
         }
 
-        String launcher = System.getProperty("server.launcher");
-
-        devMode = (launcher == null) ? true : false;
-
-        LauncherType launcherType = (launcher == null || LauncherType.isTomcat(launcher)) ? LauncherType.TOMCAT : LauncherType.JETTY;
-
         String jarPath;
+
         if (devMode) {
             String artifact = MavenUtils.get(Thread.currentThread().getContextClassLoader()).getArtifactId();
             jarPath = artifact + File.separator + workspace + File.separator + launcherType.getName();
