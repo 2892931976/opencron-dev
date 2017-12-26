@@ -20,7 +20,7 @@ public class MinaCodecAdapter implements ProtocolCodecFactory {
 
     private Class<?> decodeClass;
 
-    public MinaCodecAdapter(Class<?> encodeClass,Class<?> decodeClass){
+    public MinaCodecAdapter(Class<?> encodeClass, Class<?> decodeClass) {
         this.encodeClass = encodeClass;
         this.decodeClass = decodeClass;
     }
@@ -45,7 +45,7 @@ public class MinaCodecAdapter implements ProtocolCodecFactory {
 
         @Override
         public boolean doDecode(IoSession session, IoBuffer in, ProtocolDecoderOutput out) throws Exception {
-            if (in.limit()<= 0 || in.remaining() < Constants.HEADER_SIZE) {
+            if (in.limit() <= 0 || in.remaining() < Constants.HEADER_SIZE) {
                 return false;
             }
             in.mark();
@@ -58,7 +58,7 @@ public class MinaCodecAdapter implements ProtocolCodecFactory {
             }
             byte[] data = new byte[dataLength];
             in.get(data);
-            Object obj = serializer.decode(data,type);
+            Object obj = serializer.decode(data, type);
             out.write(obj);
             return true;
         }
@@ -92,7 +92,6 @@ public class MinaCodecAdapter implements ProtocolCodecFactory {
         }
 
     }
-
 
 
 }

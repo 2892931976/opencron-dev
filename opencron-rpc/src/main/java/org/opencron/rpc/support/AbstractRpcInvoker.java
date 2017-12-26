@@ -62,7 +62,7 @@ public class AbstractRpcInvoker implements RpcInvoker {
     //异步调用...
     public void sentAsync(Request request, InvokeCallback callback) {
         try {
-            client.sentAsync(request.setRpcType(RpcType.ASYNC),callback);
+            client.sentAsync(request.setRpcType(RpcType.ASYNC), callback);
         } catch (Exception e) {
             e.printStackTrace();
         }

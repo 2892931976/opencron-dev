@@ -42,7 +42,7 @@ public class ConnectWrapper {
     }
 
     public boolean isActive() {
-        return this.connectFuture!=null && this.connectFuture.isConnected();
+        return this.connectFuture != null && this.connectFuture.isConnected();
     }
 
     public void close() {

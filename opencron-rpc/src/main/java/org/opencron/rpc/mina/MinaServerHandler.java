@@ -14,7 +14,7 @@ public class MinaServerHandler extends IoHandlerAdapter {
 
     private ServerHandler handler;
 
-    public MinaServerHandler(ServerHandler handler){
+    public MinaServerHandler(ServerHandler handler) {
         this.handler = handler;
     }
 

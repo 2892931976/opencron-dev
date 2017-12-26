@@ -27,10 +27,10 @@ import org.opencron.common.job.Response;
 
 public interface RpcInvoker {
 
-    Response sentSync(Request request) throws Exception  ;
+    Response sentSync(Request request) throws Exception;
 
-    void sentOneway(Request request) throws Exception  ;
+    void sentOneway(Request request) throws Exception;
 
-    void sentAsync(Request request, InvokeCallback callback) throws Exception  ;
+    void sentAsync(Request request, InvokeCallback callback) throws Exception;
 
 }

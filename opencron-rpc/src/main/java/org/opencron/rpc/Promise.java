@@ -40,7 +40,9 @@ public class Promise {
     //处理开始时间
     private final long beginTimestamp = System.currentTimeMillis();
 
-    /**超时时间**/
+    /**
+     * 超时时间
+     **/
     private Integer timeout;
     private TimeUnit unit;
 
@@ -51,18 +53,18 @@ public class Promise {
     }
 
     public Promise(Integer timeout) {
-        this.timeout = timeout == null?Integer.MAX_VALUE:timeout;
+        this.timeout = timeout == null ? Integer.MAX_VALUE : timeout;
     }
 
     public Promise(Integer timeout, InvokeCallback callback) {
-        this.timeout =  timeout == null?Integer.MAX_VALUE:timeout;
+        this.timeout = timeout == null ? Integer.MAX_VALUE : timeout;
         this.unit = TimeUnit.SECONDS;
         this.callback = callback;
     }
 
-    public void execCallback(){
-        if(isDone()){
-            if(this.exc != null) {
+    public void execCallback() {
+        if (isDone()) {
+            if (this.exc != null) {
                 this.callback.failure(this.exc);
             } else {
                 this.callback.success(this.result);
@@ -71,8 +73,9 @@ public class Promise {
     }
 
     public boolean isAsync() {
-        return this.callback!=null;
+        return this.callback != null;
     }
+
     public boolean isCancelled() {
         return this.exc == CANCELLED;
     }
@@ -82,11 +85,11 @@ public class Promise {
     }
 
     public void setResult(Response response) {
-        synchronized(this) {
-            if(!this.haveResult) {
+        synchronized (this) {
+            if (!this.haveResult) {
                 this.result = response;
                 this.haveResult = true;
-                if(this.latch != null) {
+                if (this.latch != null) {
                     this.latch.countDown();
                 }
             }
@@ -94,15 +97,15 @@ public class Promise {
     }
 
     public void setFailure(Throwable throwable) {
-        if(!(throwable instanceof IOException) && !(throwable instanceof SecurityException)) {
+        if (!(throwable instanceof IOException) && !(throwable instanceof SecurityException)) {
             throwable = new IOException(throwable);
         }
 
-        synchronized(this) {
-            if(!this.haveResult) {
+        synchronized (this) {
+            if (!this.haveResult) {
                 this.exc = throwable;
                 this.haveResult = true;
-                if(this.latch != null) {
+                if (this.latch != null) {
                     this.latch.countDown();
                 }
             }
@@ -110,7 +113,7 @@ public class Promise {
     }
 
     public void setResult(Response result, Throwable exc) {
-        if(exc == null) {
+        if (exc == null) {
             this.setResult(result);
         } else {
             this.setFailure(exc);
@@ -119,9 +122,9 @@ public class Promise {
     }
 
     public Response get() throws InterruptedException, ExecutionException {
-        if(!this.haveResult) {
+        if (!this.haveResult) {
             boolean wait = this.prepareForWait();
-            if(wait) {
+            if (wait) {
                 this.latch.await();
             }
         }
@@ -129,9 +132,9 @@ public class Promise {
     }
 
     public Response get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
-        if(!this.haveResult) {
+        if (!this.haveResult) {
             boolean wait = this.prepareForWait();
-            if(wait && !this.latch.await(timeout, unit)) {
+            if (wait && !this.latch.await(timeout, unit)) {
                 throw new TimeoutException();
             }
         }
@@ -139,8 +142,8 @@ public class Promise {
     }
 
     private Response returnResult() throws ExecutionException {
-        if(this.exc != null) {
-            if(this.exc == CANCELLED) {
+        if (this.exc != null) {
+            if (this.exc == CANCELLED) {
                 throw new CancellationException();
             } else {
                 throw new ExecutionException(this.exc);
@@ -151,11 +154,11 @@ public class Promise {
     }
 
     private boolean prepareForWait() {
-        synchronized(this) {
-            if(this.haveResult) {
+        synchronized (this) {
+            if (this.haveResult) {
                 return false;
             } else {
-                if(this.latch == null) {
+                if (this.latch == null) {
                     this.latch = new CountDownLatch(1);
                 }
                 return true;

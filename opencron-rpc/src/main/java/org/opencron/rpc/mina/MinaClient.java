@@ -29,7 +29,7 @@ public class MinaClient implements Client {
 
     private NioSocketConnector connector;
 
-    protected final ConcurrentHashMap<Integer, Promise> promiseTable =  new ConcurrentHashMap<Integer, Promise>(256);
+    protected final ConcurrentHashMap<Integer, Promise> promiseTable = new ConcurrentHashMap<Integer, Promise>(256);
 
     private final ConcurrentHashMap<String, ConnectWrapper> connectTable = new ConcurrentHashMap<String, ConnectWrapper>();
 
@@ -43,7 +43,7 @@ public class MinaClient implements Client {
     public void connect() {
 
         connector = new NioSocketConnector();
-        connector.getFilterChain().addLast("codec", new ProtocolCodecFilter(new MinaCodecAdapter(Request.class,Response.class)));
+        connector.getFilterChain().addLast("codec", new ProtocolCodecFilter(new MinaCodecAdapter(Request.class, Response.class)));
         connector.setHandler(new MinaClientHandler(new Promise.Getter() {
             @Override
             public Promise getPromise(Integer id) {
@@ -60,9 +60,10 @@ public class MinaClient implements Client {
 
         this.scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(5, new ThreadFactory() {
             private final AtomicInteger idGenerator = new AtomicInteger(0);
+
             @Override
             public Thread newThread(Runnable r) {
-                return new Thread(r, "MinaRPC "+ this.idGenerator.incrementAndGet());
+                return new Thread(r, "MinaRPC " + this.idGenerator.incrementAndGet());
             }
         });
 
@@ -107,7 +108,7 @@ public class MinaClient implements Client {
             connect.getSession().write(request);
             return promise.get();
         } else {
-            throw new IllegalArgumentException("[opencron] MinaRPC channel not active. request id:"+request.getId());
+            throw new IllegalArgumentException("[opencron] MinaRPC channel not active. request id:" + request.getId());
         }
     }
 
@@ -127,15 +128,15 @@ public class MinaClient implements Client {
             });
             connect.getSession().write(request);
         } else {
-            throw new IllegalArgumentException("[opencron] MinaRPC channel not active. request id:"+request.getId());
+            throw new IllegalArgumentException("[opencron] MinaRPC channel not active. request id:" + request.getId());
         }
     }
 
     @Override
-    public void sentAsync(final Request request,final InvokeCallback callback) throws Exception {
+    public void sentAsync(final Request request, final InvokeCallback callback) throws Exception {
         final ConnectFuture connect = getOrCreateConnect(request);
         if (connect != null && connect.isConnected()) {
-            final Promise promise = new Promise(request.getTimeOut(),callback);
+            final Promise promise = new Promise(request.getTimeOut(), callback);
             this.promiseTable.put(request.getId(), promise);
             //写数据
             connect.addListener(new IoFutureListener<IoFuture>() {
@@ -157,7 +158,7 @@ public class MinaClient implements Client {
             });
             connect.getSession().write(request);
         } else {
-            throw new IllegalArgumentException("[opencron] MinaRPC sentAsync channel not active. request id:"+request.getId());
+            throw new IllegalArgumentException("[opencron] MinaRPC sentAsync channel not active. request id:" + request.getId());
         }
     }
 
@@ -166,14 +167,14 @@ public class MinaClient implements Client {
 
         ConnectWrapper connectWrapper = this.connectTable.get(request.getAddress());
 
-        if (connectWrapper!=null) {
-            if(connectWrapper.isActive()){
+        if (connectWrapper != null) {
+            if (connectWrapper.isActive()) {
                 return connectWrapper.getConnectFuture();
             }
             connectWrapper.close();
         }
 
-        synchronized (this){
+        synchronized (this) {
             // 发起异步连接操作
             ConnectFuture connectFuture = connector.connect(HttpUtils.parseSocketAddress(request.getAddress()));
             connectWrapper = new ConnectWrapper(connectFuture);
@@ -197,7 +198,9 @@ public class MinaClient implements Client {
         return null;
     }
 
-    /**定时清理超时Future**/
+    /**
+     * 定时清理超时Future
+     **/
     private void scanPromiseTable() {
         Iterator<Map.Entry<Integer, Promise>> it = this.promiseTable.entrySet().iterator();
         while (it.hasNext()) {

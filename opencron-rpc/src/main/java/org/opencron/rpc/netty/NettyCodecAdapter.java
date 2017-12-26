@@ -48,8 +48,8 @@ public class NettyCodecAdapter<T> {
                     byte[] data = serializer.encode(msg);
                     out.writeInt(data.length);
                     out.writeBytes(data);
-                }else {
-                    logger.error("[opencron] NettyCodecAdapter encode error: this encode target is not instanceOf {}",this.type.getName());
+                } else {
+                    logger.error("[opencron] NettyCodecAdapter encode error: this encode target is not instanceOf {}", this.type.getName());
                 }
             } catch (Exception e) {
                 logger.error("[opencron] NettyCodecAdapter encode error:", stackTrace(e));
@@ -82,7 +82,7 @@ public class NettyCodecAdapter<T> {
                 in.readBytes(data);
                 Object object = serializer.decode(data, type);
                 out.add(object);
-            }catch (Exception e) {
+            } catch (Exception e) {
                 logger.error("[opencron] NettyCodecAdapter decode error:", stackTrace(e));
             }
         }

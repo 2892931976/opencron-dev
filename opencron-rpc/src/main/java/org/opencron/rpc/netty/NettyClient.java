@@ -62,7 +62,7 @@ public class NettyClient implements Client {
 
     private Bootstrap bootstrap = new Bootstrap();
 
-    protected final ConcurrentHashMap<Integer, Promise> promiseTable =  new ConcurrentHashMap<Integer, Promise>(256);
+    protected final ConcurrentHashMap<Integer, Promise> promiseTable = new ConcurrentHashMap<Integer, Promise>(256);
 
     private final ConcurrentHashMap<String, ChannelWrapper> channelTable = new ConcurrentHashMap<String, ChannelWrapper>();
 
@@ -97,7 +97,7 @@ public class NettyClient implements Client {
         this.scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(5, new ThreadFactory() {
             @Override
             public Thread newThread(Runnable r) {
-                return new Thread(r, "NettyRPC "+ IdGenerator.getId());
+                return new Thread(r, "NettyRPC " + IdGenerator.getId());
             }
         });
 
@@ -140,18 +140,18 @@ public class NettyClient implements Client {
             });
             return promise.get();
         } else {
-            throw new IllegalArgumentException("[opencron] NettyRPC sentSync channel not active. request id:"+request.getId());
+            throw new IllegalArgumentException("[opencron] NettyRPC sentSync channel not active. request id:" + request.getId());
         }
     }
 
     @Override
-    public void sentAsync(final Request request,final InvokeCallback callback) throws Exception {
+    public void sentAsync(final Request request, final InvokeCallback callback) throws Exception {
 
         Channel channel = getOrCreateChannel(request);
 
         if (channel != null && channel.isActive()) {
 
-            final Promise promise = new Promise(request.getTimeOut(),callback);
+            final Promise promise = new Promise(request.getTimeOut(), callback);
             this.promiseTable.put(request.getId(), promise);
             //写数据
             channel.writeAndFlush(request).addListener(new ChannelFutureListener() {
@@ -172,12 +172,12 @@ public class NettyClient implements Client {
                 }
             });
         } else {
-            throw new IllegalArgumentException("[opencron] NettyRPC sentAsync channel not active. request id:"+request.getId());
+            throw new IllegalArgumentException("[opencron] NettyRPC sentAsync channel not active. request id:" + request.getId());
         }
     }
 
     @Override
-    public void sentOneway(final Request request) throws Exception{
+    public void sentOneway(final Request request) throws Exception {
         Channel channel = getOrCreateChannel(request);
         if (channel != null && channel.isActive()) {
             channel.writeAndFlush(request).addListener(new ChannelFutureListener() {
@@ -191,7 +191,7 @@ public class NettyClient implements Client {
                 }
             });
         } else {
-            throw new IllegalArgumentException("[opencron] NettyRPC sentAsync sentOneway channel not active. request id:"+request.getId());
+            throw new IllegalArgumentException("[opencron] NettyRPC sentAsync sentOneway channel not active. request id:" + request.getId());
         }
     }
 
@@ -203,7 +203,7 @@ public class NettyClient implements Client {
             return channelWrapper.getChannel();
         }
 
-        synchronized (this){
+        synchronized (this) {
             // 发起异步连接操作
             ChannelFuture channelFuture = bootstrap.connect(HttpUtils.parseSocketAddress(request.getAddress()));
             channelWrapper = new ChannelWrapper(channelFuture);
@@ -226,7 +226,9 @@ public class NettyClient implements Client {
         return null;
     }
 
-    /**定时清理超时Future**/
+    /**
+     * 定时清理超时Future
+     **/
     private void scanPromiseTable() {
         Iterator<Map.Entry<Integer, Promise>> it = this.promiseTable.entrySet().iterator();
         while (it.hasNext()) {

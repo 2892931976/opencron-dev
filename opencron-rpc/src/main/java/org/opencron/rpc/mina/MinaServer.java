@@ -28,12 +28,12 @@ public class MinaServer implements Server {
     @Override
     public void start(final int port, ServerHandler handler) {
 
-        final MinaServerHandler  serverHandler = new MinaServerHandler(handler);
+        final MinaServerHandler serverHandler = new MinaServerHandler(handler);
         this.socketAddress = new InetSocketAddress(port);
 
         acceptor = new NioSocketAcceptor();
         acceptor.getFilterChain().addLast("threadPool", new ExecutorFilter(Executors.newCachedThreadPool()));
-        acceptor.getFilterChain().addLast("codec", new ProtocolCodecFilter(new MinaCodecAdapter(Response.class,Request.class)));
+        acceptor.getFilterChain().addLast("codec", new ProtocolCodecFilter(new MinaCodecAdapter(Response.class, Request.class)));
         acceptor.setHandler(serverHandler);
         try {
             acceptor.bind(this.socketAddress);
@@ -51,7 +51,7 @@ public class MinaServer implements Server {
             }
             logger.info("[opencron] MinaServer stoped!");
         } catch (Throwable e) {
-            logger.error("[opencron] MinaServer stop error:{}",stackTrace(e));
+            logger.error("[opencron] MinaServer stop error:{}", stackTrace(e));
         }
     }
 

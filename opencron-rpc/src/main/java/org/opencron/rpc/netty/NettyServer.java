@@ -54,7 +54,7 @@ public class NettyServer implements Server {
     }
 
     @Override
-    public void start(final int port,final ServerHandler serverHandler) {
+    public void start(final int port, final ServerHandler serverHandler) {
         this.bootstrap = new ServerBootstrap();
         this.bossGroup = new NioEventLoopGroup(1, new DefaultThreadFactory("NettyServerBoss", true));
         this.workerGroup = new NioEventLoopGroup(Constants.DEFAULT_IO_THREADS, new DefaultThreadFactory("NettyServerWorker", true));
@@ -67,7 +67,7 @@ public class NettyServer implements Server {
                 .childHandler(new ChannelInitializer<SocketChannel>() {
                     protected void initChannel(SocketChannel channel) throws Exception {
                         channel.pipeline().addLast(
-                                new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE,0,4,0,0),
+                                new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 0, 4, 0, 0),
                                 NettyCodecAdapter.getCodecAdapter().getDecoder(Request.class),
                                 NettyCodecAdapter.getCodecAdapter().getEncoder(Response.class),
                                 new NettyServerHandler(serverHandler)
@@ -76,7 +76,7 @@ public class NettyServer implements Server {
                 });
         try {
 
-           this.bootstrap.bind(port).sync().addListener(new ChannelFutureListener() {
+            this.bootstrap.bind(port).sync().addListener(new ChannelFutureListener() {
                 @Override
                 public void operationComplete(ChannelFuture future) {
                     if (future.isSuccess()) {
@@ -102,7 +102,7 @@ public class NettyServer implements Server {
             }
             logger.info("[opencron] NettyServer stoped!");
         } catch (Throwable e) {
-            logger.error("[opencron] NettyServer stop error:{}",stackTrace(e));
+            logger.error("[opencron] NettyServer stop error:{}", stackTrace(e));
         }
     }
 
