@@ -14,22 +14,14 @@
             <groupId>org.opencron</groupId>
             <artifactId>opencron-common</artifactId>
         </dependency>
-
         <dependency>
             <groupId>org.opencron</groupId>
             <artifactId>opencron-rpc</artifactId>
         </dependency>
         <dependency>
-            <groupId>io.netty</groupId>
-            <artifactId>netty-all</artifactId>
-        </dependency>
-
-        <dependency>
             <groupId>com.corundumstudio.socketio</groupId>
             <artifactId>netty-socketio</artifactId>
         </dependency>
-
-
     </dependencies>
 
     <build>
@@ -97,7 +89,7 @@
                             <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>../lib</classpathPrefix>
-                            <mainClass>org.opencron.agent.Bootstrap</mainClass>
+                            <mainClass>org.opencron.agent.AgentBootstrap</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
