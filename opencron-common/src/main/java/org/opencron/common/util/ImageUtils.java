@@ -44,30 +44,30 @@ public class ImageUtils {
 
     //获取实例
     public static ImageUtils instance(File image) throws IOException {
-        if(image.exists()) {
+        if (image.exists()) {
             imageUtils = new ImageUtils();
             imageUtils.originImage = image;
             imageUtils.bufferedImage = ImageIO.read(image);
             imageUtils.dealedImage = imageUtils.bufferedImage;
             return imageUtils;
-        }else{
+        } else {
             throw new FileNotFoundException("image file not exists");
         }
     }
 
-    private String getFileType(String imageName){
+    private String getFileType(String imageName) {
         String imageType = "jpg";
         int index = imageName.lastIndexOf(".");
-        if(index!=-1 && index!=imageName.length()){
-            imageType = imageName.substring(index+1);
+        if (index != -1 && index != imageName.length()) {
+            imageType = imageName.substring(index + 1);
         }
         return imageType;
     }
 
-    public boolean build(){
+    public boolean build() {
         String imageType = getFileType(originImage.getName());
         try {
-            ImageIO.write(dealedImage,imageType,originImage);
+            ImageIO.write(dealedImage, imageType, originImage);
             return true;
         } catch (IOException e) {
             e.printStackTrace();
@@ -76,21 +76,22 @@ public class ImageUtils {
     }
 
     //生成处理后的图片，若参数为null，则修改原始图片
-    public boolean build(File disposedImage){
+    public boolean build(File disposedImage) {
         boolean flag = false;
-        if(disposedImage==null){
+        if (disposedImage == null) {
             disposedImage = originImage;
         }
         String imageType = getFileType(disposedImage.getName());
         try {
-            flag = ImageIO.write(dealedImage,imageType,disposedImage);
+            flag = ImageIO.write(dealedImage, imageType, disposedImage);
         } catch (IOException e) {
             e.printStackTrace();
         }
         return flag;
     }
+
     //图片缩放处理
-    public ImageUtils scale(int width, int height){
+    public ImageUtils scale(int width, int height) {
         BufferedImage newImg = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         Graphics2D g = newImg.createGraphics();
         g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
@@ -100,8 +101,9 @@ public class ImageUtils {
 
         return this;
     }
+
     //剪切处理
-    public ImageUtils clip(int srcX, int srcY, int width, int height){
+    public ImageUtils clip(int srcX, int srcY, int width, int height) {
         BufferedImage newImg = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         Graphics2D g = newImg.createGraphics();
         g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
@@ -114,21 +116,22 @@ public class ImageUtils {
 
         return this;
     }
+
     //angle：角度，图片旋转角度
-    public ImageUtils rotate(int angle){
+    public ImageUtils rotate(int angle) {
         if (angle == 0) {
             return this;
         }
 
-        if (angle>360) {
-            angle = Math.abs(angle)%360;
+        if (angle > 360) {
+            angle = Math.abs(angle) % 360;
         }
 
-        if (angle<0){
-            if (Math.abs(angle)<360) {
-                angle = 360+angle;
-            }else {
-                angle =(Math.abs(angle)/360+1)*360+angle;
+        if (angle < 0) {
+            if (Math.abs(angle) < 360) {
+                angle = 360 + angle;
+            } else {
+                angle = (Math.abs(angle) / 360 + 1) * 360 + angle;
             }
         }
 
@@ -169,15 +172,16 @@ public class ImageUtils {
 
         return this;
     }
+
     //isVertical:true,垂直翻转 ; false,水平翻转
-    public ImageUtils reverse(boolean isVertical){
+    public ImageUtils reverse(boolean isVertical) {
         int width = this.dealedImage.getWidth();
         int height = this.dealedImage.getHeight();
         double[] matrix;
-        if(isVertical){
-            matrix = new double[]{1, 0, 0, -1, 0,height};
-        }else {
-            matrix = new double[]{-1, 0, 0, 1,width,0};
+        if (isVertical) {
+            matrix = new double[]{1, 0, 0, -1, 0, height};
+        } else {
+            matrix = new double[]{-1, 0, 0, 1, width, 0};
         }
         AffineTransform affineTransform = new AffineTransform(matrix);
         BufferedImage newImg = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
@@ -189,6 +193,7 @@ public class ImageUtils {
 
         return this;
     }
+
     private AffineTransform findTranslation(AffineTransform at, BufferedImage bi, int angle) {//45
         Point2D p2din, p2dout;
         double ytrans = 0.0, xtrans = 0.0;

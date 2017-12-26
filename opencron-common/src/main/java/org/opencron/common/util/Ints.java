@@ -24,7 +24,7 @@ package org.opencron.common.util;
 
 /**
  * Static utility methods pertaining to {@code int} primitives.
- *
+ * <p>
  * jupiter
  * org.jupiter.common.util
  *
@@ -56,7 +56,7 @@ public final class Ints {
 
     /**
      * Fast method of finding the next power of 2 greater than or equal to the supplied value.
-     *
+     * <p>
      * If the value is {@code <= 0} then 1 will be returned.
      * This method is not suitable for {@link Integer#MIN_VALUE} or numbers greater than 2^30.
      *
@@ -67,5 +67,6 @@ public final class Ints {
         return value <= 0 ? 1 : value >= 0x40000000 ? 0x40000000 : 1 << (32 - Integer.numberOfLeadingZeros(value - 1));
     }
 
-    private Ints() {}
+    private Ints() {
+    }
 }

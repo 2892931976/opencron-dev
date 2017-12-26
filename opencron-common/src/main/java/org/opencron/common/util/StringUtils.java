@@ -42,9 +42,6 @@ public abstract class StringUtils {
     private StringUtils() {
     }
 
-    public static boolean hasText(String str) {
-        return org.springframework.util.StringUtils.hasText(str);
-    }
 
     public static String joinString(Object[] arrays, String separator) {
         return joinString(Arrays.asList(arrays), separator);
@@ -68,7 +65,8 @@ public abstract class StringUtils {
     }
 
     /**
-     *将字符串转换成String[]
+     * 将字符串转换成String[]
+     *
      * @param str 要转换的目标字符串
      * @return
      */
@@ -77,8 +75,9 @@ public abstract class StringUtils {
     }
 
     /**
-     *将字符串转换成String[]
-     * @param str 要转换的目标字符串
+     * 将字符串转换成String[]
+     *
+     * @param str   要转换的目标字符串
      * @param limit 要转换的目标字符串
      * @return
      */
@@ -87,8 +86,9 @@ public abstract class StringUtils {
     }
 
     /**
-     *将字符串转换成String[]
-     * @param str 要转换的目标字符串
+     * 将字符串转换成String[]
+     *
+     * @param str   要转换的目标字符串
      * @param split 对字符串截取的分隔符
      * @return
      */
@@ -97,8 +97,9 @@ public abstract class StringUtils {
     }
 
     /**
-     *将字符串转换成String[]
-     * @param str 要转换的目标字符串
+     * 将字符串转换成String[]
+     *
+     * @param str   要转换的目标字符串
      * @param split 对字符串截取的分隔符
      * @param limit 长度
      * @return
@@ -112,7 +113,8 @@ public abstract class StringUtils {
     }
 
     /**
-     *将字符串转换成List<String>
+     * 将字符串转换成List<String>
+     *
      * @param str 要转换的目标字符串
      * @return
      */
@@ -121,8 +123,9 @@ public abstract class StringUtils {
     }
 
     /**
-     *将字符串转换成List<String>
-     * @param str 要转换的目标字符串
+     * 将字符串转换成List<String>
+     *
+     * @param str   要转换的目标字符串
      * @param limit 对字符串截取的分隔符
      * @return
      */
@@ -131,8 +134,9 @@ public abstract class StringUtils {
     }
 
     /**
-     *将字符串转换成List<String>
-     * @param str 要转换的目标字符串
+     * 将字符串转换成List<String>
+     *
+     * @param str   要转换的目标字符串
      * @param split 长度
      * @return
      */
@@ -143,7 +147,7 @@ public abstract class StringUtils {
     /**
      * 转换字符串成list
      *
-     * @param str  字符串
+     * @param str   字符串
      * @param split 分隔符
      * @param limit 长度
      * @return
@@ -207,8 +211,8 @@ public abstract class StringUtils {
 
     /**
      * 转换字符串为long类型，如果转换失败，则返回默认值 -1
-     * @param str
-     *            字符串
+     *
+     * @param str 字符串
      * @return
      */
     public static long parseLong(String str) {
@@ -218,10 +222,8 @@ public abstract class StringUtils {
     /**
      * 转换字符串为long类型，如果转换失败，则返回默认值 defaultValue
      *
-     * @param str
-     *            字符串
-     * @param defaultValue
-     *            默认值
+     * @param str          字符串
+     * @param defaultValue 默认值
      * @return
      */
     public static long parseLong(String str, long defaultValue) {
@@ -354,15 +356,12 @@ public abstract class StringUtils {
     /**
      * 取字符串的前toCount个字符
      *
-     * @param str
-     *            被处理字符串
-     * @param toCount
-     *            截取长度
-     * @param more
-     *            后缀字符串
+     * @param str     被处理字符串
+     * @param toCount 截取长度
+     * @param more    后缀字符串
+     * @return String
      * @version 2004.11.24
      * @author zhulx
-     * @return String
      */
     public static String subString(String str, int toCount, String more) {
         int reInt = 0;
@@ -541,7 +540,7 @@ public abstract class StringUtils {
 
     /**
      * 生成计费ID bs+四位随机生成的
-     * */
+     */
     public static String generateString(int length) {
         String corpid = "";
         int value;
@@ -627,11 +626,11 @@ public abstract class StringUtils {
     }
 
 
-    public static boolean isChinese(String string){
+    public static boolean isChinese(String string) {
         int n = 0;
-        for(int i = 0; i < string.length(); i++) {
-            n = (int)string.charAt(i);
-            if((19968 <= n && n <40869)) {
+        for (int i = 0; i < string.length(); i++) {
+            n = (int) string.charAt(i);
+            if ((19968 <= n && n < 40869)) {
                 return true;
             }
         }

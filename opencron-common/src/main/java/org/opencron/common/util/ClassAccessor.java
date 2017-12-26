@@ -45,20 +45,19 @@ public abstract class ClassAccessor {
 
     /**
      * 用ASM生成的类继承 {@link ClassAccessor} 并实现这个抽象方法
-     *
+     * <p>
      * 子类 invoke() 以下面的方式规避反射调用:
-     *
-     *  public Object invoke(Object obj, int methodIndex, Object... args) {
-     *      switch(methodIndex) {
-     *          case 0:
-     *              return 直接调用 this.methodNames[0] 对应的方法;
-     *          case 1:
-     *              return 直接调用 this.methodNames[1] 对应的方法;
-     *          case ...
-     *      }
-     *      throw new IllegalArgumentException("method not found: " + methodIndex);
-     *  }
-     *
+     * <p>
+     * public Object invoke(Object obj, int methodIndex, Object... args) {
+     * switch(methodIndex) {
+     * case 0:
+     * return 直接调用 this.methodNames[0] 对应的方法;
+     * case 1:
+     * return 直接调用 this.methodNames[1] 对应的方法;
+     * case ...
+     * }
+     * throw new IllegalArgumentException("method not found: " + methodIndex);
+     * }
      */
     public abstract Object invoke(Object obj, int methodIndex, Object... args);
 
@@ -165,7 +164,7 @@ public abstract class ClassAccessor {
                 for (int i = 0; i < n; i++) {
                     mv.visitLabel(labels[i]);
                     if (i == 0) {
-                        mv.visitFrame(Opcodes.F_APPEND, 1, new Object[] { classNameInternal }, 0, null);
+                        mv.visitFrame(Opcodes.F_APPEND, 1, new Object[]{classNameInternal}, 0, null);
                     } else {
                         mv.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
                     }

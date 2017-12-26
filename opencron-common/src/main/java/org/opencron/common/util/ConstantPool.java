@@ -43,7 +43,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * A pool of {@link Constant}s.
- *
+ * <p>
  * Forked from <a href="https://github.com/netty/netty">Netty</a>.
  */
 public abstract class ConstantPool<T extends Constant<T>> {
@@ -70,7 +70,7 @@ public abstract class ConstantPool<T extends Constant<T>> {
      * @param name the name of the {@link Constant}
      */
     public T valueOf(String name) {
-        AssertUtils.checkArgument(CommonUtils.notEmpty(name),"empty name");
+        AssertUtils.checkArgument(CommonUtils.notEmpty(name), "empty name");
         return getOrCreate(name);
     }
 
@@ -85,7 +85,7 @@ public abstract class ConstantPool<T extends Constant<T>> {
             final T newConstant = newConstant(nextId.getAndIncrement(), name);
             constant = constants.putIfAbsent(name, newConstant);
             if (constant == null) {
-                constant =  newConstant;
+                constant = newConstant;
             }
         }
         return constant;
@@ -95,7 +95,7 @@ public abstract class ConstantPool<T extends Constant<T>> {
      * Returns {@code true} if exists for the given {@code name}.
      */
     public boolean exists(String name) {
-        AssertUtils.checkArgument(CommonUtils.notEmpty(name),"empty name");
+        AssertUtils.checkArgument(CommonUtils.notEmpty(name), "empty name");
         return constants.containsKey(name);
     }
 
@@ -104,7 +104,7 @@ public abstract class ConstantPool<T extends Constant<T>> {
      * {@link IllegalArgumentException} if a {@link Constant} for the given {@code name} exists.
      */
     public T newInstance(String name) {
-        AssertUtils.checkArgument(CommonUtils.notEmpty(name),"empty name");
+        AssertUtils.checkArgument(CommonUtils.notEmpty(name), "empty name");
         return createOrThrow(name);
     }
 

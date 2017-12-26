@@ -484,7 +484,7 @@ public class Monitor implements Serializable {
         }
     }
 
-    @JSONType(orders={"pid","user","virt","res","cpu","mem","time","command"})
+    @JSONType(orders = {"pid", "user", "virt", "res", "cpu", "mem", "time", "command"})
     public static class Top implements Serializable {
 
         private String pid;

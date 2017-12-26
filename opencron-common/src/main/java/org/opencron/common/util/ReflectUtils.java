@@ -164,7 +164,8 @@ public final class ReflectUtils {
         for (Class<?> cls = checkNotNull(clazz, "class"); cls != null; cls = cls.getSuperclass()) {
             try {
                 return cls.getDeclaredField(name);
-            } catch (Throwable ignored) {}
+            } catch (Throwable ignored) {
+            }
         }
         throw new NoSuchFieldException(clazz.getName() + "#" + name);
     }
@@ -580,14 +581,10 @@ public final class ReflectUtils {
 
 
     /**
-     *
      * java反射bean的get方法
      *
-     * @param clazz
-     *            javaBean对象类型
-     * @param fieldName
-     *            字段名称
-     *
+     * @param clazz     javaBean对象类型
+     * @param fieldName 字段名称
      * @return get方法
      */
     public static Method getter(Class<?> clazz, String fieldName) throws NoSuchMethodException {
@@ -604,7 +601,7 @@ public final class ReflectUtils {
                     continue;
                 }
 
-                if (objPds[i].getName().equals(fieldName)){
+                if (objPds[i].getName().equals(fieldName)) {
                     return objPds[i].getReadMethod();
                 }
             }
@@ -618,18 +615,14 @@ public final class ReflectUtils {
     }
 
     /**
-     *
      * java反射bean的set方法
      *
-     * @param clazz
-     *            javaBean对象
-     * @param fieldName
-     *            字段名称
-     *
+     * @param clazz     javaBean对象
+     * @param fieldName 字段名称
      * @return set方法
      */
     public static Method setter(Class<?> clazz, String fieldName) {
-        AssertUtils.notNull(clazz,fieldName);
+        AssertUtils.notNull(clazz, fieldName);
         try {
             PropertyDescriptor[] objPds = Introspector.getBeanInfo(clazz).getPropertyDescriptors();
 
@@ -640,7 +633,7 @@ public final class ReflectUtils {
                     continue;
                 }
 
-                if (objPds[i].getName().equals(fieldName)){
+                if (objPds[i].getName().equals(fieldName)) {
                     return objPds[i].getWriteMethod();
                 }
             }
@@ -667,25 +660,26 @@ public final class ReflectUtils {
      */
     /**
      * 根据注解获取类上有该注解的全部字段
+     *
      * @param objClass
      * @param annotationClass
      * @return
      */
 
-    private static List<Field> getFieldsByAnnotation(Class<?> objClass,Class<? extends Annotation> annotationClass) {
-        AssertUtils.notNull(objClass,annotationClass);
+    private static List<Field> getFieldsByAnnotation(Class<?> objClass, Class<? extends Annotation> annotationClass) {
+        AssertUtils.notNull(objClass, annotationClass);
         List<Field> fields = new ArrayList<Field>(0);
-        while (!objClass.getSuperclass().equals(Object.class)){
+        while (!objClass.getSuperclass().equals(Object.class)) {
             Collections.copy(fields, getDeclaredFieldByAnnotation(objClass, annotationClass));
             objClass = objClass.getSuperclass();
         }
         return fields;
     }
 
-    private static List<Field> getDeclaredFieldByAnnotation(Class<?> objClass,Class<? extends Annotation> annotationClass) {
-        AssertUtils.notNull(objClass,annotationClass);
+    private static List<Field> getDeclaredFieldByAnnotation(Class<?> objClass, Class<? extends Annotation> annotationClass) {
+        AssertUtils.notNull(objClass, annotationClass);
         List<Field> fields = new ArrayList<Field>(0);
-        for (Field field:objClass.getDeclaredFields()) {
+        for (Field field : objClass.getDeclaredFields()) {
             if (field.getAnnotation(annotationClass) != null) {
                 field.setAccessible(true);
                 fields.add(field);
@@ -697,17 +691,17 @@ public final class ReflectUtils {
     public static List<Field> getAllFields(Class<?> objClass) {
         AssertUtils.notNull(objClass);
         List<Field> fields = new ArrayList<Field>(0);
-        while (!objClass.getSuperclass().equals(Object.class)){
+        while (!objClass.getSuperclass().equals(Object.class)) {
             Collections.copy(fields, Arrays.asList(objClass.getDeclaredFields()));
             objClass = objClass.getSuperclass();
         }
         return fields;
     }
 
-    public static List<Method> getMethodsByAnnotation(Class<?> objClass,Class<? extends Annotation> annoClass) throws ClassNotFoundException {
+    public static List<Method> getMethodsByAnnotation(Class<?> objClass, Class<? extends Annotation> annoClass) throws ClassNotFoundException {
         List<Method> methods = new ArrayList<Method>(0);
-        for(Method method:objClass.getDeclaredMethods()){
-            if (method.getAnnotation(annoClass)!=null){
+        for (Method method : objClass.getDeclaredMethods()) {
+            if (method.getAnnotation(annoClass) != null) {
                 methods.add(method);
             }
         }
@@ -725,7 +719,7 @@ public final class ReflectUtils {
         String kindClass = ".class";
         if ("jar".equals(url.getProtocol())) {
             String jarPath = url.getPath().substring(0, url.getPath().indexOf("!")).replaceFirst("file:/", "").replaceAll("%20", " ");
-            JarFile jarFile =  new JarFile(new File(jarPath));
+            JarFile jarFile = new JarFile(new File(jarPath));
             Enumeration<JarEntry> es = jarFile.entries();
             while (es.hasMoreElements()) {
                 String name = null;
@@ -735,7 +729,7 @@ public final class ReflectUtils {
                     if (name.contains(kindClass)) break;
                 }
                 if (name != null && name.endsWith(kindClass)) {
-                    String className = name.replaceAll("/", ".").replace(kindClass,"");
+                    String className = name.replaceAll("/", ".").replace(kindClass, "");
                     classNames.add(Class.forName(className));
                 }
             }
@@ -743,7 +737,7 @@ public final class ReflectUtils {
             File urlFile = new File(url.toURI());
             for (File pkgFile : urlFile.listFiles()) {
                 if (pkgFile.isFile()) {
-                    String className = packageName + "." + pkgFile.getName().replace(kindClass,"");
+                    String className = packageName + "." + pkgFile.getName().replace(kindClass, "");
                     classNames.add(Class.forName(className));
                 }
             }
@@ -753,12 +747,10 @@ public final class ReflectUtils {
     }
 
     /**
-     *
      * 执行get方法
-     * @param o
-     *            执行对象
-     * @param fieldName
-     *            属性
+     *
+     * @param o         执行对象
+     * @param fieldName 属性
      * @return 该get方法的返回值
      */
     public static Object invokeGet(Object o, String fieldName) {
@@ -766,13 +758,13 @@ public final class ReflectUtils {
             Method method = getter(o.getClass(), fieldName);
             return method.invoke(o);
         } catch (Exception e) {
-            throw new RuntimeException("invoke " + o.getClass().getName()+ "get Method Error，Detail：" + e.getMessage());
+            throw new RuntimeException("invoke " + o.getClass().getName() + "get Method Error，Detail：" + e.getMessage());
         }
     }
 
     public static boolean methodHasAnnotation(Method method, Class<? extends Annotation> annoClazz) {
-        AssertUtils.notNull(method,annoClazz);
-        return method.getAnnotation(annoClazz)!=null;
+        AssertUtils.notNull(method, annoClazz);
+        return method.getAnnotation(annoClazz) != null;
     }
 
     /**
@@ -801,8 +793,8 @@ public final class ReflectUtils {
 
     //是否为数字或集合
     public static boolean isArrayOrSet(Object object) {
-        if (object instanceof Class){
-            return ((Class)object).isArray() || Collection.class.isAssignableFrom((Class)object);
+        if (object instanceof Class) {
+            return ((Class) object).isArray() || Collection.class.isAssignableFrom((Class) object);
         }
         return object.getClass().isArray() || Collection.class.isAssignableFrom(object.getClass());
     }

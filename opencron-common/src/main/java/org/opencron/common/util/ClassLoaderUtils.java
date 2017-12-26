@@ -27,22 +27,23 @@ import java.net.URL;
 import java.net.URLClassLoader;
 
 /**
- *@author benjobs
+ * @author benjobs
  */
 public final class ClassLoaderUtils {
 
-    /** URLClassLoader的addURL方法 */
+    /**
+     * URLClassLoader的addURL方法
+     */
     private static Method addURL = initAddMethod();
 
     private static URLClassLoader classloader = (URLClassLoader) ClassLoader.getSystemClassLoader();
 
     private static Method initAddMethod() {
         try {
-            Method add = URLClassLoader.class.getDeclaredMethod("addURL", new Class[] { URL.class });
+            Method add = URLClassLoader.class.getDeclaredMethod("addURL", new Class[]{URL.class});
             add.setAccessible(true);
             return add;
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
@@ -76,8 +77,7 @@ public final class ClassLoaderUtils {
             for (File tmp : tmps) {
                 loopFiles(tmp);
             }
-        }
-        else {
+        } else {
             if (file.getAbsolutePath().endsWith(".jar") || file.getAbsolutePath().endsWith(".zip")) {
                 addURL(file);
             }
@@ -87,19 +87,18 @@ public final class ClassLoaderUtils {
 
     private static void addURL(File file) {
         try {
-            addURL.invoke(classloader, new Object[] { file.toURI().toURL() });
-        }
-        catch (Exception e) {
+            addURL.invoke(classloader, new Object[]{file.toURI().toURL()});
+        } catch (Exception e) {
         }
     }
 
     public static void loadJar(String jarFilePath) {
         File jarFile = new File(jarFilePath);
         if (!jarFile.exists()) {
-            throw new IllegalArgumentException("[opencron] jarFilePath:"+jarFilePath+" is not exists");
+            throw new IllegalArgumentException("[opencron] jarFilePath:" + jarFilePath + " is not exists");
         }
         if (jarFile.isFile()) {
-            throw new IllegalArgumentException("[opencron] jarFile "+jarFilePath+" is not file");
+            throw new IllegalArgumentException("[opencron] jarFile " + jarFilePath + " is not file");
         }
         loadPath(jarFile.getAbsolutePath());
     }
@@ -107,17 +106,17 @@ public final class ClassLoaderUtils {
     public static void loadJars(String path) {
         File jarDir = new File(path);
         if (!jarDir.exists()) {
-            throw new IllegalArgumentException("[opencron] jarPath:"+path+" is not exists");
+            throw new IllegalArgumentException("[opencron] jarPath:" + path + " is not exists");
         }
         if (!jarDir.isDirectory()) {
-            throw new IllegalArgumentException("[opencron] jarPath:"+path+" is not directory");
+            throw new IllegalArgumentException("[opencron] jarPath:" + path + " is not directory");
         }
 
-        if ( jarDir.listFiles().length == 0 ) {
-            throw new IllegalArgumentException("[opencron] have not jar in path:"+path);
+        if (jarDir.listFiles().length == 0) {
+            throw new IllegalArgumentException("[opencron] have not jar in path:" + path);
         }
 
-        for (File jarFile:jarDir.listFiles()) {
+        for (File jarFile : jarDir.listFiles()) {
             loadPath(jarFile.getAbsolutePath());
         }
     }

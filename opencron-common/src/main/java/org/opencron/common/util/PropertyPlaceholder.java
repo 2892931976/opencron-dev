@@ -39,7 +39,7 @@ import java.util.Properties;
  */
 public class PropertyPlaceholder extends PropertyPlaceholderConfigurer {
 
-    private static Map<String,String> properties = new HashMap<String,String>();
+    private static Map<String, String> properties = new HashMap<String, String>();
 
     @Override
     protected void processProperties(ConfigurableListableBeanFactory beanFactoryToProcess, Properties props) throws BeansException {
@@ -69,11 +69,12 @@ public class PropertyPlaceholder extends PropertyPlaceholderConfigurer {
 
     public static Boolean getBoolean(String name) {
         String result = get(name);
-        if (result==null) {
+        if (result == null) {
             return false;
         }
         return CommonUtils.toBoolean(result);
     }
+
     public static Map<String, String> getProperties() {
         return properties;
     }

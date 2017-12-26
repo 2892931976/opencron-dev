@@ -29,7 +29,6 @@ import static org.opencron.common.util.ExceptionUtils.stackTrace;
 
 /**
  * A collection of utility methods to retrieve and parse the values of the Java system properties.
- *
  */
 public class SystemPropertyUtils {
 
@@ -59,8 +58,8 @@ public class SystemPropertyUtils {
      * the property access fails.
      *
      * @return the property value.
-     *         {@code def} if there's no such property or if an access to the
-     *         specified property is not allowed.
+     * {@code def} if there's no such property or if an access to the
+     * specified property is not allowed.
      */
     public static String get(final String key, String def) {
         if (key == null) {
@@ -102,8 +101,8 @@ public class SystemPropertyUtils {
      * the property access fails.
      *
      * @return the property value.
-     *         {@code def} if there's no such property or if an access to the
-     *         specified property is not allowed.
+     * {@code def} if there's no such property or if an access to the
+     * specified property is not allowed.
      */
     public static boolean getBoolean(String key, boolean def) {
         String value = get(key);
@@ -137,8 +136,8 @@ public class SystemPropertyUtils {
      * the property access fails.
      *
      * @return the property value.
-     *         {@code def} if there's no such property or if an access to the
-     *         specified property is not allowed.
+     * {@code def} if there's no such property or if an access to the
+     * specified property is not allowed.
      */
     public static int getInt(String key, int def) {
         String value = get(key);
@@ -150,7 +149,8 @@ public class SystemPropertyUtils {
         if (INTEGER_PATTERN.matcher(value).matches()) {
             try {
                 return Integer.parseInt(value);
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+            }
         }
 
         logger.warn("Unable to parse the integer system property '{}':{} - using the default value: {}.", key, value, def);
@@ -164,8 +164,8 @@ public class SystemPropertyUtils {
      * the property access fails.
      *
      * @return the property value.
-     *         {@code def} if there's no such property or if an access to the
-     *         specified property is not allowed.
+     * {@code def} if there's no such property or if an access to the
+     * specified property is not allowed.
      */
     public static long getLong(String key, long def) {
         String value = get(key);
@@ -177,7 +177,8 @@ public class SystemPropertyUtils {
         if (INTEGER_PATTERN.matcher(value).matches()) {
             try {
                 return Long.parseLong(value);
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+            }
         }
 
         logger.warn("Unable to parse the long integer system property '{}':{} - using the default value: {}.", key, value, def);

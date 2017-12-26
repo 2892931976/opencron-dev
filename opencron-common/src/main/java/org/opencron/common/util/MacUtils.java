@@ -32,11 +32,11 @@ import java.util.regex.Pattern;
 
 public class MacUtils {
 
-    private static String macAddressStr  = null;
+    private static String macAddressStr = null;
 
-    private static final String[] windowsCommand = { "ipconfig", "/all" };
-    private static final String[] linuxCommand   = { "/sbin/ifconfig", "-a" };
-    private static final Pattern  macPattern     = Pattern.compile(".*((:?[0-9a-f]{2}[-:]){5}[0-9a-f]{2}).*", Pattern.CASE_INSENSITIVE);
+    private static final String[] windowsCommand = {"ipconfig", "/all"};
+    private static final String[] linuxCommand = {"/sbin/ifconfig", "-a"};
+    private static final Pattern macPattern = Pattern.compile(".*((:?[0-9a-f]{2}[-:]){5}[0-9a-f]{2}).*", Pattern.CASE_INSENSITIVE);
 
     public final static List<String> getMacAddressList() throws IOException {
         final ArrayList<String> macAddressList = new ArrayList<String>();
@@ -53,7 +53,7 @@ public class MacUtils {
         final Process process = Runtime.getRuntime().exec(command);
 
         BufferedReader bufReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-        for (String line; (line = bufReader.readLine()) != null ;) {
+        for (String line; (line = bufReader.readLine()) != null; ) {
             Matcher matcher = macPattern.matcher(line);
             if (matcher.matches()) {
                 //macAddressList.add(matcher.group(1));
@@ -70,15 +70,14 @@ public class MacUtils {
             StringBuffer sb = new StringBuffer(); //存放多个网卡地址用，目前只取一个非0000000000E0隧道的值
             try {
                 List<String> macList = getMacAddressList();
-                for (Iterator<String> iter = macList.iterator() ; iter.hasNext() ;) {
+                for (Iterator<String> iter = macList.iterator(); iter.hasNext(); ) {
                     String amac = iter.next();
                     if (!amac.equals("0000000000E0")) {
                         sb.append(amac);
                         break;
                     }
                 }
-            }
-            catch (IOException e) {
+            } catch (IOException e) {
                 e.printStackTrace();
             }
             macAddressStr = sb.toString();

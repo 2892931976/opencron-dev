@@ -23,7 +23,6 @@ package org.opencron.common.util;
 
 /**
  * 异常处理类,以运行时异常的形式将指定的异常抛出
- *
  */
 public abstract class ExceptionHandler {
 

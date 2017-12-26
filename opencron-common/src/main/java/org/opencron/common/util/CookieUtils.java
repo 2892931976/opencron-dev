@@ -63,7 +63,7 @@ public abstract class CookieUtils {
         c.setMaxAge(expire);
         if (domain != null) {
             c.setDomain(domain);
-        }else {
+        } else {
             c.setPath("/");
         }
         response.addCookie(c);

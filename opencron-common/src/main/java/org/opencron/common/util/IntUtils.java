@@ -45,7 +45,7 @@ public final class IntUtils {
 
     /**
      * Fast method of finding the next power of 2 greater than or equal to the supplied value.
-     *
+     * <p>
      * If the value is {@code <= 0} then 1 will be returned.
      * This method is not suitable for {@link Integer#MIN_VALUE} or numbers greater than 2^30.
      *
@@ -56,5 +56,6 @@ public final class IntUtils {
         return value <= 0 ? 1 : value >= 0x40000000 ? 0x40000000 : 1 << (32 - Integer.numberOfLeadingZeros(value - 1));
     }
 
-    private IntUtils() {}
+    private IntUtils() {
+    }
 }

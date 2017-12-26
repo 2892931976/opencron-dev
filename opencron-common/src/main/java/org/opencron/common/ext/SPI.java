@@ -24,14 +24,12 @@ import java.lang.annotation.*;
 
 
 /**
- *
  * 十步杀一人 千里不留行
- *
+ * <p>
  * 事了拂衣去 深藏身与名
- *
+ * <p>
  * 扩展点以Key=扩展点实例的全类名的方式在META-INF.opencron里定义
  * 默认的扩展点以"扩展点实例的全类名"呈现,不用Key
- *
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)

@@ -111,15 +111,15 @@ public abstract class IOUtils implements Serializable {
     }
 
     public static void writeFile(File file, InputStream inputStream) throws IOException {
-        AssertUtils.notNull(file,inputStream);
+        AssertUtils.notNull(file, inputStream);
         if (!file.getParentFile().exists()) {
             file.getParentFile().mkdirs();
         }
 
-        BufferedOutputStream  output= new BufferedOutputStream(new FileOutputStream(file));
+        BufferedOutputStream output = new BufferedOutputStream(new FileOutputStream(file));
         int r;
-        while((r=inputStream.read())!=-1){
-            output.write((byte)r);
+        while ((r = inputStream.read()) != -1) {
+            output.write((byte) r);
         }
         output.close();
     }
@@ -129,7 +129,7 @@ public abstract class IOUtils implements Serializable {
         try {
             input = openInputStream(file);
             long size = file.length();
-            if(file.length() > Integer.MAX_VALUE) {
+            if (file.length() > Integer.MAX_VALUE) {
                 throw new IllegalArgumentException("Size cannot be greater than Integer max value: " + size);
             }
 
@@ -145,7 +145,7 @@ public abstract class IOUtils implements Serializable {
             int offset = 0;
             int readed;
 
-            while (offset < size && (readed = input.read(data, offset, (int)size - offset)) != EOF) {
+            while (offset < size && (readed = input.read(data, offset, (int) size - offset)) != EOF) {
                 offset += readed;
             }
 
@@ -154,7 +154,7 @@ public abstract class IOUtils implements Serializable {
             }
             return data;
         } finally {
-            if (input!=null) {
+            if (input != null) {
                 input.close();
             }
         }
@@ -376,12 +376,12 @@ public abstract class IOUtils implements Serializable {
             file = new File((String) file);
         }
 
-        return  ((File)file).exists();
+        return ((File) file).exists();
     }
 
     public static String getCurrentPath(Class type) {
         AssertUtils.notNull(type);
-        return  type.getProtectionDomain().getCodeSource().getLocation().getFile();
+        return type.getProtectionDomain().getCodeSource().getLocation().getFile();
     }
 
 }

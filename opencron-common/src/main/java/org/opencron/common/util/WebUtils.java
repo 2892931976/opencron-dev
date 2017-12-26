@@ -32,11 +32,11 @@ import java.io.UnsupportedEncodingException;
 /**
  * Created by benjobs on 2017/6/21.
  */
-public class WebUtils implements Serializable{
+public class WebUtils implements Serializable {
 
     public static void writeXml(HttpServletResponse response, String xml) {
         response.setCharacterEncoding("UTF-8");
-        setContentLength(response,xml);
+        setContentLength(response, xml);
         response.setContentType("text/xml");
         write(response, xml);
     }
@@ -44,21 +44,21 @@ public class WebUtils implements Serializable{
     public static void writeTxt(HttpServletResponse response, String txt) {
         response.setCharacterEncoding("UTF-8");
         response.setContentType("text/plain");
-        setContentLength(response,txt);
+        setContentLength(response, txt);
         write(response, txt);
     }
 
     public static void writeHtml(HttpServletResponse response, String html) {
         response.setCharacterEncoding("UTF-8");
         response.setContentType("text/html");
-        setContentLength(response,html);
+        setContentLength(response, html);
         write(response, html);
     }
 
     public static void writeJson(HttpServletResponse response, String json) {
         response.setCharacterEncoding("UTF-8");
         response.setContentType("application/json");
-        setContentLength(response,json);
+        setContentLength(response, json);
         write(response, json);
     }
 
@@ -84,7 +84,7 @@ public class WebUtils implements Serializable{
         }
     }
 
-    private static void setContentLength(HttpServletResponse response,String text){
+    private static void setContentLength(HttpServletResponse response, String text) {
         try {
             byte[] data = String.valueOf(text).getBytes("UTF-8");
             response.setHeader("Content-Length", "" + data.length);
@@ -94,27 +94,28 @@ public class WebUtils implements Serializable{
     }
 
     public static String getWebUrlPath(HttpServletRequest request) {
-        String port = request.getServerPort() == 80 ? "" : (":"+request.getServerPort());
-        String path = request.getContextPath().replaceAll("/$","");
-        return request.getScheme()+"://"+request.getServerName()+port+path;
+        String port = request.getServerPort() == 80 ? "" : (":" + request.getServerPort());
+        String path = request.getContextPath().replaceAll("/$", "");
+        return request.getScheme() + "://" + request.getServerName() + port + path;
     }
 
     /**
      * 从web的作用域中获取对象...
+     *
      * @param key
      * @param clazz
      * @param <T>
      * @return
      */
-    public static <T>T getObject(String key, Object obj, Class<T> clazz) {
-        AssertUtils.notNull(key,obj,clazz);
+    public static <T> T getObject(String key, Object obj, Class<T> clazz) {
+        AssertUtils.notNull(key, obj, clazz);
         if (obj instanceof HttpServletRequest) {
             HttpServletRequest request = (HttpServletRequest) obj;
             return (T) request.getAttribute(key);
-        }else if(obj instanceof HttpSession){
+        } else if (obj instanceof HttpSession) {
             HttpSession session = (HttpSession) obj;
             return (T) session.getAttribute(key);
-        }else if(obj instanceof ServletContext){
+        } else if (obj instanceof ServletContext) {
             ServletContext servletContext = (ServletContext) obj;
             return (T) servletContext.getAttribute(key);
         }
@@ -123,15 +124,15 @@ public class WebUtils implements Serializable{
 
     public static String getIp(HttpServletRequest request) {
         String ip = request.getHeader("x-forwarded-for");
-        if(ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)){
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
             ip = request.getHeader("Proxy-Client-IP");
         }
-        if(ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)){
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
             ip = request.getHeader("WL-Proxy-Client-IP");
         }
-        if(ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)){
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
             ip = request.getRemoteAddr();
         }
-        return ip.equals("0:0:0:0:0:0:0:1")?"127.0.0.1":ip;
+        return ip.equals("0:0:0:0:0:0:0:1") ? "127.0.0.1" : ip;
     }
 }

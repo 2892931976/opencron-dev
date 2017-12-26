@@ -48,7 +48,7 @@ public class ExtensionLoader<T> {
 
     private SPI spi;
 
-    private static final Map<String, Class<?>> EXTENSION_SPIS = new HashMap<String,Class<?>>();
+    private static final Map<String, Class<?>> EXTENSION_SPIS = new HashMap<String, Class<?>>();
 
     private static final ConcurrentMap<Class<?>, ExtensionLoader<?>> EXTENSION_LOADERS = new ConcurrentHashMap<Class<?>, ExtensionLoader<?>>();
 
@@ -89,20 +89,20 @@ public class ExtensionLoader<T> {
         try {
             Class<?> instanceClass;
             //spi注解上是否指定了实现类的key
-            if ( CommonUtils.isEmpty(spi.value()) ) {
+            if (CommonUtils.isEmpty(spi.value())) {
                 instanceClass = EXTENSION_SPIS.get(spiName);
-            }else {
+            } else {
                 //当前的获取方法是否指定了spi实现类的Key
                 if (CommonUtils.notEmpty(spiName)) {
                     instanceClass = EXTENSION_SPIS.get(spiName);
-                }else {
+                } else {
                     instanceClass = EXTENSION_SPIS.get(spi.value());
                 }
             }
             if (instanceClass != null) {
                 Object instance = instanceClass.newInstance();
                 this.type.cast(instance);
-                return (T)instance;
+                return (T) instance;
             }
         } catch (Exception e) {
             throw new IllegalArgumentException(e);
@@ -140,18 +140,18 @@ public class ExtensionLoader<T> {
                                     String spiImpl = null;
 
                                     if (args.length == 1) {
-                                        if ( CommonUtils.isEmpty(this.spi.value()) ) {
+                                        if (CommonUtils.isEmpty(this.spi.value())) {
                                             //default SpiImpl...
                                             spiImpl = args[0].trim();
                                         }
-                                    }else if(args.length == 2) {
+                                    } else if (args.length == 2) {
                                         String name = args[0].trim();
                                         line = args[1].trim();
                                         if (CommonUtils.notEmpty(name, line)) {
                                             spiName = name;
                                             spiImpl = line;
                                         }
-                                    }else {
+                                    } else {
                                         throw new IllegalStateException("invalid SPI configuration:" + line + "please check config: " + url);
                                     }
 
@@ -162,7 +162,7 @@ public class ExtensionLoader<T> {
                                                     this.type + ", class line: " + clazz.getName() + "), class "
                                                     + clazz.getName() + "is not subtype of interface.");
                                         }
-                                        this.EXTENSION_SPIS.put(spiName,clazz);
+                                        this.EXTENSION_SPIS.put(spiName, clazz);
                                     }
                                 } catch (Throwable t) {
                                     throw new IllegalStateException("Failed to load extension class(interface: " + type + ", class line: " + line + ") in " + url + ", cause: " + t.getMessage(), t);

@@ -33,7 +33,6 @@ import static org.opencron.common.util.AssertUtils.checkNotNull;
 
 /**
  * Static utility methods pertaining to {@link List} instances.
- *
  */
 public final class ContainerUtils {
 
@@ -161,7 +160,6 @@ public final class ContainerUtils {
     }
 
 
-
     /**
      * Creates a mutable, empty {@code HashMap} instance.
      */
@@ -220,11 +218,11 @@ public final class ContainerUtils {
      * Creates a {@code ConcurrentMap} instance, with a high enough "initial capacity"
      * that it should hold {@code expectedSize} elements without growth.
      */
-    public static <K, V> ConcurrentMap<K, V> newConcurrentMap(int initialCapacity,boolean useNonBlocking) {
+    public static <K, V> ConcurrentMap<K, V> newConcurrentMap(int initialCapacity, boolean useNonBlocking) {
         if (useNonBlocking) {
             return new NonBlockingHashMap<K, V>(initialCapacity);
         }
-        return new ConcurrentHashMap<K,V>(initialCapacity);
+        return new ConcurrentHashMap<K, V>(initialCapacity);
     }
 
     /**

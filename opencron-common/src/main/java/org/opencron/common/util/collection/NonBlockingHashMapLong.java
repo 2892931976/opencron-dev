@@ -89,7 +89,7 @@ import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
  * @param <TypeV> the type of mapped values
  * @author Cliff Click
  * @since 1.5
- *
+ * <p>
  * Forked from <a href="https://github.com/JCTools/JCTools">JCTools</a>.
  */
 @SuppressWarnings("all")
@@ -1467,7 +1467,7 @@ public class NonBlockingHashMapLong<TypeV>
     private void readObject(java.io.ObjectInputStream s) throws IOException, ClassNotFoundException {
         s.defaultReadObject();      // Read nothing
         initialize(MIN_SIZE);
-        for (;;) {
+        for (; ; ) {
             final long K = s.readLong();
             final TypeV V = (TypeV) s.readObject();
             if (K == NO_KEY && V == null) break;

@@ -18,7 +18,7 @@ public class SyncTest {
 
         final Timer timer = new Timer();
 
-        final DefaultExecuteResultHandler resultHandler = new DefaultExecuteResultHandler(){
+        final DefaultExecuteResultHandler resultHandler = new DefaultExecuteResultHandler() {
             @Override
             public void onProcessComplete(int exitValue) {
                 super.onProcessComplete(exitValue);
@@ -49,10 +49,10 @@ public class SyncTest {
                     System.out.println("kill....");
                 }
             }
-        },5*1000);
+        }, 5 * 1000);
 
         executor.execute(cmdLine, resultHandler);
-        System.out.println("dog is running?"+watchdog.isWatching());
+        System.out.println("dog is running?" + watchdog.isWatching());
 
     }
 

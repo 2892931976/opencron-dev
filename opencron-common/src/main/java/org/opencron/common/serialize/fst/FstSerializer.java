@@ -11,7 +11,6 @@ import java.util.concurrent.ExecutionException;
 
 /**
  * https://github.com/RuedigerMoeller/fast-serialization/wiki/Serialization
- *
  */
 
 public class FstSerializer implements Serializer {
@@ -38,7 +37,7 @@ public class FstSerializer implements Serializer {
         try {
             return configurationLoadingCache.get(clz);
         } catch (ExecutionException e) {
-            throw new IOException("create FSTConfiguration error, class:"+clz);
+            throw new IOException("create FSTConfiguration error, class:" + clz);
         }
     }
 }

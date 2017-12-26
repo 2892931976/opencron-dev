@@ -30,16 +30,16 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 
 /**
- *@author benjobs
+ * @author benjobs
  */
 public class MavenUtils {
 
     private String projectPath;
 
-    public static MavenUtils get(ClassLoader classLoader){
+    public static MavenUtils get(ClassLoader classLoader) {
         MavenUtils utils = new MavenUtils();
         String path = classLoader.getResource("").getPath();
-        utils.projectPath = path.replaceFirst("/target/(.*)|/classes/","");
+        utils.projectPath = path.replaceFirst("/target/(.*)|/classes/", "");
         return utils;
     }
 
@@ -55,14 +55,14 @@ public class MavenUtils {
         throw new IllegalArgumentException("[opencron]:mavenUtils getModel error,please check " + pom);
     }
 
-    private Model getParentModel(){
+    private Model getParentModel() {
         return getModel("./pom.xml");
     }
 
-    private Model getCurrentModel(){
+    private Model getCurrentModel() {
         Model model = getParentModel();
         List<String> modules = model.getModules();
-        for (String module:modules ) {
+        for (String module : modules) {
             if (projectPath.endsWith(module)) {
                 String currentPom = "./".concat(module).concat("/pom.xml");
                 model = getModel(currentPom);
@@ -72,7 +72,7 @@ public class MavenUtils {
         return null;
     }
 
-    public String getArtifactId()  {
+    public String getArtifactId() {
         Model model = getCurrentModel();
         if (model == null) {
             return null;
@@ -83,12 +83,12 @@ public class MavenUtils {
     public String getArtifactVersion() {
 
         Model model = getCurrentModel();
-        if (model!=null && model.getVersion()!=null) {
+        if (model != null && model.getVersion() != null) {
             return model.getVersion();
         }
 
         model = getParentModel();
-        if (model!=null) {
+        if (model != null) {
             return model.getVersion();
         }
         return null;
@@ -98,7 +98,7 @@ public class MavenUtils {
         return getArtifactId().concat("-").concat(getArtifactVersion());
     }
 
-    public String getName()  {
+    public String getName() {
         Model model = getCurrentModel();
         return model.getName();
     }
@@ -106,9 +106,8 @@ public class MavenUtils {
 
     public static void main(String[] args) {
         MavenUtils mavenUtils = MavenUtils.get(Thread.currentThread().getContextClassLoader());
-        System.out.println(mavenUtils.getArtifact() +"---> " + mavenUtils.getName());
+        System.out.println(mavenUtils.getArtifact() + "---> " + mavenUtils.getName());
     }
-
 
 
 }

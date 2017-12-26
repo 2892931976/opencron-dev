@@ -21,6 +21,7 @@ public interface AgentJob {
 
     /**
      * 扫描Agent里crontab已经定义的job
+     *
      * @param request
      * @return
      */
@@ -30,6 +31,7 @@ public interface AgentJob {
 
     /**
      * agent 自动注册...
+     *
      * @return
      */
     boolean register();

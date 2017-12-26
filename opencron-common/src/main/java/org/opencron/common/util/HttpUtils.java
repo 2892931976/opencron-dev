@@ -151,6 +151,7 @@ public abstract class HttpUtils {
 
     /**
      * true: 要检查的本地端口已被使用 false:要检查的本地端口未被使用
+     *
      * @param port
      * @return
      */
@@ -167,8 +168,8 @@ public abstract class HttpUtils {
 
     public static int freePort() {
         Random random = new Random();
-        int max=65535;
-        int min=1024;
+        int max = 65535;
+        int min = 1024;
         int port;
         do {
             port = random.nextInt(max - min + 1) + min;

@@ -16,7 +16,7 @@ public class SPITest {
     }
 
     @Test
-    public void testInstance(){
+    public void testInstance() {
 
 
     }

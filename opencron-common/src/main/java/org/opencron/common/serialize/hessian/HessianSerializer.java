@@ -44,7 +44,7 @@ public class HessianSerializer implements Serializer {
             out.flush();
             return bos.toByteArray();
         } finally {
-            if(out!=null){
+            if (out != null) {
                 out.close();
             }
         }
@@ -57,7 +57,7 @@ public class HessianSerializer implements Serializer {
             input = new Hessian2Input(new ByteArrayInputStream(buf));
             return (T) input.readObject(type);
         } finally {
-            if(input!=null){
+            if (input != null) {
                 input.close();
             }
         }

@@ -29,14 +29,13 @@ import java.util.*;
 
 
 /**
- *
  * @author <a href="mailto:benjobs@qq.com">benjobs@qq.com</a>
  * @name:CommonUtil
  * @version: 1.0.0
  * @company: org.opencron
  * @description: 常用工具类
  * @date: 2012-10-9 pa 18:03 于大麦<br/><br/>
- *
+ * <p>
  * <b style="color:RED">呵呵</b><br/><br/>
  * 我说我喜欢你,你说呵呵,<br/>
  * 我问你喜欢我不,你说呵呵,<br/>
@@ -49,7 +48,7 @@ import java.util.*;
  * 请你不要敷衍我,<br/>
  * 我爱你那么多, <br/>
  * 你也喜欢下我好么？<br/><br/>
- *
+ * <p>
  * 记得上次我们一起唱的歌,<br/>
  * 我小声唱,你也跟着合,<br/>
  * 看着你脸上醉人的酒窝,<br/>
@@ -66,7 +65,7 @@ import java.util.*;
  * 只要你在我身边, <br/>
  * 沿途风景,即便再美,我也不会留恋，<br/>
  * 为什么我们不能把这场恋爱谈完？<br/><br/>
- *
+ * <p>
  * 往日温柔的你现在何处,<br/>
  * 我的心只想向你倾诉，<br/>
  * 你怎忍心一人远走, <br/>
@@ -79,7 +78,7 @@ import java.util.*;
  * 梦想着能和你在未来的旅途, <br/>
  * 一起嬉戏,没了忧愁, <br/>
  * 执子之手,相约白头! <br/><br/>
- *
+ * <p>
  * 后来你打电话说已经有了男朋友,<br/>
  * 一起过的很幸福。  <br/>
  * 我说了声:呵呵,祝你幸福! <br/>
@@ -90,7 +89,7 @@ import java.util.*;
  * 寻找属于你的归宿,  <br/>
  * 我也不能挽留，    <br/>
  * 只能真心的祝你幸福! <br/><br/>
- *
+ * <p>
  * 我用尽一生的思念，<br/>
  * 只为等待你的出现,<br/>
  * 如今你已越走越远,  <br/>
@@ -214,7 +213,6 @@ public abstract class CommonUtils implements Serializable {
     }
 
 
-
     public static float toFloat(Object val, float defVal) {
         if (isEmpty(val)) {
             return defVal;
@@ -226,7 +224,7 @@ public abstract class CommonUtils implements Serializable {
         }
     }
 
-    public static Boolean toBoolean(String text,Boolean defVal) {
+    public static Boolean toBoolean(String text, Boolean defVal) {
         if (isEmpty(text)) {
             return false;
         }
@@ -238,7 +236,7 @@ public abstract class CommonUtils implements Serializable {
     }
 
     public static Boolean toBoolean(String text) {
-      return toBoolean(text,false);
+        return toBoolean(text, false);
     }
 
     public static Integer toInt(Object val) {
@@ -305,8 +303,9 @@ public abstract class CommonUtils implements Serializable {
 
     /**
      * Check whether the given Enumeration contains the given element.
+     *
      * @param enumeration the Enumeration to check
-     * @param element the element to look for
+     * @param element     the element to look for
      * @return <code>true</code> if found, <code>false</code> else
      */
     public static boolean contains(Enumeration enumeration, Object element) {
@@ -325,8 +324,9 @@ public abstract class CommonUtils implements Serializable {
      * Check whether the given Collection contains the given element instance.
      * <p>Enforces the given instance to be present, rather than returning
      * <code>true</code> for an equal element as well.
+     *
      * @param collection the Collection to check
-     * @param element the element to look for
+     * @param element    the element to look for
      * @return <code>true</code> if found, <code>false</code> else
      */
     public static boolean containsInstance(Collection collection, Object element) {
@@ -351,6 +351,7 @@ public abstract class CommonUtils implements Serializable {
 
     /**
      * Adapt an enumeration to an iterator.
+     *
      * @param enumeration the enumeration
      * @return the iterator
      */
@@ -394,9 +395,10 @@ public abstract class CommonUtils implements Serializable {
 
     /**
      * 将String数组转化为Long数组
-     * @Title: strArr2LongArr
+     *
      * @param strArr String数组
      * @return Long数组
+     * @Title: strArr2LongArr
      * @author: wanghajie 2012-12-13上午10:15:42
      */
     public static Long[] string2LongArray(String[] strArr) {
@@ -412,9 +414,10 @@ public abstract class CommonUtils implements Serializable {
 
     /**
      * 将将String数组转化为LongList
-     * @Title: strArr2LongList
+     *
      * @param strArr String数组
      * @return LongList
+     * @Title: strArr2LongList
      * @author: wanghajie 2012-12-13上午11:09:10
      */
     public static List<Long> string2LongList(String[] strArr) {
@@ -438,45 +441,46 @@ public abstract class CommonUtils implements Serializable {
         return result;
     }
 
-    public static <T>T[] arrayRemoveElements(T[] array,T... elem) {
+    public static <T> T[] arrayRemoveElements(T[] array, T... elem) {
         AssertUtils.notNull(array);
         List<T> arrayList = new ArrayList<T>(0);
-        Collections.addAll(arrayList,array);
+        Collections.addAll(arrayList, array);
         if (isEmpty(elem)) return array;
-        for(T el:elem)  arrayList.remove(el);
+        for (T el : elem) arrayList.remove(el);
         return Arrays.copyOf(arrayList.toArray(array), arrayList.size());
     }
 
-    public static <T>T[] arrayRemoveIndex(T[] array,int... index) {
+    public static <T> T[] arrayRemoveIndex(T[] array, int... index) {
         AssertUtils.notNull(array);
-        for(int j:index) {
-            if (j < 0 || j > array.length - 1) throw new IndexOutOfBoundsException("index error.@"+j);
+        for (int j : index) {
+            if (j < 0 || j > array.length - 1) throw new IndexOutOfBoundsException("index error.@" + j);
         }
         List<T> arrayList = new ArrayList<T>(0);
         Collections.addAll(arrayList, array);
-        int i=0;
-        for(int j:index) {
-            arrayList.remove(j-i);
+        int i = 0;
+        for (int j : index) {
+            arrayList.remove(j - i);
             ++i;
         }
         return Arrays.copyOf(arrayList.toArray(array), arrayList.size());
     }
 
     public static String uuid() {
-        return UUID.randomUUID().toString().replaceAll("-","");
+        return UUID.randomUUID().toString().replaceAll("-", "");
     }
 
     /**
      * 生成指定长度的uuid
+     *
      * @param len
      * @return
      */
     public static String uuid(int len) {
         StringBuffer sb = new StringBuffer();
-        while (sb.length()<len) {
+        while (sb.length() < len) {
             sb.append(uuid());
         }
-        return sb.toString().substring(0,len);
+        return sb.toString().substring(0, len);
     }
 
 

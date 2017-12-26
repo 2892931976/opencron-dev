@@ -25,7 +25,7 @@ import java.util.*;
 
 /**
  * Static utility methods pertaining to {@link List} instances.
- *
+ * <p>
  * jupiter
  * org.jupiter.common.util
  *
@@ -156,5 +156,6 @@ public final class Lists {
         return Ints.saturatedCast(5L + arraySize + (arraySize / 10));
     }
 
-    private Lists() {}
+    private Lists() {
+    }
 }

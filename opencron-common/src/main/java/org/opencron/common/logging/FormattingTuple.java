@@ -24,7 +24,7 @@ package org.opencron.common.logging;
 
 /**
  * Holds the results of formatting done by {@link MessageFormatter}.
- *
+ * <p>
  * Forked from <a href="https://github.com/netty/netty">Netty</a>.
  */
 class FormattingTuple {

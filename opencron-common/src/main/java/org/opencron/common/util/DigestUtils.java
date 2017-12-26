@@ -648,7 +648,8 @@ public abstract class DigestUtils {
             if (text.equals(new String(text.getBytes(encode), encode))) {
                 return encode;
             }
-        } catch (Exception exception) {}
+        } catch (Exception exception) {
+        }
 
         encode = "UTF-8";
         try {

@@ -38,14 +38,14 @@ public abstract class LoggerFactory {
         ClassLoader loader = Thread.currentThread().getContextClassLoader();
         URL url = loader.getResource("log4j.properties");
         String path;
-        if (url==null) {
+        if (url == null) {
             String currPath = LoggerFactory.class.getProtectionDomain().getCodeSource().getLocation().getFile();
             File file = new File(currPath);
             path = file.getParentFile().getParentFile() + "/conf/log4j.properties";
             if (!new File(path).exists()) {
                 throw new ExceptionInInitializerError("[opencron] error: can not found log4j.properties...");
             }
-        }else {
+        } else {
             path = url.getPath();
         }
         PropertyConfigurator.configure(path);

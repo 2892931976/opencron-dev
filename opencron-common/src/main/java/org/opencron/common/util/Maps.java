@@ -28,7 +28,7 @@ import java.util.concurrent.ConcurrentMap;
 
 /**
  * Static utility methods pertaining to {@link Map} instances.
- *
+ * <p>
  * jupiter
  * org.jupiter.common.util
  *
@@ -86,6 +86,7 @@ public final class Maps {
     public static <K, V> ConcurrentMap<K, V> newConcurrentMap() {
         return new ConcurrentHashMap<>();
     }
+
     /**
      * Returns a capacity that is sufficient to keep the map from being resized as
      * long as it grows no larger than expectedSize and the load factor is >= its
@@ -102,5 +103,6 @@ public final class Maps {
         return Integer.MAX_VALUE; // any large value
     }
 
-    private Maps() {}
+    private Maps() {
+    }
 }

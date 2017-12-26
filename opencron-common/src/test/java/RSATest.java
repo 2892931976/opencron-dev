@@ -17,9 +17,8 @@
  * KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations
  * under the License.
- *
- *
  */
+
 import org.opencron.common.util.RSAUtils;
 
 import java.util.Map;

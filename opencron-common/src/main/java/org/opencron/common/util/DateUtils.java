@@ -33,8 +33,8 @@ import static org.opencron.common.util.CommonUtils.toInt;
 
 /**
  * @author wanghuajie
- *
- *         2011-9-15
+ * <p>
+ * 2011-9-15
  */
 public abstract class DateUtils {
 
@@ -55,8 +55,7 @@ public abstract class DateUtils {
     /**
      * 格式化日期 年月日形式
      *
-     * @param date
-     *            日期
+     * @param date 日期
      * @return 日期字符串
      */
     public static String formatSimpleDate(Date date) {
@@ -68,6 +67,7 @@ public abstract class DateUtils {
 
     /**
      * 全日期格式格式化
+     *
      * @param date
      * @return
      */
@@ -145,6 +145,7 @@ public abstract class DateUtils {
 
     /**
      * 获取一天的最后一秒
+     *
      * @param date
      * @return
      */
@@ -243,9 +244,9 @@ public abstract class DateUtils {
     /**
      * 根据日期推算是周几
      *
-     * @Title: getWeek
      * @param sdate
      * @return
+     * @Title: getWeek
      * @Author: 王华杰 2013-3-21 上午11:08:49
      */
     public static String getWeek(String sdate) {
@@ -277,9 +278,9 @@ public abstract class DateUtils {
     /**
      * 字符串转日期
      *
-     * @Title: strToDate
      * @param strDate
      * @return
+     * @Title: strToDate
      * @Author: 王华杰 2013-3-21 上午11:07:49
      */
     public static Date strToDate(String strDate) {
@@ -297,8 +298,8 @@ public abstract class DateUtils {
     /**
      * 获得当前日期与本周日相差的天数
      *
-     * @Title: getMondayPlus
      * @return
+     * @Title: getMondayPlus
      * @Author: 王华杰 2013-3-21 上午11:11:33
      */
     private static int getMondayPlus() {
@@ -315,8 +316,8 @@ public abstract class DateUtils {
     /**
      * 获得上周星期一的日期
      *
-     * @Title: getPrevWeekday
      * @return
+     * @Title: getPrevWeekday
      * @Author: 王华杰 2013-3-21 上午11:10:09
      */
     public String getPrevWeekday() {
@@ -332,8 +333,8 @@ public abstract class DateUtils {
     /**
      * 获得上周星期日的日期
      *
-     * @Title: getPrevWeekSunday
      * @return
+     * @Title: getPrevWeekSunday
      * @Author: 王华杰 2013-3-21 上午11:13:31
      */
     public static String getPrevWeekSunday() {
@@ -352,8 +353,8 @@ public abstract class DateUtils {
     /**
      * 获取当月第一天
      *
-     * @Title: getFirstDayOfMonth
      * @return
+     * @Title: getFirstDayOfMonth
      * @Author: 王华杰 2013-3-21 上午11:15:10
      */
     public static String getFirstDayOfMonth() {
@@ -365,8 +366,8 @@ public abstract class DateUtils {
     /**
      * 上月第一天
      *
-     * @Title: getPrevMonthFirstDay
      * @return
+     * @Title: getPrevMonthFirstDay
      * @Author: 王华杰 2013-3-21 上午11:35:40
      */
     public static String getPrevMonthFirstDay() {
@@ -385,8 +386,8 @@ public abstract class DateUtils {
     /**
      * 获得上月最后一天的日期
      *
-     * @Title: getPrevMonthEnd
      * @return
+     * @Title: getPrevMonthEnd
      * @Author: 王华杰 2013-3-21 上午11:16:57
      */
     public static String getPrevMonthLastDay() {

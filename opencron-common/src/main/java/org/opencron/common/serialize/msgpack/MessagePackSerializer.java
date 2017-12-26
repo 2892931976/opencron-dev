@@ -33,7 +33,8 @@ import java.io.IOException;
 
 public class MessagePackSerializer implements Serializer {
 
-    private final ObjectMapper objectMapper = new ObjectMapper(new MessagePackFactory());;
+    private final ObjectMapper objectMapper = new ObjectMapper(new MessagePackFactory());
+    ;
 
     @Override
     public byte[] encode(Object msg) throws IOException {

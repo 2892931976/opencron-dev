@@ -78,5 +78,6 @@ public final class Unsafe {
         }
     }
 
-    private Unsafe() {}
+    private Unsafe() {
+    }
 }

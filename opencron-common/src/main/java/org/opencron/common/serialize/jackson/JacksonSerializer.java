@@ -42,7 +42,7 @@ public class JacksonSerializer implements Serializer {
 
     @Override
     public <T> T decode(byte[] buf, Class<T> type) throws IOException {
-        String jsonString =  new String(buf, CHARSET);
+        String jsonString = new String(buf, CHARSET);
         return objectMapper.readValue(jsonString, type);
     }
 }

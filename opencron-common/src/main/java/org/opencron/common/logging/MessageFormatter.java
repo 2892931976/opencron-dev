@@ -98,15 +98,14 @@ final class MessageFormatter {
     /**
      * Performs single argument substitution for the 'messagePattern' passed as
      * parameter.
-     *
+     * <p>
      * For example,
-     *
+     * <p>
      * <pre>
      * MessageFormatter.format(&quot;Hi {}.&quot;, &quot;there&quot;);
      * </pre>
-     *
+     * <p>
      * will return the string "Hi there.".
-     *
      *
      * @param messagePattern The message pattern which will be parsed and formatted
      * @param arg            The argument to be substituted in place of the formatting anchor
@@ -119,13 +118,13 @@ final class MessageFormatter {
     /**
      * Performs a two argument substitution for the 'messagePattern' passed as
      * parameter.
-     *
+     * <p>
      * For example,
-     *
+     * <p>
      * <pre>
      * MessageFormatter.format(&quot;Hi {}. My name is {}.&quot;, &quot;Alice&quot;, &quot;Bob&quot;);
      * </pre>
-     *
+     * <p>
      * will return the string "Hi Alice. My name is Bob.".
      *
      * @param messagePattern The message pattern which will be parsed and formatted
@@ -259,7 +258,7 @@ final class MessageFormatter {
             String oAsString = o.toString();
             buf.append(oAsString);
         } catch (Throwable t) {
-            System.err.println("SLF4J: Failed toString() invocation on an object of type ["  + o.getClass().getName() + ']');
+            System.err.println("SLF4J: Failed toString() invocation on an object of type [" + o.getClass().getName() + ']');
             t.printStackTrace();
             buf.append("[FAILED toString()]");
         }
@@ -373,5 +372,6 @@ final class MessageFormatter {
         }
     }
 
-    private MessageFormatter() {}
+    private MessageFormatter() {
+    }
 }

@@ -27,8 +27,6 @@ import org.objenesis.strategy.StdInstantiatorStrategy;
 import org.opencron.common.serialize.Serializer;
 
 
-
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -39,7 +37,7 @@ import java.io.IOException;
 
 public class KryoSerializer implements Serializer {
 
-    private static final ThreadLocal<Kryo> THREAD_LOCAL = new ThreadLocal<Kryo>(){
+    private static final ThreadLocal<Kryo> THREAD_LOCAL = new ThreadLocal<Kryo>() {
         @Override
         protected Kryo initialValue() {
             Kryo kryo = new Kryo();
@@ -50,8 +48,8 @@ public class KryoSerializer implements Serializer {
 
     @Override
     public byte[] encode(Object msg) throws IOException {
-        try(ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            Output output = new Output(bos)){
+        try (ByteArrayOutputStream bos = new ByteArrayOutputStream();
+             Output output = new Output(bos)) {
 
             Kryo kryo = THREAD_LOCAL.get();
             kryo.writeObject(output, msg);

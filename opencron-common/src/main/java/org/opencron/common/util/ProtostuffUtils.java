@@ -26,6 +26,7 @@ public class ProtostuffUtils {
 
     /**
      * 序列化
+     *
      * @param obj
      * @return
      */
@@ -45,6 +46,7 @@ public class ProtostuffUtils {
 
     /**
      * 反序列化
+     *
      * @param data
      * @param clazz
      * @return

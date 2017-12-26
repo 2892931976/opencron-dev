@@ -41,11 +41,11 @@ public class Request implements Serializable {
     private Long proxyAgent;
     private Map<String, String> params;
 
-    public Request(){
+    public Request() {
 
     }
 
-    public static Request request(String host, Integer port, Action action, String password, Integer timeOut,Long proxyAgent) {
+    public static Request request(String host, Integer port, Action action, String password, Integer timeOut, Long proxyAgent) {
         return new Request()
                 .setHost(host)
                 .setPort(port)
@@ -92,7 +92,7 @@ public class Request implements Serializable {
     }
 
     public Integer getTimeOut() {
-        return timeOut == null?0:timeOut;
+        return timeOut == null ? 0 : timeOut;
     }
 
     public Request setTimeOut(Integer timeOut) {
@@ -128,8 +128,8 @@ public class Request implements Serializable {
     }
 
     public String getAddress() {
-        if (CommonUtils.notEmpty(this.host,this.port)) {
-            this.address = this.host +":"+this.port;
+        if (CommonUtils.notEmpty(this.host, this.port)) {
+            this.address = this.host + ":" + this.port;
         }
         return this.address;
     }
