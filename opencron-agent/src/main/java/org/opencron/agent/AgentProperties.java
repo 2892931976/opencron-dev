@@ -49,7 +49,7 @@ public class AgentProperties {
      * @return specified property value
      */
     public static String getProperty(String name) {
-        if ( properties == null ) {
+        if (properties == null) {
             loadProperties();
         }
         return properties.getProperty(name);
@@ -79,7 +79,7 @@ public class AgentProperties {
                 properties.load(is);
             } catch (Throwable t) {
                 handleThrowable(t);
-                logger.warn("[opencron] init properties error:{}",t.getMessage());
+                logger.warn("[opencron] init properties error:{}", t.getMessage());
             } finally {
                 try {
                     is.close();

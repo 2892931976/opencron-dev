@@ -59,7 +59,7 @@ public class AgentMonitor {
 
     public void start() {
 
-        if (this.server!=null) {
+        if (this.server != null) {
 
             final Integer port = Integer.parseInt(AgentProperties.getProperty(Constants.PARAM_MONITORPORT_KEY));
 
@@ -78,7 +78,7 @@ public class AgentMonitor {
                     /**
                      * 断开连接或者获取数据错误,不在推送数据...
                      */
-                    while (  clients.get(sessionId) != null  ) {
+                    while (clients.get(sessionId) != null) {
                         client.sendEvent("monitor", monitor());
                         try {
                             TimeUnit.MICROSECONDS.sleep(1000);
@@ -108,7 +108,7 @@ public class AgentMonitor {
     }
 
     public void stop() {
-        if (this.server!=null) {
+        if (this.server != null) {
             this.server.stop();
             this.server = null;
         }

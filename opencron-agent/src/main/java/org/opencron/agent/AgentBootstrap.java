@@ -154,7 +154,7 @@ public class AgentBootstrap implements Serializable {
                 String filePassowrd = IOUtils.readText(Constants.OPENCRON_PASSWORD_FILE, Constants.CHARSET_UTF8).trim().toLowerCase();
                 if (notEmpty(filePassowrd)) {
                     this.password = filePassowrd;
-                }else {
+                } else {
                     writeDefault = true;
                 }
             } else {
@@ -167,19 +167,19 @@ public class AgentBootstrap implements Serializable {
                 IOUtils.writeText(Constants.OPENCRON_PASSWORD_FILE, this.password, Constants.CHARSET_UTF8);
             }
         }
-        SystemPropertyUtils.setProperty(Constants.PARAM_OPENCRON_PORT_KEY,this.port.toString());
-        SystemPropertyUtils.setProperty(Constants.PARAM_OPENCRON_PASSWORD_KEY,this.password);
+        SystemPropertyUtils.setProperty(Constants.PARAM_OPENCRON_PORT_KEY, this.port.toString());
+        SystemPropertyUtils.setProperty(Constants.PARAM_OPENCRON_PASSWORD_KEY, this.password);
     }
 
     private void start() {
         try {
-            final int port = SystemPropertyUtils.getInt(Constants.PARAM_OPENCRON_PORT_KEY,1577);
+            final int port = SystemPropertyUtils.getInt(Constants.PARAM_OPENCRON_PORT_KEY, 1577);
 
             //new thread to start for netty server
             Executors.newSingleThreadExecutor().submit(new Runnable() {
                 @Override
                 public void run() {
-                    server.start(port,handler);
+                    server.start(port, handler);
                 }
             });
             /**
@@ -309,7 +309,6 @@ public class AgentBootstrap implements Serializable {
     }
 
     /**
-     *
      * @throws Exception
      */
 
@@ -320,7 +319,7 @@ public class AgentBootstrap implements Serializable {
         Integer shutdownPort = Integer.valueOf(AgentProperties.getProperty(Constants.PARAM_OPENCRON_SHUTDOWN_KEY));
 
         // Stop the existing server
-        try  {
+        try {
             Socket socket = new Socket(address, shutdownPort);
             OutputStream stream = socket.getOutputStream();
             for (int i = 0; i < shutdown.length(); i++) {
@@ -338,7 +337,7 @@ public class AgentBootstrap implements Serializable {
     }
 
     private void stopServer() throws Throwable {
-       this.server.destroy();
+        this.server.destroy();
     }
 
     private static void handleThrowable(Throwable t) {

@@ -44,7 +44,7 @@ import static org.opencron.common.util.CommonUtils.*;
 import static org.opencron.common.util.ReflectUtils.isPrototype;
 
 
-public class AgentProcessor implements ServerHandler,AgentJob {
+public class AgentProcessor implements ServerHandler, AgentJob {
 
     private Logger logger = LoggerFactory.getLogger(AgentProcessor.class);
 
@@ -59,7 +59,7 @@ public class AgentProcessor implements ServerHandler,AgentJob {
     private String password;
 
     public AgentProcessor() {
-        this.password = DigestUtils.md5Hex(SystemPropertyUtils.get(Constants.PARAM_OPENCRON_PASSWORD_KEY,Constants.PARAM_DEF_PASSWORD_KEY));
+        this.password = DigestUtils.md5Hex(SystemPropertyUtils.get(Constants.PARAM_OPENCRON_PASSWORD_KEY, Constants.PARAM_DEF_PASSWORD_KEY));
     }
 
     @Override
@@ -123,7 +123,7 @@ public class AgentProcessor implements ServerHandler,AgentJob {
         switch (connType) {
             case PROXY:
                 Monitor monitor = null;//agentMonitor.monitor();
-                Map<String, String> map  = serializableToMap(monitor);
+                Map<String, String> map = serializableToMap(monitor);
                 response.setResult(map);
                 return response;
             default:
@@ -144,7 +144,7 @@ public class AgentProcessor implements ServerHandler,AgentJob {
 
         logger.info("[opencron]:execute:{},pid:{}", command, pid);
 
-        File shellFile = CommandUtils.createShellFile(command,pid,request.getParams().get(Constants.PARAM_RUNAS_KEY),EXITCODE_SCRIPT);
+        File shellFile = CommandUtils.createShellFile(command, pid, request.getParams().get(Constants.PARAM_RUNAS_KEY), EXITCODE_SCRIPT);
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
@@ -161,13 +161,13 @@ public class AgentProcessor implements ServerHandler,AgentJob {
         String successExit = request.getParams().get(Constants.PARAM_SUCCESSEXIT_KEY);
         if (CommonUtils.isEmpty(successExit)) {
             exitValue = 0;//标准退住值:0
-        }else {
+        } else {
             exitValue = Integer.parseInt(successExit);
         }
 
         try {
 
-            CommandLine commandLine = CommandLine.parse(String.format("/bin/bash +x %s",shellFile.getAbsoluteFile()));
+            CommandLine commandLine = CommandLine.parse(String.format("/bin/bash +x %s", shellFile.getAbsoluteFile()));
 
             final DefaultExecutor executor = new DefaultExecutor();
 
@@ -268,7 +268,7 @@ public class AgentProcessor implements ServerHandler,AgentJob {
             } else {
                 if (CommonUtils.isEmpty(successExit)) {
                     response.setExitCode(exitValue).setSuccess(exitValue == Constants.StatusCode.SUCCESS_EXIT.getValue()).end();
-                }else {
+                } else {
                     response.setExitCode(exitValue).setSuccess(successExit.equals(exitValue.toString())).end();
                 }
             }
@@ -297,7 +297,7 @@ public class AgentProcessor implements ServerHandler,AgentJob {
         }
 
         this.password = newPassword.toLowerCase().trim();
-        SystemPropertyUtils.setProperty("opencron.password",password);
+        SystemPropertyUtils.setProperty("opencron.password", password);
         IOUtils.writeText(Constants.OPENCRON_PASSWORD_FILE, password, "UTF-8");
         return response.setSuccess(true).setExitCode(Constants.StatusCode.SUCCESS_EXIT.getValue()).end();
     }
@@ -348,7 +348,7 @@ public class AgentProcessor implements ServerHandler,AgentJob {
             params = (Map<String, String>) JSON.parse(proxyParams);
         }
 
-        Request proxyReq = Request.request(proxyHost, toInt(proxyPort), Action.findByName(proxyAction), proxyPassword,request.getTimeOut(),null).setParams(params);
+        Request proxyReq = Request.request(proxyHost, toInt(proxyPort), Action.findByName(proxyAction), proxyPassword, request.getTimeOut(), null).setParams(params);
 
         Response response = null;
         try {
@@ -357,7 +357,7 @@ public class AgentProcessor implements ServerHandler,AgentJob {
             e.printStackTrace();
             response = Response.response(request);
             response.setExitCode(Constants.StatusCode.ERROR_EXIT.getValue())
-                    .setMessage("[opencron]:proxy error:"+e.getLocalizedMessage())
+                    .setMessage("[opencron]:proxy error:" + e.getLocalizedMessage())
                     .setSuccess(false)
                     .end();
         }
@@ -372,10 +372,10 @@ public class AgentProcessor implements ServerHandler,AgentJob {
             List<String> macIds = MacUtils.getMacAddressList();
             if (CommonUtils.notEmpty(macIds)) {
                 TreeSet<String> macSet = new TreeSet<String>(macIds);
-                macId = StringUtils.joinString(macSet,"-");
+                macId = StringUtils.joinString(macSet, "-");
             }
         } catch (IOException e) {
-            logger.error("[opencron]:getMac error:{}",e);
+            logger.error("[opencron]:getMac error:{}", e);
         }
 
         Response response = Response.response(request).end();
@@ -392,7 +392,8 @@ public class AgentProcessor implements ServerHandler,AgentJob {
     }
 
     /**
-     *重启前先检查密码,密码不正确返回Response,密码正确则直接执行重启
+     * 重启前先检查密码,密码不正确返回Response,密码正确则直接执行重启
+     *
      * @param request
      * @return
      * @throws InterruptedException
@@ -438,27 +439,27 @@ public class AgentProcessor implements ServerHandler,AgentJob {
     @Override
     public boolean register() {
         if (CommonUtils.notEmpty(Constants.OPENCRON_SERVER)) {
-            String url = Constants.OPENCRON_SERVER+"/agent/autoreg.do";
+            String url = Constants.OPENCRON_SERVER + "/agent/autoreg.do";
             String mac = MacUtils.getMacAddress();
             String agentPassword = IOUtils.readText(Constants.OPENCRON_PASSWORD_FILE, "UTF-8").trim().toLowerCase();
 
-            Map<String,Object> params = new HashMap<String, Object>(0);
-            params.put("machineId",mac);
-            params.put("password",agentPassword);
+            Map<String, Object> params = new HashMap<String, Object>(0);
+            params.put("machineId", mac);
+            params.put("password", agentPassword);
             params.put("port", Constants.OPENCRON_PORT);
             params.put("key", Constants.OPENCRON_REGKEY);
 
             logger.info("[opencron]agent auto register staring:{}", Constants.OPENCRON_SERVER);
             try {
-                String result = HttpClientUtils.httpPostRequest(url,params);
-                if (result==null) {
+                String result = HttpClientUtils.httpPostRequest(url, params);
+                if (result == null) {
                     return false;
                 }
                 JSONObject jsonObject = JSON.parseObject(result);
                 if (jsonObject.get("status").toString().equals("200")) {
                     return true;
                 }
-                logger.error("[opencron:agent auto regsiter error:{}]",jsonObject.get("message"));
+                logger.error("[opencron:agent auto regsiter error:{}]", jsonObject.get("message"));
             } catch (Exception e) {
                 e.printStackTrace();
                 return false;
@@ -466,8 +467,6 @@ public class AgentProcessor implements ServerHandler,AgentJob {
         }
         return false;
     }
-
-
 
 
 }

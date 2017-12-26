@@ -54,8 +54,8 @@ public class BootstrapTest implements Serializable {
             final int port = 1577;
 
             String password = DigestUtils.md5Hex("opencron").toLowerCase();
-            SystemPropertyUtils.setProperty("opencron.port",port+"");
-            SystemPropertyUtils.setProperty("opencron.password",password);
+            SystemPropertyUtils.setProperty("opencron.port", port + "");
+            SystemPropertyUtils.setProperty("opencron.password", password);
 
             this.server = ExtensionLoader.load(Server.class);
             //new thread to start for netty server
