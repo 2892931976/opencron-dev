@@ -53,13 +53,13 @@ public class SecurityHandlerInterceptor extends HandlerInterceptorAdapter {
 
         request = new XssHttpServletRequest(request);
 
-        request.setAttribute("uri",request.getRequestURI());
+        request.setAttribute("uri", request.getRequestURI());
 
         HttpSession session = request.getSession();
 
-        if (session.getAttribute(Constants.PARAM_SKIN_NAME_KEY)==null) {
-            Cookie cookie = CookieUtils.getCookie(request,Constants.PARAM_SKIN_NAME_KEY);
-            if (cookie!=null) {
+        if (session.getAttribute(Constants.PARAM_SKIN_NAME_KEY) == null) {
+            Cookie cookie = CookieUtils.getCookie(request, Constants.PARAM_SKIN_NAME_KEY);
+            if (cookie != null) {
                 String skin = cookie.getValue();
                 session.setAttribute(Constants.PARAM_SKIN_NAME_KEY, skin);
             }
@@ -75,18 +75,18 @@ public class SecurityHandlerInterceptor extends HandlerInterceptorAdapter {
 
         //静态资源,页面
         if (requestURI.equals("/")
-                ||requestURI.contains("/static/")
+                || requestURI.contains("/static/")
                 || requestURI.contains("/WEB-INF")
-                ||requestURI.contains("/login")
+                || requestURI.contains("/login")
                 || requestURI.contains("/upload")
                 || requestURI.contains("/agent/autoreg")) {
 
             return super.preHandle(request, response, handler);
         }
 
-        String port = request.getServerPort() == 80 ? "" : (":"+request.getServerPort());
-        String path = request.getContextPath().replaceAll("/$","");
-        String urlPath = request.getScheme()+"://"+request.getServerName()+port+path;
+        String port = request.getServerPort() == 80 ? "" : (":" + request.getServerPort());
+        String path = request.getContextPath().replaceAll("/$", "");
+        String urlPath = request.getScheme() + "://" + request.getServerName() + port + path;
 
         String referer = request.getHeader("referer");
         if (referer != null && !referer.startsWith(urlPath)) {

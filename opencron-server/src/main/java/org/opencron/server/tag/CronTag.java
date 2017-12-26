@@ -51,7 +51,7 @@ public class CronTag {
         }
         int len = str.length();
         if (StringUtils.isChinese(str)) {
-            end = end/3;
+            end = end / 3;
         }
         if (len > end && index < end) {
             return str.substring(index, end) + tempStr;
@@ -70,16 +70,16 @@ public class CronTag {
         }
     }
 
-    public static String escapeHtml(String html){
+    public static String escapeHtml(String html) {
         return StringUtils.htmlEncode(html);
     }
 
 
-    public static String toBase64(String text){
+    public static String toBase64(String text) {
         return DigestUtils.toBase64(text);
     }
 
-    public static String passBase64(String text){
+    public static String passBase64(String text) {
         return DigestUtils.passBase64(text);
     }
 

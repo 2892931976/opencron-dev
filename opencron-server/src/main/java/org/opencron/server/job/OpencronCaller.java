@@ -82,12 +82,12 @@ public class OpencronCaller extends AbstractRpcInvoker {
     }
 
     private void checkProxyAgent(Request request) {
-        if ( request.getProxyAgent()!=null ) {
+        if (request.getProxyAgent() != null) {
             ParamsMap proxyParams = new ParamsMap();
             proxyParams.put(
                     Constants.PARAM_PROXYHOST_KEY, request.getHost(),
                     Constants.PARAM_PROXYPORT_KEY, request.getPort(),
-                    Constants.PARAM_PROXYACTION_KEY,request.getAction().name(),
+                    Constants.PARAM_PROXYACTION_KEY, request.getAction().name(),
                     Constants.PARAM_PROXYPASSWORD_KEY, request.getPassword()
             );
 

@@ -39,91 +39,91 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 public class TerminalHandler extends TextWebSocketHandler {
 
-	private TerminalClient terminalClient;
+    private TerminalClient terminalClient;
 
-	@Autowired
-	private TerminalService terminalService;
+    @Autowired
+    private TerminalService terminalService;
 
-	@Override
-	public void afterConnectionEstablished(WebSocketSession session) throws Exception {
-		super.afterConnectionEstablished(session);
-		String sshSessionId = (String) session.getAttributes().get(Constants.PARAM_SSH_SESSION_ID_KEY);
-		if (sshSessionId != null) {
-			final Terminal terminal = TerminalContext.remove(sshSessionId);
-			if (terminal!=null) {
-				try {
-					session.sendMessage(new TextMessage("Welcome to opencron Terminal! Connect Starting."));
-					getClient(session,terminal);
-					int cols = Integer.parseInt(session.getAttributes().get("cols").toString());
-					int rows = Integer.parseInt(session.getAttributes().get("rows").toString());
-					int width = Integer.parseInt(session.getAttributes().get("width").toString());
-					int height = Integer.parseInt(session.getAttributes().get("height").toString());
-					terminalClient.openTerminal(cols,rows,width,height);
-					terminalService.login(terminal);
-				} catch (Exception e) {
-					if (e.getLocalizedMessage().replaceAll("\\s+", "").contentEquals("Operationtimedout")) {
-						session.sendMessage(new TextMessage("Sorry! Connect timed out, please try again. "));
-					} else {
-						session.sendMessage(new TextMessage("Sorry! Operation error, please try again. "));
-					}
-					terminalClient.disconnect();
-					session.close();
-				}
-			}else {
-				this.terminalClient.disconnect();
-				session.sendMessage(new TextMessage("Sorry! Connect failed, please try again. "));
-				session.close();
-			}
-		}
-	}
+    @Override
+    public void afterConnectionEstablished(WebSocketSession session) throws Exception {
+        super.afterConnectionEstablished(session);
+        String sshSessionId = (String) session.getAttributes().get(Constants.PARAM_SSH_SESSION_ID_KEY);
+        if (sshSessionId != null) {
+            final Terminal terminal = TerminalContext.remove(sshSessionId);
+            if (terminal != null) {
+                try {
+                    session.sendMessage(new TextMessage("Welcome to opencron Terminal! Connect Starting."));
+                    getClient(session, terminal);
+                    int cols = Integer.parseInt(session.getAttributes().get("cols").toString());
+                    int rows = Integer.parseInt(session.getAttributes().get("rows").toString());
+                    int width = Integer.parseInt(session.getAttributes().get("width").toString());
+                    int height = Integer.parseInt(session.getAttributes().get("height").toString());
+                    terminalClient.openTerminal(cols, rows, width, height);
+                    terminalService.login(terminal);
+                } catch (Exception e) {
+                    if (e.getLocalizedMessage().replaceAll("\\s+", "").contentEquals("Operationtimedout")) {
+                        session.sendMessage(new TextMessage("Sorry! Connect timed out, please try again. "));
+                    } else {
+                        session.sendMessage(new TextMessage("Sorry! Operation error, please try again. "));
+                    }
+                    terminalClient.disconnect();
+                    session.close();
+                }
+            } else {
+                this.terminalClient.disconnect();
+                session.sendMessage(new TextMessage("Sorry! Connect failed, please try again. "));
+                session.close();
+            }
+        }
+    }
 
-	@Override
-	protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
-		super.handleTextMessage(session, message);
-		try {
-			getClient(session,null);
-			if (this.terminalClient != null ) {
-				if ( !terminalClient.isClosed()) {
-					terminalClient.write(message.getPayload());
-				}else {
-					session.close();
-				}
-			}
-		} catch (Exception e) {
-			session.sendMessage(new TextMessage("Sorry! opencron Terminal was closed, please try again. "));
-			terminalClient.disconnect();
-			session.close();
-		}
-	}
+    @Override
+    protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
+        super.handleTextMessage(session, message);
+        try {
+            getClient(session, null);
+            if (this.terminalClient != null) {
+                if (!terminalClient.isClosed()) {
+                    terminalClient.write(message.getPayload());
+                } else {
+                    session.close();
+                }
+            }
+        } catch (Exception e) {
+            session.sendMessage(new TextMessage("Sorry! opencron Terminal was closed, please try again. "));
+            terminalClient.disconnect();
+            session.close();
+        }
+    }
 
-	@Override
-	public void handleTransportError(WebSocketSession session, Throwable exception) throws Exception {
-		super.handleTransportError(session, exception);
-		this.closeTerminal(session);
-		session.close();
-	}
+    @Override
+    public void handleTransportError(WebSocketSession session, Throwable exception) throws Exception {
+        super.handleTransportError(session, exception);
+        this.closeTerminal(session);
+        session.close();
+    }
 
-	@Override
-	public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
-		super.afterConnectionClosed(session, status);
-		this.closeTerminal(session);
-	}
+    @Override
+    public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
+        super.afterConnectionClosed(session, status);
+        this.closeTerminal(session);
+    }
 
-	private TerminalClient getClient(WebSocketSession session, Terminal terminal){
-		this.terminalClient =  TerminalSession.get(session);
-		if (this.terminalClient==null && terminal!=null) {
-			this.terminalClient = new TerminalClient(session,terminal);
-			TerminalSession.put(session,this.terminalClient);
-		}
-		return this.terminalClient;
-	}
+    private TerminalClient getClient(WebSocketSession session, Terminal terminal) {
+        this.terminalClient = TerminalSession.get(session);
+        if (this.terminalClient == null && terminal != null) {
+            this.terminalClient = new TerminalClient(session, terminal);
+            TerminalSession.put(session, this.terminalClient);
+        }
+        return this.terminalClient;
+    }
 
-	private void closeTerminal(WebSocketSession session) throws IOException {
-		terminalClient = TerminalSession.remove(session);
-		if (terminalClient != null) {
-			terminalClient.disconnect();
-		}
-	}
+    private void closeTerminal(WebSocketSession session) throws IOException {
+        terminalClient = TerminalSession.remove(session);
+        if (terminalClient != null) {
+            terminalClient.disconnect();
+        }
+    }
 
 }
 

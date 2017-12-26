@@ -180,10 +180,11 @@ public class HibernateDao {
 
     /**
      * sql查询
+     *
      * @param <T>
      * @param beanClass
      * @param sql
-     * @param isNorm 是否标准模式，当false类型beanClass为非托管实体类
+     * @param isNorm     是否标准模式，当false类型beanClass为非托管实体类
      * @param parameters
      * @return
      */
@@ -261,10 +262,8 @@ public class HibernateDao {
      * 分页查询
      *
      * @param query
-     * @param pageNo
-     *            页码
-     * @param pageSize
-     *            每页数据大小
+     * @param pageNo   页码
+     * @param pageSize 每页数据大小
      * @return
      */
     public static List pageQuery(Query query, int pageNo, int pageSize) {
@@ -284,7 +283,7 @@ public class HibernateDao {
      * 对于简单类型的定义由实现类决定,以上所有类型均支持in操作
      * </ul>
      * 示例:
-     *
+     * <p>
      * <pre>
      * &lt;code&gt;Map&lt;String, Object&gt; map = new HashMap&lt;String, Object&gt;();
      * map.put(&quot;idList&quot;, new Long[]{1L, 2L, 3L});
@@ -315,7 +314,7 @@ public class HibernateDao {
      * 此外,如果SQL(HQL)语句中只包含JDBC占位符,支持按索引位置赋值,但不支持in操作
      * </ul>
      * 示例:
-     *
+     * <p>
      * <pre>
      * &lt;code&gt;Map&lt;String, Object&gt; map = new HashMap&lt;String, Object&gt;();
      * map.put(&quot;idList&quot;, new Long[]{1L, 2L, 3L});
@@ -391,7 +390,7 @@ public class HibernateDao {
      * 对于简单类型的定义由实现类决定,以上所有类型均支持in操作
      * </ul>
      * 示例:
-     *
+     * <p>
      * <pre>
      * &lt;code&gt;Map&lt;String, Object&gt; map = new HashMap&lt;String, Object&gt;();
      * map.put(&quot;idList&quot;, new Long[]{1L, 2L, 3L});
@@ -401,7 +400,7 @@ public class HibernateDao {
      * sql = &quot;select e1.event_id ID,e1.event_date Date,e1.title,e1.type from event e1 where e1.title like :title or e1.title like ?1 and e1.event_id in :idList&quot;;
      * list = hibernateDao.sqlQuery(EventAlias.class, sql,event, &quot;%中国%&quot;, map);&lt;/code&gt;
      * </pre>
-     *
+     * <p>
      * 另外,如果SQL(HQL)语句中只包含JDBC占位符的话,支持按索引位置赋值,但不支持in操作
      *
      * @param query
@@ -492,8 +491,7 @@ public class HibernateDao {
     }
 
     /**
-     * @param entityClass
-     *            实体类型
+     * @param entityClass 实体类型
      * @return
      */
     private ClassMetadata getClassMetadata(Class entityClass) {

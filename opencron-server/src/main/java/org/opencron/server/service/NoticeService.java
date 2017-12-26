@@ -87,15 +87,15 @@ public class NoticeService {
         if (!job.getWarning()) return;
         Agent agent = job.getAgent();
         String message = "执行任务:" + job.getCommand() + "(" + job.getCronExp() + ")失败,%s!";
-        if (msg==null) {
-            message = String.format(message,"");
-        }else {
-            message = String.format(message,"["+msg+"]");
+        if (msg == null) {
+            message = String.format(message, "");
+        } else {
+            message = String.format(message, "[" + msg + "]");
         }
-        String content = getMessage(agent,message);
+        String content = getMessage(agent, message);
         logger.info(content);
         try {
-            sendMessage(Arrays.asList(job.getUser()),agent.getAgentId(), job.getEmailAddress(), job.getMobiles(), content);
+            sendMessage(Arrays.asList(job.getUser()), agent.getAgentId(), job.getEmailAddress(), job.getMobiles(), content);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -106,7 +106,7 @@ public class NoticeService {
         return String.format(msgFormat, agent.getName(), agent.getHost(), agent.getPort(), message, DateUtils.formatFullDate(new Date()));
     }
 
-    public void sendMessage(List<User> users,Long workId, String emailAddress, String mobiles, String content) {
+    public void sendMessage(List<User> users, Long workId, String emailAddress, String mobiles, String content) {
         Log log = new Log();
         log.setIsread(false);
         log.setAgentId(workId);
@@ -131,7 +131,7 @@ public class NoticeService {
                 email.send();
                 log.setReceiver(emailAddress);
                 homeService.saveLog(log);
-            }catch (Exception e) {
+            } catch (Exception e) {
                 e.printStackTrace(System.err);
             }
         }
@@ -157,7 +157,7 @@ public class NoticeService {
 
         //发送站内信
         log.setType(Constants.MsgType.WEBSITE.getValue());
-        for(User user:users) {
+        for (User user : users) {
             //一一发送站内信
             log.setUserId(user.getUserId());
             log.setReceiver(user.getUserName());

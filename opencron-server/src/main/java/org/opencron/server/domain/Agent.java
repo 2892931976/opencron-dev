@@ -50,7 +50,7 @@ public class Agent implements Serializable {
     private Boolean warning;
 
     @Lob
-    @Column(columnDefinition="TEXT")
+    @Column(columnDefinition = "TEXT")
     private String emailAddress;
     private String mobiles;
     private Boolean status;
@@ -61,7 +61,7 @@ public class Agent implements Serializable {
 
     private Integer proxy;//是否需要代理
 
-    @ManyToMany(mappedBy="agents")
+    @ManyToMany(mappedBy = "agents")
     private Set<Group> groups;//对应的agentGroup
 
     /**

@@ -60,9 +60,9 @@ public class Startup {
         LauncherType launcherType = (launcher == null || LauncherType.isTomcat(launcher)) ? LauncherType.TOMCAT : LauncherType.JETTY;
 
         URL bannerURL = Thread.currentThread().getContextClassLoader().getResource("app-banner.txt");
-        if (bannerURL!=null) {
+        if (bannerURL != null) {
             String banner = IOUtils.readText(new File(bannerURL.getPath()), Constants.CHARSET_UTF8);
-            System.out.println( ansi().eraseScreen().fg(GREEN).a(banner).reset());
+            System.out.println(ansi().eraseScreen().fg(GREEN).a(banner).reset());
         }
 
         if (portParam == null) {

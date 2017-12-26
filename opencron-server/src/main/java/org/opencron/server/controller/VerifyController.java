@@ -49,7 +49,7 @@ public class VerifyController extends BaseController {
     @Autowired
     private AgentService agentService;
 
-    @RequestMapping(value = "exp.do",method= RequestMethod.POST)
+    @RequestMapping(value = "exp.do", method = RequestMethod.POST)
     @ResponseBody
     public boolean validateCronExp(Integer cronType, String cronExp) {
         boolean pass = false;
@@ -58,7 +58,7 @@ public class VerifyController extends BaseController {
         return pass;
     }
 
-    @RequestMapping(value = "ping.do",method= RequestMethod.POST)
+    @RequestMapping(value = "ping.do", method = RequestMethod.POST)
     @ResponseBody
     public boolean validatePing(int proxy, Long proxyId, String host, Integer port, String password) {
         Agent agent = new Agent();
@@ -87,7 +87,7 @@ public class VerifyController extends BaseController {
         return ping;
     }
 
-    @RequestMapping(value = "guid.do",method= RequestMethod.POST)
+    @RequestMapping(value = "guid.do", method = RequestMethod.POST)
     @ResponseBody
     public String getGuid(int proxy, Long proxyId, String host, Integer port, String password, HttpServletResponse response) {
         Agent agent = new Agent();
@@ -108,6 +108,6 @@ public class VerifyController extends BaseController {
                 agent.setProxy(Constants.ConnType.PROXY.getType());
             }
         }
-       return executeService.guid(agent);
+        return executeService.guid(agent);
     }
 }

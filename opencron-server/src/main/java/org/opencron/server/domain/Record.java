@@ -43,7 +43,7 @@ public class Record implements Serializable {
 
 
     @Lob
-    @Column(columnDefinition="text")
+    @Column(columnDefinition = "text")
     private String command;
     private Integer returnCode;
     private Integer success;
@@ -51,7 +51,7 @@ public class Record implements Serializable {
     private Date endTime;
     private Integer execType;
     @Lob
-    @Column(columnDefinition="longtext")
+    @Column(columnDefinition = "longtext")
     private String message;
     private Integer redoCount;
     private Integer status;
@@ -79,7 +79,7 @@ public class Record implements Serializable {
     public Record() {
     }
 
-    public Record(JobInfo jobInfo,Constants.ExecType execType) {
+    public Record(JobInfo jobInfo, Constants.ExecType execType) {
         this.setJobId(jobInfo.getJobId());
         this.setExecType(execType.getStatus());
         this.setAgentId(jobInfo.getAgentId());

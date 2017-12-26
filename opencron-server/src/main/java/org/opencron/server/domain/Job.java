@@ -38,9 +38,9 @@ public class Job implements Serializable {
     private String cronExp;
 
     @Lob
-    @Column(columnDefinition="TEXT")
+    @Column(columnDefinition = "TEXT")
     private String command;
-    
+
     private String comment;
     private String runAs;
     private String successExit;
@@ -71,7 +71,7 @@ public class Job implements Serializable {
     private Boolean pause;//任务是否暂停(true:已经暂停,false:未暂停)
 
     @Lob
-    @Column(columnDefinition="TEXT")
+    @Column(columnDefinition = "TEXT")
     private String emailAddress;
 
     private Boolean deleted;//是否删除

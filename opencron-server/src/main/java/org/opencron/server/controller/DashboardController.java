@@ -155,7 +155,7 @@ public class DashboardController extends BaseController {
         }
     }
 
-    @RequestMapping(value = "progress.do",method= RequestMethod.POST)
+    @RequestMapping(value = "progress.do", method = RequestMethod.POST)
     @ResponseBody
     public ChartInfo progress(HttpSession session) {
         //成功失败折线图数据
@@ -167,9 +167,9 @@ public class DashboardController extends BaseController {
         return chartInfo;
     }
 
-    @RequestMapping(value = "monitor.do",method= RequestMethod.POST)
+    @RequestMapping(value = "monitor.do", method = RequestMethod.POST)
     @ResponseBody
-    public Map<String,Serializable> port(Long agentId) throws Exception {
+    public Map<String, Serializable> port(Long agentId) throws Exception {
         final Agent agent = agentService.getAgent(agentId);
 
         /**
@@ -177,20 +177,20 @@ public class DashboardController extends BaseController {
          */
         if (agent.getProxy().equals(Constants.ConnType.CONN.getType())) {
             final String url = String.format("http://%s:%s", agent.getHost(), PropertyPlaceholder.get(Constants.PARAM_MONITORPORT_KEY));
-            return new HashMap<String,Serializable>(){{
-                put("connType",agent.getProxy());
-                put("data",url);
+            return new HashMap<String, Serializable>() {{
+                put("connType", agent.getProxy());
+                put("data", url);
             }};
         } else {//代理
             final Response resp = executeService.monitor(agent);
-            return new HashMap<String,Serializable>(){{
-                put("connType",agent.getProxy());
-                put("data",JSON.toJSONString(resp.getResult()));
+            return new HashMap<String, Serializable>() {{
+                put("connType", agent.getProxy());
+                put("data", JSON.toJSONString(resp.getResult()));
             }};
         }
     }
 
-    @RequestMapping(value = "login.do",method= RequestMethod.POST)
+    @RequestMapping(value = "login.do", method = RequestMethod.POST)
     public void login(HttpSession session, HttpServletRequest request, HttpServletResponse response, HttpSession httpSession, @RequestParam String username, @RequestParam String password) throws Exception {
 
         //用户信息验证
@@ -220,7 +220,7 @@ public class DashboardController extends BaseController {
 
             if (user.getHeaderpic() != null) {
                 String name = user.getUserId() + "_140" + user.getPicExtName();
-                String path = httpSession.getServletContext().getRealPath("/").replaceFirst("/$","") + "/upload/" + name;
+                String path = httpSession.getServletContext().getRealPath("/").replaceFirst("/$", "") + "/upload/" + name;
                 IOUtils.writeFile(new File(path), user.getHeaderpic().getBinaryStream());
                 user.setHeaderPath(getWebUrlPath(request) + "/upload/" + name);
                 session.setAttribute(Constants.PARAM_LOGIN_USER_KEY, user);
@@ -236,7 +236,7 @@ public class DashboardController extends BaseController {
         return "redirect:/";
     }
 
-    @RequestMapping(value = "headpic/upload.do",method= RequestMethod.POST)
+    @RequestMapping(value = "headpic/upload.do", method = RequestMethod.POST)
     public void upload(@RequestParam(value = "file", required = false) MultipartFile file, Long userId, String data, HttpServletRequest request, HttpSession httpSession, HttpServletResponse response) throws Exception {
 
         String extensionName = null;
@@ -264,7 +264,7 @@ public class DashboardController extends BaseController {
         }
 
         String rootPath = httpSession.getServletContext().getRealPath("/");
-        String path = rootPath.replaceFirst("/$","") + "/upload/";
+        String path = rootPath.replaceFirst("/$", "") + "/upload/";
 
         String picName = user.getUserId() + extensionName.toLowerCase();
 
@@ -326,7 +326,7 @@ public class DashboardController extends BaseController {
     }
 
 
-    @RequestMapping(value = "notice/uncount.do",method= RequestMethod.POST)
+    @RequestMapping(value = "notice/uncount.do", method = RequestMethod.POST)
     @ResponseBody
     public Long uncount(HttpSession session) {
         return homeService.getUnReadCount(session);
@@ -345,7 +345,7 @@ public class DashboardController extends BaseController {
     }
 
     @RequestMapping("notice/detail/{logId}.htm")
-    public String detail(Model model,@PathVariable("logId") Long logId) {
+    public String detail(Model model, @PathVariable("logId") Long logId) {
         Log log = homeService.getLogDetail(logId);
         if (log == null) {
             return "/error/404";

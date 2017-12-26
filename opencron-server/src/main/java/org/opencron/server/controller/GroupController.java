@@ -58,27 +58,27 @@ public class GroupController extends BaseController {
     @RequestMapping("add.htm")
     public String add(Model model) {
         List<Group> groups = groupService.getGroupforAgent();
-        model.addAttribute("groups",groups);
+        model.addAttribute("groups", groups);
         return "/group/add";
     }
 
     @RequestMapping("edit/{groupId}.htm")
-    public String edit(@PathVariable("groupId")Long groupId, Model model) {
+    public String edit(@PathVariable("groupId") Long groupId, Model model) {
         Group group = groupService.getById(groupId);
         List<Group> groups = groupService.getGroupforAgent();
-        model.addAttribute("group",group);
-        model.addAttribute("groups",groups);
+        model.addAttribute("group", group);
+        model.addAttribute("groups", groups);
         return "/group/edit";
     }
 
-    @RequestMapping(value = "checkname.do",method= RequestMethod.POST)
+    @RequestMapping(value = "checkname.do", method = RequestMethod.POST)
     @ResponseBody
     public boolean checkname(Long id, String groupName) {
-        return  !groupService.existsName(id, groupName);
+        return !groupService.existsName(id, groupName);
     }
 
-    @RequestMapping(value = "save.do",method= RequestMethod.POST)
-    public String save(HttpSession session,Group group, String agentIds){
+    @RequestMapping(value = "save.do", method = RequestMethod.POST)
+    public String save(HttpSession session, Group group, String agentIds) {
         group.setCreateTime(new Date());
         group.setUserId(OpencronTools.getUserId(session));
 

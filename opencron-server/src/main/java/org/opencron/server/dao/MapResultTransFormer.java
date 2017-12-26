@@ -34,7 +34,6 @@ import java.util.Map.Entry;
 
 /**
  * 查询结果存储Map中,其中key为字段名,value为字段值,key值不分大小写
- *
  */
 @SuppressWarnings("unchecked")
 public class MapResultTransFormer extends BasicTransformerAdapter implements Serializable {

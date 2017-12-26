@@ -32,7 +32,6 @@ import javax.servlet.http.HttpSession;
 import java.util.Map;
 
 
-
 public class TerminalHandShaker extends HttpSessionHandshakeInterceptor {
 
     @Override
@@ -40,19 +39,19 @@ public class TerminalHandShaker extends HttpSessionHandshakeInterceptor {
         if (request instanceof ServletServerHttpRequest) {
             ServletServerHttpRequest servletRequest = (ServletServerHttpRequest) request;
             HttpSession session = servletRequest.getServletRequest().getSession();
-            attributes.put("cols",servletRequest.getServletRequest().getParameter("cols"));
-            attributes.put("rows",servletRequest.getServletRequest().getParameter("rows"));
-            attributes.put("width",servletRequest.getServletRequest().getParameter("width"));
-            attributes.put("height",servletRequest.getServletRequest().getParameter("height"));
-            attributes.put(Constants.PARAM_SSH_SESSION_ID_KEY,session.getAttribute(Constants.PARAM_SSH_SESSION_ID_KEY));
-            attributes.put(Constants.PARAM_HTTP_SESSION_ID_KEY,session.getAttribute(Constants.PARAM_HTTP_SESSION_ID_KEY));
+            attributes.put("cols", servletRequest.getServletRequest().getParameter("cols"));
+            attributes.put("rows", servletRequest.getServletRequest().getParameter("rows"));
+            attributes.put("width", servletRequest.getServletRequest().getParameter("width"));
+            attributes.put("height", servletRequest.getServletRequest().getParameter("height"));
+            attributes.put(Constants.PARAM_SSH_SESSION_ID_KEY, session.getAttribute(Constants.PARAM_SSH_SESSION_ID_KEY));
+            attributes.put(Constants.PARAM_HTTP_SESSION_ID_KEY, session.getAttribute(Constants.PARAM_HTTP_SESSION_ID_KEY));
         }
-        return super.beforeHandshake(request,response,wsHandler,attributes);
+        return super.beforeHandshake(request, response, wsHandler, attributes);
     }
 
     @Override
     public void afterHandshake(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler wsHandler, Exception exception) {
-        super.afterHandshake(request,response,wsHandler,exception);
+        super.afterHandshake(request, response, wsHandler, exception);
     }
 
 }

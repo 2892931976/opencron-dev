@@ -50,12 +50,12 @@ public class GroupService {
     private AgentService agentService;
 
     public PageBean<Group> getGroupPage(PageBean pageBean) {
-        pageBean = queryDao.getPageBySql(pageBean,Group.class,"SELECT G.*,U.userName FROM T_GROUP AS G INNER JOIN T_USER AS U ON G.userId=U.userId");
+        pageBean = queryDao.getPageBySql(pageBean, Group.class, "SELECT G.*,U.userName FROM T_GROUP AS G INNER JOIN T_USER AS U ON G.userId=U.userId");
         List<Group> groups = pageBean.getResult();
         if (CommonUtils.notEmpty(groups)) {
             String sql = "SELECT COUNT(1) FROM T_AGENT_GROUP WHERE groupId=?";
             for (Group group : groups) {
-                Long count = queryDao.getCountBySql(sql,group.getGroupId());
+                Long count = queryDao.getCountBySql(sql, group.getGroupId());
                 group.setAgentCount(count);
             }
         }
@@ -74,33 +74,33 @@ public class GroupService {
                 " ON A.agentId = T.agentId" +
                 " LEFT JOIN T_GROUP AS G" +
                 " ON T.groupId = G.groupId" +
-                " WHERE A.deleted=0 "+
+                " WHERE A.deleted=0 " +
                 " ORDER BY G.createTime ";
 
         Group noGroup = new Group();
         noGroup.setGroupName("未分组");
         noGroup.setGroupId(0L);
 
-        Map<Long,Group> groupMap = new HashMap<Long, Group>(0);
+        Map<Long, Group> groupMap = new HashMap<Long, Group>(0);
 
-        List<AgentGroupInfo> agentGroupInfos = queryDao.sqlQuery(AgentGroupInfo.class,sql);
-        if (CommonUtils.notEmpty(agentGroupInfos))  {
-            for(AgentGroupInfo agentGroup: agentGroupInfos){
+        List<AgentGroupInfo> agentGroupInfos = queryDao.sqlQuery(AgentGroupInfo.class, sql);
+        if (CommonUtils.notEmpty(agentGroupInfos)) {
+            for (AgentGroupInfo agentGroup : agentGroupInfos) {
                 Agent agent = new Agent();
                 agent.setAgentId(agentGroup.getAgentId());
                 agent.setName(agentGroup.getAgentName());
                 agent.setHost(agentGroup.getAgentHost());
 
-                if (agentGroup.getGroupId()==null) {
+                if (agentGroup.getGroupId() == null) {
                     noGroup.getAgents().add(agent);
-                }else {
+                } else {
                     if (groupMap.get(agentGroup.getGroupId()) == null) {
                         Group group = new Group();
                         group.setGroupId(agentGroup.getGroupId());
                         group.setGroupName(agentGroup.getGroupName());
                         group.getAgents().add(agent);
-                        groupMap.put(agentGroup.getGroupId(),group);
-                    }else {
+                        groupMap.put(agentGroup.getGroupId(), group);
+                    } else {
                         groupMap.get(agentGroup.getGroupId()).getAgents().add(agent);
                     }
                 }
@@ -109,7 +109,7 @@ public class GroupService {
 
         List<Group> groups = new ArrayList<Group>(0);
         groups.add(noGroup);
-        for(Map.Entry<Long,Group> entry:groupMap.entrySet()){
+        for (Map.Entry<Long, Group> entry : groupMap.entrySet()) {
             groups.add(entry.getValue());
         }
         return groups;
@@ -128,9 +128,9 @@ public class GroupService {
     }
 
     public Group getById(Long groupId) {
-        Group group = queryDao.get(Group.class,groupId);
+        Group group = queryDao.get(Group.class, groupId);
         String sql = "SELECT A.* FROM T_GROUP AS G INNER JOIN T_AGENT_GROUP AS T ON G.groupId = T.groupId AND G.groupId=? INNER JOIN T_AGENT AS A ON T.agentId = A.agentId";
-        List<Agent> agents = queryDao.sqlQuery(Agent.class,sql,groupId);
+        List<Agent> agents = queryDao.sqlQuery(Agent.class, sql, groupId);
         group.getAgents().addAll(agents);
         return group;
     }

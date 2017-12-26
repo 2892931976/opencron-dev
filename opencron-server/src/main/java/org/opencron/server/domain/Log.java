@@ -44,11 +44,11 @@ public class Log implements Serializable {
     private String receiver;
 
     @Lob
-    @Column(columnDefinition="TEXT")
+    @Column(columnDefinition = "TEXT")
     private String message;
 
     @Lob
-    @Column(columnDefinition="TEXT")
+    @Column(columnDefinition = "TEXT")
     private String result;
 
     private Date sendTime;

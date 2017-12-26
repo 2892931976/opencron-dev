@@ -45,6 +45,7 @@ public class OpencronRegistry implements InitializingBean, DisposableBean, Notif
 
     /**
      * 每台server启动起来都必须往注册中心注册信息...注册中心在重新统一分配任务到每台server上...
+     *
      * @throws Exception
      */
     public void afterPropertiesSet() throws Exception {

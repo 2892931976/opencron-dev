@@ -83,7 +83,7 @@ public class ExecuteService implements Job {
         JobInfo jobInfo = (JobInfo) jobExecutionContext.getJobDetail().getJobDataMap().get(key);
         try {
             ExecuteService executeService = (ExecuteService) jobExecutionContext.getJobDetail().getJobDataMap().get("jobBean");
-            boolean success = executeService.executeJob(jobInfo,ExecType.AUTO);
+            boolean success = executeService.executeJob(jobInfo, ExecType.AUTO);
             this.loggerInfo("[opencron] job:{} at {}:{},execute:{}", jobInfo, success ? "successful" : "failed");
         } catch (Exception e) {
             logger.error(e.getLocalizedMessage(), e);
@@ -93,14 +93,14 @@ public class ExecuteService implements Job {
     /**
      * 基本方式执行任务，按任务类型区分
      */
-    public boolean executeJob(final JobInfo job,Constants.ExecType execType) {
+    public boolean executeJob(final JobInfo job, Constants.ExecType execType) {
 
         JobType jobType = JobType.getJobType(job.getJobType());
         switch (jobType) {
             case SINGLETON:
                 return executeSingleJob(job, execType);//单一任务
             case FLOW:
-                return executeFlowJob(job,execType);//流程任务
+                return executeFlowJob(job, execType);//流程任务
             default:
                 return false;
         }
@@ -113,7 +113,7 @@ public class ExecuteService implements Job {
 
         if (!checkJobPermission(job.getAgentId(), job.getUserId())) return false;
 
-        Record record = new Record(job,execType);
+        Record record = new Record(job, execType);
         record.setJobType(JobType.SINGLETON.getCode());//单一任务
         try {
             //执行前先保存
@@ -147,7 +147,7 @@ public class ExecuteService implements Job {
     /**
      * 流程任务 按流程任务处理方式区分
      */
-    private boolean executeFlowJob(JobInfo job,ExecType execType) {
+    private boolean executeFlowJob(JobInfo job, ExecType execType) {
         if (!checkJobPermission(job.getAgentId(), job.getUserId())) return false;
 
         final long groupId = System.nanoTime() + Math.abs(new Random().nextInt());//分配一个流程组Id
@@ -157,9 +157,9 @@ public class ExecuteService implements Job {
         RunModel runModel = RunModel.getRunModel(job.getRunModel());
         switch (runModel) {
             case SEQUENCE:
-                return executeSequenceJob(groupId, jobQueue,execType);//串行任务
+                return executeSequenceJob(groupId, jobQueue, execType);//串行任务
             case SAMETIME:
-                return executeSameTimeJob(groupId, jobQueue,execType);//并行任务
+                return executeSameTimeJob(groupId, jobQueue, execType);//并行任务
             default:
                 return false;
         }
@@ -168,9 +168,9 @@ public class ExecuteService implements Job {
     /**
      * 串行任务处理方式
      */
-    private boolean executeSequenceJob(long groupId, Queue<JobInfo> jobQueue,ExecType execType) {
+    private boolean executeSequenceJob(long groupId, Queue<JobInfo> jobQueue, ExecType execType) {
         for (JobInfo jobInfo : jobQueue) {
-            if (!doFlowJob(jobInfo, groupId,execType)) {
+            if (!doFlowJob(jobInfo, groupId, execType)) {
                 return false;
             }
         }
@@ -180,7 +180,7 @@ public class ExecuteService implements Job {
     /**
      * 并行任务处理方式
      */
-    private boolean executeSameTimeJob(final long groupId, final Queue<JobInfo> jobQueue,final ExecType execType) {
+    private boolean executeSameTimeJob(final long groupId, final Queue<JobInfo> jobQueue, final ExecType execType) {
         final List<Boolean> result = new ArrayList<Boolean>(0);
 
         final Semaphore semaphore = new Semaphore(jobQueue.size());
@@ -192,7 +192,7 @@ public class ExecuteService implements Job {
                 public void run() {
                     try {
                         semaphore.acquire();
-                        result.add(doFlowJob(jobInfo, groupId,execType));
+                        result.add(doFlowJob(jobInfo, groupId, execType));
                         semaphore.release();
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -213,8 +213,8 @@ public class ExecuteService implements Job {
     /**
      * 流程任务（通用）执行过程
      */
-    private boolean doFlowJob(JobInfo job, long groupId,ExecType execType) {
-        Record record = new Record(job,execType);
+    private boolean doFlowJob(JobInfo job, long groupId, ExecType execType) {
+        Record record = new Record(job, execType);
         record.setGroupId(groupId);//组Id
         record.setJobType(JobType.FLOW.getCode());//流程任务
         record.setFlowNum(job.getFlowNum());
@@ -339,7 +339,7 @@ public class ExecuteService implements Job {
         }
 
         parentRecord.setStatus(RunStatus.RERUNNING.getStatus());
-        Record record = new Record(job,ExecType.RERUN);
+        Record record = new Record(job, ExecType.RERUN);
 
         try {
             recordService.merge(parentRecord);
@@ -433,14 +433,14 @@ public class ExecuteService implements Job {
                         recordService.merge(cord);
                         job = jobService.getJobInfoById(cord.getJobId());
                         //向远程机器发送kill指令
-                        caller.sentSync( Request.request(
-                                        job.getHost(),
-                                        job.getPort(),
-                                        Action.KILL,
-                                        job.getPassword(),
-                                        Constants.RPC_TIMEOUT,
-                                        job.getAgent().getProxyAgent()
-                        ).putParam(
+                        caller.sentSync(Request.request(
+                                job.getHost(),
+                                job.getPort(),
+                                Action.KILL,
+                                job.getPassword(),
+                                Constants.RPC_TIMEOUT,
+                                job.getAgent().getProxyAgent()
+                                ).putParam(
                                 Constants.PARAM_PID_KEY,
                                 cord.getPid())
                         );
@@ -479,7 +479,7 @@ public class ExecuteService implements Job {
      * 向执行器发送请求，并封装响应结果
      */
     private Response responseToRecord(final JobInfo job, final Record record) throws Exception {
-        Response response = caller.sentSync( Request.request(
+        Response response = caller.sentSync(Request.request(
                 job.getHost(),
                 job.getPort(),
                 Action.EXECUTE,
@@ -489,8 +489,8 @@ public class ExecuteService implements Job {
                 .putParam(Constants.PARAM_COMMAND_KEY, job.getCommand())
                 .putParam(Constants.PARAM_PID_KEY, record.getPid())
                 .putParam(Constants.PARAM_TIMEOUT_KEY, job.getTimeout() + "")
-                .putParam(Constants.PARAM_RUNAS_KEY,job.getRunAs())
-                .putParam(Constants.PARAM_SUCCESSEXIT_KEY,job.getSuccessExit())
+                .putParam(Constants.PARAM_RUNAS_KEY, job.getRunAs())
+                .putParam(Constants.PARAM_SUCCESSEXIT_KEY, job.getSuccessExit())
         );
 
         logger.info("[opencron]:execute response:{}", response.toString());
@@ -531,7 +531,7 @@ public class ExecuteService implements Job {
      */
     private void checkPing(JobInfo job, Record record) throws PingException {
         boolean ping = ping(job.getAgent());
-        if ( ! ping ) {
+        if (!ping) {
             record.setStatus(RunStatus.DONE.getStatus());//已完成
             record.setReturnCode(StatusCode.ERROR_PING.getValue());
 
@@ -557,7 +557,7 @@ public class ExecuteService implements Job {
                     agent.getProxyAgent()
             ));
 
-            return response!=null && response.isSuccess();
+            return response != null && response.isSuccess();
         } catch (Exception e) {
             logger.error("[opencron]ping failed,host:{},port:{}", agent.getHost(), agent.getPort());
             return false;
@@ -600,6 +600,7 @@ public class ExecuteService implements Job {
 
     /**
      * 扫描agenet机器上已有的crontab任务列表
+     *
      * @param agent
      * @return
      */
@@ -633,7 +634,7 @@ public class ExecuteService implements Job {
                     agent.getPassword(),
                     Constants.RPC_TIMEOUT,
                     agent.getProxyAgent()
-            ).putParam(
+                    ).putParam(
                     Constants.PARAM_NEWPASSWORD_KEY,
                     newPassword)
             );

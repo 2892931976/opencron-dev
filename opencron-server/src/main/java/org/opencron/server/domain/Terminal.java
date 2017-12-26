@@ -17,8 +17,6 @@
  * KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations
  * under the License.
- *
- *
  */
 package org.opencron.server.domain;
 
@@ -37,7 +35,7 @@ import java.util.Date;
 
 @Entity
 @Table(name = "T_TERMINAL")
-public class Terminal implements Serializable{
+public class Terminal implements Serializable {
 
     @Id
     @GeneratedValue
@@ -51,7 +49,7 @@ public class Terminal implements Serializable{
 
     @Lob
     @Column(columnDefinition = "BLOB")
-    @JSONField(serialize=false)
+    @JSONField(serialize = false)
     private byte[] authorization;
 
     private String status = AuthStatus.SUCCESS.status;
@@ -60,11 +58,11 @@ public class Terminal implements Serializable{
     private Date logintime;
 
     @Transient
-    @JSONField(serialize=false)
+    @JSONField(serialize = false)
     private User user;
 
     @Transient
-    @JSONField(serialize=false)
+    @JSONField(serialize = false)
     private String password;
 
     @Transient
@@ -136,7 +134,7 @@ public class Terminal implements Serializable{
     }
 
     public void setPassword(String password) throws Exception {
-        if (password!=null) {
+        if (password != null) {
             password = DigestUtils.passBase64(password);
         }
         this.authorization = RSAUtils.encryptByPublicKey(password.getBytes(), OpencronTools.Auth.getPublicKey());
@@ -223,7 +221,7 @@ public class Terminal implements Serializable{
         SUCCESS("success");
         public String status;
 
-        AuthStatus(String status){
+        AuthStatus(String status) {
             this.status = status;
         }
 

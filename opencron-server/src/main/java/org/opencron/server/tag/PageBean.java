@@ -77,7 +77,7 @@ public class PageBean<T> implements Serializable {
      * 获得当前页的页号,序号从1开始,默认为1.
      */
     public int getPageNo() {
-        return CommonUtils.toInt(pageNo,1);
+        return CommonUtils.toInt(pageNo, 1);
     }
 
     /**
@@ -85,7 +85,7 @@ public class PageBean<T> implements Serializable {
      */
     public void setPageNo(final Serializable pageNo) {
         this.pageNo = pageNo;
-        if (CommonUtils.toInt(pageNo,1) < 1) {
+        if (CommonUtils.toInt(pageNo, 1) < 1) {
             this.pageNo = 1;
         }
     }
@@ -94,7 +94,7 @@ public class PageBean<T> implements Serializable {
      * 获得每页的记录数量,默认为15.
      */
     public int getPageSize() {
-        return CommonUtils.toInt(this.pageSize,15);
+        return CommonUtils.toInt(this.pageSize, 15);
     }
 
     /**
@@ -103,7 +103,7 @@ public class PageBean<T> implements Serializable {
     public void setPageSize(final Serializable pageSize) {
         this.pageSize = pageSize;
 
-        if (CommonUtils.toInt(pageSize,15) < 1) {
+        if (CommonUtils.toInt(pageSize, 15) < 1) {
             this.pageSize = 1;
         }
     }
@@ -112,7 +112,7 @@ public class PageBean<T> implements Serializable {
      * 根据pageNo和pageSize计算当前页第一条记录在总结果集中的位置,序号从1开始.
      */
     public int getFirst() {
-        return ((CommonUtils.toInt(pageNo,1) - 1) * CommonUtils.toInt(pageSize,15)) + 1;
+        return ((CommonUtils.toInt(pageNo, 1) - 1) * CommonUtils.toInt(pageSize, 15)) + 1;
     }
 
     /**
@@ -133,21 +133,20 @@ public class PageBean<T> implements Serializable {
      * 是否已设置排序字段,无默认值.
      */
     public boolean isOrderBySetted() {
-        return CommonUtils.notEmpty(orderBy,order);
+        return CommonUtils.notEmpty(orderBy, order);
     }
 
     /**
      * 获得排序方向.
      */
     public String getOrder() {
-        return order == null?ASC:order.equals(ASC)?ASC:DESC;
+        return order == null ? ASC : order.equals(ASC) ? ASC : DESC;
     }
 
     /**
      * 设置排序方式向.
      *
-     * @param order
-     *            可选值为desc或asc,多个排序字段时用','分隔.
+     * @param order 可选值为desc或asc,多个排序字段时用','分隔.
      */
     public void setOrder(final String order) {
         this.order = StringUtils.lowerCase(order);
@@ -245,12 +244,12 @@ public class PageBean<T> implements Serializable {
             return CommonUtils.toInt(pageNo);
     }
 
-    public void verifyOrderBy(String defultOrderBy, String...orderBys) {
+    public void verifyOrderBy(String defultOrderBy, String... orderBys) {
         if (this.getOrderBy() == null) {
             this.setOrderBy(defultOrderBy);
-        }else {
+        } else {
             String orderBy = this.getOrderBy();
-            for(String field:orderBys){
+            for (String field : orderBys) {
                 if (orderBy.equals(field)) {
                     this.setOrderBy(orderBy);
                     return;

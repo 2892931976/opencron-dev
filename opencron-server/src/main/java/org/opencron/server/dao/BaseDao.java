@@ -51,6 +51,7 @@ public class BaseDao<T, PK extends Serializable> extends HibernateDao {
 
     /**
      * 获取实体
+     *
      * @param id
      * @return
      */
@@ -61,6 +62,7 @@ public class BaseDao<T, PK extends Serializable> extends HibernateDao {
 
     /**
      * 获取全部实体列表
+     *
      * @return
      */
     public List<T> getAll() {
@@ -86,6 +88,7 @@ public class BaseDao<T, PK extends Serializable> extends HibernateDao {
 
     /**
      * 删除实体
+     *
      * @param id
      */
     @Transactional(propagation = Propagation.REQUIRED, readOnly = false)
@@ -100,6 +103,7 @@ public class BaseDao<T, PK extends Serializable> extends HibernateDao {
 
     /**
      * 根据sql获取总数
+     *
      * @param sql 需要保证sql为查询总数的语句
      * @return
      */
@@ -110,6 +114,7 @@ public class BaseDao<T, PK extends Serializable> extends HibernateDao {
 
     /**
      * 执行count查询获得本次Hql查询所能获得的对象总数
+     *
      * @param hql
      * @param values
      * @return

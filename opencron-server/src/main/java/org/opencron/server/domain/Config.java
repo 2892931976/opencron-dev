@@ -34,8 +34,8 @@ import java.io.Serializable;
 public class Config implements Serializable {
 
     @Id
-    @GenericGenerator(name="gen_id",strategy="assigned")
-    @GeneratedValue(generator="gen_id")
+    @GenericGenerator(name = "gen_id", strategy = "assigned")
+    @GeneratedValue(generator = "gen_id")
     private Long configId;
     private String senderEmail;
     private String password;

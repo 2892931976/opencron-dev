@@ -70,7 +70,7 @@ public class RecordService {
                 sql += " AND R.jobId = " + recordInfo.getJobId() + " ";
             }
             if (notEmpty(queryTime)) {
-                sql += " AND date_format(R.startTime,'%Y-%m-%d')='"+queryTime+"'";
+                sql += " AND date_format(R.startTime,'%Y-%m-%d')='" + queryTime + "'";
             }
             if (notEmpty(recordInfo.getExecType())) {
                 sql += " AND R.execType = " + recordInfo.getExecType() + " ";
@@ -78,7 +78,7 @@ public class RecordService {
             if (status) {
                 sql += " AND IFNULL(R.flowNum,0) = 0 ";
             }
-            if (!OpencronTools.isPermission(session) ) {
+            if (!OpencronTools.isPermission(session)) {
                 User user = OpencronTools.getUser(session);
                 sql += " AND R.userId = " + user.getUserId() + " AND R.agentId in (" + user.getAgentIds() + ")";
             }
@@ -183,7 +183,7 @@ public class RecordService {
     public Record merge(Record record) {
         record = (Record) queryDao.merge(record);
         String sql = "UPDATE T_RECORD SET startTime=NOW() WHERE recordId=?";
-        queryDao.createSQLQuery(sql,record.getRecordId()).executeUpdate();
+        queryDao.createSQLQuery(sql, record.getRecordId()).executeUpdate();
         return record;
     }
 
@@ -283,7 +283,7 @@ public class RecordService {
             User user = OpencronTools.getUser(session);
             sql += " AND userId = " + user.getUserId() + " AND agentid IN (" + user.getAgentIds() + ")";
         }
-        return queryDao.getCountBySql(sql, 1, execType.getStatus(), Constants.RunStatus.STOPED.getStatus(),Constants.RunStatus.DONE.getStatus(),Constants.RunStatus.RERUNDONE.getStatus());
+        return queryDao.getCountBySql(sql, 1, execType.getStatus(), Constants.RunStatus.STOPED.getStatus(), Constants.RunStatus.DONE.getStatus(), Constants.RunStatus.RERUNDONE.getStatus());
     }
 
     @Transactional

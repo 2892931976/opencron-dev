@@ -298,7 +298,7 @@ public class JobController extends BaseController {
         job.setUserId(userId);
         job.setAgent(agentService.getAgent(job.getAgentId()));
         try {
-            this.executeService.executeJob(job,Constants.ExecType.OPERATOR);
+            this.executeService.executeJob(job, Constants.ExecType.OPERATOR);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -350,7 +350,7 @@ public class JobController extends BaseController {
                         continue;
                     }
                     String cron = cronBuilder.toString().trim();
-                    CrontabInfo crontabInfo = new CrontabInfo(++index,cron, cmd);
+                    CrontabInfo crontabInfo = new CrontabInfo(++index, cron, cmd);
                     crontabs.add(crontabInfo);
                 }
             }

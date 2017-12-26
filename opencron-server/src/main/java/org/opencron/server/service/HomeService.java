@@ -110,12 +110,12 @@ public class HomeService {
 
     public List<LogInfo> getUnReadMessage(HttpSession session) {
         String sql = "SELECT * FROM T_LOG WHERE isRead=0 AND type=?  and userId = ? ORDER BY sendTime DESC LIMIT 5 ";
-        return queryDao.sqlQuery(LogInfo.class, sql,Constants.MsgType.WEBSITE.getValue(),OpencronTools.getUserId(session));
+        return queryDao.sqlQuery(LogInfo.class, sql, Constants.MsgType.WEBSITE.getValue(), OpencronTools.getUserId(session));
     }
 
     public Long getUnReadCount(HttpSession session) {
         String sql = "SELECT COUNT(1) FROM T_LOG WHERE isRead=0 AND type=? and userId = ?";
-        return queryDao.getCountBySql(sql,Constants.MsgType.WEBSITE.getValue(),OpencronTools.getUserId(session));
+        return queryDao.getCountBySql(sql, Constants.MsgType.WEBSITE.getValue(), OpencronTools.getUserId(session));
     }
 
     public void saveLog(Log log) {

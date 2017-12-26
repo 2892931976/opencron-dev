@@ -39,7 +39,7 @@ public class UploadDao extends BaseDao {
 
     public User uploadimg(File file, Long userId) throws IOException {
         Session session = getSession();
-        User loginUser =  get(User.class,userId);
+        User loginUser = get(User.class, userId);
         loginUser.setHeaderpic(Hibernate.getLobCreator(session).createBlob(IOUtils.readFileToArray(file)));
         //图像文件的后缀名
         loginUser.setPicExtName(file.getName().substring(file.getName().lastIndexOf(".")));

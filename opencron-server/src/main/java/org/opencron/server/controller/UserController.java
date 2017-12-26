@@ -82,17 +82,17 @@ public class UserController extends BaseController {
         return "/user/add";
     }
 
-    @RequestMapping(value = "add.do",method= RequestMethod.POST)
+    @RequestMapping(value = "add.do", method = RequestMethod.POST)
     public String add(HttpSession session, User user) {
         userService.addUser(user);
         return "redirect:/user/view.htm?csrf=" + OpencronTools.getCSRF(session);
     }
 
     @RequestMapping("edit/{id}.htm")
-    public String editPage(HttpSession session, Model model,@PathVariable("id") Long id) {
+    public String editPage(HttpSession session, Model model, @PathVariable("id") Long id) {
         if (!OpencronTools.isPermission(session)
                 && !OpencronTools.getUserId(session).equals(id)) {
-            return  String.format("redirect:/user/detail/%d.htm?csrf=%s",id,OpencronTools.getCSRF(session));
+            return String.format("redirect:/user/detail/%d.htm?csrf=%s", id, OpencronTools.getCSRF(session));
         }
 
         User user = userService.queryUserById(id);
@@ -105,7 +105,7 @@ public class UserController extends BaseController {
         return "/user/edit";
     }
 
-    @RequestMapping(value = "edit.do",method= RequestMethod.POST)
+    @RequestMapping(value = "edit.do", method = RequestMethod.POST)
     public String edit(HttpSession session, User user) throws SchedulerException {
         User user1 = userService.getUserById(user.getUserId());
         if (notEmpty(user.getRoleId()) && OpencronTools.isPermission(session)) {
@@ -118,22 +118,22 @@ public class UserController extends BaseController {
         user1.setQq(user.getQq());
         user1.setModifyTime(new Date());
         userService.updateUser(user1);
-        return String.format("redirect:/user/view.htm?csrf=%s",OpencronTools.getCSRF(session));
+        return String.format("redirect:/user/view.htm?csrf=%s", OpencronTools.getCSRF(session));
     }
 
-    @RequestMapping(value = "get.do",method= RequestMethod.POST)
+    @RequestMapping(value = "get.do", method = RequestMethod.POST)
     public void get(HttpServletResponse response, Long id) {
         User user = userService.queryUserById(id);
         writeJson(response, JSON.toJSONString(user));
     }
 
-    @RequestMapping(value = "pwd.do",method= RequestMethod.POST)
+    @RequestMapping(value = "pwd.do", method = RequestMethod.POST)
     @ResponseBody
     public String pwd(Long id, String pwd0, String pwd1, String pwd2) {
         return userService.editPwd(id, pwd0, pwd1, pwd2);
     }
 
-    @RequestMapping(value = "checkname.do",method= RequestMethod.POST)
+    @RequestMapping(value = "checkname.do", method = RequestMethod.POST)
     @ResponseBody
     public boolean checkName(String name) {
         return !userService.existsName(name);

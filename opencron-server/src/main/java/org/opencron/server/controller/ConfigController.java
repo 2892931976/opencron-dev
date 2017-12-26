@@ -63,7 +63,7 @@ public class ConfigController extends BaseController {
         return "config/edit";
     }
 
-    @RequestMapping(value = "edit.do",method= RequestMethod.POST)
+    @RequestMapping(value = "edit.do", method = RequestMethod.POST)
     public String edit(HttpSession session, Config config) {
         Config cfg = configService.getSysConfig();
         cfg.setSenderEmail(config.getSenderEmail());
@@ -78,17 +78,17 @@ public class ConfigController extends BaseController {
         return "redirect:/config/view.htm?csrf=" + OpencronTools.getCSRF(session);
     }
 
-    @RequestMapping(value = "clear.do",method= RequestMethod.POST)
+    @RequestMapping(value = "clear.do", method = RequestMethod.POST)
     @ResponseBody
     public boolean clearRecord(String startTime, String endTime) {
         recordService.deleteRecordBetweenTime(startTime, endTime);
         return true;
     }
 
-    @RequestMapping(value = "skin.do",method= RequestMethod.POST)
+    @RequestMapping(value = "skin.do", method = RequestMethod.POST)
     @ResponseBody
-    public boolean skin(String skin,HttpSession session) {
-        session.setAttribute(Constants.PARAM_SKIN_NAME_KEY,skin);
+    public boolean skin(String skin, HttpSession session) {
+        session.setAttribute(Constants.PARAM_SKIN_NAME_KEY, skin);
         return true;
     }
 

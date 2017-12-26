@@ -93,7 +93,7 @@ public class JobService {
         return jobs;
     }
 
-    public List<JobInfo> getJobInfoByAgentId(Long agentId,CronType cronType) {
+    public List<JobInfo> getJobInfoByAgentId(Long agentId, CronType cronType) {
         String sql = "SELECT T.*,D.name AS agentName,D.port,D.host,D.password FROM T_JOB AS T " +
                 "INNER JOIN T_AGENT D " +
                 "ON T.agentId = D.agentId " +
@@ -102,7 +102,7 @@ public class JobService {
                 "AND T.deleted=0 " +
                 "AND D.agentId=? ";
 
-        List<JobInfo> jobs = queryDao.sqlQuery(JobInfo.class, sql, cronType.getType(),agentId);
+        List<JobInfo> jobs = queryDao.sqlQuery(JobInfo.class, sql, cronType.getType(), agentId);
         queryJobMore(jobs);
         return jobs;
     }
@@ -378,9 +378,9 @@ public class JobService {
 
         Job job = this.getJob(jobBean.getJobId());
 
-        if (jobBean.getPause()==null) return false;
+        if (jobBean.getPause() == null) return false;
 
-        if ( job.getPause()!=null && jobBean.getPause().equals(job.getPause())) {
+        if (job.getPause() != null && jobBean.getPause().equals(job.getPause())) {
             return false;
         }
 
@@ -392,30 +392,30 @@ public class JobService {
                     if (jobBean.getPause()) {
                         //暂停任务
                         schedulerService.pause(jobBean.getJobId());
-                    }else {
+                    } else {
                         //恢复任务
                         schedulerService.resume(jobBean.getJobId());
                     }
                     job.setPause(jobBean.getPause());
                     merge(job);
                     return true;
-                }catch (SchedulerException e) {
-                    logger.error("[opencron] pauseQuartzJob error:{}",e.getLocalizedMessage());
+                } catch (SchedulerException e) {
+                    logger.error("[opencron] pauseQuartzJob error:{}", e.getLocalizedMessage());
                     return false;
                 }
             case CRONTAB:
                 try {
                     if (jobBean.getPause()) {
                         opencronCollector.removeTask(jobBean.getJobId());
-                    }else {
+                    } else {
                         JobInfo jobInfo = getJobInfoById(job.getJobId());
                         opencronCollector.addTask(jobInfo);
                     }
                     job.setPause(jobBean.getPause());
                     merge(job);
                     return true;
-                }catch (Exception e) {
-                    logger.error("[opencron] pauseCrontabJob error:{}",e.getLocalizedMessage());
+                } catch (Exception e) {
+                    logger.error("[opencron] pauseCrontabJob error:{}", e.getLocalizedMessage());
                     return false;
                 }
         }

@@ -66,7 +66,7 @@ public class AgentService {
     private ConfigService configService;
 
     public List<Agent> getAgentByConnType(Constants.ConnType connType) {
-        return queryDao.hqlQuery("FROM Agent WHERE deleted=? AND status = ? AND proxy =?",false,true,connType.getType());
+        return queryDao.hqlQuery("FROM Agent WHERE deleted=? AND status = ? AND proxy =?", false, true, connType.getType());
     }
 
     public List<Agent> getAll() {
@@ -79,16 +79,16 @@ public class AgentService {
 
 
     private synchronized void flushAgent() {
-        OpencronTools.CACHE.put(Constants.PARAM_CACHED_AGENT_ID_KEY, queryDao.hqlQuery("FROM Agent WHERE deleted=?",false));
+        OpencronTools.CACHE.put(Constants.PARAM_CACHED_AGENT_ID_KEY, queryDao.hqlQuery("FROM Agent WHERE deleted=?", false));
     }
 
     public List<Agent> getOwnerAgentByConnStatus(HttpSession session, Constants.ConnStatus status) {
         String hql = "from Agent Where deleted=? AND status=?";
-        if ( !OpencronTools.isPermission(session)) {
+        if (!OpencronTools.isPermission(session)) {
             User user = OpencronTools.getUser(session);
             hql += " AND agentId in (" + user.getAgentIds() + ")";
         }
-        return queryDao.hqlQuery(hql,false,status.isValue());
+        return queryDao.hqlQuery(hql, false, status.isValue());
     }
 
     public PageBean getOwnerAgent(HttpSession session, PageBean pageBean) {
@@ -146,7 +146,7 @@ public class AgentService {
             /**
              * 获取该执行器下所有的自动执行,并且是quartz类型的作业
              */
-            List<JobInfo> jobInfos = jobService.getJobInfoByAgentId(agent.getAgentId(),Constants.CronType.QUARTZ);
+            List<JobInfo> jobInfos = jobService.getJobInfoByAgentId(agent.getAgentId(), Constants.CronType.QUARTZ);
             try {
                 schedulerService.put(jobInfos, this.executeService);
             } catch (SchedulerException e) {
@@ -156,7 +156,7 @@ public class AgentService {
                 throw new RuntimeException(e.getCause());
             }
         } else {
-           agent = (Agent) queryDao.merge(agent);
+            agent = (Agent) queryDao.merge(agent);
         }
 
         /**
@@ -251,7 +251,7 @@ public class AgentService {
     public Agent getAgentByMachineId(String machineId) {
         String sql = "SELECT * FROM T_AGENT WHERE deleted=0 AND machineId=?";
         //不能保证macId的唯一性,可能两台机器存在同样的macId,这种概率可以忽略不计,这里为了程序的健壮性...
-        List<Agent> agents = queryDao.sqlQuery(Agent.class,sql,machineId);
+        List<Agent> agents = queryDao.sqlQuery(Agent.class, sql, machineId);
         if (CommonUtils.notEmpty(agents)) {
             return agents.get(0);
         }
@@ -259,8 +259,8 @@ public class AgentService {
     }
 
     public List<Agent> getAgentByIds(String agentIds) {
-        String sql = String.format("SELECT * FROM T_AGENT WHERE agentId IN (%s)",agentIds);
-        return queryDao.sqlQuery(Agent.class,sql);
+        String sql = String.format("SELECT * FROM T_AGENT WHERE agentId IN (%s)", agentIds);
+        return queryDao.sqlQuery(Agent.class, sql);
     }
 
     public void doDisconnect(Agent agent) {

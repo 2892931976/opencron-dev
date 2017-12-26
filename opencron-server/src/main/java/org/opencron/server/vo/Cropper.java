@@ -35,7 +35,7 @@ public class Cropper implements Serializable {
     private int rotate;
 
     public Integer getX() {
-        return x==null?null:x.intValue();
+        return x == null ? null : x.intValue();
     }
 
     public void setX(Double x) {
@@ -43,7 +43,7 @@ public class Cropper implements Serializable {
     }
 
     public Integer getY() {
-        return y==null?null:y.intValue();
+        return y == null ? null : y.intValue();
     }
 
     public void setY(Double y) {
@@ -51,7 +51,7 @@ public class Cropper implements Serializable {
     }
 
     public Integer getWidth() {
-        return width==null?null:width.intValue();
+        return width == null ? null : width.intValue();
     }
 
     public void setWidth(Double width) {
@@ -59,7 +59,7 @@ public class Cropper implements Serializable {
     }
 
     public Integer getHeight() {
-        return height==null?null:height.intValue();
+        return height == null ? null : height.intValue();
     }
 
     public void setHeight(Double height) {

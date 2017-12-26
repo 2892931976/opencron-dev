@@ -158,7 +158,7 @@ public class TerminalService {
             return "error";
         }
         int count = queryDao.createSQLQuery("DELETE FROM T_TERMINAL WHERE id=?", term.getId()).executeUpdate();
-        return String.valueOf(count>0);
+        return String.valueOf(count > 0);
     }
 
     public void login(Terminal terminal) {

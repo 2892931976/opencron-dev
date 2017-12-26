@@ -78,7 +78,6 @@ public class JettyLauncher implements Launcher {
         appContext.setClassLoader(Thread.currentThread().getContextClassLoader());
 
 
-
         ServerConnector connector = new ServerConnector(server);
         connector.setHost("0.0.0.0");
         connector.setPort(port);

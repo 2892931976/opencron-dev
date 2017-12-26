@@ -34,6 +34,7 @@ public class QueryDao extends BaseDao {
 
     /**
      * 获取分页结果,
+     *
      * @param beanClass 支持任意Bean，按结果集映射
      * @return
      */

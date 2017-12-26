@@ -71,7 +71,7 @@ public class User implements Serializable {
     private String headerPath;
 
     //头像文件的后缀名字
-    private  String picExtName;
+    private String picExtName;
 
     public Long getUserId() {
         return userId;

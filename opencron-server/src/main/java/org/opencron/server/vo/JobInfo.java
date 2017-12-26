@@ -90,11 +90,12 @@ public class JobInfo implements Serializable {
 
     private Boolean deleted;
 
-    public JobInfo(){}
+    public JobInfo() {
+    }
 
     public JobInfo(Long userId, String command, Agent agent) {
         this.jobId = 0L;
-        this.jobName = agent.getName()+"-batchJob";
+        this.jobName = agent.getName() + "-batchJob";
         this.userId = userId;
         this.command = command;
         this.agent = agent;
@@ -340,7 +341,7 @@ public class JobInfo implements Serializable {
     }
 
     public Integer getTimeout() {
-        return timeout == null?0:timeout;
+        return timeout == null ? 0 : timeout;
     }
 
     public void setTimeout(Integer timeout) {

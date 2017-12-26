@@ -48,7 +48,7 @@ public class ConfigService {
         return queryDao.sqlUniqueQuery(Config.class, "SELECT * FROM T_CONFIG WHERE configId = 1");
     }
 
-    
+
     public void update(Config config) {
         queryDao.save(config);
     }

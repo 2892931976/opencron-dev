@@ -26,7 +26,7 @@ public class Group {
     @ManyToMany(cascade = {CascadeType.MERGE})
     @JoinTable(
             name = "T_AGENT_GROUP",
-            joinColumns =@JoinColumn(name = "groupId"),
+            joinColumns = @JoinColumn(name = "groupId"),
             inverseJoinColumns = @JoinColumn(name = "agentId")
     )
     private Set<Agent> agents = new HashSet<Agent>(0);

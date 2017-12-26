@@ -38,8 +38,8 @@ import java.io.Serializable;
 public class Role implements Serializable {
 
     @Id
-    @GenericGenerator(name="gen_id",strategy="assigned")
-    @GeneratedValue(generator="gen_id")
+    @GenericGenerator(name = "gen_id", strategy = "assigned")
+    @GeneratedValue(generator = "gen_id")
     private Long roleId;
 
     private String roleName;

@@ -62,7 +62,7 @@ public class RecordController extends BaseController {
      * @param model
      * @return
      */
-     @RequestMapping("done.htm")
+    @RequestMapping("done.htm")
     public String queryDone(HttpSession session, PageBean pageBean, RecordInfo recordInfo, String queryTime, Model model) {
 
         model.addAttribute("agents", agentService.getOwnerAgents(session));
@@ -95,7 +95,7 @@ public class RecordController extends BaseController {
         return "/record/done";
     }
 
-     @RequestMapping("running.htm")
+    @RequestMapping("running.htm")
     public String queryRunning(HttpSession session, PageBean pageBean, RecordInfo recordInfo, String queryTime, Model model, Boolean refresh) {
 
         model.addAttribute("agents", agentService.getOwnerAgents(session));
@@ -117,16 +117,16 @@ public class RecordController extends BaseController {
             model.addAttribute("execType", recordInfo.getExecType());
         }
         recordService.query(session, pageBean, recordInfo, queryTime, false);
-        return refresh==null?"/record/running":"/record/refresh";
+        return refresh == null ? "/record/running" : "/record/refresh";
     }
 
-     @RequestMapping("refresh.htm")
+    @RequestMapping("refresh.htm")
     public String refresh(HttpSession session, PageBean pageBean, RecordInfo recordInfo, String queryTime, Model model) {
-        return this.queryRunning(session,pageBean, recordInfo,queryTime,model,true);
+        return this.queryRunning(session, pageBean, recordInfo, queryTime, model, true);
     }
 
-     @RequestMapping("detail/{id}.htm")
-    public String showDetail(Model model,@PathVariable("id") Long id) {
+    @RequestMapping("detail/{id}.htm")
+    public String showDetail(Model model, @PathVariable("id") Long id) {
         RecordInfo recordInfo = recordService.getDetailById(id);
         if (recordInfo == null) {
             return "/error/404";
@@ -135,7 +135,7 @@ public class RecordController extends BaseController {
         return "/record/detail";
     }
 
-    @RequestMapping(value = "kill.do",method= RequestMethod.POST)
+    @RequestMapping(value = "kill.do", method = RequestMethod.POST)
     @ResponseBody
     public boolean kill(HttpSession session, Long recordId) {
         Record record = recordService.get(recordId);
