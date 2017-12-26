@@ -657,7 +657,7 @@ public class ExecuteService implements Job {
                         agent.getPassword(),
                         Constants.RPC_TIMEOUT,
                         agent.getProxyAgent()
-                ).setParams(ParamsMap.instance().fill("connType", ConnType.getByType(agent.getProxy()).getName())));
+                ).setParams(ParamsMap.map().set("connType", ConnType.getByType(agent.getProxy()).getName())));
     }
 
     /**

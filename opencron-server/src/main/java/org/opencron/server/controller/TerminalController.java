@@ -23,6 +23,7 @@ package org.opencron.server.controller;
 
 import org.opencron.common.Constants;
 import org.opencron.common.util.CommonUtils;
+import org.opencron.common.util.collection.ParamsMap;
 import org.opencron.server.domain.Terminal;
 import org.opencron.server.domain.User;
 
@@ -67,7 +68,6 @@ public class TerminalController extends BaseController {
         User user = OpencronTools.getUser(session);
 
         terminal = termService.getById(terminal.getId());
-        Map<String, String> map = new HashMap<String, String>(0);
 
         Terminal.AuthStatus authStatus = termService.auth(terminal);
         //登陆认证成功
@@ -76,13 +76,14 @@ public class TerminalController extends BaseController {
             terminal.setUser(user);
             TerminalContext.put(token, terminal);
             OpencronTools.setSshSessionId(session, token);
-            map.put("status", "success");
-            map.put("url", "/terminal/open.htm?token=" + token + "&csrf=" + OpencronTools.getCSRF(session));
+
+            return ParamsMap.map().put(
+                    "status","success",
+                    "url", String.format("/terminal/open.htm?token=%s&csrf=%s",token,OpencronTools.getCSRF(session))
+            );
         } else {
-            //重新输入密码进行认证...
-            map.put("status", authStatus.status);
+            return ParamsMap.map().set("status",authStatus.status);
         }
-        return map;
     }
 
     @RequestMapping("ssh2.htm")

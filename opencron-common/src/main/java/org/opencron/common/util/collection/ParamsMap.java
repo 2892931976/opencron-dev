@@ -35,7 +35,7 @@ public class ParamsMap<K, V> extends HashMap<K, V> implements Map<K, V> {
 
     private Map<K, V> map = new HashMap<K, V>(0);
 
-    public static ParamsMap instance() {
+    public static ParamsMap map() {
         return new ParamsMap();
     }
 
@@ -248,7 +248,7 @@ public class ParamsMap<K, V> extends HashMap<K, V> implements Map<K, V> {
         this.map.putAll(m);
     }
 
-    public ParamsMap fill(K key, V val) {
+    public ParamsMap set(K key, V val) {
         map.put(key, val);
         return this;
     }
@@ -260,7 +260,7 @@ public class ParamsMap<K, V> extends HashMap<K, V> implements Map<K, V> {
     public static void main(String[] args) {
         ParamsMap paramsMap = new ParamsMap();
         ParamsMap<Integer, Object> map = paramsMap.put("A", "B", "2", "d", 4, "55", new Date(), "ff");
-        map.fill(1, "ddd").fill("2", "fdafds").fill(444, 666);
+        map.set(1, "ddd").set("2", "fdafds").set(444, 666);
         for (Map.Entry<Integer, Object> entry : map.entrySet()) {
             System.out.println(entry.getKey() + "_____" + entry.getValue() + "____" + entry.getValue().getClass());
         }
