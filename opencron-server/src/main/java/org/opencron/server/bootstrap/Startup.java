@@ -33,6 +33,7 @@ import static org.fusesource.jansi.Ansi.Color.*;
 
 import java.io.File;
 import java.net.URL;
+import java.util.concurrent.Executors;
 
 /**
  * @author benjobs
@@ -93,9 +94,18 @@ public class Startup {
         //load jars.
         ClassLoaderUtils.loadJars(jarPath);
 
-        Launcher startLauncher = ExtensionLoader.load(Launcher.class, launcherType.getName());
+        final Launcher startLauncher = ExtensionLoader.load(Launcher.class, launcherType.getName());
 
-        startLauncher.start(devMode, startPort);
+        Executors.newSingleThreadExecutor().submit(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    startLauncher.start(devMode, startPort);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
 
     }
 
