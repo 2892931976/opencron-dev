@@ -79,7 +79,7 @@ public class JettyLauncher implements Launcher {
 
 
         ServerConnector connector = new ServerConnector(server);
-        connector.setHost("0.0.0.0");
+        connector.setHost("localhost");
         connector.setPort(port);
 
         server.setConnectors(new Connector[]{connector});
