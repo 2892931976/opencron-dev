@@ -31,8 +31,16 @@
             </list>
         </property>
     </bean>
+
     <!--Json 视图-->
-    <bean id="jsonHttpMessageConverter" class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter"/>
+    <bean id="jsonHttpMessageConverter" class="com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter">
+        <property name="supportedMediaTypes">
+            <list>
+                <value>text/html;charset=UTF-8</value>
+                <value>application/json</value>
+            </list>
+        </property>
+    </bean>
 
     <mvc:annotation-driven/>
     <mvc:resources mapping="/static/**" location="/static/"/>
@@ -45,7 +53,6 @@
             <bean class="org.opencron.server.handler.SecurityHandlerInterceptor" />
         </mvc:interceptor>
     </mvc:interceptors>
-
 
     <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
         <property name="viewClass" value="org.springframework.web.servlet.view.JstlView" />

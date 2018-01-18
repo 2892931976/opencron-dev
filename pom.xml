@@ -73,7 +73,6 @@
         <protostuff.version>1.0.12</protostuff.version>
         <kryo.version>4.0.0</kryo.version>
         <fst.version>2.50</fst.version>
-        <jackson.version>2.9.2</jackson.version>
         <fastjson.version>1.2.31</fastjson.version>
         <msgpack.version>0.8.12</msgpack.version>
         <zookeeper.version>3.4.11</zookeeper.version>
@@ -625,18 +624,6 @@
                 <groupId>com.dyuproject.protostuff</groupId>
                 <artifactId>protostuff-runtime</artifactId>
                 <version>1.0.12</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.fasterxml.jackson.core</groupId>
-                <artifactId>jackson-core</artifactId>
-                <version>${jackson.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.fasterxml.jackson.module</groupId>
-                <artifactId>jackson-module-jaxb-annotations</artifactId>
-                <version>${jackson.version}</version>
             </dependency>
 
             <dependency>
