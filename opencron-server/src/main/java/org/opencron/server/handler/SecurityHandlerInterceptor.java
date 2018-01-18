@@ -26,7 +26,6 @@ package org.opencron.server.handler;
 import org.opencron.common.Constants;
 import org.opencron.common.util.CommonUtils;
 import org.opencron.common.util.CookieUtils;
-import org.opencron.common.util.StringUtils;
 import org.opencron.server.domain.User;
 import org.opencron.server.job.OpencronTools;
 import org.slf4j.Logger;
@@ -36,10 +35,6 @@ import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 import javax.servlet.http.*;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Map;
 
 /**
  * 登陆权限拦截器
@@ -50,8 +45,6 @@ public class SecurityHandlerInterceptor extends HandlerInterceptorAdapter {
     private static final Logger logger = LoggerFactory.getLogger(SecurityHandlerInterceptor.class);
 
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-
-        request = new XssHttpServletRequest(request);
 
         request.setAttribute("uri", request.getRequestURI());
 
@@ -144,85 +137,6 @@ public class SecurityHandlerInterceptor extends HandlerInterceptorAdapter {
             return false;
         }
         return requestCSRF.equals(sessionCSRF);
-    }
-
-
-    class XssHttpServletRequest extends HttpServletRequestWrapper {
-
-        public XssHttpServletRequest(HttpServletRequest servletRequest) {
-            super(servletRequest);
-        }
-
-        public String[] getParameterValues(String parameter) {
-            String[] values = super.getParameterValues(parameter);
-            if (values == null) {
-                return null;
-            }
-            int count = values.length;
-            String[] encodedValues = new String[count];
-            for (int i = 0; i < count; i++) {
-                encodedValues[i] = cleanXSS(values[i]);
-            }
-            return encodedValues;
-        }
-
-        public Map getParameterMap() {
-            Map<String, String[]> map = super.getParameterMap();
-            for (Map.Entry<String, String[]> entry : map.entrySet()) {
-                String[] values = entry.getValue();
-                for (int i = 0; i < values.length; i++) {
-                    values[i] = cleanXSS(values[i]);
-                }
-                map.put(entry.getKey(), values);
-            }
-            return map;
-        }
-
-        public Enumeration getParameterNames() {
-
-            class MyEnumeration implements Enumeration {
-                private int count;
-                private int length;
-                private Object[] data;
-
-                MyEnumeration(Object[] data) {
-                    this.count = 0;
-                    this.length = data.length;
-                    this.data = data;
-                }
-
-                @Override
-                public boolean hasMoreElements() {
-                    return (count < length);
-                }
-
-                @Override
-                public Object nextElement() {
-                    return data[count++];
-                }
-            }
-            Enumeration enumeration = super.getParameterNames();
-            List<Object> list = new ArrayList<Object>();
-            while (enumeration.hasMoreElements()) {
-                Object value = enumeration.nextElement();
-                value = cleanXSS((String) value);
-                list.add(value);
-            }
-            return new MyEnumeration(list.toArray());
-        }
-
-        public String getParameter(String parameter) {
-            String value = super.getParameter(parameter);
-            if (value == null) {
-                return null;
-            }
-            return cleanXSS(value);
-        }
-
-        private String cleanXSS(String value) {
-            if (value == null) return null;
-            return StringUtils.htmlEncode(value);
-        }
     }
 
 
