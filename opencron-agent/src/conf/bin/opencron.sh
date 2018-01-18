@@ -204,9 +204,10 @@ if [ -z "$OPENCRON_TMPDIR" ] ; then
 fi
 
 OPENCRON_PIDDIR="/var/run";
- if [ ! -x "$OPENCRON_PIDDIR" ] ; then
-   mkdir $OPENCRON_PIDDIR;
- fi
+if [ ! -d "$OPENCRON_PIDDIR" ] ; then
+    mkdir $OPENCRON_PIDDIR;
+fi
+
 OPENCRON_PID="$OPENCRON_PIDDIR/opencron.pid";
 
 #opencron version
@@ -353,7 +354,7 @@ case "$1" in
         >> "$OPENCRON_OUT" 2>&1 "&";
 
       if [ ! -z "$OPENCRON_PID" ]; then
-        echo $! > "$OPENCRON_PID"
+         echo +x $! > "$OPENCRON_PID"
       fi
       echo_g "opencron started."
       exit $?
@@ -392,7 +393,7 @@ case "$1" in
                 echo_r "PID file is empty and has been ignored."
               fi
             else
-              echo_r "\$OPENCRON_PID was set but the specified file does not exist. Is opencron running? Stop aborted."
+              echo_r "$OPENCRON_PID was set but the specified file does not exist. Is opencron running? Stop aborted."
               exit 1
             fi
           fi
