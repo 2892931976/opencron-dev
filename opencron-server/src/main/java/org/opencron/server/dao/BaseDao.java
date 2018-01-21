@@ -24,6 +24,7 @@ package org.opencron.server.dao;
 
 import org.opencron.common.util.CommonUtils;
 import org.opencron.common.util.ReflectUtils;
+import org.opencron.common.util.collection.ParamsMap;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,6 +33,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static org.opencron.common.util.CommonUtils.toInt;
 import static org.opencron.common.util.CommonUtils.toLong;
 
 
@@ -112,18 +114,6 @@ public class BaseDao<T, PK extends Serializable> extends HibernateDao {
         return toLong(result);
     }
 
-    /**
-     * 执行count查询获得本次Hql查询所能获得的对象总数
-     *
-     * @param hql
-     * @param values
-     * @return
-     */
-    public Long getCountByHql(String hql, final Object... values) {
-        hql = preparedCount(hql);
-        return toLong(createQuery(hql, values).uniqueResult());
-    }
-
     public static String preparedCount(String sql) {
         Pattern pattern = Pattern.compile("\\((.*?)\\)");
         Matcher matcher = pattern.matcher(sql);
@@ -149,4 +139,13 @@ public class BaseDao<T, PK extends Serializable> extends HibernateDao {
         return sql;
     }
 
+    public Long hqlLongUniqueResult(String hql, Object... params) {
+        Object result = createQuery(hql,params).uniqueResult();
+        return result==null?null:toLong(result);
+    }
+
+    public Integer hqlIntUniqueResult(String hql, Object... params) {
+        Object result = createQuery(hql,params).uniqueResult();
+        return result==null?null:toInt(result);
+    }
 }

@@ -21,6 +21,7 @@ function ajax(params,successCallback,errorCallBack) {
         type:  params.type||"GET",
         url:params.url,
         data:params.data||{},
+        dataType:params.dataType||"json",
         success:function (data) {
             if (successCallback) {
                 successCallback(data);

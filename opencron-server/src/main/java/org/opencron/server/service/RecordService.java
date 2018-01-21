@@ -22,8 +22,14 @@
 
 package org.opencron.server.service;
 
+import org.apache.commons.collections.ArrayStack;
 import org.opencron.common.Constants;
+import org.opencron.common.util.CommandUtils;
+import org.opencron.common.util.CommonUtils;
+import org.opencron.common.util.StringUtils;
+import org.opencron.common.util.collection.ParamsMap;
 import org.opencron.server.dao.QueryDao;
+import org.opencron.server.domain.Job;
 import org.opencron.server.domain.Record;
 import org.opencron.server.job.OpencronTools;
 import org.opencron.server.domain.User;
@@ -35,9 +41,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpSession;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import static org.opencron.common.util.CommonUtils.notEmpty;
+import static org.opencron.common.util.CommonUtils.toLong;
 
 @Service
 @Transactional
@@ -45,6 +54,9 @@ public class RecordService {
 
     @Autowired
     private QueryDao queryDao;
+
+    @Autowired
+    private JobService jobService;
 
     public PageBean query(HttpSession session, PageBean<RecordInfo> pageBean, RecordInfo recordInfo, String queryTime, boolean status) {
         String sql = "SELECT R.recordId,R.jobId,R.command,R.success,R.startTime,R.status,R.redoCount,R.jobType,R.groupId," +
@@ -209,12 +221,37 @@ public class RecordService {
         return queryDao.sqlQuery(Record.class, sql);
     }
 
+    /**
+     *
+     * @param id
+     * @return true:running false:noRun
+     */
     public Boolean isRunning(Long id) {
-        return queryDao.getCountBySql("SELECT COUNT(1) FROM T_RECORD AS R " +
-                "LEFT JOIN T_JOB AS T " +
-                "ON R.jobId = T.jobId  " +
-                "WHERE (R.jobId = ? OR T.flowId = ?) " +
-                "AND R.status IN (0,2,4) ", id, id) > 0L;
+        //找到当前任务所有执行过的流程任务
+        List<Job> jobs = jobService.getFlowJob(id);
+
+        List<Long> jobIds = Arrays.asList(id);
+        if (CommonUtils.notEmpty(jobs)) {
+            for (Job job:jobs) {
+                jobIds.add(job.getJobId());
+            }
+        }
+
+        for (Long jobId:jobIds) {
+            String hql = "select count(1) from Record where jobId=:jobId and status IN (:status)";
+            Integer status[] = new Integer[3];
+            status[0] = Constants.RunStatus.RUNNING.getStatus();//正在运行
+            status[1] = Constants.RunStatus.STOPPING.getStatus();//正在停止
+            status[2] = Constants.RunStatus.RERUNNING.getStatus();//正在重跑
+
+            Map params = ParamsMap.map().set("jobId",jobId).set("status",status);
+            boolean running = toLong(queryDao.createQuery(hql,params).uniqueResult()) > 0;
+            //找到该任务的任务一个单一任务或者流程任务为运行中则返回true
+            if (running) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public List<ChartInfo> getRecord(HttpSession session, String startTime, String endTime) {

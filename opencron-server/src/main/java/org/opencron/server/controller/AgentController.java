@@ -21,13 +21,11 @@
 
 package org.opencron.server.controller;
 
-import java.util.Date;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import com.alibaba.fastjson.JSON;
 import org.opencron.common.Constants;
 import org.opencron.common.util.CommonUtils;
 import org.opencron.common.util.PropertyPlaceholder;
@@ -37,6 +35,8 @@ import org.opencron.server.service.ExecuteService;
 import org.opencron.server.tag.PageBean;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.opencron.server.domain.Agent;
+import org.opencron.server.vo.Status;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -75,8 +75,8 @@ public class AgentController extends BaseController {
 
     @RequestMapping(value = "checkname.do", method = RequestMethod.POST)
     @ResponseBody
-    public boolean checkName(Long id, String name) {
-        return !agentService.existsName(id, name);
+    public Status checkName(Long id, String name) {
+        return new Status(!agentService.existsName(id, name));
     }
 
     @RequestMapping(value = "checkdel.do", method = RequestMethod.POST)
@@ -93,8 +93,8 @@ public class AgentController extends BaseController {
 
     @RequestMapping(value = "checkhost.do", method = RequestMethod.POST)
     @ResponseBody
-    public boolean checkhost(Long id, String host) {
-        return !agentService.existshost(id, host);
+    public Status checkhost(Long id, String host) {
+        return new Status(!agentService.existshost(id, host));
     }
 
     @RequestMapping("add.htm")
@@ -110,16 +110,13 @@ public class AgentController extends BaseController {
             agent.setMobiles(null);
             agent.setEmailAddress(null);
         }
-
         //直联
         if (Constants.ConnType.CONN.getType().equals(agent.getProxy())) {
             agent.setProxyAgent(null);
         }
-
         agent.setPassword(DigestUtils.md5Hex(agent.getPassword()));
         agent.setStatus(true);
         agent.setDeleted(false);
-        agent.setUpdateTime(new Date());
         agent = agentService.merge(agent);
         session.setAttribute("scanAgent", agent);
         return "redirect:/agent/view.htm?csrf=" + OpencronTools.getCSRF(session);
@@ -166,42 +163,33 @@ public class AgentController extends BaseController {
             agent.setProxyAgent(null);
             agent.setStatus(true);
             agent.setDeleted(false);
-            agent.setUpdateTime(new Date());
             agentService.merge(agent);
             writeJson(response, String.format(format, 200, host));
         }
     }
 
     @RequestMapping(value = "get.do", method = RequestMethod.POST)
-    public void get(HttpServletResponse response, Long id) {
+    @ResponseBody
+    public Agent get(HttpServletResponse response, Long id) {
         Agent agent = agentService.getAgent(id);
         if (agent == null) {
             write404(response);
-            return;
+            return null;
         }
-        writeJson(response, JSON.toJSONString(agent));
+        return agent;
     }
 
     @RequestMapping(value = "edit.do", method = RequestMethod.POST)
     @ResponseBody
-    public void edit(Agent agent) {
-        Agent agent1 = agentService.getAgent(agent.getAgentId());
-        agent1.setName(agent.getName());
-        agent1.setProxy(agent.getProxy());
-        if (Constants.ConnType.CONN.getType().equals(agent.getProxy())) {
-            agent1.setProxyAgent(null);
+    public void edit(Agent agentParam) {
+        Agent agent = agentService.getAgent(agentParam.getAgentId());
+        BeanUtils.copyProperties(agent, agentParam, "machineId", "host","password","deleted","status","proxyAgent");
+        if (Constants.ConnType.CONN.getType().equals(agentParam.getProxy())) {
+            agent.setProxyAgent(null);
         } else {
-            agent1.setProxyAgent(agent.getProxyAgent());
+            agent.setProxyAgent(agentParam.getProxyAgent());
         }
-        agent1.setPort(agent.getPort());
-        agent1.setWarning(agent.getWarning());
-        if (agent.getWarning()) {
-            agent1.setMobiles(agent.getMobiles());
-            agent1.setEmailAddress(agent.getEmailAddress());
-        }
-        agent1.setComment(agent.getComment());
-        agent1.setUpdateTime(new Date());
-        agentService.merge(agent1);
+        agentService.merge(agent);
     }
 
     @RequestMapping(value = "pwd.do", method = RequestMethod.POST)

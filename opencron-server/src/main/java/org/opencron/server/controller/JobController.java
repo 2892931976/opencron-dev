@@ -24,9 +24,11 @@ package org.opencron.server.controller;
 import java.util.*;
 
 import com.alibaba.fastjson.JSON;
+import org.apache.zookeeper.data.Stat;
 import org.opencron.common.Constants;
 import org.opencron.common.util.DigestUtils;
 import org.opencron.common.util.StringUtils;
+import org.opencron.common.util.collection.ParamsMap;
 import org.opencron.server.domain.Job;
 import org.opencron.server.job.OpencronTools;
 import org.opencron.server.service.*;
@@ -35,6 +37,7 @@ import org.opencron.common.util.CommonUtils;
 import org.opencron.server.domain.Agent;
 import org.opencron.server.vo.CrontabInfo;
 import org.opencron.server.vo.JobInfo;
+import org.opencron.server.vo.Status;
 import org.quartz.SchedulerException;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -105,8 +108,8 @@ public class JobController extends BaseController {
      */
     @RequestMapping(value = "checkname.do", method = RequestMethod.POST)
     @ResponseBody
-    public boolean checkName(Long jobId, Long agentId, String name) {
-        return !jobService.existsName(jobId, agentId, name);
+    public Status checkName(Long jobId, Long agentId, String name) {
+        return new Status(!jobService.existsName(jobId, agentId, name));
     }
 
     @RequestMapping(value = "checkdel.do", method = RequestMethod.POST)
@@ -117,13 +120,13 @@ public class JobController extends BaseController {
 
     @RequestMapping(value = "delete.do", method = RequestMethod.POST)
     @ResponseBody
-    public boolean delete(Long id) {
+    public Status delete(Long id) {
         try {
             jobService.delete(id);
-            return true;
+            return Status.TRUE;
         } catch (SchedulerException e) {
             e.printStackTrace();
-            return false;
+            return Status.FALSE;
         }
     }
 
@@ -155,7 +158,6 @@ public class JobController extends BaseController {
         //单任务
         if (Constants.JobType.SINGLETON.getCode().equals(job.getJobType())) {
             job.setUserId(OpencronTools.getUserId(session));
-            job.setUpdateTime(new Date());
             job.setLastChild(false);
             job = jobService.merge(job);
         } else { //流程任务
@@ -218,14 +220,15 @@ public class JobController extends BaseController {
     }
 
     @RequestMapping("editsingle.do")
-    public void editSingleJob(HttpSession session, HttpServletResponse response, Long id) {
+    @ResponseBody
+    public JobInfo editSingleJob(HttpSession session, HttpServletResponse response, Long id) {
         JobInfo job = jobService.getJobInfoById(id);
         if (job == null) {
             write404(response);
-            return;
+            return null;
         }
-        if (!jobService.checkJobOwner(session, job.getUserId())) return;
-        writeJson(response, JSON.toJSONString(job));
+        if (!jobService.checkJobOwner(session, job.getUserId())) return null;
+        return job;
     }
 
     @RequestMapping("editflow.htm")
@@ -245,9 +248,9 @@ public class JobController extends BaseController {
 
     @RequestMapping(value = "edit.do", method = RequestMethod.POST)
     @ResponseBody
-    public boolean edit(HttpSession session, Job job) throws SchedulerException {
+    public Status edit(HttpSession session, Job job) throws SchedulerException {
         Job dbJob = jobService.getJob(job.getJobId());
-        if (!jobService.checkJobOwner(session, dbJob.getUserId())) return false;
+        if (!jobService.checkJobOwner(session, dbJob.getUserId())) return Status.FALSE;
         dbJob.setCronType(job.getCronType());
         dbJob.setCronExp(job.getCronExp());
         dbJob.setCommand(DigestUtils.passBase64(job.getCommand()));
@@ -263,36 +266,39 @@ public class JobController extends BaseController {
             dbJob.setEmailAddress(job.getEmailAddress());
         }
         dbJob.setComment(job.getComment());
-        dbJob.setUpdateTime(new Date());
         jobService.merge(dbJob);
         schedulerService.syncJobTigger(dbJob.getJobId(), executeService);
-        return true;
+        return Status.TRUE;
     }
 
     @RequestMapping(value = "editcmd.do", method = RequestMethod.POST)
     @ResponseBody
-    public boolean editCmd(HttpSession session, Long jobId, String command) throws SchedulerException {
+    public Status editCmd(HttpSession session, Long jobId, String command) throws SchedulerException {
         command = DigestUtils.passBase64(command);
         Job dbJob = jobService.getJob(jobId);
-        if (!jobService.checkJobOwner(session, dbJob.getUserId())) return false;
+        if (!jobService.checkJobOwner(session, dbJob.getUserId())) return Status.FALSE;
         dbJob.setCommand(command);
-        dbJob.setUpdateTime(new Date());
         jobService.merge(dbJob);
         schedulerService.syncJobTigger(Constants.JobType.FLOW.getCode().equals(dbJob.getJobType()) ? dbJob.getFlowId() : dbJob.getJobId(), executeService);
-        return true;
+        return Status.TRUE;
     }
 
-    @RequestMapping(value = "canrun.do", method = RequestMethod.POST)
+    /**
+     * 检测当前的job是否正在运行中,运行中true,未运行false
+     * @param id
+     * @return
+     */
+    @RequestMapping(value = "running.do", method = RequestMethod.POST)
     @ResponseBody
-    public boolean canRun(Long id) {
-        return recordService.isRunning(id);
+    public Status jobisRunning(Long id) {
+        return new Status(recordService.isRunning(id));
     }
 
     @RequestMapping(value = "execute.do", method = RequestMethod.POST)
     @ResponseBody
-    public boolean remoteExecute(HttpSession session, Long id) {
+    public Status remoteExecute(HttpSession session, Long id) {
         JobInfo job = jobService.getJobInfoById(id);//找到要执行的任务
-        if (!jobService.checkJobOwner(session, job.getUserId())) return false;
+        if (!jobService.checkJobOwner(session, job.getUserId())) return Status.FALSE;
         //手动执行
         Long userId = OpencronTools.getUserId(session);
         job.setUserId(userId);
@@ -302,7 +308,7 @@ public class JobController extends BaseController {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return true;
+        return Status.TRUE;
     }
 
 
@@ -366,13 +372,13 @@ public class JobController extends BaseController {
 
     @RequestMapping(value = "pause.do", method = RequestMethod.POST)
     @ResponseBody
-    public boolean pause(Job jobBean) {
-        return jobService.pauseJob(jobBean);
+    public Status pause(Job jobBean) {
+        return new Status(jobService.pauseJob(jobBean));
     }
 
     @RequestMapping(value = "batchexec.do", method = RequestMethod.POST)
     @ResponseBody
-    public boolean batchExec(HttpSession session, String command, String agentIds) {
+    public Status batchExec(HttpSession session, String command, String agentIds) {
         if (notEmpty(agentIds) && notEmpty(command)) {
             command = DigestUtils.passBase64(command);
             Long userId = OpencronTools.getUserId(session);
@@ -380,9 +386,10 @@ public class JobController extends BaseController {
                 this.executeService.batchExecuteJob(userId, command, agentIds);
             } catch (Exception e) {
                 e.printStackTrace();
+                return Status.FALSE;
             }
         }
-        return true;
+        return Status.TRUE;
     }
 
     @RequestMapping("detail/{id}.htm")

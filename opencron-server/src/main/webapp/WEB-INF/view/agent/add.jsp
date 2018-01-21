@@ -36,7 +36,7 @@
                                 "name": _name
                             }
                         },function (data) {
-                            if (!data) {
+                            if (!data.status) {
                                 opencron.tipError("#name","执行器名称已存在!");
                                 _this.status = false;
                             }else{
@@ -66,7 +66,7 @@
                                 "host": _host
                             }
                         },function (data) {
-                            if (!data){
+                            if (!data.status){
                                 opencron.tipError("#host","该执行器Host已存在!不能重复添加!");
                                 _this.status = false;
                             }else{
@@ -156,7 +156,7 @@
                         "password": calcMD5($("#password").val())
                     }
                 },function (data) {
-                    if (data) {
+                    if (data.status) {
                         opencron.tipOk("#port");
                         ajax({
                             headers: {"csrf": "${csrf}"},

@@ -109,7 +109,8 @@
                         "pageSize":${pageBean.pageSize},
                         "order":"${pageBean.order}",
                         "orderBy":"${pageBean.orderBy}"
-                    }
+                    },
+                    dataType:'html'
                 },function (data) {
                     //解决子页面登录失联,不能跳到登录页面的bug
                     if (data.indexOf("login") > -1) {
@@ -146,7 +147,7 @@
                         "name": $("#name").val()
                     }
                 },function (data) {
-                    if (data) {
+                    if (data.status) {
                         $("#checkName").html("<font color='green'>" + '<i class="glyphicon glyphicon-ok-sign"></i>&nbsp;执行器名可用' + "</font>");
                         return false;
                     } else {
@@ -309,7 +310,7 @@
                     "name": name
                 }
             },function (data) {
-                if (data) {
+                if (data.status) {
                     if (status == 1) {
                         ajax({
                             headers:{"csrf":"${csrf}"},
@@ -324,7 +325,7 @@
                                 "password": password
                             }
                         },function (data) {
-                            if (data) {
+                            if (data.status) {
                                 canSave(proxy, id, name, port, warning, mobiles, email);
                                 return false;
                             } else {
@@ -568,7 +569,7 @@
                     "password": password
                 }
             },function (data) {
-                if (data) {
+                if (data.status) {
                     $("#pingResult").html("<font color='green'>" + '<i class="glyphicon glyphicon-ok-sign"></i>&nbsp;通信正常' + "</font>");
                 } else {
                     $("#pingResult").html("<font color='red'>" + '<i class="glyphicon glyphicon-remove-sign"></i>&nbsp;通信失败' + "</font>");
@@ -593,7 +594,8 @@
                 headers:{"csrf":"${csrf}"},
                 type: "POST",
                 url: "${contextPath}/agent/path.do",
-                data: { "agentId": id }
+                data: { "agentId": id },
+                dataType:"html"
             },function (result) {
                 if(result) {
                     $("#pwdPath").val("more " + result);
@@ -923,3 +925,5 @@
 </body>
 
 </html>
+
+

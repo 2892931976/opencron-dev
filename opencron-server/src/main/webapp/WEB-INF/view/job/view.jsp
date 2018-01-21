@@ -234,7 +234,7 @@
                     "cronExp": cronExp
                 }
             },function (data) {
-                if (data) {
+                if (data.status) {
                     doSave(jobObj);
                 } else {
                     alert("时间规则语法错误!");
@@ -253,8 +253,8 @@
                     "id": job.jobId,
                     "name": job.jobName
                 }
-            },function (result) {
-                if (result) {
+            },function (data) {
+                if (data.status) {
                     ajax({
                         headers: {"csrf": "${csrf}"},
                         type: "POST",
@@ -277,7 +277,7 @@
                             "timeout": job.timeout
                         }
                     },function (data) {
-                        if (data) {
+                        if (data.status) {
                             $('#jobModal').modal('hide');
                             alertMsg("修改成功");
 
@@ -347,7 +347,7 @@
                         "name": $("#jobName").val()
                     }
                 },function (data) {
-                    if (data) {
+                    if (data.status) {
                         opencron.tipOk($("#checkJobName"),"作业名称可用");
                     } else {
                         opencron.tipError($("#checkJobName"),"作业名称已存在");
@@ -376,7 +376,7 @@
                         "cronExp": cronExp
                     }
                 },function (data) {
-                    if (data) {
+                    if (data.status) {
                         opencron.tipOk($("#checkcronExp"),"时间规则格式正确");
                     } else {
                         opencron.tipError($("#checkcronExp"),"时间规则格式错误,请填写正确的时间规则");
@@ -416,7 +416,7 @@
                     }
                 },function (data) {
                     var pauseElem = $("#pause_"+id);
-                    if(data) {
+                    if(data.status) {
                         if (status){
                             pauseElem.attr("title","恢复");
                             pauseElem.click(function () {
@@ -440,29 +440,25 @@
             ajax({
                 headers: {"csrf": "${csrf}"},
                 type: "POST",
-                url: "${contextPath}/job/canrun.do",
+                url: "${contextPath}/job/running.do",
                 data: {"id": id}
             },function (data) {
-                if (!data) {
-                    swal({
-                        title: "",
-                        text: "您确定要执行这个作业吗？",
-                        type: "warning",
-                        showCancelButton: true,
-                        closeOnConfirm: false,
-                        confirmButtonText: "执行"
-                    }, function () {
-                        ajax({
-                            headers: {"csrf": "${csrf}"},
-                            type: "POST",
-                            url: "${contextPath}/job/execute.do",
-                            data: {"id": id}
-                        });
-                        alertMsg("该作业已启动,正在执行中.");
+                swal({
+                    title: "",
+                    text: data.status?"该作业已经在运作中,您确定要再次执行吗?":"您确定要执行这个作业吗",
+                    type: "warning",
+                    showCancelButton: true,
+                    closeOnConfirm: false,
+                    confirmButtonText:data.status?"再次执行":"执行"
+                }, function () {
+                    ajax({
+                        headers: {"csrf": "${csrf}"},
+                        type: "POST",
+                        url: "${contextPath}/job/execute.do",
+                        data: {"id": id}
                     });
-                } else {
-                    alert("当前作业已在运行中,不能重复执行!");
-                }
+                    alertMsg("该作业已启动,正在执行中.");
+                });
             });
         }
 
@@ -523,7 +519,7 @@
                     "command": toBase64(command)
                 }
             },function (data) {
-                if (data) {
+                if (data.status) {
                     $('#cmdModal').modal('hide');
                     alertMsg("修改成功");
                     $("#command_" + jobId).attr("title", command);
@@ -563,7 +559,7 @@
                             url: "${contextPath}/job/delete.do",
                             data: {"id": id}
                         },function (data) {
-                            if (data) {
+                            if (data.status) {
                                 alertMsg("删除作业成功");
                                 location.reload();
                             } else {
