@@ -35,4 +35,8 @@ public class Status {
     public static void setTRUE(Status TRUE) {
         Status.TRUE = TRUE;
     }
+
+    public static Status create(boolean b) {
+        return new Status(b);
+    }
 }

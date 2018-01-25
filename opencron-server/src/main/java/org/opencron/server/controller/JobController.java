@@ -109,7 +109,7 @@ public class JobController extends BaseController {
     @RequestMapping(value = "checkname.do", method = RequestMethod.POST)
     @ResponseBody
     public Status checkName(Long jobId, Long agentId, String name) {
-        return new Status(!jobService.existsName(jobId, agentId, name));
+        return Status.create(!jobService.existsName(jobId, agentId, name));
     }
 
     @RequestMapping(value = "checkdel.do", method = RequestMethod.POST)
@@ -291,26 +291,31 @@ public class JobController extends BaseController {
     @RequestMapping(value = "running.do", method = RequestMethod.POST)
     @ResponseBody
     public Status jobisRunning(Long id) {
-        return new Status(recordService.isRunning(id));
+        return Status.create(recordService.isRunning(id));
     }
 
     @RequestMapping(value = "execute.do", method = RequestMethod.POST)
     @ResponseBody
     public Status remoteExecute(HttpSession session, Long id) {
-        JobInfo job = jobService.getJobInfoById(id);//找到要执行的任务
+        final JobInfo job = jobService.getJobInfoById(id);//找到要执行的任务
         if (!jobService.checkJobOwner(session, job.getUserId())) return Status.FALSE;
         //手动执行
         Long userId = OpencronTools.getUserId(session);
         job.setUserId(userId);
         job.setAgent(agentService.getAgent(job.getAgentId()));
-        try {
-            this.executeService.executeJob(job, Constants.ExecType.OPERATOR);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return Status.TRUE;
+        //无等待返回前台响应.
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    executeService.executeJob(job, Constants.ExecType.OPERATOR);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+        return Status.create(true);
     }
-
 
     @RequestMapping(value = "scan.do", method = RequestMethod.POST)
     @ResponseBody
@@ -373,7 +378,7 @@ public class JobController extends BaseController {
     @RequestMapping(value = "pause.do", method = RequestMethod.POST)
     @ResponseBody
     public Status pause(Job jobBean) {
-        return new Status(jobService.pauseJob(jobBean));
+        return Status.create(jobService.pauseJob(jobBean));
     }
 
     @RequestMapping(value = "batchexec.do", method = RequestMethod.POST)

@@ -57,7 +57,7 @@ public class VerifyController extends BaseController {
         boolean pass = false;
         if (cronType == 0) pass = SchedulingPattern.validate(cronExp);
         if (cronType == 1) pass = CronExpression.isValidExpression(cronExp);
-        return Status.FALSE;
+        return Status.create(pass);
     }
 
     @RequestMapping(value = "ping.do", method = RequestMethod.POST)
@@ -86,7 +86,7 @@ public class VerifyController extends BaseController {
         if (!ping) {
             logger.error(String.format("validate host:%s,port:%s cannot ping!", agent.getHost(), port));
         }
-        return new Status(ping);
+        return Status.create(ping);
     }
 
     @RequestMapping(value = "guid.do", method = RequestMethod.POST)

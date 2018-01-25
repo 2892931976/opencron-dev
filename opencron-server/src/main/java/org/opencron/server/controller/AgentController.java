@@ -76,13 +76,13 @@ public class AgentController extends BaseController {
     @RequestMapping(value = "checkname.do", method = RequestMethod.POST)
     @ResponseBody
     public Status checkName(Long id, String name) {
-        return new Status(!agentService.existsName(id, name));
+        return Status.create(!agentService.existsName(id, name));
     }
 
     @RequestMapping(value = "checkdel.do", method = RequestMethod.POST)
     @ResponseBody
-    public String checkDelete(Long id) {
-        return agentService.checkDelete(id);
+    public Status checkDelete(Long id) {
+        return Status.create(agentService.checkDelete(id));
     }
 
     @RequestMapping(value = "delete.do", method = RequestMethod.POST)
@@ -94,7 +94,7 @@ public class AgentController extends BaseController {
     @RequestMapping(value = "checkhost.do", method = RequestMethod.POST)
     @ResponseBody
     public Status checkhost(Long id, String host) {
-        return new Status(!agentService.existshost(id, host));
+        return Status.create(!agentService.existshost(id, host));
     }
 
     @RequestMapping("add.htm")
@@ -195,7 +195,7 @@ public class AgentController extends BaseController {
     @RequestMapping(value = "pwd.do", method = RequestMethod.POST)
     @ResponseBody
     public String pwd(Boolean type, Long id, String pwd0, String pwd1, String pwd2) {
-        return agentService.editPwd(id, type, pwd0, pwd1, pwd2);
+        return agentService.editPassword(id, type, pwd0, pwd1, pwd2);
     }
 
     @RequestMapping("detail/{id}.htm")

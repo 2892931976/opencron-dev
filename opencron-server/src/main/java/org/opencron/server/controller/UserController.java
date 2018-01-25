@@ -137,6 +137,6 @@ public class UserController extends BaseController {
     @RequestMapping(value = "checkname.do", method = RequestMethod.POST)
     @ResponseBody
     public Status checkName(String name) {
-        return new Status(!userService.existsName(name));
+        return Status.create(!userService.existsName(name));
     }
 }

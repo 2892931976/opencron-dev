@@ -54,7 +54,7 @@ public class ConfigService {
     }
 
     public void initDataBase() {
-        long count = queryDao.getCountBySql("select count(1) from Config");
+        long count = queryDao.hqlLongUniqueResult("select count(1) from Config");
         if (count == 0) {
 
             Session session = queryDao.getSessionFactory().openSession();

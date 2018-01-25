@@ -429,10 +429,8 @@
                     url:"${contextPath}/agent/checkdel.do",
                     data:{"id":id}
                 },function (data) {
-                    if(data == "error"){
-                        alert("该执行器不存在,删除失败!")
-                    }else if (data == "false"){
-                        alert("该执行器上定义了作业,请先删除作业再尝试删除")
+                    if (!data.status){
+                        alert("删除失败,找到不该执行器或者该执行器上定义了作业")
                     }else {
                         ajax({
                             headers:{"csrf":"${csrf}"},

@@ -115,9 +115,9 @@ public class AgentService {
     }
 
     private List<User> getAgentUsers(Agent agent) {
-        Long agentId = agent.getAgentId();
+        String agentId = agent.getAgentId().toString();
 
-        String hql = "from User where agentIds like :id";
+        String hql = "from User where agentIds like ?";
 
         //1
         List<User> users = queryDao.hqlQuery(hql, agentId);

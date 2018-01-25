@@ -227,6 +227,7 @@ public class HibernateDao {
      * @see #createQuery(String, Object...)
      */
     public <T> T hqlUniqueQuery(String hql, Object... parameters) {
+        //影院+影片
         return (T) createQuery(hql, parameters).uniqueResult();
     }
 
