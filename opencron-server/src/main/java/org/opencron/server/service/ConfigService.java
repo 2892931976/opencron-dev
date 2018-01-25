@@ -45,7 +45,7 @@ public class ConfigService {
     private UserService userService;
 
     public Config getSysConfig() {
-        return queryDao.sqlUniqueQuery(Config.class, "SELECT * FROM T_CONFIG WHERE configId = 1");
+        return queryDao.hqlUniqueQuery("from Config where configid = 1");
     }
 
 
@@ -54,7 +54,7 @@ public class ConfigService {
     }
 
     public void initDataBase() {
-        long count = queryDao.getCountBySql("SELECT COUNT(1) FROM T_CONFIG");
+        long count = queryDao.hqlLongUniqueResult("select count(1) from Config");
         if (count == 0) {
 
             Session session = queryDao.getSessionFactory().openSession();

@@ -66,7 +66,7 @@ public class AgentService {
     private ConfigService configService;
 
     public List<Agent> getAgentByConnType(Constants.ConnType connType) {
-        return queryDao.hqlQuery("FROM Agent WHERE deleted=? AND status = ? AND proxy =?", false, true, connType.getType());
+        return queryDao.hqlQuery("from Agent where deleted=? and status=? and proxy=?", false,true,connType.getType());
     }
 
     public List<Agent> getAll() {
@@ -79,27 +79,30 @@ public class AgentService {
 
 
     private synchronized void flushAgent() {
-        OpencronTools.CACHE.put(Constants.PARAM_CACHED_AGENT_ID_KEY, queryDao.hqlQuery("FROM Agent WHERE deleted=?", false));
+        OpencronTools.CACHE.put(
+                Constants.PARAM_CACHED_AGENT_ID_KEY,
+                queryDao.hqlQuery("from Agent where deleted=?", false)
+        );
     }
 
     public List<Agent> getOwnerAgentByConnStatus(HttpSession session, Constants.ConnStatus status) {
-        String hql = "from Agent Where deleted=? AND status=?";
+        String hql = "from Agent where deleted=? and status=?";
         if (!OpencronTools.isPermission(session)) {
             User user = OpencronTools.getUser(session);
-            hql += " AND agentId in (" + user.getAgentIds() + ")";
+            hql += " and agentId in (".concat(user.getAgentIds()).concat(")");
         }
-        return queryDao.hqlQuery(hql, false, status.isValue());
+        return queryDao.hqlQuery(hql, false,status.isValue());
     }
 
     public PageBean getOwnerAgent(HttpSession session, PageBean pageBean) {
-        String sql = "SELECT * FROM T_AGENT WHERE deleted=0 ";
+        String hql = "from Agent where deleted=? ";
         if (!OpencronTools.isPermission(session)) {
             User user = OpencronTools.getUser(session);
-            sql += " AND agentId IN (" + user.getAgentIds() + ")";
+            hql += " and agentId in (".concat(user.getAgentIds()).concat(")");
         }
         pageBean.verifyOrderBy("name", "name", "host", "port");
-        sql += " ORDER By " + pageBean.getOrderBy() + " " + pageBean.getOrder();
-        queryDao.getPageBySql(pageBean, Agent.class, sql);
+        hql += " order by " + pageBean.getOrderBy() + " " + pageBean.getOrder();
+        queryDao.hqlPageQuery(hql,pageBean.getPageNo(),pageBean.getPageSize(),false);
         return pageBean;
     }
 
@@ -112,8 +115,26 @@ public class AgentService {
     }
 
     private List<User> getAgentUsers(Agent agent) {
-        String sql = "SELECT * FROM T_USER WHERE FIND_IN_SET(?,AGENTIDS)";
-        List<User> users = queryDao.sqlQuery(User.class, sql, agent.getAgentId());
+        String agentId = agent.getAgentId().toString();
+
+        String hql = "from User where agentIds like ?";
+
+        //1
+        List<User> users = queryDao.hqlQuery(hql, agentId);
+        if (isEmpty(users)) {
+            //1,
+            users = queryDao.hqlQuery(hql,agentId+",%");
+        }
+        if (isEmpty(users)) {
+            //,1
+            users = queryDao.hqlQuery(hql,",%"+agentId);
+        }
+
+        if (isEmpty(users)) {
+            //,1,
+            users = queryDao.hqlQuery(hql,",%"+agentId+",%");
+        }
+
         return isEmpty(users) ? Collections.<User>emptyList() : users;
     }
 
@@ -169,39 +190,40 @@ public class AgentService {
     }
 
     public boolean existsName(Long id, String name) {
-        String sql = "SELECT COUNT(1) FROM T_AGENT WHERE deleted=0 AND name=? ";
+        String hql = "select count(1) from Agent where deleted=? and name=? ";
         if (notEmpty(id)) {
-            sql += " AND agentId != " + id;
+            hql += " and agentId !="+id;
         }
-        return (queryDao.getCountBySql(sql, name)) > 0L;
+        return queryDao.hqlIntUniqueResult(hql,false,name) > 0;
     }
 
-    public String checkDelete(Long id) {
+    public boolean checkDelete(Long id) {
         Agent agent = getAgent(id);
         if (agent == null) {
-            return "error";
+            return false;
         }
-
         //检查该执行器是否定义的有任务
-        String sql = "SELECT COUNT(1) FROM T_AGENT AS G INNER JOIN T_JOB AS J ON G.agentId = J.agentId WHERE G.agentId=? AND J.deleted=0";
-        return queryDao.getCountBySql(sql, id) > 0 ? "false" : "true";
+        String hql = "select count(1) from Job where deleted=? and agentId=? ";
+        return queryDao.hqlIntUniqueResult(hql,false,id) > 0;
     }
 
     public void delete(Long id) {
-        queryDao.createSQLQuery("UPDATE T_AGENT SET deleted=1 WHERE agentId = " + id).executeUpdate();
+        Agent agent = getAgent(id);
+        agent.setDeleted(true);
+        queryDao.save(agent);
         flushAgent();
     }
 
     public boolean existshost(Long id, String host) {
-        String sql = "SELECT COUNT(1) FROM T_AGENT WHERE deleted=0 AND host=? ";
+        String hql = "select count(1) from Agent where deleted=? and host=? ";
         if (notEmpty(id)) {
-            sql += " AND agentId != " + id;
+            hql += " and agentId != "+id;
         }
-        return (queryDao.getCountBySql(sql, host)) > 0L;
+        return queryDao.hqlIntUniqueResult(hql,false,host) > 0;
     }
 
 
-    public String editPwd(Long id, Boolean type, String pwd0, String pwd1, String pwd2) {
+    public String editPassword(Long id, Boolean type, String pwd0, String pwd1, String pwd2) {
         Agent agent = this.getAgent(id);
         boolean verify;
         if (type) {//直接输入的密钥
@@ -231,17 +253,17 @@ public class AgentService {
     }
 
     public List<Agent> getOwnerAgents(HttpSession session) {
-        String sql = "SELECT * FROM T_AGENT WHERE deleted=0 ";
+        String hql = "from Agent where deleted=? ";
         if (!OpencronTools.isPermission(session)) {
             User user = OpencronTools.getUser(session);
-            sql += " AND agentId IN (" + user.getAgentIds() + ")";
+            hql += " and agentid in (" + user.getAgentIds() + ")";
         }
-        return queryDao.sqlQuery(Agent.class, sql);
+        return queryDao.hqlQuery(hql,false);
     }
 
     public Agent getByHost(String host) {
-        String sql = "SELECT * FROM T_AGENT WHERE deleted=0 AND host=?";
-        Agent agent = queryDao.sqlUniqueQuery(Agent.class, sql, host);
+        String hql = "from Agent where deleted=? and host=?";
+        Agent agent = queryDao.hqlUniqueQuery(hql,false, host);
         if (agent != null) {
             agent.setUsers(getAgentUsers(agent));
         }
@@ -249,9 +271,9 @@ public class AgentService {
     }
 
     public Agent getAgentByMachineId(String machineId) {
-        String sql = "SELECT * FROM T_AGENT WHERE deleted=0 AND machineId=?";
+        String hql = "from Agent where deleted=? and machineId=?";
         //不能保证macId的唯一性,可能两台机器存在同样的macId,这种概率可以忽略不计,这里为了程序的健壮性...
-        List<Agent> agents = queryDao.sqlQuery(Agent.class, sql, machineId);
+        List<Agent> agents = queryDao.hqlQuery(hql,false, machineId);
         if (CommonUtils.notEmpty(agents)) {
             return agents.get(0);
         }
@@ -259,8 +281,7 @@ public class AgentService {
     }
 
     public List<Agent> getAgentByIds(String agentIds) {
-        String sql = String.format("SELECT * FROM T_AGENT WHERE agentId IN (%s)", agentIds);
-        return queryDao.sqlQuery(Agent.class, sql);
+        return queryDao.hqlQuery(String.format("from Agent where agentId in (%s)", agentIds));
     }
 
     public void doDisconnect(Agent agent) {

@@ -421,4 +421,8 @@ public class JobService {
         }
         return true;
     }
+
+    public List<Job> getFlowJob(Long id) {
+        return queryDao.hqlQuery("from Job where flowId=?",id);
+    }
 }

@@ -26,6 +26,7 @@ import org.opencron.server.domain.Agent;
 import it.sauronsoftware.cron4j.SchedulingPattern;
 import org.opencron.server.service.AgentService;
 import org.opencron.server.service.ExecuteService;
+import org.opencron.server.vo.Status;
 import org.quartz.CronExpression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,6 +37,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.Map;
 
 @Controller
 @RequestMapping("verify")
@@ -51,16 +53,16 @@ public class VerifyController extends BaseController {
 
     @RequestMapping(value = "exp.do", method = RequestMethod.POST)
     @ResponseBody
-    public boolean validateCronExp(Integer cronType, String cronExp) {
+    public Status validateCronExp(Integer cronType, String cronExp) {
         boolean pass = false;
         if (cronType == 0) pass = SchedulingPattern.validate(cronExp);
         if (cronType == 1) pass = CronExpression.isValidExpression(cronExp);
-        return pass;
+        return Status.create(pass);
     }
 
     @RequestMapping(value = "ping.do", method = RequestMethod.POST)
     @ResponseBody
-    public boolean validatePing(int proxy, Long proxyId, String host, Integer port, String password) {
+    public Status validatePing(int proxy, Long proxyId, String host, Integer port, String password) {
         Agent agent = new Agent();
         agent.setProxy(proxy);
         agent.setHost(host);
@@ -72,7 +74,7 @@ public class VerifyController extends BaseController {
             if (proxyId != null) {
                 Agent proxyAgent = agentService.getAgent(proxyId);
                 if (proxyAgent == null) {
-                    return false;
+                    return Status.FALSE;
                 }
                 agent.setProxyAgent(proxyId);
                 //需要代理..
@@ -84,7 +86,7 @@ public class VerifyController extends BaseController {
         if (!ping) {
             logger.error(String.format("validate host:%s,port:%s cannot ping!", agent.getHost(), port));
         }
-        return ping;
+        return Status.create(ping);
     }
 
     @RequestMapping(value = "guid.do", method = RequestMethod.POST)

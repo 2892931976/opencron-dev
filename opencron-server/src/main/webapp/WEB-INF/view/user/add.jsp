@@ -73,7 +73,7 @@
                     "name":name
                 }
             },function (data) {
-                if (data){
+                if (data.status){
                     $("#user").submit();
                     return false;
                 }else {
@@ -99,7 +99,7 @@
                         "name":$("#name").val()
                     }
                 },function (data) {
-                    if (data){
+                    if (data.status){
                         $("#checkname").html("<font color='green'>" + '<i class="glyphicon glyphicon-ok-sign"></i>&nbsp;用户名可用' + "</font>");
                         return false;
                     }else {

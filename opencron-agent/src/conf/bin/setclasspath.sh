@@ -21,6 +21,7 @@
 #  endorsed directory.
 # -----------------------------------------------------------------------------
 
+
 # Make sure prerequisite environment variables are set
 if [ -z "$JAVA_HOME" -a -z "$JRE_HOME" ]; then
   if $darwin; then
@@ -77,15 +78,9 @@ if [ "$1" = "debug" ] ; then
   fi
 fi
 
-# Don't override the endorsed dir if the user has set it previously
-if [ -z "$JAVA_ENDORSED_DIRS" ]; then
-  # Set the default -Djava.endorsed.dirs argument
-  JAVA_ENDORSED_DIRS="$OPENCRON_HOME"/endorsed
-fi
-
 # Set standard commands for invoking Java, if not already set.
-if [ -z "$RUNJAVA" ]; then
-  RUNJAVA="$JRE_HOME"/bin/java
+if [ -z "$_RUNJAVA" ]; then
+  _RUNJAVA="$JRE_HOME"/bin/java
 fi
 if [ "$os400" != "true" ]; then
   if [ -z "$_RUNJDB" ]; then

@@ -28,7 +28,8 @@
                         "execType":"${execType}",
                         "pageNo":${pageBean.pageNo},
                         "pageSize":${pageBean.pageSize}
-                    }
+                    },
+                    dataType:"html"
                 },function (data) {
                     //解决子页面登录失联,不能跳到登录页面的bug
                     if(data.indexOf("login")>-1){

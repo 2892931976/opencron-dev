@@ -21,6 +21,7 @@ function ajax(params,successCallback,errorCallBack) {
         type:  params.type||"GET",
         url:params.url,
         data:params.data||{},
+        dataType:params.dataType||"json",
         success:function (data) {
             if (successCallback) {
                 successCallback(data);
@@ -76,26 +77,37 @@ var opencron = {
     },
 
     tipOk:function (el) {
-        var okStyle = "";
+        var pel;
         if (typeof(el) == "string") {
-            okStyle = $(el).parent().hasClass("col-md-9")?'right:-30px':'';
+            pel = $(el).parent()
             el = $(el).next();
         }else {
-            okStyle = el.parent().hasClass("col-md-9")?'right:-30px':'';
+            pel = el.parent()
         }
-        el.html($("<font class='big-green' color='green' style='"+okStyle+"'><i class='glyphicon glyphicon-ok-sign'></i></font>"))
+        var okStyle = pel.hasClass("col-md-9")?'right:-30px':'';
+        if (pel.find(".ok").length == 0){
+            var okHtml = "<span class='ok'><font class='big-green' color='green' style='"+okStyle+"'><i class='glyphicon glyphicon-ok-sign'></i></font></span>";
+            el.before($(okHtml));
+        }
+        pel.find(".tips").css("visibility","hidden");
     },
+
     tipError:function (el,message) {
         if (typeof(el) == "string"){
             el = $(el).next();
         }
-        el.html("<font color='red'><i class='glyphicon glyphicon-remove-sign'></i>&nbsp;"+message+"</font>");
+        var pel = el.parent();
+        pel.find(".ok").remove();
+        pel.find(".tips").html("<font color='red'><i class='glyphicon glyphicon-remove-sign'></i>&nbsp;"+message+"</font>");
     },
     tipDefault:function (el) {
         if (typeof(el) == "string"){
             el = $(el).next();
         }
-        el.html(el.attr("tip"));
+        if (el.hasClass("ok")){
+            el = el.next();
+        }
+        el.html(el.attr("tip")).css("visibility","visible");
     }
 };
 

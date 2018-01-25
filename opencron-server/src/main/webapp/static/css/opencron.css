@@ -1,3 +1,12 @@
+
+.none {
+    visibility: hidden;
+}
+
+.form-horizontal > .form-group{
+    padding-bottom:2px;
+}
+
 .highcharts-button{
     display: none;
 }

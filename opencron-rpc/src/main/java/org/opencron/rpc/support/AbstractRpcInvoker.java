@@ -36,7 +36,7 @@ import org.opencron.rpc.RpcInvoker;
  * @date 2016-03-27
  */
 
-public class AbstractRpcInvoker implements RpcInvoker {
+public abstract class AbstractRpcInvoker implements RpcInvoker {
 
     private Client client = ExtensionLoader.load(Client.class);
 

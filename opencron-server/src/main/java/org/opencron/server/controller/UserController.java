@@ -28,6 +28,7 @@ import org.opencron.server.service.UserService;
 import org.opencron.server.tag.PageBean;
 import org.opencron.server.domain.Role;
 import org.opencron.server.domain.User;
+import org.opencron.server.vo.Status;
 import org.quartz.SchedulerException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -122,9 +123,9 @@ public class UserController extends BaseController {
     }
 
     @RequestMapping(value = "get.do", method = RequestMethod.POST)
-    public void get(HttpServletResponse response, Long id) {
-        User user = userService.queryUserById(id);
-        writeJson(response, JSON.toJSONString(user));
+    @ResponseBody
+    public User get(HttpServletResponse response, Long id) {
+        return userService.queryUserById(id);
     }
 
     @RequestMapping(value = "pwd.do", method = RequestMethod.POST)
@@ -135,7 +136,7 @@ public class UserController extends BaseController {
 
     @RequestMapping(value = "checkname.do", method = RequestMethod.POST)
     @ResponseBody
-    public boolean checkName(String name) {
-        return !userService.existsName(name);
+    public Status checkName(String name) {
+        return Status.create(!userService.existsName(name));
     }
 }

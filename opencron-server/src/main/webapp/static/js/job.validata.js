@@ -22,14 +22,14 @@ function Validata() {
         },
 
         jobName: function () {
-            var elemFix = arguments[0] || "";
-            var _jobName = $("#jobName" + elemFix).val();
+            var prefix = arguments[0] || "";
+            var _jobName = $("#jobName" + prefix).val();
             if (!_jobName) {
-                opencron.tipError("#jobName" + elemFix, "必填项,作业名称不能为空");
+                opencron.tipError("#jobName" + prefix, "必填项,作业名称不能为空");
                 this.status = false;
             } else {
                 if (_jobName.length < 4 || _jobName.length > 17) {
-                    opencron.tipError("#jobName" + elemFix, "作业名称不能小于4个字符并且不能超过16个字符!");
+                    opencron.tipError("#jobName" + prefix, "作业名称不能小于4个字符并且不能超过16个字符!");
                     this.status = false;
                 } else {
                     var _this = this;
@@ -45,15 +45,15 @@ function Validata() {
                     }).done(function (data) {
                         _this.jobNameRemote = true;
                         if (!data) {
-                            opencron.tipError("#jobName" + elemFix, "作业名称已存在!");
+                            opencron.tipError("#jobName" + prefix, "作业名称已存在!");
                             _this.status = false;
                         } else {
-                            opencron.tipOk("#jobName" + elemFix);
+                            opencron.tipOk("#jobName" + prefix);
                         }
                     }).fail(function () {
                         _this.jobNameRemote = true;
                         _this.status = false;
-                        opencron.tipError("#jobName" + elemFix, "网络请求错误,请重试!");
+                        opencron.tipError("#jobName" + prefix, "网络请求错误,请重试!");
                     });
                 }
             }
@@ -61,9 +61,17 @@ function Validata() {
 
         cronExp: function () {
             var cronType = $('input[type="radio"][name="cronType"]:checked').val();
+
+            if (cronType == 0) {
+                $("#cronTip").css("visibility","visible").html("crontab: unix/linux的时间格式表达式 ");
+            }
+            if (cronType == 1) {
+                $("#cronTip").css("visibility","visible").html('quartz: quartz框架的时间格式表达式');
+            }
+
             var cronExp = $("#cronExp").val();
             if (!cronExp) {
-                opencron.tipError("#cronExp", "时间规则不能为空!");
+                opencron.tipError($("#cronExp"),"时间规则不能为空,请填写时间规则");
                 this.status = false;
             } else {
                 var _this = this;
@@ -74,12 +82,15 @@ function Validata() {
                     data: {
                         "cronType": cronType,
                         "cronExp": cronExp
-                    }
+                    },
+                    dataType:"json"
                 }).done(function (data) {
                     _this.cronExpRemote = true;
-                    if (data) {
+                    if (data.status) {
                         opencron.tipOk($("#expTip"));
                     } else {
+                        self.toggle.cronTip(cronType);
+                        $("#expTip").css("visibility","visible");
                         opencron.tipError($("#expTip"), "时间规则语法错误!");
                         _this.status = false;
                     }
@@ -92,53 +103,53 @@ function Validata() {
         },
 
         command: function () {
-            var elemFix = arguments[0] || "";
-            if ($("#cmd" + elemFix).val().length == 0) {
-                opencron.tipError("#cmd" + elemFix, "执行命令不能为空,请填写执行命令");
+            var prefix = arguments[0] || "";
+            if ($("#cmd" + prefix).val().length == 0) {
+                opencron.tipError("#cmd" + prefix, "执行命令不能为空,请填写执行命令");
                 this.status = false;
             } else {
-                opencron.tipOk("#cmd" + elemFix);
+                opencron.tipOk("#cmd" + prefix);
             }
         },
 
         runAs: function () {
-            var elemFix = arguments[0] || "";
-            if ($("#runAs" + elemFix).val().length == 0) {
-                opencron.tipError("#runAs" + elemFix, "任务运行身份不能为空,请填写任务运行身份");
+            var prefix = arguments[0] || "";
+            if ($("#runAs" + prefix).val().length == 0) {
+                opencron.tipError("#runAs" + prefix, "任务运行身份不能为空,请填写任务运行身份");
                 this.status = false;
             } else {
-                opencron.tipOk("#runAs" + elemFix);
+                opencron.tipOk("#runAs" + prefix);
             }
         },
 
         successExit: function () {
-            var elemFix = arguments[0] || "";
-            var successExit = $("#successExit" + elemFix).val();
+            var prefix = arguments[0] || "";
+            var successExit = $("#successExit" + prefix).val();
             if (successExit.length == 0) {
-                opencron.tipError("#successExit" + elemFix, "自定义成功标识不能为空");
+                opencron.tipError("#successExit" + prefix, "自定义成功标识不能为空");
                 this.status = false;
             } else if (isNaN(successExit)) {
-                opencron.tipError("#successExit" + elemFix, "自定义成功标识必须为数字");
+                opencron.tipError("#successExit" + prefix, "自定义成功标识必须为数字");
                 this.status = false;
             } else {
-                opencron.tipOk("#successExit" + elemFix);
+                opencron.tipOk("#successExit" + prefix);
             }
         },
 
         runCount: function () {
-            var elemFix = arguments[0] || "";
-            var redo = elemFix ? $("#itemRedo").val() : $('input[type="radio"][name="redo"]:checked').val();
+            var prefix = arguments[0] || "";
+            var redo = prefix ? $("#itemRedo").val() : $('input[type="radio"][name="redo"]:checked').val();
             var reg = /^[0-9]*[1-9][0-9]*$/;
             if (redo == 1) {
-                var _runCount = $("#runCount" + elemFix).val();
+                var _runCount = $("#runCount" + prefix).val();
                 if (!_runCount) {
-                    opencron.tipError("#runCount" + elemFix, "请填写重跑次数!");
+                    opencron.tipError("#runCount" + prefix, "请填写重跑次数!");
                     this.status = false;
                 } else if (!reg.test(_runCount)) {
-                    opencron.tipError("#runCount" + elemFix, "截止重跑次数必须为正整数!");
+                    opencron.tipError("#runCount" + prefix, "截止重跑次数必须为正整数!");
                     this.status = false;
                 } else {
-                    opencron.tipOk("#runCount" + elemFix);
+                    opencron.tipOk("#runCount" + prefix);
                 }
             }
         },
@@ -196,18 +207,18 @@ function Validata() {
         },
 
         timeout: function () {
-            var elemFix = arguments[0] || "";
-            var timeout = $("#timeout" + elemFix).val();
+            var prefix = arguments[0] || "";
+            var timeout = $("#timeout" + prefix).val();
             if (timeout.length > 0) {
                 if (isNaN(timeout) || parseInt(timeout) < 0) {
-                    opencron.tipError("#timeout" + elemFix, "超时时间必须为正整数,请填写正确的超时时间!");
+                    opencron.tipError("#timeout" + prefix, "超时时间必须为正整数,请填写正确的超时时间!");
                     this.status = false;
                 } else {
-                    opencron.tipOk("#timeout" + elemFix);
+                    opencron.tipOk("#timeout" + prefix);
                 }
             } else {
                 this.status = false;
-                opencron.tipError("#timeout" + elemFix, "超时时间不能为空,请填写(0:忽略超时时间,分钟为单位!");
+                opencron.tipError("#timeout" + prefix, "超时时间不能为空,请填写(0:忽略超时时间,分钟为单位!");
             }
         },
 
@@ -432,15 +443,14 @@ function Validata() {
             }
         },
         cronTip: function (type) {
-            if (type == "0") {
-                $("#cronTip").html("crontab: unix/linux的时间格式表达式 ");
-                $("#expTip").html('crontab: 请采用unix/linux的时间格式表达式,如 00 01 * * *');
+            if (type == 0) {
+                $("#cronTip").css("visibility","visible").html("crontab: unix/linux的时间格式表达式 ");
+                $("#expTip").css("visibility","visible").html('crontab: 请采用unix/linux的时间格式表达式,如 00 01 * * *');
             }
-            if (type == "1") {
-                $("#cronTip").html('quartz: quartz框架的时间格式表达式');
-                $("#expTip").html('quartz: 请采用quartz框架的时间格式表达式,如 0 0 10 L * ?');
+            if (type == 1) {
+                $("#cronTip").css("visibility","visible").html('quartz: quartz框架的时间格式表达式');
+                $("#expTip").css("visibility","visible").html('quartz: 请采用quartz框架的时间格式表达式,如 0 0 10 L * ?');
             }
-
             if ( (arguments[1]||false) && $("#cronExp").val().length > 0) {
                 self.validata.cronExp();
             }
@@ -476,16 +486,16 @@ Validata.prototype.ready = function () {
     var _this = this;
 
     $("#cronType0").next().click(function () {
-        _this.toggle.cronTip(0,true);
+        _this.validata.cronExp();
     });
     $("#cronType0").parent().parent().click(function () {
-        _this.toggle.cronTip(0,true);
+        _this.validata.cronExp();
     });
     $("#cronType1").next().click(function () {
-        _this.toggle.cronTip(1,true);
+        _this.validata.cronExp();
     });
     $("#cronType1").parent().parent().click(function () {
-        _this.toggle.cronTip(1,true);
+        _this.validata.cronExp();
     });
 
     $("#runModel0").next().click(function () {
@@ -494,6 +504,7 @@ Validata.prototype.ready = function () {
     $("#runModel0").parent().parent().click(function () {
         _this.toggle.runModel(0);
     });
+
     $("#runModel1").next().click(function () {
         _this.toggle.runModel(1);
     });
@@ -606,13 +617,13 @@ Validata.prototype.ready = function () {
         _this.validata.cronExp();
     }).focus(function () {
         var type = $('input[type="radio"][name="cronType"]:checked').val();
-        if (type == "0") {
-            $("#cronTip").html("crontab: unix/linux的时间格式表达式 ");
-            $("#expTip").html('crontab: 请采用unix/linux的时间格式表达式,如 00 01 * * *');
+        if (type == 0) {
+            $("#cronTip").css("visibility","visible").html("crontab: unix/linux的时间格式表达式 ");
+            $("#expTip").css("visibility","visible").html('crontab: 请采用unix/linux的时间格式表达式,如 00 01 * * *');
         }
-        if (type == "1") {
-            $("#cronTip").html('quartz: quartz框架的时间格式表达式');
-            $("#expTip").html('quartz: 请采用quartz框架的时间格式表达式,如 0 0 10 L * ?');
+        if (type == 1) {
+            $("#cronTip").css("visibility","visible").html('quartz: quartz框架的时间格式表达式');
+            $("#expTip").css("visibility","visible").html('quartz: 请采用quartz框架的时间格式表达式,如 0 0 10 L * ?');
         }
     });
 

@@ -88,10 +88,12 @@ echo_w () {
 cygwin=false
 darwin=false
 os400=false
+hpux=false
 case "`uname`" in
 CYGWIN*) cygwin=true;;
 Darwin*) darwin=true;;
 OS400*) os400=true;;
+HP-UX*) hpux=true;;
 esac
 
 # resolve links - $0 may be a softlink
@@ -139,16 +141,15 @@ fi
 # as this is used as the separator in the classpath and Java provides no
 # mechanism for escaping if the same character appears in the path.
 case $OPENCRON_HOME in
-  *:*) echo_w "Using OPENCRON_HOME:   $OPENCRON_HOME";
-       echo_w "Unable to start as OPENCRON_HOME contains a colon (:) character";
+  *:*) echo "Using OPENCRON_HOME:   $OPENCRON_HOME";
+       echo "Unable to start as OPENCRON_HOME contains a colon (:) character";
        exit 1;
 esac
 case $OPENCRON_BASE in
-  *:*) echo_w "Using OPENCRON_BASE:   $OPENCRON_BASE";
-       echo_w "Unable to start as OPENCRON_BASE contains a colon (:) character";
+  *:*) echo "Using OPENCRON_BASE:   $OPENCRON_BASE";
+       echo "Unable to start as OPENCRON_BASE contains a colon (:) character";
        exit 1;
 esac
-
 
 # For OS400
 if $os400; then
@@ -193,7 +194,6 @@ if [ "`${RUNJAVA} -version 2>&1 | head -1|grep "openjdk"|wc -l`"x == "1"x ]; the
   exit 1;
 fi
 
-
 if [ -z "$OPENCRON_OUT" ] ; then
   OPENCRON_OUT="$OPENCRON_BASE"/logs/opencron.out
 fi
@@ -207,17 +207,21 @@ OPENCRON_PIDDIR="/var/run";
 if [ ! -d "$OPENCRON_PIDDIR" ] ; then
     mkdir $OPENCRON_PIDDIR;
 fi
-
 OPENCRON_PID="$OPENCRON_PIDDIR/opencron.pid";
 
 #opencron version
 OPENCRON_VERSION="1.2.0-RELEASE"
-
-# Add bootstrap.jar to classpath
+# Add on extra jar files to CLASSPATH
 if [ ! -z "$CLASSPATH" ] ; then
   CLASSPATH="$CLASSPATH":
 fi
 CLASSPATH="$CLASSPATH""$OPENCRON_BASE"/lib/opencron-agent-${OPENCRON_VERSION}.jar
+
+# Bugzilla 37848: When no TTY is available, don't output to console
+have_tty=0
+if [ "`tty`" != "not a tty" ]; then
+    have_tty=1
+fi
 
 # Bugzilla 37848: When no TTY is available, don't output to console
 have_tty=0
@@ -233,6 +237,25 @@ if $cygwin; then
   OPENCRON_BASE=`cygpath --absolute --windows "$OPENCRON_BASE"`
   OPENCRON_TMPDIR=`cygpath --absolute --windows "$OPENCRON_TMPDIR"`
   CLASSPATH=`cygpath --path --windows "$CLASSPATH"`
+fi
+
+# Set UMASK unless it has been overridden
+if [ -z "$UMASK" ]; then
+    UMASK="0027"
+fi
+umask $UMASK
+
+# Uncomment the following line to make the umask available when using the
+if [ -z "$USE_NOHUP" ]; then
+    if $hpux; then
+        USE_NOHUP="true"
+    else
+        USE_NOHUP="false"
+    fi
+fi
+unset _NOHUP
+if [ "$USE_NOHUP" = "true" ]; then
+    _NOHUP=nohup
 fi
 
 # ----- Execute The Requested Command -----------------------------------------
@@ -341,7 +364,7 @@ case "$1" in
         fi
 
         touch "$OPENCRON_OUT"
-        eval "\"$RUNJAVA\"" \
+        eval $_NOHUP "\"$RUNJAVA\"" \
         -classpath "\"$CLASSPATH\"" \
         -Dopencron.home="$OPENCRON_HOME" \
         -Dopencron.pid="$OPENCRON_PID" \
