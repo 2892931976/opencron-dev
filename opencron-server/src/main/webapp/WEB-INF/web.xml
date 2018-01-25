@@ -73,8 +73,8 @@
     </filter-mapping>
 
     <servlet>
-        <servlet-name>springMVC</servlet-name>
-        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+        <servlet-name>opencronServlet</servlet-name>
+        <servlet-class>org.opencron.server.handler.OpencronServlet</servlet-class>
         <init-param>
             <param-name>contextConfigLocation</param-name>
             <param-value>classpath*:app-mvc.xml</param-value>
@@ -84,7 +84,7 @@
     </servlet>
 
     <servlet-mapping>
-        <servlet-name>springMVC</servlet-name>
+        <servlet-name>opencronServlet</servlet-name>
         <url-pattern>/</url-pattern>
     </servlet-mapping>
 
@@ -96,15 +96,6 @@
         <servlet-name>DruidStatView</servlet-name>
         <url-pattern>/druid/*</url-pattern>
     </servlet-mapping>
-
-    <filter>
-        <filter-name>xssFilter</filter-name>
-        <filter-class>org.opencron.server.handler.XssFilter</filter-class>
-    </filter>
-    <filter-mapping>
-        <filter-name>xssFilter</filter-name>
-        <url-pattern>/*</url-pattern>
-    </filter-mapping>
 
     <filter>
         <filter-name>sitemesh</filter-name>
