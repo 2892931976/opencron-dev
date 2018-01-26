@@ -309,7 +309,7 @@ public class RecordService {
         return queryDao.sqlQuery(Record.class, sql, recordId);
     }
 
-    public Long getRecords(HttpSession session, int status, Constants.ExecType execType) {
+    public Integer getRecords(HttpSession session, int status, Constants.ExecType execType) {
         String sql;
         if (status == 1) {
             sql = "SELECT COUNT(1) FROM T_RECORD WHERE success=? AND execType=? AND STATUS IN (?,?,?) AND (FLOWNUM IS NULL OR flowNum=1)";

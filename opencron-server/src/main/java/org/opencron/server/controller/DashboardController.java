@@ -115,8 +115,8 @@ public class DashboardController extends BaseController {
         /**
          * 成功作业,自动执行
          */
-        Long successAutoRecord = recordService.getRecords(session, 1, Constants.ExecType.AUTO);
-        Long successOperRecord = recordService.getRecords(session, 1, Constants.ExecType.OPERATOR);
+        Integer successAutoRecord = recordService.getRecords(session, 1, Constants.ExecType.AUTO);
+        Integer successOperRecord = recordService.getRecords(session, 1, Constants.ExecType.OPERATOR);
 
         model.addAttribute("successAutoRecord", successAutoRecord);
         model.addAttribute("successOperRecord", successOperRecord);
@@ -125,8 +125,8 @@ public class DashboardController extends BaseController {
         /**
          * 失败作业
          */
-        Long failedAutoRecord = recordService.getRecords(session, 0, Constants.ExecType.AUTO);
-        Long failedOperRecord = recordService.getRecords(session, 0, Constants.ExecType.OPERATOR);
+        Integer failedAutoRecord = recordService.getRecords(session, 0, Constants.ExecType.AUTO);
+        Integer failedOperRecord = recordService.getRecords(session, 0, Constants.ExecType.OPERATOR);
         model.addAttribute("failedAutoRecord", failedAutoRecord);
         model.addAttribute("failedOperRecord", failedOperRecord);
         model.addAttribute("failedRecord", failedAutoRecord + failedOperRecord);
@@ -328,7 +328,7 @@ public class DashboardController extends BaseController {
 
     @RequestMapping(value = "notice/uncount.do", method = RequestMethod.POST)
     @ResponseBody
-    public Long uncount(HttpSession session) {
+    public Integer uncount(HttpSession session) {
         return homeService.getUnReadCount(session);
     }
 

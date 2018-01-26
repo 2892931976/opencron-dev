@@ -113,7 +113,7 @@ public class HomeService {
         return queryDao.sqlQuery(LogInfo.class, sql, Constants.MsgType.WEBSITE.getValue(), OpencronTools.getUserId(session));
     }
 
-    public Long getUnReadCount(HttpSession session) {
+    public Integer getUnReadCount(HttpSession session) {
         String sql = "SELECT COUNT(1) FROM T_LOG WHERE isRead=0 AND type=? and userId = ?";
         return queryDao.sqlCount(sql, Constants.MsgType.WEBSITE.getValue(), OpencronTools.getUserId(session));
     }
