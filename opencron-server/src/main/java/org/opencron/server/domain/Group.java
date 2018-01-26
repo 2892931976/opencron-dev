@@ -38,7 +38,7 @@ public class Group {
     private String userName;//显示用户名的冗余字段
 
     @Transient
-    private Long agentCount;
+    private Integer agentCount;
 
     public Long getGroupId() {
         return groupId;
@@ -96,11 +96,11 @@ public class Group {
         this.agents = agents;
     }
 
-    public Long getAgentCount() {
+    public Integer getAgentCount() {
         return agentCount;
     }
 
-    public void setAgentCount(Long agentCount) {
+    public void setAgentCount(Integer agentCount) {
         this.agentCount = agentCount;
     }
 }

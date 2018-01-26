@@ -38,16 +38,18 @@ public class QueryDao extends BaseDao {
      * @param beanClass 支持任意Bean，按结果集映射
      * @return
      */
-    public <E> PageBean<E> getPageBySql(PageBean<E> pageBean, Class<E> beanClass, String sql, Object... parameters) {
+    public <E> PageBean<E> sqlPageQuery(PageBean<E> pageBean, Class<E> beanClass, String sql, Object... parameters) {
         Query query = createSQLQuery(sql, parameters).setResultTransformer(BeanResultTransFormer.get(beanClass));
         pageQuery(query, pageBean);
+        Integer count = this.sqlCount(sql, parameters);
+        pageBean.setTotalCount(count);
+        return pageBean;
+    }
 
-        //总记录数
-        sql = preparedCount(sql);
-        Long count = this.getCountBySql(sql, parameters);
-        if (count == null) {
-            count = 0L;
-        }
+    public <E> PageBean<E> hqlPageQuery(String hql, PageBean pageBean, Object... parameters) {
+        Query query = createQuery(hql,parameters);
+        pageQuery(query, pageBean);
+        int count = hqlCount(hql);
         pageBean.setTotalCount(count);
         return pageBean;
     }
@@ -58,9 +60,8 @@ public class QueryDao extends BaseDao {
      * @param query
      * @return
      */
-    public static PageBean pageQuery(Query query, PageBean pageBean) {
+    private static void pageQuery(Query query, PageBean pageBean) {
         pageBean.setResult(pageQuery(query, pageBean.getPageNo(), pageBean.getPageSize()));
-        return pageBean;
     }
 
 }

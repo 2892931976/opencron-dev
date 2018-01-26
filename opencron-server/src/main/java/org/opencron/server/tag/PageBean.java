@@ -192,7 +192,7 @@ public class PageBean<T> implements Serializable {
     /**
      * 设置总记录数.
      */
-    public void setTotalCount(final long totalCount) {
+    public void setTotalCount(final Integer totalCount) {
         this.totalCount = totalCount;
     }
 

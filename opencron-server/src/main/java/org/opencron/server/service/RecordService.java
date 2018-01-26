@@ -96,7 +96,7 @@ public class RecordService {
             }
         }
         sql += " ORDER BY R.startTime DESC";
-        queryDao.getPageBySql(pageBean, RecordInfo.class, sql);
+        queryDao.sqlPageQuery(pageBean, RecordInfo.class, sql);
         if (status) {
             //已完成任务的子任务及重跑记录查询
             queryChildrenAndRedo(pageBean);
@@ -320,7 +320,7 @@ public class RecordService {
             User user = OpencronTools.getUser(session);
             sql += " AND userId = " + user.getUserId() + " AND agentid IN (" + user.getAgentIds() + ")";
         }
-        return queryDao.getCountBySql(sql, 1, execType.getStatus(), Constants.RunStatus.STOPED.getStatus(), Constants.RunStatus.DONE.getStatus(), Constants.RunStatus.RERUNDONE.getStatus());
+        return queryDao.sqlCount(sql, 1, execType.getStatus(), Constants.RunStatus.STOPED.getStatus(), Constants.RunStatus.DONE.getStatus(), Constants.RunStatus.RERUNDONE.getStatus());
     }
 
     @Transactional

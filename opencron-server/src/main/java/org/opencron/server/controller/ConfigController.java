@@ -27,6 +27,7 @@ import org.opencron.server.domain.Config;
 import org.opencron.server.job.OpencronTools;
 import org.opencron.server.service.ConfigService;
 import org.opencron.server.service.RecordService;
+import org.opencron.server.vo.Status;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -80,16 +81,16 @@ public class ConfigController extends BaseController {
 
     @RequestMapping(value = "clear.do", method = RequestMethod.POST)
     @ResponseBody
-    public boolean clearRecord(String startTime, String endTime) {
+    public Status clearRecord(String startTime, String endTime) {
         recordService.deleteRecordBetweenTime(startTime, endTime);
-        return true;
+        return Status.TRUE;
     }
 
     @RequestMapping(value = "skin.do", method = RequestMethod.POST)
     @ResponseBody
-    public boolean skin(String skin, HttpSession session) {
+    public Status skin(String skin, HttpSession session) {
         session.setAttribute(Constants.PARAM_SKIN_NAME_KEY, skin);
-        return true;
+        return Status.TRUE;
     }
 
 }

@@ -104,7 +104,7 @@ public class HomeService {
             sql += " AND L.sendTime LIKE '" + sendTime + "%' ";
         }
         sql += " ORDER BY L.sendTime DESC";
-        queryDao.getPageBySql(pageBean, LogInfo.class, sql);
+        queryDao.sqlPageQuery(pageBean, LogInfo.class, sql);
         return pageBean;
     }
 
@@ -115,7 +115,7 @@ public class HomeService {
 
     public Long getUnReadCount(HttpSession session) {
         String sql = "SELECT COUNT(1) FROM T_LOG WHERE isRead=0 AND type=? and userId = ?";
-        return queryDao.getCountBySql(sql, Constants.MsgType.WEBSITE.getValue(), OpencronTools.getUserId(session));
+        return queryDao.sqlCount(sql, Constants.MsgType.WEBSITE.getValue(), OpencronTools.getUserId(session));
     }
 
     public void saveLog(Log log) {

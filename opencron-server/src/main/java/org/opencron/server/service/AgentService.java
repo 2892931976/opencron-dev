@@ -94,7 +94,7 @@ public class AgentService {
         return queryDao.hqlQuery(hql, false,status.isValue());
     }
 
-    public PageBean getOwnerAgent(HttpSession session, PageBean pageBean) {
+    public void getOwnerAgent(HttpSession session, PageBean pageBean) {
         String hql = "from Agent where deleted=? ";
         if (!OpencronTools.isPermission(session)) {
             User user = OpencronTools.getUser(session);
@@ -102,8 +102,7 @@ public class AgentService {
         }
         pageBean.verifyOrderBy("name", "name", "host", "port");
         hql += " order by " + pageBean.getOrderBy() + " " + pageBean.getOrder();
-        queryDao.hqlPageQuery(hql,pageBean.getPageNo(),pageBean.getPageSize(),false);
-        return pageBean;
+        queryDao.hqlPageQuery(hql,pageBean,false);
     }
 
     public Agent getAgent(Long id) {

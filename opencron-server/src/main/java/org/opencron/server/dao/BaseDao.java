@@ -109,34 +109,34 @@ public class BaseDao<T, PK extends Serializable> extends HibernateDao {
      * @param sql 需要保证sql为查询总数的语句
      * @return
      */
-    public Long getCountBySql(String sql, Object... params) {
-        Object result = createSQLQuery(sql, params).uniqueResult();
-        return toLong(result);
+    public Integer sqlCount(String sql, Object... params) {
+        return sqlIntUniqueResult( preparedCount(sql),params);
     }
 
-    public static String preparedCount(String sql) {
-        Pattern pattern = Pattern.compile("\\((.*?)\\)");
-        Matcher matcher = pattern.matcher(sql);
-
-        String tmpSql = sql.toLowerCase();
-        while (matcher.find()) {
-            String strFinded = matcher.group(1);
-            String strReplace = strFinded.replace("from", "####");
-            tmpSql = tmpSql.replace(strFinded, strReplace);
+    public Integer hqlCount(String hql,Object...params) {
+        if (hql.toLowerCase().startsWith("from")) {
+            hql = "select count(1) " + hql;
+        }else {
+            hql = "select count(1) " + hql.substring(hql.toLowerCase().indexOf("from"));
         }
+        hql = hql.replaceAll("\\s+"," ");
 
-        Pattern groupPattern = Pattern.compile(".from.*group\\s+by\\s+.*");
-        Matcher groupMatcher = groupPattern.matcher(sql.toLowerCase());
-
-        if (groupMatcher.find()) {
-            sql = "select count(1) as total from ( " + sql + " ) as t ";
-        } else {
-            int startIndex = tmpSql.indexOf("select");
-            int endIndex = tmpSql.indexOf(" from ");
-            String repaceSql = sql.substring(startIndex + 6, endIndex);
-            sql = sql.replace(repaceSql, " count(1) as total ");
+        if (hql.toLowerCase().contains("group by")) {
+            List list = createQuery(hql,params).list();
+            if (CommonUtils.isEmpty(list)) return 0;
+            return list.size();
+        }else {
+            return hqlIntUniqueResult(hql,params);
         }
-        return sql;
+    }
+
+    public Integer sqlIntUniqueResult(String sql, Object... params) {
+        Object result = createSQLQuery(sql,params).uniqueResult();
+        return result==null?null:toInt(result);
+    }
+
+    private static String preparedCount(String sql) {
+        return  String.format("select count(1) from ( %s ) as t ",sql);
     }
 
     public Long hqlLongUniqueResult(String hql, Object... params) {

@@ -50,12 +50,12 @@ public class GroupService {
     private AgentService agentService;
 
     public PageBean<Group> getGroupPage(PageBean pageBean) {
-        pageBean = queryDao.getPageBySql(pageBean, Group.class, "SELECT G.*,U.userName FROM T_GROUP AS G INNER JOIN T_USER AS U ON G.userId=U.userId");
+        pageBean = queryDao.sqlPageQuery(pageBean, Group.class, "SELECT G.*,U.userName FROM T_GROUP AS G INNER JOIN T_USER AS U ON G.userId=U.userId");
         List<Group> groups = pageBean.getResult();
         if (CommonUtils.notEmpty(groups)) {
             String sql = "SELECT COUNT(1) FROM T_AGENT_GROUP WHERE groupId=?";
             for (Group group : groups) {
-                Long count = queryDao.getCountBySql(sql, group.getGroupId());
+                Integer count = queryDao.sqlCount(sql, group.getGroupId());
                 group.setAgentCount(count);
             }
         }
@@ -124,7 +124,7 @@ public class GroupService {
         if (notEmpty(id)) {
             sql += " AND groupId != " + id;
         }
-        return (queryDao.getCountBySql(sql, name)) > 0L;
+        return (queryDao.sqlCount(sql, name)) > 0L;
     }
 
     public Group getById(Long groupId) {

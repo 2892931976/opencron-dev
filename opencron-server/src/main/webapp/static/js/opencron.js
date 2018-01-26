@@ -28,7 +28,7 @@ function ajax(params,successCallback,errorCallBack) {
             }
         },
         error: function () {
-            if (errorCallBack){
+            if (errorCallBack) {
                 errorCallBack();
             }else {
                 alert("网络繁忙请刷新页面重试!");

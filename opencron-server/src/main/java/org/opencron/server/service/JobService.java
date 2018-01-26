@@ -173,7 +173,7 @@ public class JobService {
                 sql += " AND T.userId = " + user.getUserId() + " AND T.agentId IN (" + user.getAgentIds() + ")";
             }
         }
-        pageBean = queryDao.getPageBySql(pageBean, JobInfo.class, sql);
+        pageBean = queryDao.sqlPageQuery(pageBean, JobInfo.class, sql);
         List<JobInfo> parentJobs = pageBean.getResult();
 
         for (JobInfo parentJob : parentJobs) {
@@ -251,7 +251,7 @@ public class JobService {
         if (notEmpty(jobId)) {
             sql += " AND jobId != " + jobId + " AND flowId != " + jobId;
         }
-        return (queryDao.getCountBySql(sql, agentId, name)) > 0L;
+        return (queryDao.sqlCount(sql, agentId, name)) > 0L;
     }
 
     public String checkDelete(Long id) {
@@ -262,7 +262,7 @@ public class JobService {
 
         //该任务是否正在执行中
         String sql = "SELECT COUNT(1) FROM T_RECORD WHERE jobId = ? AND `status`=?";
-        Long count = queryDao.getCountBySql(sql, id, RunStatus.RUNNING.getStatus());
+        int count = queryDao.sqlCount(sql, id, RunStatus.RUNNING.getStatus());
         if (count > 0) {
             return "false";
         }
@@ -276,7 +276,7 @@ public class JobService {
                     " ) AS J" +
                     " on R.jobId = J.jobId" +
                     " and R.status=?";
-            count = queryDao.getCountBySql(sql, id, RunStatus.RUNNING.getStatus());
+            count = queryDao.sqlCount(sql, id, RunStatus.RUNNING.getStatus());
             if (count > 0) {
                 return "false";
             }

@@ -53,7 +53,7 @@ public class UserService {
 
     public PageBean queryUser(PageBean pageBean) {
         String sql = "SELECT U.*,R.roleName FROM T_USER AS U LEFT JOIN T_ROLE R ON U.roleId = R.roleId";
-        queryDao.getPageBySql(pageBean, User.class, sql);
+        queryDao.sqlPageQuery(pageBean, User.class, sql);
         return pageBean;
     }
 
@@ -109,7 +109,7 @@ public class UserService {
 
     public boolean existsName(String name) {
         String sql = "SELECT COUNT(1) FROM T_USER WHERE userName=?";
-        return (queryDao.getCountBySql(sql, name)) > 0L;
+        return (queryDao.sqlCount(sql, name)) > 0L;
     }
 
 
