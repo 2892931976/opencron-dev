@@ -86,8 +86,6 @@ public class JobInfo implements Serializable {
     //运行超时的截止时间
     private Integer timeout;
 
-    private String csrf;
-
     private Boolean deleted;
 
     public JobInfo() {
@@ -346,14 +344,6 @@ public class JobInfo implements Serializable {
 
     public void setTimeout(Integer timeout) {
         this.timeout = timeout;
-    }
-
-    public String getCsrf() {
-        return csrf;
-    }
-
-    public void setCsrf(String csrf) {
-        this.csrf = csrf;
     }
 
     public Boolean getDeleted() {

@@ -25,6 +25,7 @@ import com.alibaba.fastjson.JSON;
 import org.opencron.common.Constants;
 import org.opencron.common.job.Response;
 import org.opencron.common.util.*;
+import org.opencron.common.util.collection.ParamsMap;
 import org.opencron.server.domain.Agent;
 import org.opencron.server.domain.Job;
 import org.opencron.server.domain.Log;
@@ -191,18 +192,18 @@ public class DashboardController extends BaseController {
     }
 
     @RequestMapping(value = "login.do", method = RequestMethod.POST)
-    public void login(HttpSession session, HttpServletRequest request, HttpServletResponse response, HttpSession httpSession, @RequestParam String username, @RequestParam String password) throws Exception {
+    @ResponseBody
+    public Map login(HttpSession session, HttpServletRequest request, HttpServletResponse response, HttpSession httpSession, @RequestParam String username, @RequestParam String password) throws Exception {
 
         //用户信息验证
         int status = homeService.checkLogin(request, username, password);
 
         if (status == 500) {
-            writeJson(response, "{\"msg\":\"用户名密码错误\"}");
-            return;
+            return ParamsMap.map().set("msg","用户名密码错误");
         }
         if (status == 200) {
             //登陆成功了则生成csrf...
-            String csrf = OpencronTools.getCSRF(session);
+            String csrf = OpencronTools.createCSRF(request,response);
             logger.info("[opencron]login seccussful,generate csrf:{}", csrf);
 
             User user = OpencronTools.getUser(session);
@@ -211,11 +212,8 @@ public class DashboardController extends BaseController {
             byte[] hashPassword = DigestUtils.sha1(DigestUtils.md5Hex("opencron").toUpperCase().getBytes(), salt, 1024);
             String hashPass = DigestUtils.encodeHex(hashPassword);
 
-            String format = "{\"status\":\"%s\",\"%s\":\"%s\",\"%s\":\"%s\"}";
-
             if (user.getUserName().equals("opencron") && user.getPassword().equals(hashPass)) {
-                writeJson(response, String.format(format, "edit", "userId", user.getUserId(), "csrf", csrf));
-                return;
+                return ParamsMap.map().set("status","edit").set("userId",user.getUserId());
             }
 
             if (user.getHeaderpic() != null) {
@@ -225,8 +223,10 @@ public class DashboardController extends BaseController {
                 user.setHeaderPath(getWebUrlPath(request) + "/upload/" + name);
                 session.setAttribute(Constants.PARAM_LOGIN_USER_KEY, user);
             }
-            writeJson(response, String.format(format, "success", "url", "/dashboard.htm?csrf=" + csrf, "csrf", csrf));
+            return ParamsMap.map().set("status","success").set("url","/dashboard.htm");
         }
+
+        return ParamsMap.map().set("status","error");
     }
 
 
@@ -237,7 +237,8 @@ public class DashboardController extends BaseController {
     }
 
     @RequestMapping(value = "headpic/upload.do", method = RequestMethod.POST)
-    public void upload(@RequestParam(value = "file", required = false) MultipartFile file, Long userId, String data, HttpServletRequest request, HttpSession httpSession, HttpServletResponse response) throws Exception {
+    @ResponseBody
+    public Map upload(@RequestParam(value = "file", required = false) MultipartFile file, Long userId, String data, HttpServletRequest request, HttpSession httpSession, HttpServletResponse response) throws Exception {
 
         String extensionName = null;
         if (file != null) {
@@ -245,22 +246,18 @@ public class DashboardController extends BaseController {
             extensionName = extensionName.replaceAll("\\?\\d+$", "");
         }
 
-        String successFormat = "{\"result\":\"%s\",\"state\":200}";
-        String errorFormat = "{\"message\":\"%s\",\"state\":500}";
 
         Cropper cropper = JSON.parseObject(DigestUtils.passBase64(data), Cropper.class);
-
+        ParamsMap result = ParamsMap.map();
         //检查后缀
         if (!".BMP,.JPG,.JPEG,.PNG,.GIF".contains(extensionName.toUpperCase())) {
-            writeJson(response, String.format(errorFormat, "格式错误,请上传(bmp,jpg,jpeg,png,gif)格式的图片"));
-            return;
+            return result.set("message","格式错误,请上传(bmp,jpg,jpeg,png,gif)格式的图片").set("state",500);
         }
 
         User user = userService.getUserById(userId);
 
         if (user == null) {
-            writeJson(response, String.format(errorFormat, "用户信息获取失败"));
-            return;
+            return result.set("message","用户信息获取失败").set("state",500);
         }
 
         String rootPath = httpSession.getServletContext().getRealPath("/");
@@ -278,16 +275,14 @@ public class DashboardController extends BaseController {
             //检查文件是不是图片
             Image image = ImageIO.read(picFile);
             if (image == null) {
-                writeJson(response, String.format(errorFormat, "格式错误,正确的图片"));
                 picFile.delete();
-                return;
+                return result.set("message","格式错误,解析失败,请上传正确的图片").set("state",500);
             }
 
             //检查文件大小
             if (picFile.length() / 1024 / 1024 > 5) {
-                writeJson(response, String.format(errorFormat, "文件错误,上传图片大小不能超过5M"));
                 picFile.delete();
-                return;
+                return result.set("message","文件错误,上传图片大小不能超过5M").set("state",500);
             }
 
             //旋转并且裁剪
@@ -303,12 +298,16 @@ public class DashboardController extends BaseController {
             user.setHeaderpic(null);
             httpSession.setAttribute(Constants.PARAM_LOGIN_USER_KEY, user);
 
-            writeJson(response, String.format(successFormat, imgPath));
             logger.info(" upload file successful @ " + picName);
+
+            return result.set("result",imgPath).set("state",200);
+
         } catch (Exception e) {
             e.printStackTrace();
             logger.info("upload exception:" + e.getMessage());
         }
+
+        return result.set("message","未知错误,上传失败").set("state",500);
     }
 
 

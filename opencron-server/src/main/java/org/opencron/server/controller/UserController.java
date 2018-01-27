@@ -86,14 +86,14 @@ public class UserController extends BaseController {
     @RequestMapping(value = "add.do", method = RequestMethod.POST)
     public String add(HttpSession session, User user) {
         userService.addUser(user);
-        return "redirect:/user/view.htm?csrf=" + OpencronTools.getCSRF(session);
+        return "redirect:/user/view.htm";
     }
 
     @RequestMapping("edit/{id}.htm")
     public String editPage(HttpSession session, Model model, @PathVariable("id") Long id) {
         if (!OpencronTools.isPermission(session)
                 && !OpencronTools.getUserId(session).equals(id)) {
-            return String.format("redirect:/user/detail/%d.htm?csrf=%s", id, OpencronTools.getCSRF(session));
+            return String.format("redirect:/user/detail/%d.htm", id);
         }
 
         User user = userService.queryUserById(id);
@@ -119,7 +119,7 @@ public class UserController extends BaseController {
         user1.setQq(user.getQq());
         user1.setModifyTime(new Date());
         userService.updateUser(user1);
-        return String.format("redirect:/user/view.htm?csrf=%s", OpencronTools.getCSRF(session));
+        return "redirect:/user/view.htm";
     }
 
     @RequestMapping(value = "get.do", method = RequestMethod.POST)

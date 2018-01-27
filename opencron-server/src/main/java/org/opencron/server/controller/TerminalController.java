@@ -79,7 +79,7 @@ public class TerminalController extends BaseController {
 
             return ParamsMap.map().put(
                     "status","success",
-                    "url", String.format("/terminal/open.htm?token=%s&csrf=%s",token,OpencronTools.getCSRF(session))
+                    "url", String.format("/terminal/open.htm?token=%s",token)
             );
         } else {
             return ParamsMap.map().set("status",authStatus.status);
@@ -98,10 +98,10 @@ public class TerminalController extends BaseController {
             terminal.setUser(user);
             TerminalContext.put(token, terminal);
             OpencronTools.setSshSessionId(session, token);
-            return "redirect:/terminal/open.htm?token=" + token + "&csrf=" + OpencronTools.getCSRF(session);
+            return "redirect:/terminal/open.htm?token=" + token;
         } else {
             //重新输入密码进行认证...
-            return "redirect:/terminal/open.htm?id=" + terminal.getId() + "&csrf=" + OpencronTools.getCSRF(session);
+            return "redirect:/terminal/open.htm?id=" + terminal.getId();
         }
 
     }
@@ -153,7 +153,7 @@ public class TerminalController extends BaseController {
             token = CommonUtils.uuid();
             TerminalContext.put(token, terminal);
             session.setAttribute(Constants.PARAM_SSH_SESSION_ID_KEY, token);
-            return "redirect:/terminal/open.htm?token=" + token + "&csrf=" + OpencronTools.getCSRF(session);
+            return "redirect:/terminal/open.htm?token=" + token;
         }
         return "/terminal/error";
     }

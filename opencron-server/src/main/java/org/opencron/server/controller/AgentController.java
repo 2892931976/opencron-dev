@@ -119,7 +119,7 @@ public class AgentController extends BaseController {
         agent.setDeleted(false);
         agent = agentService.merge(agent);
         session.setAttribute("scanAgent", agent);
-        return "redirect:/agent/view.htm?csrf=" + OpencronTools.getCSRF(session);
+        return "redirect:/agent/view.htm";
     }
 
 

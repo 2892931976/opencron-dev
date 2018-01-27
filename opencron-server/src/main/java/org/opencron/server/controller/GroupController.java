@@ -85,7 +85,7 @@ public class GroupController extends BaseController {
         List<Agent> agents = agentService.getAgentByIds(agentIds);
         group.getAgents().addAll(agents);
         groupService.merge(group);
-        return "redirect:/group/view.htm?csrf=" + OpencronTools.getCSRF(session);
+        return "redirect:/group/view.htm";
     }
 
 

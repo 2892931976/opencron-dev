@@ -76,7 +76,7 @@ public class ConfigController extends BaseController {
         cfg.setSpaceTime(config.getSpaceTime());
         cfg.setSmtpPort(config.getSmtpPort());
         configService.update(cfg);
-        return "redirect:/config/view.htm?csrf=" + OpencronTools.getCSRF(session);
+        return "redirect:/config/view.htm";
     }
 
     @RequestMapping(value = "clear.do", method = RequestMethod.POST)

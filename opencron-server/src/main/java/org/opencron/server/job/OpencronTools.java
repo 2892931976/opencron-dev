@@ -30,6 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.util.Map;
@@ -78,26 +79,6 @@ public final class OpencronTools {
         session.invalidate();
     }
 
-    public static String getCSRF(HttpSession session) {
-        String token;
-        synchronized (session) {
-            token = (String) session.getAttribute(Constants.PARAM_CSRF_NAME_KEY);
-            if (null == token) {
-                token = CommonUtils.uuid();
-                session.setAttribute(Constants.PARAM_CSRF_NAME_KEY, token);
-            }
-        }
-        return token;
-    }
-
-    public static String getCSRF(HttpServletRequest request) {
-        String csrf = request.getHeader(Constants.PARAM_CSRF_NAME_KEY);
-        if (csrf == null) {
-            csrf = request.getParameter(Constants.PARAM_CSRF_NAME_KEY);
-        }
-        return csrf;
-    }
-
     public static void setSshSessionId(HttpSession session, String sshSessionId) {
         session.setAttribute(Constants.PARAM_SSH_SESSION_ID_KEY, sshSessionId);
     }
@@ -107,6 +88,20 @@ public final class OpencronTools {
             resourceId = CommonUtils.uuid();
         }
         return resourceId;
+    }
+
+    public static String createCSRF(HttpServletRequest request, HttpServletResponse response) {
+        String token;
+        HttpSession session = request.getSession();
+        synchronized (session) {
+            token = (String) session.getAttribute(Constants.PARAM_CSRF_NAME_KEY);
+            if (null == token) {
+                token = CommonUtils.uuid();
+                session.setAttribute(Constants.PARAM_CSRF_NAME_KEY, token);
+                CookieUtils.setCookie(response,Constants.PARAM_CSRF_NAME_KEY,token,-1,WebUtils.getWebUrlPath(request));
+            }
+        }
+        return token;
     }
 
     public static class CACHE {

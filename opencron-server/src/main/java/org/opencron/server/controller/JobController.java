@@ -148,7 +148,7 @@ public class JobController extends BaseController {
         if (job.getJobId() != null) {
             Job job1 = jobService.getJob(job.getJobId());
             if (!jobService.checkJobOwner(session, job1.getUserId()))
-                return "redirect:/job/view.htm?csrf=" + OpencronTools.getCSRF(session);
+                return "redirect:/job/view.htm";
             /**
              * 将数据库中持久化的作业和当前修改的合并,当前修改的属性覆盖持久化的属性...
              */
@@ -204,7 +204,7 @@ public class JobController extends BaseController {
 
             //流程任务必须有子任务,没有的话不保存
             if (CommonUtils.isEmpty(children)) {
-                return "redirect:/job/view.htm?csrf=" + OpencronTools.getCSRF(session);
+                return "redirect:/job/view.htm";
             }
 
             if (job.getUserId() == null) {
@@ -216,7 +216,7 @@ public class JobController extends BaseController {
 
         schedulerService.syncJobTigger(job.getJobId(), executeService);
 
-        return "redirect:/job/view.htm?csrf=" + OpencronTools.getCSRF(session);
+        return "redirect:/job/view.htm";
     }
 
     @RequestMapping("editsingle.do")
@@ -238,7 +238,7 @@ public class JobController extends BaseController {
             return "/error/404";
         }
         if (!jobService.checkJobOwner(session, job.getUserId()))
-            return "redirect:/job/view.htm?csrf=" + OpencronTools.getCSRF(session);
+            return "redirect:/job/view.htm";
         model.addAttribute("job", job);
         List<Agent> agents = agentService.getOwnerAgents(session);
         model.addAttribute("agents", agents);
@@ -404,7 +404,7 @@ public class JobController extends BaseController {
             return "/error/404";
         }
         if (!jobService.checkJobOwner(session, jobInfo.getUserId())) {
-            return "redirect:/job/view.htm?csrf=" + OpencronTools.getCSRF(session);
+            return "redirect:/job/view.htm";
         }
         model.addAttribute("job", jobInfo);
         return "/job/detail";
