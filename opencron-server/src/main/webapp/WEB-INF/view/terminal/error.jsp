@@ -83,10 +83,12 @@
                     </div>
                 </form>
             </div>
-            <div class="modal-footer text-center">
+            <div class="modal-footer">
+                <center>
                     <button type="button" class="btn btn-sm" id="sshbtn" onclick="saveSsh()">登陆</button>
                     &nbsp;&nbsp;
                     <button type="button" class="btn btn-sm" onclick="resetForm()">重置</button>
+                </center>
             </div>
         </div>
     </div>

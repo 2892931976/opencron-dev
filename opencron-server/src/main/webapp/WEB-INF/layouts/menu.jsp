@@ -118,10 +118,10 @@
 				</a>
 				<ul class="list-unstyled menu-item">
 					<li <c:if test="${fn:contains(uri,'/job/view')}">class="active"</c:if>>
-						<a href="${contextPath}/job/view.htm class="<c:if test="${fn:contains(uri,'/job/view')}">active</c:if>">作业列表</a>
+						<a href="${contextPath}/job/view.htm" class="<c:if test="${fn:contains(uri,'/job/view')}">active</c:if>">作业列表</a>
 					</li>
 					<li <c:if test="${fn:contains(uri,'/goexec')}">class="active"</c:if>>
-						<a href="${contextPath}/job/goexec.htm class="<c:if test="${fn:contains(uri,'/goexec')}">active</c:if>">现场执行</a>
+						<a href="${contextPath}/job/goexec.htm" class="<c:if test="${fn:contains(uri,'/goexec')}">active</c:if>">现场执行</a>
 					</li>
 				</ul>
 			</li>
@@ -132,28 +132,28 @@
 				</a>
 				<ul class="list-unstyled menu-item">
 					<li <c:if test="${fn:contains(uri,'/running')}">class="active"</c:if>>
-						<a href="${contextPath}/record/running.htm class="<c:if test="${fn:contains(uri,'running')}">active</c:if>">正在运行</a>
+						<a href="${contextPath}/record/running.htm" class="<c:if test="${fn:contains(uri,'running')}">active</c:if>">正在运行</a>
 					</li>
 					<li <c:if test="${fn:contains(uri,'/done')}">class="active"</c:if>>
-						<a href="${contextPath}/record/done.htm class="<c:if test="${fn:contains(uri,'done')}">active</c:if>">已完成</a>
+						<a href="${contextPath}/record/done.htm" class="<c:if test="${fn:contains(uri,'done')}">active</c:if>">已完成</a>
 					</li>
 				</ul>
 			</li>
 
 			<li class="<c:if test="${fn:contains(uri,'/terminal')}">active</c:if>">
-				<a href="${contextPath}/terminal/view.htm>
+				<a href="${contextPath}/terminal/view.htm">
 					<i aria-hidden="true" class="fa fa-terminal"></i><span class="menu-item">WEB终端</span>
 				</a>
 			</li>
 
 			<c:if test="${permission eq true}">
 				<li <c:if test="${fn:contains(uri,'/user')}">class="active"</c:if>>
-					<a href="${contextPath}/user/view.htm>
+					<a href="${contextPath}/user/view.htm">
 						<i class="fa fa-user" aria-hidden="true"></i></i><span class="menu-item">用户管理</span>
 					</a>
 				</li>
 				<li <c:if test="${fn:contains(uri,'/config')}">class="active"</c:if>>
-					<a href="${contextPath}/config/view.htm>
+					<a href="${contextPath}/config/view.htm">
 						<i aria-hidden="true" class="fa fa-cog"></i><span class="menu-item">系统设置</span>
 					</a>
 				</li>

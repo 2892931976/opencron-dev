@@ -203,16 +203,16 @@ public class DashboardController extends BaseController {
         }
         if (status == 200) {
             //登陆成功了则生成csrf...
-            String csrf = OpencronTools.createCSRF(request,response);
+            String csrf = OpencronTools.generateCSRF(request,response);
             logger.info("[opencron]login seccussful,generate csrf:{}", csrf);
 
             User user = OpencronTools.getUser(session);
             //提示用户更改默认密码
             byte[] salt = DigestUtils.decodeHex(user.getSalt());
-            byte[] hashPassword = DigestUtils.sha1(DigestUtils.md5Hex("opencron").toUpperCase().getBytes(), salt, 1024);
+            byte[] hashPassword = DigestUtils.sha1(DigestUtils.md5Hex(Constants.PARAM_DEF_PASSWORD_KEY).toUpperCase().getBytes(), salt, 1024);
             String hashPass = DigestUtils.encodeHex(hashPassword);
 
-            if (user.getUserName().equals("opencron") && user.getPassword().equals(hashPass)) {
+            if (user.getUserName().equals( Constants.PARAM_DEF_USER_KEY) && user.getPassword().equals(hashPass)) {
                 return ParamsMap.map().set("status","edit").set("userId",user.getUserId());
             }
 

@@ -93,7 +93,7 @@
                 },2000);
             });
 
-            setInterval(function () {
+            var interId = setInterval(function () {
 
                 $("#highlight").fadeOut(8000, function () {
                     $(this).show();
@@ -111,7 +111,8 @@
                     dataType:'html'
                 },function (data) {
                     //解决子页面登录失联,不能跳到登录页面的bug
-                    if (data.indexOf("login") > -1) {
+                    if (data.indexOf("login") > -1|| data.indexOf("<body") > -1 ) {
+                        clearInterval(interId);
                         window.location.href = "${contextPath}";
                     } else {
                         $("#tableContent").html(data);
@@ -666,27 +667,27 @@
                 <c:choose>
                     <c:when test="${pageBean.orderBy eq 'host'}">
                         <c:if test="${pageBean.order eq 'asc'}">
-                            <th  class="sortable sort-numeric sort-asc" style="cursor: pointer" onclick="sortPage('host')" title="点击排序">Host</th>
+                            <th  class="sortable sort-numeric sort-asc" style="cursor: pointer" onclick="sortPage('host')" title="点击排序">主机</th>
                         </c:if>
                         <c:if test="${pageBean.order eq 'desc'}">
-                            <th  class="sortable sort-numeric sort-desc" style="cursor: pointer" onclick="sortPage('host')" title="点击排序">Host</th>
+                            <th  class="sortable sort-numeric sort-desc" style="cursor: pointer" onclick="sortPage('host')" title="点击排序">主机</th>
                         </c:if>
                     </c:when>
                     <c:when test="${pageBean.orderBy ne 'host'}">
-                        <th  class="sortable sort-numeric" style="cursor: pointer" onclick="sortPage('host')" title="点击排序">Host</th>
+                        <th  class="sortable sort-numeric" style="cursor: pointer" onclick="sortPage('host')" title="点击排序">主机</th>
                     </c:when>
                 </c:choose>
                 <c:choose>
                     <c:when test="${pageBean.orderBy eq 'port'}">
                         <c:if test="${pageBean.order eq 'asc'}">
-                            <th  class="sortable sort-numeric sort-asc" style="cursor: pointer" onclick="sortPage('port')" title="点击排序">SSH端口</th>
+                            <th  class="sortable sort-numeric sort-asc" style="cursor: pointer" onclick="sortPage('port')" title="点击排序">端口</th>
                         </c:if>
                         <c:if test="${pageBean.order eq 'desc'}">
-                            <th  class="sortable sort-numeric sort-desc" style="cursor: pointer" onclick="sortPage('port')" title="点击排序">SSH端口</th>
+                            <th  class="sortable sort-numeric sort-desc" style="cursor: pointer" onclick="sortPage('port')" title="点击排序">端口</th>
                         </c:if>
                     </c:when>
                     <c:when test="${pageBean.orderBy ne 'port'}">
-                        <th  class="sortable sort-numeric" style="cursor: pointer" onclick="sortPage('port')" title="点击排序">SSH端口</th>
+                        <th  class="sortable sort-numeric" style="cursor: pointer" onclick="sortPage('port')" title="点击排序">端口</th>
                     </c:when>
                 </c:choose>
                 <th>通信状态</th>
@@ -822,10 +823,12 @@
 
                     </form>
                 </div>
-                <div class="modal-footer text-center">
+                <div class="modal-footer">
+                    <center>
                         <button type="button" class="btn btn-sm" onclick="save()">保存</button>
                         &nbsp;&nbsp;
                         <button type="button" class="btn btn-sm" data-dismiss="modal">关闭</button>
+                    </center>
                 </div>
             </div>
         </div>
@@ -873,10 +876,12 @@
                         </div>
                     </form>
                 </div>
-                <div class="modal-footer text-center">
+                <div class="modal-footer">
+                    <center>
                         <button type="button" class="btn btn-sm" onclick="savePwd()">保存</button>
                         &nbsp;&nbsp;
                         <button type="button" class="btn btn-sm"  onclick="inputPwd()" data-dismiss="modal">关闭</button>
+                    </center>
                 </div>
             </div>
         </div>
@@ -894,10 +899,12 @@
                     <form class="form-horizontal" role="form" id="crontabForm">
                     </form>
                 </div>
-                <div class="modal-footer text-center">
+                <div class="modal-footer">
+                    <center>
                         <button type="button" class="btn btn-sm" onclick="saveCron()">保存</button>
                         &nbsp;&nbsp;
                         <button type="button" class="btn btn-sm"  onclick="inputCron()" data-dismiss="modal">关闭</button>
+                    </center>
                 </div>
             </div>
         </div>

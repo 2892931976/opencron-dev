@@ -505,10 +505,12 @@
                         </div>
                     </form>
                 </div>
-                <div class="modal-footer text-center">
+                <div class="modal-footer">
+                    <center>
                         <button type="button" class="btn btn-sm" id="sshbtn" onclick="save()">保存</button>
                         &nbsp;&nbsp;
                         <button type="button" class="btn btn-sm" data-dismiss="modal">关闭</button>
+                    </center>
                 </div>
             </div>
         </div>

@@ -90,7 +90,7 @@ public final class OpencronTools {
         return resourceId;
     }
 
-    public static String createCSRF(HttpServletRequest request, HttpServletResponse response) {
+    public static String generateCSRF(HttpServletRequest request, HttpServletResponse response) {
         String token;
         HttpSession session = request.getSession();
         synchronized (session) {
@@ -98,7 +98,7 @@ public final class OpencronTools {
             if (null == token) {
                 token = CommonUtils.uuid();
                 session.setAttribute(Constants.PARAM_CSRF_NAME_KEY, token);
-                CookieUtils.setCookie(response,Constants.PARAM_CSRF_NAME_KEY,token,-1,WebUtils.getWebUrlPath(request));
+                CookieUtils.setCookie(response,Constants.PARAM_CSRF_NAME_KEY,token,-1,request.getServerName());
             }
         }
         return token;

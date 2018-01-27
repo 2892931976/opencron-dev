@@ -22,6 +22,7 @@
 package org.opencron.server.controller;
 
 import java.util.List;
+import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -181,15 +182,20 @@ public class AgentController extends BaseController {
 
     @RequestMapping(value = "edit.do", method = RequestMethod.POST)
     @ResponseBody
-    public void edit(Agent agentParam) {
+    public Status edit(Agent agentParam) {
         Agent agent = agentService.getAgent(agentParam.getAgentId());
-        BeanUtils.copyProperties(agent, agentParam, "machineId", "host","password","deleted","status","proxyAgent");
+        BeanUtils.copyProperties(agentParam, agent,"machineId", "host","password","deleted","status","proxyAgent","mobiles","emailAddress");
         if (Constants.ConnType.CONN.getType().equals(agentParam.getProxy())) {
             agent.setProxyAgent(null);
         } else {
             agent.setProxyAgent(agentParam.getProxyAgent());
         }
+        if (agentParam.getWarning()) {
+            agent.setEmailAddress(agentParam.getEmailAddress());
+            agent.setMobiles(agentParam.getMobiles());
+        }
         agentService.merge(agent);
+        return Status.TRUE;
     }
 
     @RequestMapping(value = "pwd.do", method = RequestMethod.POST)

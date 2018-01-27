@@ -92,6 +92,8 @@ public class Constants {
 
     public static final String PARAM_OPENCRON_SHUTDOWN_KEY = "opencron.shutdown";
 
+    public static final String PARAM_DEF_USER_KEY = "opencron";
+
     public static final String PARAM_DEF_PASSWORD_KEY = "opencron";
 
     public static final String PARAM_OPENCRON_HOME_KEY = "opencron.home";
@@ -638,4 +640,6 @@ public class Constants {
             return JETTY.getName().equalsIgnoreCase(name.trim());
         }
     }
+
+
 }
