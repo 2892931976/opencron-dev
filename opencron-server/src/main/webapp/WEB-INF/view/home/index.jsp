@@ -112,7 +112,7 @@
 
             <c:if test="${agents ne null and !empty agents}">
                 //系统实时监控
-                opencronChart.monitor();
+                //opencronChart.monitor();
             </c:if>
 
 
@@ -408,25 +408,13 @@
                      <div id="overview_pie" class="main-chart" style="height: 300px;" ></div>
                 </div>
                 <div class="col-xs-12 block-color" id="overview_loader" style="height: 300px;">
-                     <div class="loader">
-                         <div class="loader-inner">
-                             <div class="loader-line-wrap">
-                                 <div class="loader-line"></div>
-                             </div>
-                             <div class="loader-line-wrap">
-                                 <div class="loader-line"></div>
-                             </div>
-                             <div class="loader-line-wrap">
-                                 <div class="loader-line"></div>
-                             </div>
-                             <div class="loader-line-wrap">
-                                 <div class="loader-line"></div>
-                             </div>
-                             <div class="loader-line-wrap">
-                                 <div class="loader-line"></div>
-                             </div>
-                         </div>
-                     </div>
+                    <figure>
+                        <div class='dot white'></div>
+                        <div class='dot'></div>
+                        <div class='dot'></div>
+                        <div class='dot'></div>
+                        <div class='dot'></div>
+                    </figure>
                 </div>
             </div>
 
@@ -461,27 +449,13 @@
                         </div>
 
                         <div id="overview-chart" class="p-10 text-center div-havedata" style="background:rgba(0,0,0,0.40);border-bottom-left-radius:2px;border-bottom-right-radius:2px;height: 192px;">
-
-                            <div class="loader">
-                                <div class="loader-inner">
-                                    <div class="loader-line-wrap">
-                                        <div class="loader-line"></div>
-                                    </div>
-                                    <div class="loader-line-wrap">
-                                        <div class="loader-line"></div>
-                                    </div>
-                                    <div class="loader-line-wrap">
-                                        <div class="loader-line"></div>
-                                    </div>
-                                    <div class="loader-line-wrap">
-                                        <div class="loader-line"></div>
-                                    </div>
-                                    <div class="loader-line-wrap">
-                                        <div class="loader-line"></div>
-                                    </div>
-                                </div>
-                            </div>
-
+                            <figure>
+                                <div class='dot white'></div>
+                                <div class='dot'></div>
+                                <div class='dot'></div>
+                                <div class='dot'></div>
+                                <div class='dot'></div>
+                            </figure>
                         </div>
 
                         <div class="p-10 text-center div-nodata"  style="background:rgba(0,0,0,0.40);border-bottom-left-radius:2px;border-bottom-right-radius:2px;height: 192px;">
@@ -501,25 +475,13 @@
                         <div class="div-havedata" style="margin-left: 15px;margin-right: 15px;">
                             <table class="table tile table-custom table-sortable " style="font-size: 13px;background-color: rgba(0,0,0,0);">
                                 <tbody id="topbody" style="color: #fafafa;font-size:12px;">
-                                <div class="loader" >
-                                    <div class="loader-inner">
-                                        <div class="loader-line-wrap">
-                                            <div class="loader-line"></div>
-                                        </div>
-                                        <div class="loader-line-wrap">
-                                            <div class="loader-line"></div>
-                                        </div>
-                                        <div class="loader-line-wrap">
-                                            <div class="loader-line"></div>
-                                        </div>
-                                        <div class="loader-line-wrap">
-                                            <div class="loader-line"></div>
-                                        </div>
-                                        <div class="loader-line-wrap">
-                                            <div class="loader-line"></div>
-                                        </div>
-                                    </div>
-                                </div>
+                                <figure>
+                                    <div class='dot white'></div>
+                                    <div class='dot'></div>
+                                    <div class='dot'></div>
+                                    <div class='dot'></div>
+                                    <div class='dot'></div>
+                                </figure>
                                 </tbody>
                             </table>
                         </div>
@@ -535,25 +497,13 @@
                         <h2 class="tile-title"><i aria-hidden="true" class="fa fa-line-chart"></i>&nbsp;CPU使用率</h2>
                         <div class="p-t-10 p-r-5 p-b-5">
                             <div class="div-havedata" style="height: 200px; padding: 0px; position: relative;" id="cpu-chart">
-                                <div class="loader">
-                                    <div class="loader-inner">
-                                        <div class="loader-line-wrap">
-                                            <div class="loader-line"></div>
-                                        </div>
-                                        <div class="loader-line-wrap">
-                                            <div class="loader-line"></div>
-                                        </div>
-                                        <div class="loader-line-wrap">
-                                            <div class="loader-line"></div>
-                                        </div>
-                                        <div class="loader-line-wrap">
-                                            <div class="loader-line"></div>
-                                        </div>
-                                        <div class="loader-line-wrap">
-                                            <div class="loader-line"></div>
-                                        </div>
-                                    </div>
-                                </div>
+                                <figure>
+                                    <div class='dot white'></div>
+                                    <div class='dot'></div>
+                                    <div class='dot'></div>
+                                    <div class='dot'></div>
+                                    <div class='dot'></div>
+                                </figure>
                             </div>
                             <div class="text-center div-nodata" style="height: 200px;margin-top: 20px; position: relative;">
                                 <div  style="font-size: 110px;" class="eye-grey">
@@ -569,25 +519,13 @@
 
                     <div class="tile textured">
                         <h2 class="tile-title"><i aria-hidden="true" class="fa fa-pie-chart"></i>&nbsp;机器信息</h2>
-                        <div class="loader">
-                            <div class="loader-inner">
-                                <div class="loader-line-wrap">
-                                    <div class="loader-line"></div>
-                                </div>
-                                <div class="loader-line-wrap">
-                                    <div class="loader-line"></div>
-                                </div>
-                                <div class="loader-line-wrap">
-                                    <div class="loader-line"></div>
-                                </div>
-                                <div class="loader-line-wrap">
-                                    <div class="loader-line"></div>
-                                </div>
-                                <div class="loader-line-wrap">
-                                    <div class="loader-line"></div>
-                                </div>
-                            </div>
-                        </div>
+                        <figure>
+                            <div class='dot white'></div>
+                            <div class='dot'></div>
+                            <div class='dot'></div>
+                            <div class='dot'></div>
+                            <div class='dot'></div>
+                        </figure>
 
                         <div class="p-t-10 p-r-5 p-b-5 div-havedata">
                             <div id="disk-view" class="main-chart" style="height: 250px;margin-top: 10px;"></div>

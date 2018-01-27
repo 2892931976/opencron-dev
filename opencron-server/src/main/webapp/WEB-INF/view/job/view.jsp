@@ -138,30 +138,29 @@
                                 "emailAddress": $("#email").val(),
                                 "comment": $("#comment").val()
                             };
-
-
                             ajax({
                                 type: "post",
                                 url: "${contextPath}/job/edit.do",
                                 data: jobData
                             },function (data) {
-                                loading.exit();
-                                if (data.status) {
-                                    $('#jobModal').modal('hide');
-                                    alertMsg("修改成功");
-                                    $("#jobName_" + job.jobId).html(escapeHtml(job.jobName));
-                                    $("#command_" + job.jobId).html(escapeHtml(passBase64(job.command)));
-                                    $("#cronType_" + job.jobId).html(job.cronType == "0" ? '<img class="text-center" width="70px" src="${contextPath}/static/img/crontab_ico.png">' : '<img  class="text-center" width="70px" src="${contextPath}/static/img/quartz_ico.png">');
-                                    $("#cronExp_" + job.jobId).html(escapeHtml(job.cronExp));
-                                    if (job.redo == "0") {
-                                        $("#redo_" + job.jobId).html('<span color="green">否</span>');
+                                loading.exit(function () {
+                                    if (data.status) {
+                                        $('#jobModal').modal('hide');
+                                        alertMsg("修改成功");
+                                        $("#jobName_" + job.jobId).html(escapeHtml(job.jobName));
+                                        $("#command_" + job.jobId).html(escapeHtml(passBase64(job.command)));
+                                        $("#cronType_" + job.jobId).html(job.cronType == "0" ? '<img class="text-center" width="70px" src="${contextPath}/static/img/crontab_ico.png">' : '<img  class="text-center" width="70px" src="${contextPath}/static/img/quartz_ico.png">');
+                                        $("#cronExp_" + job.jobId).html(escapeHtml(job.cronExp));
+                                        if (job.redo == "0") {
+                                            $("#redo_" + job.jobId).html('<span color="green">否</span>');
+                                        } else {
+                                            $("#redo_" + job.jobId).html('<span color="red">是</span>');
+                                        }
+                                        $("#runCount_" + job.jobId).html(job.runCount);
                                     } else {
-                                        $("#redo_" + job.jobId).html('<span color="red">是</span>');
+                                        alert("修改失败");
                                     }
-                                    $("#runCount_" + job.jobId).html(job.runCount);
-                                } else {
-                                    alert("修改失败");
-                                }
+                                });
                                 return false;
                             });
                         }

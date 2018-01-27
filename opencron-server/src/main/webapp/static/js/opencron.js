@@ -112,33 +112,24 @@ var opencron = {
 };
 
 function Loading() {
-    var loading =
-        "<div class='modal fade in' id='loading' tabindex='-1' role='dialog' aria-hidden='false' style='display: block;'>" +
-        "   <div class='loader'>\n" +
-        "      <div class='loader-inner'>\n" +
-        "          <div class='loader-line-wrap'>\n" +
-        "              <div class='loader-line'></div>\n" +
-        "          </div>\n" +
-        "          <div class='loader-line-wrap'>\n" +
-        "              <div class='loader-line'></div>\n" +
-        "          </div>\n" +
-        "          <div class='loader-line-wrap'>\n" +
-        "              <div class='loader-line'></div>\n" +
-        "          </div>\n" +
-        "          <div class='loader-line-wrap'>\n" +
-        "              <div class='loader-line'></div>\n" +
-        "          </div>\n" +
-        "          <div class='loader-line-wrap'>\n" +
-        "              <div class='loader-line'></div>\n" +
-        "          </div>\n" +
-        "      </div>\n" +
-        "  </div>"+
-        "</div>";
+    var loading = "<div class='modal fade in' id='loading' tabindex='-1' role='dialog' aria-hidden='false' style='display: block;'>" +
+                   "<figure>" +
+                   "    <div class='dot white'></div>" +
+                   "    <div class='dot'></div>" +
+                   "    <div class='dot'></div>" +
+                   "    <div class='dot'></div>" +
+                   "    <div class='dot'></div>" +
+                   "</figure>"
+                   "</div>";
     $('body').append($(loading));
-}
-
-Loading.prototype.exit = function () {
-    $("#loading").remove();
+    this.exit = function (fn) {
+        setTimeout(function () {
+            $("#loading").fadeIn(500,function () {
+                $(this).remove();
+                fn();
+            });
+        },500);
+    }
 }
 
 function toBase64(text){
