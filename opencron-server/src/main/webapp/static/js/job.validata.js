@@ -60,10 +60,10 @@ function Validata() {
         cronExp: function () {
             var cronType = $('input[type="radio"][name="cronType"]:checked').val();
 
-            if (cronType == 0) {
+            if ( !arguments[0] && cronType == 0) {
                 $("#cronTip").css("visibility","visible").html("crontab: unix/linux的时间格式表达式 ");
             }
-            if (cronType == 1) {
+            if ( !arguments[0] && cronType == 1) {
                 $("#cronTip").css("visibility","visible").html('quartz: quartz框架的时间格式表达式');
             }
 
@@ -165,16 +165,16 @@ function Validata() {
             if (!mobiles) {
                 opencron.tipError("#mobiles", "请填写手机号码!");
                 this.status = false;
+                return;
             }
             var mobs = mobiles.split(",");
-
             var verify = true;
-
             for (var i in mobs) {
                 if (!opencron.testMobile(mobs[i])) {
-                    opencron.tipError("#mobiles", "请填写正确的手机号码!");
                     this.status = false;
                     verify = false;
+                    opencron.tipError("#mobiles", "请填写正确的手机号码!");
+                    break;
                 }
             }
             if (verify) {
@@ -187,8 +187,8 @@ function Validata() {
             if (!emails) {
                 opencron.tipError("#email", "请填写邮箱地址!");
                 this.status = false;
+                return;
             }
-
             var emas = emails.split(",");
             var verify = true;
             for (var i in emas) {
@@ -196,10 +196,11 @@ function Validata() {
                     opencron.tipError("#email", "请填写正确的邮箱地址!");
                     this.status = false;
                     verify = false;
+                    break;
                 }
             }
             if (verify) {
-                opencron.tipOk("#mobiles");
+                opencron.tipOk("#email");
             }
         },
 
@@ -435,18 +436,14 @@ function Validata() {
                 $(".contact").show()
             } else {
                 $(".contact").hide();
-                opencron.tipDefault("#mobiles");
-                opencron.tipDefault("#email");
             }
         },
         cronTip: function (type) {
             if (type == 0) {
                 $("#cronTip").css("visibility","visible").html("crontab: unix/linux的时间格式表达式 ");
-                $("#expTip").css("visibility","visible").html('crontab: 请采用unix/linux的时间格式表达式,如 00 01 * * *');
             }
             if (type == 1) {
                 $("#cronTip").css("visibility","visible").html('quartz: quartz框架的时间格式表达式');
-                $("#expTip").css("visibility","visible").html('quartz: 请采用quartz框架的时间格式表达式,如 0 0 10 L * ?');
             }
             if ( (arguments[1]||false) && $("#cronExp").val().length > 0) {
                 self.validata.cronExp();

@@ -27,6 +27,7 @@ import org.opencron.server.job.OpencronTools;
 import org.opencron.server.service.AgentService;
 import org.opencron.server.service.GroupService;
 import org.opencron.server.tag.PageBean;
+import org.opencron.server.vo.Status;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -73,8 +74,8 @@ public class GroupController extends BaseController {
 
     @RequestMapping(value = "checkname.do", method = RequestMethod.POST)
     @ResponseBody
-    public boolean checkname(Long id, String groupName) {
-        return !groupService.existsName(id, groupName);
+    public Status checkname(Long id, String groupName) {
+        return Status.create(!groupService.existsName(id, groupName));
     }
 
     @RequestMapping(value = "save.do", method = RequestMethod.POST)

@@ -42,6 +42,7 @@
         </property>
     </bean>
 
+
     <mvc:annotation-driven/>
     <mvc:resources mapping="/static/**" location="/static/"/>
     <mvc:resources mapping="/favicon.ico" location="/favicon.ico"/>

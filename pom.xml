@@ -73,7 +73,7 @@
         <protostuff.version>1.0.12</protostuff.version>
         <kryo.version>4.0.0</kryo.version>
         <fst.version>2.50</fst.version>
-        <fastjson.version>1.2.31</fastjson.version>
+        <fastjson.version>1.2.45</fastjson.version>
         <msgpack.version>0.8.12</msgpack.version>
         <zookeeper.version>3.4.11</zookeeper.version>
         <curator.version>4.0.0</curator.version>

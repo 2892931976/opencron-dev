@@ -144,7 +144,7 @@
             $.ajax({
                 type:"POST",
                 url: "${contextPath}/notice/uncount.do",
-                dataType: "JSON",
+                dataType: "html",
                 success: function (data) {
                     if (data){
                         $(".n-count").text(data);

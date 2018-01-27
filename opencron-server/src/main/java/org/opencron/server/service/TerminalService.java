@@ -211,7 +211,6 @@ public class TerminalService {
             this.webSocketSession = webSocketSession;
             this.terminal = terminal;
             this.httpSessionId = (String) webSocketSession.getAttributes().get(Constants.PARAM_HTTP_SESSION_ID_KEY);
-            ;
             this.clientId = (String) webSocketSession.getAttributes().get(Constants.PARAM_SSH_SESSION_ID_KEY);
             this.sendTempCmdId = this.clientId + this.httpSessionId;
             this.jSch = new JSch();

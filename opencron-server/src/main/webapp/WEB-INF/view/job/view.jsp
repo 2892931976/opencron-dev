@@ -105,6 +105,9 @@
                     if (jobVerify.validata.jobNameRemote ) {
                         window.clearInterval(valId);
                         if (jobVerify.validata.status) {
+
+                            var loading = new Loading();
+
                             var jobName = $("#jobName").val();
                             var jobId = $("#id").val();
                             var agentId = $("#agentId").val();
@@ -125,7 +128,7 @@
                                 "agentId": agentId,
                                 "command": toBase64(command),
                                 "runAs":$("#runAs").val(),
-                                "successExit":$("#successExit").val(),
+                                "successExit":successExit,
                                 "timeout": timeout,
                                 "jobName": jobName,
                                 "redo": redo,
@@ -135,20 +138,21 @@
                                 "emailAddress": $("#email").val(),
                                 "comment": $("#comment").val()
                             };
+
+
                             ajax({
                                 type: "post",
                                 url: "${contextPath}/job/edit.do",
                                 data: jobData
                             },function (data) {
+                                loading.exit();
                                 if (data.status) {
                                     $('#jobModal').modal('hide');
                                     alertMsg("修改成功");
                                     $("#jobName_" + job.jobId).html(escapeHtml(job.jobName));
                                     $("#command_" + job.jobId).html(escapeHtml(passBase64(job.command)));
-
                                     $("#cronType_" + job.jobId).html(job.cronType == "0" ? '<img class="text-center" width="70px" src="${contextPath}/static/img/crontab_ico.png">' : '<img  class="text-center" width="70px" src="${contextPath}/static/img/quartz_ico.png">');
                                     $("#cronExp_" + job.jobId).html(escapeHtml(job.cronExp));
-
                                     if (job.redo == "0") {
                                         $("#redo_" + job.jobId).html('<span color="green">否</span>');
                                     } else {
@@ -723,7 +727,7 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <label class="col-lab control-label wid100" title="执行失败时是否自动重新执行">失败重跑&nbsp;&nbsp;&nbsp;</label>&nbsp;&nbsp;
+                            <label class="col-lab control-label wid100" title="执行失败时是否自动重新执行">&nbsp;&nbsp;失败重跑&nbsp;&nbsp;&nbsp;</label>&nbsp;&nbsp;
                             <label for="redo1" class="radio-label"><input value="1" type="radio" name="redo" id="redo1" checked> 是&nbsp;&nbsp;&nbsp;</label>
                             <label for="redo0" class="radio-label"><input value="0" type="radio" name="redo" id="redo0">否</label><br>
                         </div>
@@ -735,20 +739,22 @@
                             </div>
                         </div>
                         <div class="form-group" style="margin-top: 0px;margin-bottom: 22px">
-                            <label class="col-lab control-label" title="任务执行失败时是否发信息报警">失败报警：</label>&nbsp;&nbsp;
+                            <label class="col-lab control-label" title="任务执行失败时是否发信息报警">&nbsp;&nbsp;失败报警&nbsp;&nbsp;&nbsp;</label>&nbsp;&nbsp;
                             <label onclick="toggle.contact.show()" for="warning1" class="radio-label"><input type="radio" name="warning" value="1" id="warning1">是&nbsp;&nbsp;&nbsp;</label>
                             <label onclick="toggle.contact.hide()" for="warning0" class="radio-label"><input type="radio" name="warning" value="0" id="warning0">否</label>
                         </div>
                         <div class="form-group contact">
-                            <label for="mobiles" class="col-lab control-label" title="任务执行失败时将发送短信给此手机">报警手机：</label>
+                            <label for="mobiles" class="col-lab control-label" title="任务执行失败时将发送短信给此手机">&nbsp;&nbsp;报警手机&nbsp;&nbsp;&nbsp;</label>
                             <div class="col-md-9">
-                                <input type="text" class="form-control " id="mobiles"/>&nbsp;
+                                <input type="text" class="form-control" id="mobiles"/>&nbsp;
+                                <span class="tips none" tip="任务执行失败时将发送短信给此手机,多个请以逗号(英文)隔开">任务执行失败时将发送短信给此手机,多个请以逗号(英文)隔开</span>
                             </div>
                         </div>
                         <div class="form-group contact">
-                            <label for="email" class="col-lab control-label" title="任务执行失败时将发送报告给此邮箱">报警邮箱：</label>
+                            <label for="email" class="col-lab control-label" title="任务执行失败时将发送报告给此邮箱">&nbsp;&nbsp;报警邮箱&nbsp;&nbsp;&nbsp;</label>
                             <div class="col-md-9">
-                                <input type="text" class="form-control " id="email"/>&nbsp;
+                                <input type="text" class="form-control" id="email"/>&nbsp;
+                                <span class="tips none" tip="任务执行失败时将发送报告给此邮箱,多个请以逗号(英文)隔开">任务执行失败时将发送报告给此邮箱,多个请以逗号(英文)隔开</span>
                             </div>
                         </div>
                         <div class="form-group">
