@@ -17,8 +17,7 @@
                 });
 
                 ajax({
-                    headers:{"csrf":"${csrf}"},
-                    type:"POST",
+                    type: "post",
                     url:"${contextPath}/record/refresh.htm",
                     data:{
                         "size":"${size}",
@@ -52,7 +51,7 @@
             var agentId = $("#agentId").val();
             var jobId = $("#jobId").val();
             var execType = $("#execType").val();
-            window.location.href = "${contextPath}/record/running.htm?queryTime=" + queryTime + "&agentId=" + agentId + "&jobId=" + jobId + "&execType=" + execType + "&pageSize=" + pageSize+"&csrf=${csrf}";
+            window.location.href = "${contextPath}/record/running.htm?queryTime=" + queryTime + "&agentId=" + agentId + "&jobId=" + jobId + "&execType=" + execType + "&pageSize=" + pageSize;
         }
 
         function killJob(id){
@@ -66,8 +65,7 @@
             }, function() {
                 $("#process_"+id).html("停止中");
                 ajax({
-                    headers:{"csrf":"${csrf}"},
-                    type:"POST",
+                    type: "post",
                     url:"${contextPath}/record/kill.do",
                     data:{"recordId":id}
                 })
@@ -87,15 +85,13 @@
             }, function() {
                 $("#process_"+id).html("停止中");
                 ajax({
-                    headers:{"csrf":"${csrf}"},
-                    type:"POST",
+                    type: "post",
                     url:"${contextPath}/record/kill.do",
                     data:{"recordId":id}
                 },function (result) {
                     if (result){
                         ajax({
-                            headers:{"csrf":"${csrf}"},
-                            type:"POST",
+                            type: "post",
                             url:"${contextPath}/job/execute.do",
                             data:{"id":jobId}
                         })
@@ -191,9 +187,9 @@
                 <tr>
                     <td>
                         <c:if test="${empty r.jobName}">batchJob</c:if>
-                        <c:if test="${!empty r.jobName}"><a href="${contextPath}/job/detail/${r.jobId}.htm?csrf=${csrf}">${r.jobName}</a></c:if>
+                        <c:if test="${!empty r.jobName}"><a href="${contextPath}/job/detail/${r.jobId}.htm">${r.jobName}</a></c:if>
                     </td>
-                    <td><a href="${contextPath}/agent/detail/${r.agentId}.htm?csrf=${csrf}">${r.agentName}</a></td>
+                    <td><a href="${contextPath}/agent/detail/${r.agentId}.htm">${r.agentName}</a></td>
                     <td>
                         <div class="progress progress-striped progress-success active" style="margin-top:3px;width: 80%;height: 14px;" >
                             <div style="width:100%;height: 100%;" class="progress-bar">
@@ -240,7 +236,7 @@
             </tbody>
         </table>
 
-        <cron:pager href="${contextPath}/record/running.htm?queryTime=${queryTime}&agentId=${agentId}&jobId=${jobId}&execType=${execType}&csrf=${csrf}" id="${pageBean.pageNo}" size="${pageBean.pageSize}" total="${pageBean.totalCount}"/>
+        <cron:pager href="${contextPath}/record/running.htm?queryTime=${queryTime}&agentId=${agentId}&jobId=${jobId}&execType=${execType}" id="${pageBean.pageNo}" size="${pageBean.pageSize}" total="${pageBean.totalCount}"/>
 
     </div>
 

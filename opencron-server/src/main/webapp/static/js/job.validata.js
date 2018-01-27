@@ -2,8 +2,7 @@
 function Validata() {
 
     this.contextPath = arguments[0]||'';
-    this.csrf = arguments[1]||'';
-    this.jobId = arguments[2]||null;
+    this.jobId = arguments[1]||null;
 
     var self = this;
 
@@ -34,7 +33,6 @@ function Validata() {
                 } else {
                     var _this = this;
                     $.ajax({
-                        headers: {"csrf": self.csrf},
                         type: "POST",
                         url: self.contextPath+"/job/checkname.do",
                         data: {
@@ -76,7 +74,6 @@ function Validata() {
             } else {
                 var _this = this;
                 $.ajax({
-                    headers: {"csrf": self.csrf},
                     type: "POST",
                     url: self.contextPath+"/verify/exp.do",
                     data: {

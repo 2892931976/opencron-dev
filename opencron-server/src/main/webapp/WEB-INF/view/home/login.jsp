@@ -14,7 +14,7 @@
     <script type="text/javascript">
 
         <c:if test="${!empty opencron_user}">
-            window.location.href="${contextPath}/dashboard.htm?csrf=${csrf}";
+            window.location.href="${contextPath}/dashboard.htm";
         </c:if>
 
         $(document).ready(function() {
@@ -35,8 +35,7 @@
 
                 //同步到session中...
                 ajax({
-                    headers:{"csrf":"${csrf}"},
-                    type:"POST",
+                    type: "post",
                     url: "${contextPath}/config/skin.do",
                     data:{
                         "skin":skin
@@ -378,7 +377,7 @@
             var data = {username:username,password:sendpwd};
 
             ajax({
-                type: "POST",
+                type: "post",
                 url: "${contextPath}/login.do",
                 data: data
             },function (data) {
@@ -397,7 +396,6 @@
                         $("#error_msg").html('<font color="red">请修改初始密码</font>');
                         $("#pwdform")[0].reset();
                         $("#id").val(data.userId);
-                        $("#csrf").val(data.csrf);
                         $('#pwdModal').modal('show');
                     }
                 }
@@ -439,8 +437,7 @@
                 return false;
             }
             ajax({
-                headers:{"csrf":$("#csrf").val()},
-                type:"POST",
+                type: "post",
                 url:"${contextPath}/user/pwd.do",
                 data:{
                     "id":id,
@@ -511,7 +508,6 @@
                 <div class="modal-body">
                     <form class="form-horizontal" role="form" id="pwdform">
                         <input type="hidden" id="id">
-                        <input type="hidden" id="csrf">
                         <div class="form-group" style="margin-bottom: 20px;">
                             <label for="pwd1" class="col-lab control-label"><i class="glyphicon glyphicon-lock"></i>&nbsp;&nbsp;新&nbsp;&nbsp;密&nbsp;&nbsp;码：</label>
                             <div class="col-md-9">

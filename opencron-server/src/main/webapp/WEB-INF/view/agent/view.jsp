@@ -56,8 +56,7 @@
                     confirmButtonText: "扫描"
                 }, function() {
                     ajax({
-                        headers:{"csrf":"${csrf}"},
-                        type:"POST",
+                        type: "post",
                         url:"${contextPath}/job/scan.do",
                         data:{"agentId":"${scanAgent.agentId}"}
                     },function (data) {
@@ -83,7 +82,7 @@
 
             $("#size").change(function () {
                 var pageSize = $("#size").val();
-                window.location.href = "${contextPath}/agent/view.htm?pageSize=" + pageSize+"&csrf=${csrf}";
+                window.location.href = "${contextPath}/agent/view.htm?pageSize=" + pageSize;
             });
 
             new Clipboard('#copy-btn').on('success', function(e) {
@@ -101,8 +100,7 @@
                 });
 
                 ajax({
-                    headers:{"csrf":"${csrf}"},
-                    type: "POST",
+                    type: "post",
                     url: "${contextPath}/agent/refresh.htm",
                     data: {
                         "pageNo":${pageBean.pageNo},
@@ -139,8 +137,7 @@
                     return false;
                 }
                 ajax({
-                    headers:{"csrf":"${csrf}"},
-                    type: "POST",
+                    type: "post",
                     url: "${contextPath}/agent/checkname.do",
                     data: {
                         "id": $("#id").val(),
@@ -178,8 +175,7 @@
 
         function edit(id) {
             ajax({
-                headers:{"csrf":"${csrf}"},
-                type: "POST",
+                type: "post",
                 url: "${contextPath}/agent/get.do",
                 data: {"id": id}
             },function (obj) {
@@ -302,8 +298,7 @@
             }
 
             ajax({
-                headers:{"csrf":"${csrf}"},
-                type: "POST",
+                type: "post",
                 url: "${contextPath}/agent/checkname.do",
                 data: {
                     "id": id,
@@ -313,12 +308,10 @@
                 if (data.status) {
                     if (status == 1) {
                         ajax({
-                            headers:{"csrf":"${csrf}"},
-                            type: "POST",
+                            type: "post",
                             url: "${contextPath}/verify/ping.do",
                             data: {
-                                headers:{"csrf":"${csrf}"},
-                                "proxy": proxy,
+                                                                "proxy": proxy,
                                 "proxyId": $("#proxyAgent").val(),
                                 "host": host,
                                 "port": port,
@@ -345,8 +338,7 @@
 
         function canSave(proxy, id, name, port, warning, mobiles, email) {
             ajax({
-                headers:{"csrf":"${csrf}"},
-                type: "POST",
+                type: "post",
                 url: "${contextPath}/agent/edit.do",
                 data: {
                     "proxy": proxy,
@@ -381,8 +373,7 @@
 
         function flushConnAgents() {
             ajax({
-                headers:{"csrf":"${csrf}"},
-                type: "POST",
+                type: "post",
                 url: "${contextPath}/agent/getConnAgents.do"
             },function (obj) {
                 if (obj != null) {
@@ -397,8 +388,7 @@
         function editPwd(id) {
             inputPwd();
             ajax({
-                headers:{"csrf":"${csrf}"},
-                type: "POST",
+                type: "post",
                 url: "${contextPath}/agent/get.do",
                 data: {"id": id}
             },function (obj) {
@@ -424,8 +414,7 @@
                 confirmButtonText: "删除"
             }, function() {
                 ajax({
-                    headers:{"csrf":"${csrf}"},
-                    type:"POST",
+                    type: "post",
                     url:"${contextPath}/agent/checkdel.do",
                     data:{"id":id}
                 },function (data) {
@@ -433,8 +422,7 @@
                         alert("删除失败,找到不该执行器或者该执行器上定义了作业")
                     }else {
                         ajax({
-                            headers:{"csrf":"${csrf}"},
-                            type:"POST",
+                            type: "post",
                             url:"${contextPath}/agent/delete.do",
                             data:{"id":id}
                         },function () {
@@ -472,8 +460,7 @@
                 return false;
             }
             ajax({
-                headers:{"csrf":"${csrf}"},
-                type: "POST",
+                type: "post",
                 url: "${contextPath}/agent/pwd.do",
                 data: {
                     "id": id,
@@ -556,8 +543,7 @@
             $("#pingResult").html("<img src='${contextPath}/static/img/icon-loader.gif'> <font color='#2fa4e7'>检测中...</font>");
 
             ajax({
-                headers:{"csrf":"${csrf}"},
-                type: "POST",
+                type: "post",
                 url: "${contextPath}/verify/ping.do",
                 data: {
                     "proxy": proxy,
@@ -576,7 +562,7 @@
         }
 
         function sortPage(field) {
-            location.href="${contextPath}/agent/view.htm?pageNo=${pageBean.pageNo}&pageSize=${pageBean.pageSize}&orderBy="+field+"&order="+("${pageBean.order}"=="asc"?"desc":"asc")+"&csrf=${csrf}";
+            location.href="${contextPath}/agent/view.htm?pageNo=${pageBean.pageNo}&pageSize=${pageBean.pageSize}&orderBy="+field+"&order="+("${pageBean.order}"=="asc"?"desc":"asc");
         }
 
         function inputPwd() {
@@ -589,8 +575,7 @@
 
         function inputSrcPwd(id) {
             ajax({
-                headers:{"csrf":"${csrf}"},
-                type: "POST",
+                type: "post",
                 url: "${contextPath}/agent/path.do",
                 data: { "agentId": id },
                 dataType:"html"
@@ -655,7 +640,7 @@
             </div>
             <c:if test="${permission eq true}">
                 <div style="float: right;margin-top: -10px">
-                    <a href="${contextPath}/agent/add.htm?csrf=${csrf}" class="btn btn-sm m-t-10"
+                    <a href="${contextPath}/agent/add.htm" class="btn btn-sm m-t-10"
                        style="margin-left: 50px;margin-bottom: 8px"><i class="icon">&#61943;</i>添加</a>
                 </div>
             </c:if>
@@ -736,7 +721,7 @@
                     </td>
                     <td class="text-center">
                             <div class="visible-md visible-lg hidden-sm hidden-xs action-buttons">
-                                <a href="${contextPath}/job/add.htm?id=${w.agentId}&csrf=${csrf}" title="新任务">
+                                <a href="${contextPath}/job/add.htm?id=${w.agentId}" title="新任务">
                                     <i aria-hidden="true" class="fa fa-plus-square-o"></i>
                                 </a>&nbsp;&nbsp;
                                 <c:if test="${permission eq true}">
@@ -744,7 +729,7 @@
                                     <a href="#" onclick="editPwd('${w.agentId}')" title="修改密码"><i aria-hidden="true" class="fa fa-lock"></i></a>&nbsp;&nbsp;
                                     <a href="#" onclick="remove('${w.agentId}')" title="删除"><i aria-hidden="true" class="fa fa-times"></i></a>&nbsp;&nbsp;
                                 </c:if>
-                                <a href="${contextPath}/agent/detail/${w.agentId}.htm?csrf=${csrf}" title="查看详情">
+                                <a href="${contextPath}/agent/detail/${w.agentId}.htm" title="查看详情">
                                     <i aria-hidden="true" class="fa fa-eye"></i>
                                 </a>
                             </div>
@@ -755,7 +740,7 @@
             </tbody>
         </table>
 
-        <cron:pager href="${contextPath}/agent/view.htm?csrf=${csrf}" id="${pageBean.pageNo}" size="${pageBean.pageSize}" total="${pageBean.totalCount}"/>
+        <cron:pager href="${contextPath}/agent/view.htm" id="${pageBean.pageNo}" size="${pageBean.pageSize}" total="${pageBean.totalCount}"/>
 
     </div>
 
@@ -769,7 +754,7 @@
                 </div>
                 <div class="modal-body">
                     <form class="form-horizontal" role="form" id="agentform">
-                        <input type="hidden" name="csrf" value="${csrf}">
+
                         <input type="hidden" id="id" name="id"><input type="hidden" id="password" name="password"><input type="hidden" id="status" name="status">
                         <div class="form-group" style="margin-bottom: 4px;">
                             <label for="host" class="col-lab control-label" title="必填项,执行器Host为IP地址,或者可以连接到该Agent的网址">机器Host：</label>

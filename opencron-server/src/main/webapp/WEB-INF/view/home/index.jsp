@@ -105,7 +105,7 @@
     <script type="text/javascript">
         $(document).ready(function () {
 
-            var opencronChart = new OpencronChart('${contextPath}','${csrf}');
+            var opencronChart = new OpencronChart('${contextPath}');
 
             //跨时段查询任务运行比例
             opencronChart.query();
@@ -234,7 +234,7 @@
         <!-- cards -->
         <div class="row cards">
             <div class="card-container col-lg-3 col-sm-6 col-sm-12">
-                <div class="card hover" onclick="javascript:window.location.href='${contextPath}/agent/view.htm?csrf=${csrf}'">
+                <div class="card hover" onclick="javascript:window.location.href='${contextPath}/agent/view.htm'">
                     <div class="front count">
                         <div class="media">
                             <span class="pull-left"><i style="font-size: 60px;margin-top: 0px;" aria-hidden="true" class="fa fa-desktop"></i></span>
@@ -261,7 +261,7 @@
             </div>
 
             <div class="card-container col-lg-3 col-sm-6 col-sm-12">
-                <div class="card hover" onclick="javascript:window.location.href='${contextPath}/job/view.htm?csrf=${csrf}'">
+                <div class="card hover" onclick="javascript:window.location.href='${contextPath}/job/view.htm'">
                     <div class="front count">
                         <div class="media">
                             <span class="pull-left"><i style="font-size: 60px;margin-top: 1px;" aria-hidden="true" class="fa fa-tasks"></i></span>
@@ -288,7 +288,7 @@
             </div>
 
             <div class="card-container col-lg-3 col-sm-6 col-sm-12">
-                <div class="card hover" onclick="javascript:window.location.href='${contextPath}/record/done.htm?success=1&csrf=${csrf}'">
+                <div class="card hover" onclick="javascript:window.location.href='${contextPath}/record/done.htm?success=1'">
                     <div class="front count">
                         <div class="media">
                             <span class="pull-left"><i style="font-size: 60px;margin-top: 0px;" class="fa fa-thumbs-o-up" aria-hidden="true"></i></span>
@@ -314,7 +314,7 @@
             </div>
 
             <div class="card-container col-lg-3 col-sm-6 col-sm-12">
-                <div class="card hover" onclick="javascript:window.location.href='${contextPath}/record/done.htm?success=0&csrf=${csrf}'">
+                <div class="card hover" onclick="javascript:window.location.href='${contextPath}/record/done.htm?success=0'">
                     <div class="front count">
                         <div class="media">
                             <span class="pull-left"><i style="font-size: 60px;margin-top: -3px;" class="fa fa-thumbs-o-down" aria-hidden="true"></i></span>

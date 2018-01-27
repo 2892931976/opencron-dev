@@ -89,8 +89,7 @@
                 });
 
                 $.ajax({
-                    headers:{"csrf":"${csrf}"},
-                    type: "POST",
+                    type: "post",
                     url: "${contextPath}/progress.do",
                     dataType: "JSON",
                     success: function (data) {
@@ -157,8 +156,7 @@
 
                 //同步到session中...
                 $.ajax({
-                    headers:{"csrf":"${csrf}"},
-                    type:"POST",
+                    type: "post",
                     url: "${contextPath}/config/skin.do",
                     dataType: "JSON",
                     data:{
@@ -178,8 +176,7 @@
                     path:"/"
                 });
                 $.ajax({
-                    headers:{"csrf":"${csrf}"},
-                    type:"POST",
+                    type: "post",
                     url: "${contextPath}/config/skin.do",
                     dataType: "JSON",
                     data:{
@@ -191,8 +188,7 @@
 
 
             $.ajax({
-                headers:{"csrf":"${csrf}"},
-                type:"POST",
+                type: "post",
                 url: "${contextPath}/notice/uncount.do",
                 dataType: "JSON",
                 success: function (data) {
@@ -200,8 +196,7 @@
                         $(".n-count").text(data);
                         $("#msg-icon").show();
                         $.ajax({
-                            headers:{"csrf":"${csrf}"},
-                            type:"POST",
+                            type: "post",
                             url: "${contextPath}/notice/unread.htm",
                             dataType: "html",
                             success: function (data) {
@@ -213,7 +208,7 @@
                         $(".n-count").remove();
                         $("#toggle_message").css({"padding":"10px 0px 0"});
                         $("#msg-icon").click(function () {
-                            window.location.href="${contextPath}/notice/view.htm?csrf=${csrf}";
+                            window.location.href="${contextPath}/notice/view.htm";
                         })
                         $("#msg-icon").show();
                     }
@@ -230,7 +225,7 @@
 
 <header id="header">
     <a href="" id="menu-toggle" style="background-image: none"><i class="icon">&#61773;</i></a>
-    <a id="log1" href="${contextPath}/dashboard.htm?csrf=${csrf}" class="logo pull-left"><div style="float: left; width: 165px; margin-top: 5px; margin-left: 14px">
+    <a id="log1" href="${contextPath}/dashboard.htm" class="logo pull-left"><div style="float: left; width: 165px; margin-top: 5px; margin-left: 14px">
         <img src="${contextPath}/static/img/opencron.png">
     </div>
     </a>
@@ -258,7 +253,7 @@
         <div class="modal-dialog modal-md">
             <div class="modal-content">
                 <form class="avatar-form" name="picform" action="${contextPath}/headpic/upload.do" enctype="multipart/form-data" method="post">
-                    <input type="hidden" name="csrf" value="${csrf}">
+
                     <input name="userId" type="hidden" value="${opencron_user.userId}">
                     <div class="modal-header">
                         <button class="close btn-float" style="margin-top:-7px!important;margin-right:-11px;" data-dismiss="modal" aria-hidden="true"><i class="md md-close"></i></button>

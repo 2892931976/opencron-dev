@@ -73,8 +73,7 @@
                     return false;
                 }
                 ajax({
-                    headers: {"csrf": "${csrf}"},
-                    type: "POST",
+                    type: "post",
                     url: "${contextPath}/group/checkname.do",
                     data: {
                         "groupName": $("#groupName").val()
@@ -123,7 +122,7 @@
     <div class="block-area" id="basic">
         <div class="tile p-15">
             <form class="form-horizontal" role="form" id="agent" action="${contextPath}/group/save.do" method="post" onsubmit="return save()"></br>
-                <input type="hidden" name="csrf" value="${csrf}">
+
                 <div class="form-group">
                     <label for="groupName" class="col-lab control-label"><i class="glyphicon glyphicon-leaf"></i>&nbsp;&nbsp;执行器组名：</label>
                     <div class="col-md-10">

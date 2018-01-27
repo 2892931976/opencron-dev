@@ -16,7 +16,7 @@
             var agentId = $("#agentId").val();
             var sendTime = $("#sendTime").val();
             var pageSize = $("#size").val();
-            window.location.href = "${contextPath}/notice/view.htm?agentId="+agentId+"&sendTime="+sendTime+"&pageSize="+pageSize+"&csrf=${csrf}";
+            window.location.href = "${contextPath}/notice/view.htm?agentId="+agentId+"&sendTime="+sendTime+"&pageSize="+pageSize;
         }
 
     </script>
@@ -95,7 +95,7 @@
                     <td title="${cron:escapeHtml(log.message)}">${cron:escapeHtml(cron:substr(log.message,0,60,"..."))}</td>
                     <td>${log.sendTime}</td>
                     <td class="text-center">
-                            <a href="${contextPath}/notice/detail/${log.logId}.htm?csrf=${csrf}" title="查看详情">
+                            <a href="${contextPath}/notice/detail/${log.logId}.htm" title="查看详情">
                                 <i class="glyphicon glyphicon-eye-open"></i>
                             </a>
                     </td>
@@ -104,7 +104,7 @@
             </tbody>
         </table>
 
-        <cron:pager href="${contextPath}/notice/view.htm?agentId=${agentId}&sendTime=${sendTime}&csrf=${csrf}" id="${pageBean.pageNo}" size="${pageBean.pageSize}" total="${pageBean.totalCount}"/>
+        <cron:pager href="${contextPath}/notice/view.htm?agentId=${agentId}&sendTime=${sendTime}" id="${pageBean.pageNo}" size="${pageBean.pageSize}" total="${pageBean.totalCount}"/>
 
     </div>
 

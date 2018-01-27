@@ -29,9 +29,8 @@
                     }else {
                         var _this = this;
                         ajax({
-                            headers: {"csrf": "${csrf}"},
                             url: "${contextPath}/agent/checkname.do",
-                            type: "POST",
+                            type: "post",
                             data: {
                                 "name": _name
                             }
@@ -59,8 +58,7 @@
                     }else{
                         var _this = this;
                         ajax({
-                            headers: {"csrf": "${csrf}"},
-                            type: "POST",
+                            type: "post",
                             url: "${contextPath}/agent/checkhost.do",
                             data: {
                                 "host": _host
@@ -144,9 +142,8 @@
                 }
                 var _this = this;
                 ajax({
-                    headers: {"csrf": "${csrf}"},
                     url: "${contextPath}/verify/ping.do",
-                    type: "POST",
+                    type: "post",
                     dataType:"json",
                     data: {
                         "proxy": _ping || 0,
@@ -159,9 +156,8 @@
                     if (data.status) {
                         opencron.tipOk("#port");
                         ajax({
-                            headers: {"csrf": "${csrf}"},
                             url: "${contextPath}/verify/guid.do",
-                            type: "POST",
+                            type: "post",
                             dataType:"html",
                             data: {
                                 "proxy": _ping || 0,
@@ -314,7 +310,7 @@
         <div class="block-area" id="basic">
             <div class="tile p-15">
                 <form class="form-horizontal" role="form" id="agentForm" action="${contextPath}/agent/add.do" method="post"></br>
-                    <input type="hidden" name="csrf" value="${csrf}">
+
                     <input type="hidden" name="machineId" id="machineId" value="">
                     <div class="form-group">
                         <label for="name" class="col-lab control-label wid150"><i class="glyphicon glyphicon-leaf"></i>&nbsp;&nbsp;执行器名&nbsp;&nbsp;<b>*&nbsp;</b></label>

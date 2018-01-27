@@ -37,10 +37,8 @@
                     });
                     if ("" != ids){
                         ids = ids.substring(0,ids.length-1);
-
                         ajax({
-                            headers:{"csrf":"${csrf}"},
-                            type:"POST",
+                            type: "post",
                             url:"${contextPath}/job/batchexec.do",
                             data:{
                                 "command":toBase64(cmd),

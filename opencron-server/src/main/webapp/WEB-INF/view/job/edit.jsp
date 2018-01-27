@@ -28,7 +28,7 @@
 
     <script type="text/javascript">
         $(document).ready(function () {
-            window.opencronValidata = new Validata('${contextPath}','${csrf}','${job.jobId}');
+            window.opencronValidata = new Validata('${contextPath}','${job.jobId}');
         });
     </script>
 
@@ -61,7 +61,7 @@
     <div class="block-area" id="basic">
         <div class="tile p-15">
             <form class="form-horizontal" role="form" id="jobform" action="${contextPath}/job/save.do" method="post"><br>
-                <input type="hidden" name="csrf" value="${csrf}">
+
                 <input type="hidden" id="jobId" name="jobId" value="${job.jobId}">
                 <input type="hidden" name="command" id="command">
                 <input type="hidden" name="userId" value="${job.userId}">

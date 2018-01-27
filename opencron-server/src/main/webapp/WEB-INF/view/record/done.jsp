@@ -56,7 +56,7 @@
             var agentId = $("#agentId").val();
             var jobId = $("#jobId").val();
             var execType = $("#execType").val();
-            window.location.href = "${contextPath}/record/done.htm?queryTime=" + queryTime + "&success=" + success + "&agentId=" + agentId + "&jobId=" + jobId + "&execType=" + execType + "&pageSize=" + pageSize+"&csrf=${csrf}";
+            window.location.href = "${contextPath}/record/done.htm?queryTime=" + queryTime + "&success=" + success + "&agentId=" + agentId + "&jobId=" + jobId + "&execType=" + execType + "&pageSize=" + pageSize;
         }
 
         function showRedo(id,length,groupId,count){
@@ -340,7 +340,7 @@
                                         <i aria-hidden="true" class="fa fa-chevron-down groupIcon_${r.groupId}" redoOpen="off" id="redoIcon_${r.recordId}"></i>
                                     </a>&nbsp;&nbsp;
                                 </c:if>
-                                <a href="${contextPath}/record/detail/${r.recordId}.htm?csrf=${csrf}" title="查看详情">
+                                <a href="${contextPath}/record/detail/${r.recordId}.htm" title="查看详情">
                                     <i class="glyphicon glyphicon-eye-open"></i>
                                 </a>&nbsp;&nbsp;
                             </div>
@@ -377,7 +377,7 @@
                                 </td>
                                 <td class="text-center ${index.count eq 1 ? (r.redoCount eq index.count ? "redo-last" : "redo-last-top") : (r.redoCount eq index.count ? "redo-last-bottom" : "")}" >
                                     <div class="visible-md visible-lg hidden-sm hidden-xs action-buttons">
-                                            <a href="${contextPath}/record/detail/${rc.recordId}.htm?csrf=${csrf}" title="查看详情">
+                                            <a href="${contextPath}/record/detail/${rc.recordId}.htm" title="查看详情">
                                                 <i class="glyphicon glyphicon-eye-open"></i>
                                             </a>&nbsp;&nbsp;
                                     </div>
@@ -423,7 +423,7 @@
                                                     <i aria-hidden="true" class="fa fa-chevron-down groupIcon_${r.groupId}" redoOpen="off" id="redoIcon_${t.recordId}"></i>
                                                 </a>&nbsp;&nbsp;
                                             </c:if>
-                                            <a href="${contextPath}/record/detail/${t.recordId}.htm?csrf=${csrf}" title="查看详情">
+                                            <a href="${contextPath}/record/detail/${t.recordId}.htm" title="查看详情">
                                                 <i class="glyphicon glyphicon-eye-open"></i>
                                             </a>&nbsp;&nbsp;
                                         </div>
@@ -457,7 +457,7 @@
                                         <td>流程任务</td>
                                         <td class="text-center${index.count eq 1 ? (t.redoCount eq index.count ? "redo-last" : "redo-last-top") : (t.redoCount eq index.count ? "redo-last-bottom" : "")}" >
                                             <div class="visible-md visible-lg hidden-sm hidden-xs action-buttons">
-                                                    <a href="${contextPath}/record/detail/${tc.recordId}.htm?csrf=${csrf}" title="查看详情">
+                                                    <a href="${contextPath}/record/detail/${tc.recordId}.htm" title="查看详情">
                                                         <i class="glyphicon glyphicon-eye-open"></i>
                                                     </a>&nbsp;&nbsp;
                                             </div>
@@ -470,7 +470,7 @@
                 </tbody>
             </c:forEach>
         </table>
-        <cron:pager href="${contextPath}/record/done.htm?queryTime=${queryTime}&success=${success}&agentId=${agentId}&jobId=${jobId}&execType=${execType}&csrf=${csrf}" id="${pageBean.pageNo}" size="${pageBean.pageSize}" total="${pageBean.totalCount}"/>
+        <cron:pager href="${contextPath}/record/done.htm?queryTime=${queryTime}&success=${success}&agentId=${agentId}&jobId=${jobId}&execType=${execType}" id="${pageBean.pageNo}" size="${pageBean.pageSize}" total="${pageBean.totalCount}"/>
     </div>
 
 </section>

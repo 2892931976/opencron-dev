@@ -36,7 +36,7 @@
         </div>
 
         <div style="float: right;margin-top: -10px">
-            <a href="${contextPath}/group/add.htm?csrf=${csrf}" class="btn btn-sm m-t-10" style="margin-left: 50px;margin-bottom: 8px"><i class="icon">&#61943;</i>添加</a>
+            <a href="${contextPath}/group/add.htm" class="btn btn-sm m-t-10" style="margin-left: 50px;margin-bottom: 8px"><i class="icon">&#61943;</i>添加</a>
         </div>
 
         <table class="table tile textured">
@@ -60,10 +60,10 @@
                         <td><fmt:formatDate value="${g.createTime}" pattern="yyyy-MM-dd HH:mm:ss"/></td>
                         <td>${g.comment}</td>
                         <td class="text-center">
-                                <a href="${contextPath}/group/edit/${g.groupId}.htm?csrf=${csrf}" title="编辑">
+                                <a href="${contextPath}/group/edit/${g.groupId}.htm" title="编辑">
                                     <i class="glyphicon glyphicon-pencil"></i>
                                 </a>&nbsp;&nbsp;
-                                <a href="${contextPath}/group/detail/${g.groupId}.htm?csrf=${csrf}" title="查看详情">
+                                <a href="${contextPath}/group/detail/${g.groupId}.htm" title="查看详情">
                                     <i class="glyphicon glyphicon-eye-open"></i>
                                 </a>
                         </td>
@@ -71,7 +71,7 @@
                 </c:forEach>
             </tbody>
         </table>
-        <cron:pager href="${contextPath}/group/view.htm?csrf=${csrf}" id="${pageBean.pageNo}" size="${pageBean.pageSize}" total="${pageBean.totalCount}"/>
+        <cron:pager href="${contextPath}/group/view.htm" id="${pageBean.pageNo}" size="${pageBean.pageSize}" total="${pageBean.totalCount}"/>
     </div>
 
 </section>

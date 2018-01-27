@@ -28,8 +28,7 @@
                 confirmButtonText: "执行"
             }, function() {
                 ajax({
-                    headers:{"csrf":"${csrf}"},
-                    type:"POST",
+                    type: "post",
                     url: "${contextPath}/config/clear.do",
                     data: {
                         "startTime": startTime,
@@ -65,7 +64,7 @@
             <tr>
                 <td class="item"><i class="glyphicon glyphicon-envelope"></i>&nbsp;发件邮箱：</td>
                 <td>${config.senderEmail}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                <a class="green" href="${contextPath}/config/edit.htm?csrf=${csrf}" title="编辑"><i class="glyphicon glyphicon-pencil"></i></a>
+                <a class="green" href="${contextPath}/config/edit.htm" title="编辑"><i class="glyphicon glyphicon-pencil"></i></a>
                 </td>
             </tr>
 

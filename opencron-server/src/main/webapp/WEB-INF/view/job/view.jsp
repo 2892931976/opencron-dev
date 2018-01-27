@@ -18,7 +18,8 @@
     <script type="text/javascript">
 
         $(document).ready(function () {
-            window.opencronValidata = new Validata('${contextPath}','${csrf}');
+
+            window.opencronValidata = new Validata('${contextPath}');
 
             $("#redo1").next().on("click",toggle.count.show);
             $("#redo0").next().on("click",toggle.count.hide);
@@ -91,7 +92,7 @@
         var jobObj = {
             save:function (job) {
                 var jobId = $("#id").val();
-                var jobVerify = new Validata('${contextPath}','${csrf}',jobId);
+                var jobVerify = new Validata('${contextPath}',jobId);
                 jobVerify.validata.init();
                 jobVerify.validata.jobName();
                 jobVerify.validata.cronExp();
@@ -134,10 +135,8 @@
                                 "emailAddress": $("#email").val(),
                                 "comment": $("#comment").val()
                             };
-                            console.log(jobData);
                             ajax({
-                                headers: {"csrf": "${csrf}"},
-                                type: "POST",
+                                type: "post",
                                 url: "${contextPath}/job/edit.do",
                                 data: jobData
                             },function (data) {
@@ -168,8 +167,7 @@
 
             edit:function (id) {
                 ajax({
-                    headers: {"csrf": "${csrf}"},
-                    type: "POST",
+                    type: "post",
                     url: "${contextPath}/job/editsingle.do",
                     data: {"id": id}
                 },function (obj) {
@@ -246,7 +244,7 @@
                 var cronType = $("#cronType").val();
                 var jobType = $("#jobType").val();
                 var redo = $("#sredo").val();
-                window.location.href = "${contextPath}/job/view.htm?agentId=" + agentId + "&cronType=" + cronType + "&jobType=" + jobType + "&redo=" + redo + "&pageSize=" + pageSize + "&csrf=${csrf}";
+                window.location.href = "${contextPath}/job/view.htm?agentId=" + agentId + "&cronType=" + cronType + "&jobType=" + jobType + "&redo=" + redo + "&pageSize=" + pageSize ;
             },
             pauseJob:function (id,status) {
                 var msg = status?"暂停":"恢复";
@@ -259,8 +257,7 @@
                     confirmButtonText: msg
                 }, function () {
                     ajax({
-                        headers: {"csrf": "${csrf}"},
-                        type: "POST",
+                        type: "post",
                         url: "${contextPath}/job/pause.do",
                         data: {
                             "jobId": id,
@@ -289,8 +286,7 @@
             },
             executeJob:function (id) {
                 ajax({
-                    headers: {"csrf": "${csrf}"},
-                    type: "POST",
+                    type: "post",
                     url: "${contextPath}/job/running.do",
                     data: {"id": id}
                 },function (data) {
@@ -303,8 +299,7 @@
                         confirmButtonText:data.status?"再次执行":"执行"
                     }, function () {
                         ajax({
-                            headers: {"csrf": "${csrf}"},
-                            type: "POST",
+                            type: "post",
                             url: "${contextPath}/job/execute.do",
                             data: {"id": id}
                         },function (data) {
@@ -340,8 +335,7 @@
                 $("#command").parent().find(".tips").css("visibility","hidden");
                 $("#command").parent().find(".ok").remove();
                 ajax({
-                    headers: {"csrf": "${csrf}"},
-                    type: "POST",
+                    type: "post",
                     url: "${contextPath}/job/editsingle.do",
                     data: {"id": id}
                 },function (obj) {
@@ -365,8 +359,7 @@
                     return false;
                 } else {
                     ajax({
-                        headers: {"csrf": "${csrf}"},
-                        type: "POST",
+                        type: "post",
                         url: "${contextPath}/job/editcmd.do",
                         data: {
                             "jobId": jobId,
@@ -398,8 +391,7 @@
                     confirmButtonText: "删除"
                 }, function () {
                     ajax({
-                        headers: {"csrf": "${csrf}"},
-                        type: "POST",
+                        type: "post",
                         url: "${contextPath}/job/checkdel.do",
                         data: {"id": id}
                     },function (data) {
@@ -409,8 +401,7 @@
                             alert("该作业正在运行中,删除失败!")
                         } else {
                             ajax({
-                                headers: {"csrf": "${csrf}"},
-                                type: "POST",
+                                type: "post",
                                 url: "${contextPath}/job/delete.do",
                                 data: {"id": id}
                             },function (data) {
@@ -493,7 +484,7 @@
                     <option value="0" ${redo eq 0 ? 'selected' : ''}>否</option>
                 </select>
 
-                <a href="${contextPath}/job/add.htm?csrf=${csrf}" class="btn btn-sm m-t-10"
+                <a href="${contextPath}/job/add.htm" class="btn btn-sm m-t-10"
                    style="margin-left: 20px;margin-bottom: 8px;margin-top: -3px;"><i class="icon">&#61943;</i>添加</a>
             </div>
         </div>
@@ -536,9 +527,9 @@
 
                         </td>
                     </c:if>
-                    <td><a href="${contextPath}/agent/detail/${r.agentId}.htm?csrf=${csrf}">${r.agentName}</a></td>
+                    <td><a href="${contextPath}/agent/detail/${r.agentId}.htm">${r.agentName}</a></td>
                     <c:if test="${permission eq true}">
-                        <td><a href="${contextPath}/user/detail/${r.userId}.htm?csrf=${csrf}">${r.operateUname}</a>
+                        <td><a href="${contextPath}/user/detail/${r.userId}.htm">${r.operateUname}</a>
                         </td>
                     </c:if>
                     <c:if test="${permission eq false}">
@@ -580,7 +571,7 @@
                             </c:if>
 
                             <c:if test="${r.jobType eq 1}">
-                                <a title="编辑" href="${contextPath}/job/editflow.htm?id=${r.jobId}&csrf=${csrf}">
+                                <a title="编辑" href="${contextPath}/job/editflow.htm?id=${r.jobId}">
                                     <i class="glyphicon glyphicon-pencil"></i>
                                 </a>
                             </c:if>&nbsp;
@@ -613,7 +604,7 @@
                                 <i aria-hidden="true" class="fa fa-times"></i>
                             </a>&nbsp;
 
-                            <a href="${contextPath}/job/detail/${r.jobId}.htm?csrf=${csrf}" title="查看详情">
+                            <a href="${contextPath}/job/detail/${r.jobId}.htm" title="查看详情">
                                 <i class="glyphicon glyphicon-eye-open"></i>
                             </a>
                         </div>
@@ -623,10 +614,10 @@
                 <c:if test="${r.jobType eq 1}">
                     <c:forEach var="c" items="${r.children}" varStatus="index">
                         <tr class="child${r.jobId} trGroup${r.flowId}" style="display: none;">
-                            <td><a href="${contextPath}/agent/detail/${c.agentId}.htm?csrf=${csrf}">${c.agentName}</a></td>
+                            <td><a href="${contextPath}/agent/detail/${c.agentId}.htm">${c.agentName}</a></td>
                             <c:if test="${permission eq true}">
                                 <td>
-                                    <a href="${contextPath}/user/detail/${c.userId}.htm?csrf=${csrf}">${c.operateUname}</a>
+                                    <a href="${contextPath}/user/detail/${c.userId}.htm">${c.operateUname}</a>
                                 </td>
                             </c:if>
                             <c:if test="${permission eq false}">
@@ -653,7 +644,7 @@
                             </td>
                             <td class="text-center">
                                 <div class="visible-md visible-lg hidden-sm hidden-xs action-buttons">
-                                    <a href="${contextPath}/job/detail/${c.jobId}.htm?csrf=${csrf}" title="查看详情">
+                                    <a href="${contextPath}/job/detail/${c.jobId}.htm" title="查看详情">
                                         <i class="glyphicon glyphicon-eye-open"></i>
                                     </a>
                                 </div>
@@ -665,7 +656,7 @@
             </tbody>
         </table>
 
-        <cron:pager href="${contextPath}/job/view.htm?agentId=${agentId}&redo=${redo}&csrf=${csrf}" id="${pageBean.pageNo}" size="${pageBean.pageSize}" total="${pageBean.totalCount}"/>
+        <cron:pager href="${contextPath}/job/view.htm?agentId=${agentId}&redo=${redo}" id="${pageBean.pageNo}" size="${pageBean.pageSize}" total="${pageBean.totalCount}"/>
 
     </div>
 

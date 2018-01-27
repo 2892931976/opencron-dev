@@ -1,6 +1,5 @@
 function OpencronChart() {
     this.path = arguments[0] || "/";
-    this.csrf = arguments[1]||"",
     this.intervalId = null;
     this.intervalTime = 2000;
     this.gauge = null;
@@ -38,7 +37,6 @@ function OpencronChart() {
 ;OpencronChart.prototype.query = function () {
     var self = this;
     $.ajax({
-        headers:{"csrf":self.csrf},
         url: self.path + "/record.do",
         type: "POST",
         dataType: "json",
@@ -138,7 +136,6 @@ function OpencronChart() {
     }
 
     $.ajax({
-        headers:{"csrf":self.csrf},
         type: "POST",
         url: self.path + "/monitor.do",
         dataType: "json",

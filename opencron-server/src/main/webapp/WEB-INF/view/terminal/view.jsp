@@ -21,7 +21,7 @@
         $(document).ready(function () {
             $("#size").change(function () {
                 var pageSize = $("#size").val();
-                window.location.href="${contextPath}/terminal/view.htm?pageNo=${pageBean.pageNo}&pageSize="+pageSize+"&orderBy=${pageBean.orderBy}&order=${pageBean.order}&csrf=${csrf}";
+                window.location.href="${contextPath}/terminal/view.htm?pageNo=${pageBean.pageNo}&pageSize="+pageSize+"&orderBy=${pageBean.orderBy}&order=${pageBean.order}";
             });
         });
 
@@ -33,9 +33,8 @@
          */
         function ssh(id, failCallback) {
             ajax({
-                headers:{"csrf":"${csrf}"},
                 url: "${contextPath}/terminal/ssh.do",
-                type: "POST",
+                type: "post",
                 data: {"id":id}
             },function (json) {
                 if(json&&json.toString().indexOf("login")>-1){
@@ -82,9 +81,8 @@
                         //更改最后登录日期
                         window.setTimeout(function(){
                             $.ajax({
-                                headers:{"csrf":"${csrf}"},
                                 url: "${contextPath}/terminal/detail.do",
-                                type: "POST",
+                                type: "post",
                                 data: {"id":id},
                                 dataType: "json"
                             }).done(function (json) {
@@ -117,9 +115,8 @@
             }
             
             ajax({
-                headers:{"csrf":"${csrf}"},
                 url: "${contextPath}/terminal/detail.do",
-                type: "POST",
+                type: "post",
                 data: {"id":id}
             },function (json) {
                 $("#sshid").val(id);
@@ -143,9 +140,8 @@
                 confirmButtonText: "删除"
             },function () {
                 ajax({
-                    headers:{"csrf":"${csrf}"},
                     url: "${contextPath}/terminal/delete.do",
-                    type: "POST",
+                    type: "post",
                     data: {"id":id}
                 },function (data) {
                     if (data) {
@@ -238,18 +234,16 @@
 
             if (action == "add") {
                 ajax({
-                    headers:{"csrf":"${csrf}"},
                     url: "${contextPath}/terminal/exists.do",
-                    type: "POST",
+                    type: "post",
                     data: {
                         "host":host
                     }
                 },function (status) {
                     if(!status) {
                         ajax({
-                            headers:{"csrf":"${csrf}"},
                             url: "${contextPath}/terminal/save.do",
-                            type: "POST",
+                            type: "post",
                             data: {
                                 "name":name,
                                 "userName": user,
@@ -273,8 +267,7 @@
                 });
             }else {
                 ajax({
-                    headers:{"csrf":"${csrf}"},
-                    type: "POST",
+                    type: "post",
                     url: "${contextPath}/terminal/save.do",
                     data: {
                         "id":$("#sshid").val(),
@@ -320,7 +313,7 @@
         }
 
         function sortPage(field) {
-            location.href="${contextPath}/terminal/view.htm?pageNo=${pageBean.pageNo}&pageSize=${pageBean.pageSize}&orderBy="+field+"&order="+("${pageBean.order}"=="asc"?"desc":"asc")+"&csrf=${csrf}";
+            location.href="${contextPath}/terminal/view.htm?pageNo=${pageBean.pageNo}&pageSize=${pageBean.pageSize}&orderBy="+field+"&order="+("${pageBean.order}"=="asc"?"desc":"asc");
         }
 
     </script>
@@ -456,7 +449,7 @@
             </tbody>
         </table>
 
-        <cron:pager href="${contextPath}/terminal/view.htm?csrf=${csrf}" id="${pageBean.pageNo}" size="${pageBean.pageSize}" total="${pageBean.totalCount}"/>
+        <cron:pager href="${contextPath}/terminal/view.htm" id="${pageBean.pageNo}" size="${pageBean.pageSize}" total="${pageBean.totalCount}"/>
 
     </div>
 

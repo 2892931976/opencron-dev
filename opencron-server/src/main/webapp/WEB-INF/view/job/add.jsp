@@ -24,7 +24,7 @@
 
     <script type="text/javascript">
         $(document).ready(function () {
-            window.opencronValidata = new Validata('${contextPath}','${csrf}');
+            window.opencronValidata = new Validata('${contextPath}');
         });
     </script>
 
@@ -54,7 +54,7 @@
     <div class="block-area" id="basic">
         <div class="tile p-15 textured">
             <form class="form-horizontal" role="form" id="jobform" action="${contextPath}/job/save.do" method="post"></br>
-                <input type="hidden" name="csrf" value="${csrf}">
+
                 <input type="hidden" name="command" id="command">
                 <div class="form-group">
                     <label for="agentId" class="col-lab control-label wid150"><i class="glyphicon glyphicon-leaf"></i>&nbsp;&nbsp;执&nbsp;&nbsp;行&nbsp;&nbsp;器&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>

@@ -1,7 +1,8 @@
-;function OpencronTerm() {
+;function OpencronTerm(token,_theme) {
     this.socket = null;
     this.term = null;
-    this.args = arguments;
+    this.token = token;
+    this._theme = _theme;
     this.contextPath = (window.location.protocol === "https:" ? "wss://" : "ws://") + window.location.host;
     this.backgroundColor = '#000000';
     this.fontColor = "#cccccc";
@@ -48,7 +49,7 @@
         colors: Terminal.xtermColors
     });
     self.term.open(self.termContainer.empty()[0]);
-    self.theme(self.args[2]);
+    self.theme(self._theme);
     self.term.fit();
     self.term.resize(self.offset.cols, self.offset.rows);
     $(window).resize(function () {
@@ -58,12 +59,11 @@
             $(".terminal").height(self.offset.height);
             self.term.resize(self.offset.cols, self.offset.rows);
             $.ajax({
-                headers: {"csrf": self.args[1]},
                 url: '/terminal/resize.do',
                 type:'POST',
                 cache:false,
                 data: {
-                    "token": self.args[0],
+                    "token": self.token,
                     "cols": self.offset.cols,
                     "rows": self.offset.rows,
                     "width": self.offset.width,
@@ -112,12 +112,11 @@
         var sendInput = $("#sendInput").val();
         if (sendInput && sendInput.length > 0) {
             $.ajax({
-                headers:{"csrf":self.args[1]},
                 url: '/terminal/sendAll.do',
                 type:'POST',
                 cache:false,
                 data:{
-                    "token":self.args[0],
+                    "token":self.token,
                     "cmd":encodeURIComponent(sendInput),
                     "jsid":new Date()
                 }
@@ -203,12 +202,11 @@
 
     //同步到后台服务器
     $.ajax({
-        headers:{"csrf":this.args[1]},
         url:"/terminal/theme.do",
         type:"POST",
         cache:false,
         data:{
-            "token":this.args[0],
+            "token":this.token,
             "theme": this.themeName
         }
     });
