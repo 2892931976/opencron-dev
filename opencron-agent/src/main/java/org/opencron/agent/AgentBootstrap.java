@@ -103,7 +103,6 @@ public class AgentBootstrap implements Serializable {
 
 
     public static void main(String[] args) {
-
         if (daemon == null) {
             daemon = new AgentBootstrap();
         }
@@ -121,6 +120,7 @@ public class AgentBootstrap implements Serializable {
                      */
                     daemon.await();
                     daemon.stopServer();
+                    System.exit(0);
                 } else if ("stop".equals(command)) {
                     daemon.shutdown();
                 } else {
@@ -362,6 +362,7 @@ public class AgentBootstrap implements Serializable {
 
     private void stopServer() throws Throwable {
         this.server.destroy();
+
     }
 
     private static void handleThrowable(Throwable t) {
