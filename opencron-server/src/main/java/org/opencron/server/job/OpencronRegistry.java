@@ -28,7 +28,9 @@ import org.opencron.common.util.PropertyPlaceholder;
 import org.opencron.registry.URL;
 import org.opencron.registry.api.RegistryService;
 import org.opencron.registry.zookeeper.ChildListener;
+import org.opencron.server.service.AgentService;
 import org.slf4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -50,7 +52,10 @@ public class OpencronRegistry {
 
     private final URL registryURL = URL.valueOf(PropertyPlaceholder.get(Constants.PARAM_OPENCRON_REGISTRY_KEY));
 
-    private final String registryPath = Constants.ZK_REGISTRY_SERVER_PATH + "/" + MacUtils.getMac() + ":" + uuid();
+    private final String registryPath = Constants.ZK_REGISTRY_SERVER_PATH + "/" + MacUtils.getMac() + "@" + uuid();
+
+    @Autowired
+    private AgentService agentService;
 
     /**
      * 每台server启动起来都必须往注册中心注册信息...注册中心在重新统一分配任务到每台server上...
@@ -73,16 +78,28 @@ public class OpencronRegistry {
             }
         }, "OpencronShutdownHook"));
 
-        //监控agent
+        //agentAdd
         registryService.getZKClient(registryURL).addChildListener(Constants.ZK_REGISTRY_AGENT_PATH, new ChildListener() {
             @Override
             public void childChanged(String path, List<String> children) {
-                System.out.println(path);
-                for (String xx:children) {
-                    System.out.println("changed:"+xx);
+                for (String agent:children) {
+                    logger.info("[opencron] agent connected! info:{}",agent);
+                    agentService.doConnect(agent);
                 }
             }
         });
+
+        //agentRemove
+        registryService.getZKClient(registryURL).removeChildListener(Constants.ZK_REGISTRY_AGENT_PATH, new ChildListener() {
+            @Override
+            public void childChanged(String path, List<String> children) {
+                for (String agent:children) {
+                    logger.warn("[opencron] agent disconnected! info:{}",agent);
+                    agentService.doDisconnect(agent);
+                }
+            }
+        });
+
     }
 
     @PreDestroy

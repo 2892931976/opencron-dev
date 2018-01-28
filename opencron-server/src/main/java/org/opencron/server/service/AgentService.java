@@ -294,4 +294,12 @@ public class AgentService {
         this.merge(agent);
 
     }
+
+    public void doDisconnect(String agent) {
+
+    }
+
+    public void doConnect(String agent) {
+
+    }
 }
