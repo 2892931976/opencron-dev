@@ -31,6 +31,7 @@ function ajax(params,successCallback,errorCallBack) {
             if (errorCallBack) {
                 errorCallBack();
             }else {
+                $(".opencron_loading").remove();
                 alert("网络繁忙请刷新页面重试!");
             }
         }
@@ -114,7 +115,7 @@ var opencron = {
 function Loading() {
     this.loadingId = "loading_"+(new Date().getTime());
     $('body').append(
-        "<div class='modal fade in' id='"+this.loadingId+"' tabindex='-1' role='dialog' aria-hidden='false' style='display: block;'>" +
+        "<div class='modal fade in opencron_loading' id='"+this.loadingId+"' tabindex='-1' role='dialog' aria-hidden='false' style='display: block;'>" +
         "<figure>" +
         "    <div class='dot white'></div>" +
         "    <div class='dot'></div>" +
