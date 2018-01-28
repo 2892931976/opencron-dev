@@ -31,22 +31,18 @@ import org.opencron.common.ext.ExtensionLoader;
 import org.opencron.common.util.*;
 import org.opencron.common.logging.LoggerFactory;
 import org.opencron.registry.URL;
-import org.opencron.registry.zookeeper.ZookeeperClient;
-import org.opencron.registry.zookeeper.ZookeeperTransporter;
+import org.opencron.registry.api.RegistryService;
 import org.opencron.rpc.ServerHandler;
 import org.opencron.rpc.Server;
 import org.slf4j.Logger;
 
-import javax.crypto.Mac;
 import java.io.*;
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
 import java.lang.reflect.InvocationTargetException;
 import java.net.*;
 import java.security.AccessControlException;
-import java.util.List;
 import java.util.Random;
-import java.util.TreeSet;
 import java.util.concurrent.Executors;
 
 import static org.opencron.common.util.CommonUtils.isEmpty;
@@ -105,10 +101,6 @@ public class AgentBootstrap implements Serializable {
      */
     private Random random = null;
 
-    /**
-     * zkClient
-     */
-    private ZookeeperClient zookeeperClient = null;
 
     public static void main(String[] args) {
 
@@ -180,12 +172,6 @@ public class AgentBootstrap implements Serializable {
         }
         SystemPropertyUtils.setProperty(Constants.PARAM_OPENCRON_PORT_KEY, this.port.toString());
         SystemPropertyUtils.setProperty(Constants.PARAM_OPENCRON_PASSWORD_KEY, this.password);
-
-        //initZk
-        String registryAddress = AgentProperties.getProperty(Constants.PARAM_OPENCRON_REGISTRY_KEY);
-        URL url = URL.valueOf(registryAddress);
-        ZookeeperTransporter transporter = ExtensionLoader.load(ZookeeperTransporter.class);
-        this.zookeeperClient = transporter.connect(url);
     }
 
     private void start() {
@@ -205,19 +191,16 @@ public class AgentBootstrap implements Serializable {
 
             logger.info("[opencron]agent started @ port:{},pid:{}", port, getPid());
 
-            String agentId = null;
-            //多个网卡地址,按照字典顺序把他们连接在一块,用-分割.
-            List<String> macIds = MacUtils.getMacAddressList();
-            if (CommonUtils.notEmpty(macIds)) {
-                TreeSet<String> macSet = new TreeSet<String>(macIds);
-                agentId = StringUtils.joinString(macSet, "-");
-            }
-
+            String agentId = StringUtils.joinString(MacUtils.getAllMac(), "-");
             if ( agentId == null ) {
                 throw new IllegalArgumentException("[opencron] getMac error.");
             }
-            agentId = agentId+":"+this.port;
-            this.zookeeperClient.create(agentId,true);
+            String path = Constants.ZK_REGISTRY_AGENT_PATH.concat(agentId).concat(":"+this.port);
+
+            String registryAddress = AgentProperties.getProperty(Constants.PARAM_OPENCRON_REGISTRY_KEY);
+            URL url = URL.valueOf(registryAddress);
+            new RegistryService().register(url,path,true);
+            logger.info("[opencron] agent register to zookeeper done");
         } catch (Exception e) {
             e.printStackTrace();
         }

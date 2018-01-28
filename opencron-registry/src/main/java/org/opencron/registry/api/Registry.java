@@ -24,17 +24,23 @@ package org.opencron.registry.api;
  *
  * @author benjobs
  */
-public interface Registry extends RegistryService {
+
+import org.opencron.registry.URL;
+
+/**
+ *
+ * @author benjobs
+ */
+public interface Registry {
 
     /**
-     * is available.
-     *
-     * @return available.
+     * 注册数据
      */
-    boolean isAvailable();
+    void register(URL url,String path,boolean ephemeral);
 
     /**
-     * destroy.
+     * 取消注册.
      */
-    void destroy();
+    void unregister(URL url,String path);
+
 }

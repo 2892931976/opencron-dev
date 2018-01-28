@@ -21,32 +21,26 @@
 package org.opencron.registry.api;
 
 
+import org.opencron.common.ext.ExtensionLoader;
 import org.opencron.registry.URL;
+import org.opencron.registry.zookeeper.zkclient.ZkclientZookeeperTransporter;
 
 /**
  *
  * @author benjobs
  */
-public interface RegistryService {
+public class RegistryService implements Registry {
 
-    /**
-     * 注册数据
-     */
-    void register(URL url);
+    private ZkclientZookeeperTransporter transporter = ExtensionLoader.load(ZkclientZookeeperTransporter.class);
 
-    /**
-     * 取消注册.
-     */
-    void unregister(URL url);
+    @Override
+    public void register(URL url,String path,boolean ephemeral) {
+        transporter.connect(url).create(path,ephemeral);
+    }
 
-    /**
-     * 订阅消息
-     */
-    void subscribe(URL url, NotifyListener listener);
+    @Override
+    public void unregister(URL url,String path) {
 
-    /**
-     * 取消订阅.
-     */
-    void unsubscribe(URL url, NotifyListener listener);
+    }
 
 }

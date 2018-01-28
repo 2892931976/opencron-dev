@@ -207,7 +207,7 @@ OPENCRON_PIDDIR="/var/run";
 if [ ! -d "$OPENCRON_PIDDIR" ] ; then
     mkdir $OPENCRON_PIDDIR;
 fi
-OPENCRON_PID="$OPENCRON_PIDDIR/opencron.pid";
+OPENCRON_PID="$OPENCRON_BASE/opencron.pid";
 
 #opencron version
 OPENCRON_VERSION="1.2.0-RELEASE"

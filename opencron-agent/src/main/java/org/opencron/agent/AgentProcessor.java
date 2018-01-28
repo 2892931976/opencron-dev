@@ -366,18 +366,7 @@ public class AgentProcessor implements ServerHandler, AgentJob {
 
     @Override
     public Response guid(Request request) {
-        String macId = null;
-        try {
-            //多个网卡地址,按照字典顺序把他们连接在一块,用-分割.
-            List<String> macIds = MacUtils.getMacAddressList();
-            if (CommonUtils.notEmpty(macIds)) {
-                TreeSet<String> macSet = new TreeSet<String>(macIds);
-                macId = StringUtils.joinString(macSet, "-");
-            }
-        } catch (IOException e) {
-            logger.error("[opencron]:getMac error:{}", e);
-        }
-
+        String macId = StringUtils.joinString(MacUtils.getAllMac(), "-");
         Response response = Response.response(request).end();
         if (notEmpty(macId)) {
             return response.setMessage(macId).setSuccess(true).setExitCode(Constants.StatusCode.SUCCESS_EXIT.getValue());
@@ -440,7 +429,7 @@ public class AgentProcessor implements ServerHandler, AgentJob {
     public boolean register() {
         if (CommonUtils.notEmpty(Constants.OPENCRON_SERVER)) {
             String url = Constants.OPENCRON_SERVER + "/agent/autoreg.do";
-            String mac = MacUtils.getMacAddress();
+            String mac = MacUtils.getMac();
             String agentPassword = IOUtils.readText(Constants.OPENCRON_PASSWORD_FILE, "UTF-8").trim().toLowerCase();
 
             Map<String, Object> params = new HashMap<String, Object>(0);

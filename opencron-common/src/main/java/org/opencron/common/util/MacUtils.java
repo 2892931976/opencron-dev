@@ -21,71 +21,76 @@
 
 package org.opencron.common.util;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import org.opencron.common.exception.UnknownException;
+
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.net.UnknownHostException;
+import java.util.*;
 
 public class MacUtils {
 
-    private static String macAddressStr = null;
-
-    private static final String[] windowsCommand = {"ipconfig", "/all"};
-    private static final String[] linuxCommand = {"/sbin/ifconfig", "-a"};
-    private static final Pattern macPattern = Pattern.compile(".*((:?[0-9a-f]{2}[-:]){5}[0-9a-f]{2}).*", Pattern.CASE_INSENSITIVE);
-
-    public final static List<String> getMacAddressList() throws IOException {
-        final ArrayList<String> macAddressList = new ArrayList<String>();
-        final String command[];
-
-        if (CommonUtils.isWindowOs()) {
-            command = windowsCommand;
-        } else if (CommonUtils.isLinuxOs()) {
-            command = linuxCommand;
-        } else {
-            throw new IOException("Unknow operating system:" + CommonUtils.getOsName());
-        }
-
-        final Process process = Runtime.getRuntime().exec(command);
-
-        BufferedReader bufReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-        for (String line; (line = bufReader.readLine()) != null; ) {
-            Matcher matcher = macPattern.matcher(line);
-            if (matcher.matches()) {
-                //macAddressList.add(matcher.group(1));
-                macAddressList.add(matcher.group(1).replaceAll("[-:]", ""));//去掉MAC中的“-”
-            }
-        }
-        process.destroy();
-        bufReader.close();
-        return macAddressList;
-    }
-
-    public static String getMacAddress() {
-        if (macAddressStr == null || macAddressStr.equals("")) {
-            StringBuffer sb = new StringBuffer(); //存放多个网卡地址用，目前只取一个非0000000000E0隧道的值
-            try {
-                List<String> macList = getMacAddressList();
-                for (Iterator<String> iter = macList.iterator(); iter.hasNext(); ) {
-                    String amac = iter.next();
-                    if (!amac.equals("0000000000E0")) {
-                        sb.append(amac);
-                        break;
-                    }
+    public static String getMac() {
+        try {
+            byte[] mac = new byte[0];
+            mac = NetworkInterface.getByInetAddress(InetAddress.getLocalHost()).getHardwareAddress();
+            StringBuffer buffer = new StringBuffer("");
+            for (int i = 0; i < mac.length; i++) {
+                if (i > 0) {
+                    buffer.append(":");
                 }
-            } catch (IOException e) {
-                e.printStackTrace();
+                int temp = mac[i] & 0xff;
+                String str = Integer.toHexString(temp);
+                if (str.length() == 1) {
+                    buffer.append("0" + str);
+                } else {
+                    buffer.append(str);
+                }
             }
-            macAddressStr = sb.toString();
+            return buffer.toString();
+        } catch (Exception e) {
+            throw new UnknownException("[opencron] getMacAddress error");
         }
-        return macAddressStr;
     }
 
-    public static void main(String[] args) {
-        System.out.println(MacUtils.getMacAddress());
+    public static Set<String> getAllMac() {
+        List<String> list = new ArrayList<String>();
+        try {
+            Enumeration<NetworkInterface> enumeration = NetworkInterface.getNetworkInterfaces();
+            while (enumeration.hasMoreElements()) {
+                NetworkInterface network = enumeration.nextElement();
+                if (network != null) {
+                    if (network.getHardwareAddress() != null) {
+                        byte[] address = network.getHardwareAddress();
+
+                        StringBuffer buffer = new StringBuffer("");
+                        for (int i = 0; i < address.length; i++) {
+                            if (i > 0) {
+                                buffer.append(":");
+                            }
+                            String str = Integer.toHexString(address[i] & 0xff);
+                            if (str.length() == 1) {
+                                buffer.append("0" + str);
+                            } else {
+                                buffer.append(str);
+                            }
+                        }
+                        list.add(buffer.toString());
+                    }
+                } else {
+                    throw new UnknownException("[opencron] getAllMac error");
+                }
+            }
+        } catch (SocketException e) {
+            e.printStackTrace();
+        }
+        //按照字典顺序排序
+        return new TreeSet<String>(list);
+    }
+
+    public static void main(String[] args) throws SocketException, UnknownHostException {
+        System.out.println(MacUtils.getMac());
+        System.out.println(MacUtils.getAllMac());
     }
 }
