@@ -59,6 +59,7 @@ public class OpencronRegistry {
      */
     @PostConstruct
     public void initialization() throws Exception {
+
         //将server加入到注册中心
         registryService.register(registryURL,registryPath,true);
 
