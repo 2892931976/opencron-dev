@@ -28,20 +28,25 @@ package org.opencron.agent;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.opencron.common.Constants;
 import org.opencron.common.ext.ExtensionLoader;
-import org.opencron.common.util.IOUtils;
+import org.opencron.common.util.*;
 import org.opencron.common.logging.LoggerFactory;
-import org.opencron.common.util.SystemPropertyUtils;
+import org.opencron.registry.URL;
+import org.opencron.registry.zookeeper.ZookeeperClient;
+import org.opencron.registry.zookeeper.ZookeeperTransporter;
 import org.opencron.rpc.ServerHandler;
 import org.opencron.rpc.Server;
 import org.slf4j.Logger;
 
+import javax.crypto.Mac;
 import java.io.*;
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
 import java.lang.reflect.InvocationTargetException;
 import java.net.*;
 import java.security.AccessControlException;
+import java.util.List;
 import java.util.Random;
+import java.util.TreeSet;
 import java.util.concurrent.Executors;
 
 import static org.opencron.common.util.CommonUtils.isEmpty;
@@ -59,6 +64,7 @@ public class AgentBootstrap implements Serializable {
      * rpc server
      */
     private Server server = ExtensionLoader.load(Server.class);
+
 
     /**
      * rpc handler...
@@ -98,6 +104,11 @@ public class AgentBootstrap implements Serializable {
      * the shutdown command string is longer than 1024 characters.
      */
     private Random random = null;
+
+    /**
+     * zkClient
+     */
+    private ZookeeperClient zookeeperClient = null;
 
     public static void main(String[] args) {
 
@@ -169,12 +180,17 @@ public class AgentBootstrap implements Serializable {
         }
         SystemPropertyUtils.setProperty(Constants.PARAM_OPENCRON_PORT_KEY, this.port.toString());
         SystemPropertyUtils.setProperty(Constants.PARAM_OPENCRON_PASSWORD_KEY, this.password);
+
+        //initZk
+        String registryAddress = AgentProperties.getProperty(Constants.PARAM_OPENCRON_REGISTRY_KEY);
+        URL url = URL.valueOf(registryAddress);
+        ZookeeperTransporter transporter = ExtensionLoader.load(ZookeeperTransporter.class);
+        this.zookeeperClient = transporter.connect(url);
     }
 
     private void start() {
         try {
             final int port = SystemPropertyUtils.getInt(Constants.PARAM_OPENCRON_PORT_KEY, 1577);
-
             //new thread to start for netty server
             Executors.newSingleThreadExecutor().submit(new Runnable() {
                 @Override
@@ -189,6 +205,19 @@ public class AgentBootstrap implements Serializable {
 
             logger.info("[opencron]agent started @ port:{},pid:{}", port, getPid());
 
+            String agentId = null;
+            //多个网卡地址,按照字典顺序把他们连接在一块,用-分割.
+            List<String> macIds = MacUtils.getMacAddressList();
+            if (CommonUtils.notEmpty(macIds)) {
+                TreeSet<String> macSet = new TreeSet<String>(macIds);
+                agentId = StringUtils.joinString(macSet, "-");
+            }
+
+            if ( agentId == null ) {
+                throw new IllegalArgumentException("[opencron] getMac error.");
+            }
+            agentId = agentId+":"+this.port;
+            this.zookeeperClient.create(agentId,true);
         } catch (Exception e) {
             e.printStackTrace();
         }

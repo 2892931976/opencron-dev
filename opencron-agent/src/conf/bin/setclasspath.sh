@@ -80,7 +80,7 @@ fi
 
 # Set standard commands for invoking Java, if not already set.
 if [ -z "$_RUNJAVA" ]; then
-  _RUNJAVA="$JRE_HOME"/bin/java
+  RUNJAVA="$JRE_HOME"/bin/java
 fi
 if [ "$os400" != "true" ]; then
   if [ -z "$_RUNJDB" ]; then

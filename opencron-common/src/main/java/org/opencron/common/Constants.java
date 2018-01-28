@@ -92,6 +92,8 @@ public class Constants {
 
     public static final String PARAM_OPENCRON_SHUTDOWN_KEY = "opencron.shutdown";
 
+    public static final String PARAM_OPENCRON_REGISTRY_KEY = "opencron.registry";
+
     public static final String PARAM_DEF_USER_KEY = "opencron";
 
     public static final String PARAM_DEF_PASSWORD_KEY = "opencron";
