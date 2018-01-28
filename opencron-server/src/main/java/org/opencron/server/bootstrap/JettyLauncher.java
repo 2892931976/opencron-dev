@@ -110,13 +110,12 @@ public class JettyLauncher implements Launcher {
 
         @Override
         protected void doStart() throws Exception {
-            ClassLoader old = Thread.currentThread().getContextClassLoader();
             Thread.currentThread().setContextClassLoader(context.getClassLoader());
             try {
                 jasperInitializer.onStartup(null, context.getServletContext());
                 super.doStart();
             } finally {
-                Thread.currentThread().setContextClassLoader(old);
+                Thread.currentThread().setContextClassLoader(Thread.currentThread().getContextClassLoader());
             }
         }
 
