@@ -1,8 +1,10 @@
 package org.opencron.registry;
 
+import org.apache.zookeeper.data.Stat;
 import org.junit.Before;
 import org.junit.Test;
 import org.opencron.registry.zookeeper.ChildListener;
+import org.opencron.registry.zookeeper.StateListener;
 import org.opencron.registry.zookeeper.ZookeeperClient;
 import org.opencron.registry.zookeeper.zkclient.ZkclientZookeeperClient;
 
@@ -13,21 +15,21 @@ public class RegistryTest {
 
     private ZookeeperClient zookeeperClient;
 
-  //  @Before
+    String url = "zookeeper://127.0.0.1:2181";
+
+    @Before
     public void init() {
-        URL url = new URL("zookeeper","127.0.0.1",2181);
-        zookeeperClient = new ZkclientZookeeperClient(url);
+        zookeeperClient = new ZkclientZookeeperClient(URL.valueOf(url));
     }
 
     @Test
     public void create(){
-        String url = "zookeeper://127.0.0.1:2181";
-        zookeeperClient.create("/opencron",false);
+        zookeeperClient.create("/opencron/agent/123322242",true);
     }
 
     @Test
     public void delete(){
-        zookeeperClient.delete("/opencron");
+        zookeeperClient.delete("/opencron/agent");
     }
 
     @Test

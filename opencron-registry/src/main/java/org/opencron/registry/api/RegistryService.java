@@ -23,7 +23,8 @@ package org.opencron.registry.api;
 
 import org.opencron.common.ext.ExtensionLoader;
 import org.opencron.registry.URL;
-import org.opencron.registry.zookeeper.zkclient.ZkclientZookeeperTransporter;
+import org.opencron.registry.zookeeper.ZookeeperClient;
+import org.opencron.registry.zookeeper.ZookeeperTransporter;
 
 /**
  *
@@ -31,7 +32,11 @@ import org.opencron.registry.zookeeper.zkclient.ZkclientZookeeperTransporter;
  */
 public class RegistryService implements Registry {
 
-    private ZkclientZookeeperTransporter transporter = ExtensionLoader.load(ZkclientZookeeperTransporter.class);
+    private ZookeeperTransporter transporter = ExtensionLoader.load(ZookeeperTransporter.class);
+
+    public ZookeeperClient getZKClient(URL url){
+       return transporter.connect(url);
+    }
 
     @Override
     public void register(URL url,String path,boolean ephemeral) {

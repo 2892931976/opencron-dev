@@ -195,12 +195,24 @@ public class AgentBootstrap implements Serializable {
             if ( agentId == null ) {
                 throw new IllegalArgumentException("[opencron] getMac error.");
             }
-            String path = Constants.ZK_REGISTRY_AGENT_PATH.concat(agentId).concat(":"+this.port);
+            final String path = Constants.ZK_REGISTRY_AGENT_PATH + "/" + agentId + ":" + this.port;
 
             String registryAddress = AgentProperties.getProperty(Constants.PARAM_OPENCRON_REGISTRY_KEY);
-            URL url = URL.valueOf(registryAddress);
-            new RegistryService().register(url,path,true);
+            final URL url = URL.valueOf(registryAddress);
+            final RegistryService registryService = new RegistryService();
+            registryService.register(url,path,true);
+
             logger.info("[opencron] agent register to zookeeper done");
+
+            //register shutdown hook
+            Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+                public void run() {
+                    if (logger.isInfoEnabled()) {
+                        logger.info("Run shutdown hook now.");
+                    }
+                    registryService.unregister(url,path);
+                }
+            }, "OpencronShutdownHook"));
         } catch (Exception e) {
             e.printStackTrace();
         }

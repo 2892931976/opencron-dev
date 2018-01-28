@@ -3,8 +3,7 @@
        xmlns:context="http://www.springframework.org/schema/context"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
            http://www.springframework.org/schema/beans/spring-beans.xsd
-           http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd"
-       default-lazy-init="true">
+           http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
     <description>Spring公共配置文件</description>
 
@@ -17,6 +16,7 @@
         </property>
     </bean>
 
+
     <bean id="propertyConfigurer" class="org.opencron.common.util.PropertyPlaceholder">
         <property name="properties" ref="config"/>
         <property name="ignoreResourceNotFound" value="true"/>
@@ -26,6 +26,6 @@
 
     <context:component-scan base-package="org.opencron.server" scoped-proxy="targetClass"/>
 
-    <bean class="org.opencron.server.job.OpencronTask" lazy-init="false"/>
+    <bean class="org.springframework.context.annotation.CommonAnnotationBeanPostProcessor" />
 
 </beans>

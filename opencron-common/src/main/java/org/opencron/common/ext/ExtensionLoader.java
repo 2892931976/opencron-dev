@@ -87,6 +87,7 @@ public class ExtensionLoader<T> {
 
     public T getExtension(String spiName) {
         try {
+            spiName = getSpiKey(spiName);
             Class<?> instanceClass;
             //spi注解上是否指定了实现类的key
             if (CommonUtils.isEmpty(spi.value())) {
@@ -162,7 +163,7 @@ public class ExtensionLoader<T> {
                                                     this.type + ", class line: " + clazz.getName() + "), class "
                                                     + clazz.getName() + "is not subtype of interface.");
                                         }
-                                        this.EXTENSION_SPIS.put(spiName, clazz);
+                                        this.EXTENSION_SPIS.put(getSpiKey(spiName), clazz);
                                     }
                                 } catch (Throwable t) {
                                     throw new IllegalStateException("Failed to load extension class(interface: " + type + ", class line: " + line + ") in " + url + ", cause: " + t.getMessage(), t);
@@ -180,6 +181,13 @@ public class ExtensionLoader<T> {
             logger.error("Exception when load extension class(interface: " + type + ", description file: " + fileName + ").", t);
         }
 
+    }
+
+    private String getSpiKey(String spiName) {
+        if (spiName!=null) {
+            return spiName.concat("_").concat(this.type.getName());
+        }
+        return this.type.getName();
     }
 
     private static <T> boolean withExtensionAnnotation(Class<T> type) {

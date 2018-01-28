@@ -35,9 +35,9 @@ public class Constants {
 
     public static final String META_INF_DIR = "META-INF/opencron/";
 
-    public static final String ZK_REGISTRY_AGENT_PATH = "/opencron/agent/";
+    public static final String ZK_REGISTRY_AGENT_PATH = "/opencron/agent";
 
-    public static final String ZK_REGISTRY_SERVER_PATH = "/opencron/server/";
+    public static final String ZK_REGISTRY_SERVER_PATH = "/opencron/server";
 
     /**
      * 注册中心是否同步存储文件，默认异步

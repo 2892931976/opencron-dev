@@ -28,8 +28,10 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
+
 @Component
-public class OpencronTask implements InitializingBean {
+public class OpencronTask {
 
     private final Logger logger = LoggerFactory.getLogger(OpencronTask.class);
 
@@ -42,8 +44,8 @@ public class OpencronTask implements InitializingBean {
     @Autowired
     private SchedulerService schedulerService;
 
-    @Override
-    public void afterPropertiesSet() throws Exception {
+    @PostConstruct
+    public void initialization() throws Exception {
         configService.initDataBase();
         //检测所有的agent...
         clearCache();
