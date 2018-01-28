@@ -362,7 +362,6 @@ public class AgentBootstrap implements Serializable {
 
     private void stopServer() throws Throwable {
         this.server.destroy();
-
     }
 
     private static void handleThrowable(Throwable t) {
