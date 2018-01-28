@@ -112,19 +112,22 @@ var opencron = {
 };
 
 function Loading() {
-    var loading = "<div class='modal fade in' id='loading' tabindex='-1' role='dialog' aria-hidden='false' style='display: block;'>" +
-                   "<figure>" +
-                   "    <div class='dot white'></div>" +
-                   "    <div class='dot'></div>" +
-                   "    <div class='dot'></div>" +
-                   "    <div class='dot'></div>" +
-                   "    <div class='dot'></div>" +
-                   "</figure>"
-                   "</div>";
-    $('body').append($(loading));
+    this.loadingId = "loading_"+(new Date().getTime());
+    $('body').append(
+        "<div class='modal fade in' id='"+this.loadingId+"' tabindex='-1' role='dialog' aria-hidden='false' style='display: block;'>" +
+        "<figure>" +
+        "    <div class='dot white'></div>" +
+        "    <div class='dot'></div>" +
+        "    <div class='dot'></div>" +
+        "    <div class='dot'></div>" +
+        "    <div class='dot'></div>" +
+        "</figure>" +
+        "</div>"
+    );
     this.exit = function (fn) {
-        setTimeout(function () {
-            $("#loading").fadeIn(500,function () {
+        var _this = this;
+        window.setTimeout(function () {
+            $("#"+_this.loadingId).fadeIn(500,function () {
                 $(this).remove();
                 fn();
             });

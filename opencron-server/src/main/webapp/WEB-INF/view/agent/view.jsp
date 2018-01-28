@@ -312,7 +312,7 @@
                             type: "post",
                             url: "${contextPath}/verify/ping.do",
                             data: {
-                                                                "proxy": proxy,
+                                 "proxy": proxy,
                                 "proxyId": $("#proxyAgent").val(),
                                 "host": host,
                                 "port": port,
@@ -338,6 +338,7 @@
         }
 
         function canSave(proxy, id, name, port, warning, mobiles, email) {
+            var loading = new Loading();
             ajax({
                 type: "post",
                 url: "${contextPath}/agent/edit.do",
@@ -353,22 +354,24 @@
                     "comment":$("#comment").val()
                 }
             },function (data) {
-                $('#agentModal').modal('hide');
-                alertMsg("修改成功");
-                $("#name_" + id).html(escapeHtml(name));
-                $("#port_" + id).html(port);
-                if (warning == "0") {
-                    $("#warning_" + id).html('<span class="label label-default" style="color: red;font-weight:bold">&nbsp;&nbsp;否&nbsp;&nbsp;</span>');
-                } else {
-                    $("#warning_" + id).html('<span class="label label-warning" style="color: white;font-weight:bold">&nbsp;&nbsp;是&nbsp;&nbsp;</span>');
-                }
-                if (proxy == "0") {
-                    $("#connType_" + id).html("直连");
-                } else {
-                    $("#connType_" + id).html("代理");
-                }
-                flushConnAgents();
-                return false;
+                loading.exit(function () {
+                    $('#agentModal').modal('hide');
+                    alertMsg("修改成功");
+                    $("#name_" + id).html(escapeHtml(name));
+                    $("#port_" + id).html(port);
+                    if (warning == "0") {
+                        $("#warning_" + id).html('<span class="label label-default" style="color: red;font-weight:bold">&nbsp;&nbsp;否&nbsp;&nbsp;</span>');
+                    } else {
+                        $("#warning_" + id).html('<span class="label label-warning" style="color: white;font-weight:bold">&nbsp;&nbsp;是&nbsp;&nbsp;</span>');
+                    }
+                    if (proxy == "0") {
+                        $("#connType_" + id).html("直连");
+                    } else {
+                        $("#connType_" + id).html("代理");
+                    }
+                    flushConnAgents();
+                    return false;
+                });
             })
         }
 
