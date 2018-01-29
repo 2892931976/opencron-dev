@@ -1,10 +1,8 @@
 package org.opencron.registry;
 
-import org.apache.zookeeper.data.Stat;
 import org.junit.Before;
 import org.junit.Test;
 import org.opencron.registry.zookeeper.ChildListener;
-import org.opencron.registry.zookeeper.StateListener;
 import org.opencron.registry.zookeeper.ZookeeperClient;
 import org.opencron.registry.zookeeper.zkclient.ZkclientZookeeperClient;
 
