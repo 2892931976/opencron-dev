@@ -191,7 +191,7 @@ public class AgentBootstrap implements Serializable {
 
             logger.info("[opencron]agent started @ port:{},pid:{}", port, getPid());
 
-            String agentId = MacUtils.getMac();
+            String agentId = StringUtils.join(MacUtils.getAllMac(),"_");
             if ( agentId == null ) {
                 throw new IllegalArgumentException("[opencron] getMac error.");
             }

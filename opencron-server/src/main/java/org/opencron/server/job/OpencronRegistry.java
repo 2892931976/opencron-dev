@@ -26,6 +26,7 @@ import org.opencron.common.Constants;
 import org.opencron.common.logging.LoggerFactory;
 import org.opencron.common.util.MacUtils;
 import org.opencron.common.util.PropertyPlaceholder;
+import org.opencron.common.util.StringUtils;
 import org.opencron.registry.URL;
 import org.opencron.registry.api.RegistryService;
 import org.opencron.registry.zookeeper.ChildListener;
@@ -56,7 +57,7 @@ public class OpencronRegistry {
 
     private final URL registryURL = URL.valueOf(PropertyPlaceholder.get(Constants.PARAM_OPENCRON_REGISTRY_KEY));
 
-    private final String registryPath = Constants.ZK_REGISTRY_SERVER_PATH + "/" + MacUtils.getMac() + "@" + uuid();
+    private final String registryPath = Constants.ZK_REGISTRY_SERVER_PATH + "/" + StringUtils.join(MacUtils.getAllMac(),"_") + "@" + uuid();
 
     private Map<String,String> agentMap = new ConcurrentHashMap<String, String>(0);
 
@@ -87,7 +88,7 @@ public class OpencronRegistry {
         //agent添加,删除监控...
         registryService.getZKClient(registryURL).addChildListener(Constants.ZK_REGISTRY_AGENT_PATH, new ChildListener() {
             @Override
-            public void childChanged(String path, List<String> children) {
+            public synchronized void childChanged(String path, List<String> children) {
                 if (agentMap.isEmpty()) {
                     for (String agent:children) {
                         agentMap.put(agent,agent);

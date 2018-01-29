@@ -366,7 +366,7 @@ public class AgentProcessor implements ServerHandler, AgentJob {
 
     @Override
     public Response guid(Request request) {
-        String macId = MacUtils.getMac();
+        String macId = StringUtils.join(MacUtils.getAllMac(),"_");
         Response response = Response.response(request).end();
         if (notEmpty(macId)) {
             return response.setMessage(macId).setSuccess(true).setExitCode(Constants.StatusCode.SUCCESS_EXIT.getValue());
@@ -429,7 +429,7 @@ public class AgentProcessor implements ServerHandler, AgentJob {
     public boolean register() {
         if (CommonUtils.notEmpty(Constants.OPENCRON_SERVER)) {
             String url = Constants.OPENCRON_SERVER + "/agent/autoreg.do";
-            String mac = MacUtils.getMac();
+            String mac = StringUtils.join(MacUtils.getAllMac(),"_");
             String agentPassword = IOUtils.readText(Constants.OPENCRON_PASSWORD_FILE, "UTF-8").trim().toLowerCase();
 
             Map<String, Object> params = new HashMap<String, Object>(0);
