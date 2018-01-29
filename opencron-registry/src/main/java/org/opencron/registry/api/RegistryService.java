@@ -45,7 +45,7 @@ public class RegistryService implements Registry {
 
     @Override
     public void unregister(URL url,String path) {
-
+        transporter.connect(url).delete(path);
     }
 
 }

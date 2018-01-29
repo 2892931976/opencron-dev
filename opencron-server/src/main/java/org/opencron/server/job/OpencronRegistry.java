@@ -72,7 +72,7 @@ public class OpencronRegistry {
         Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
             public void run() {
                 if (logger.isInfoEnabled()) {
-                    logger.info("Run shutdown hook now.");
+                    logger.info("[opencron] run shutdown hook now...");
                 }
                 registryService.unregister(registryURL,registryPath);
             }
@@ -104,6 +104,9 @@ public class OpencronRegistry {
 
     @PreDestroy
     public void destroy() throws Exception {
+        if (logger.isInfoEnabled()) {
+            logger.info("[opencron] run destroy now...");
+        }
         registryService.unregister(registryURL,registryPath);
     }
 }
