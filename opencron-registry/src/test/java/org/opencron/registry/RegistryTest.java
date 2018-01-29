@@ -21,26 +21,40 @@ public class RegistryTest {
     }
 
     @Test
-    public void create(){
-        zookeeperClient.create("/opencron/agent/123322242",true);
+    public void create() throws IOException {
+        zookeeperClient.create("/opencron/agent/2",true);
+        System.in.read();
     }
 
     @Test
-    public void delete(){
-        zookeeperClient.delete("/opencron/agent");
+    public void delete() throws IOException {
+        zookeeperClient.delete("/opencron/agent/2");
+        System.in.read();
     }
 
     @Test
     public void lister() throws IOException {
-        zookeeperClient.addChildListener("/opencron",new ChildListener(){
+
+        zookeeperClient.addChildListener("/opencron/agent",new ChildListener(){
             @Override
             public void childChanged(String path, List<String> children) {
-                System.out.println("root:----->"+path);
+                System.out.println("add:----->"+path);
                 for (String child:children) {
                     System.out.println(child);
                 }
             }
         });
+
+        zookeeperClient.removeChildListener("/opencron/agent",new ChildListener(){
+            @Override
+            public void childChanged(String path, List<String> children) {
+                System.out.println("remove:----->"+path);
+                for (String child:children) {
+                    System.out.println(child);
+                }
+            }
+        });
+
 
         System.in.read();
     }

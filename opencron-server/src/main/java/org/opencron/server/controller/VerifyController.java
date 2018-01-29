@@ -22,6 +22,7 @@
 package org.opencron.server.controller;
 
 import org.opencron.common.Constants;
+import org.opencron.common.util.collection.ParamsMap;
 import org.opencron.server.domain.Agent;
 import it.sauronsoftware.cron4j.SchedulingPattern;
 import org.opencron.server.service.AgentService;
@@ -91,7 +92,7 @@ public class VerifyController extends BaseController {
 
     @RequestMapping(value = "guid.do", method = RequestMethod.POST)
     @ResponseBody
-    public String getGuid(int proxy, Long proxyId, String host, Integer port, String password, HttpServletResponse response) {
+    public Map getGuid(int proxy, Long proxyId, String host, Integer port, String password, HttpServletResponse response) {
         Agent agent = new Agent();
         agent.setProxy(proxy);
         agent.setHost(host);
@@ -110,6 +111,10 @@ public class VerifyController extends BaseController {
                 agent.setProxy(Constants.ConnType.PROXY.getType());
             }
         }
-        return executeService.guid(agent);
+        String macId = executeService.guid(agent);
+        if (macId == null) {
+            return ParamsMap.map().set("status",false);
+        }
+        return ParamsMap.map().set("status",true).set("macId",macId);
     }
 }

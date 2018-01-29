@@ -292,14 +292,30 @@ public class AgentService {
         }
         //save disconnect status to db.....
         this.merge(agent);
-
     }
 
-    public void doDisconnect(String agent) {
-
+    public void doConnect(Agent agent) {
+        agent.setStatus(true);
+        this.merge(agent);
     }
 
-    public void doConnect(String agent) {
+    public void doDisconnect(String info) {
+        if (CommonUtils.notEmpty(info)) {
+            String macId = info.split("@")[0];
+            Agent agent = getAgentByMachineId(macId);
+            if (agent!=null) {
+                doDisconnect(agent);
+            }
+        }
+    }
 
+    public void doConnect(String info) {
+        if (CommonUtils.notEmpty(info)) {
+            String macId = info.split("@")[0];
+            Agent agent = getAgentByMachineId(macId);
+            if (agent!=null) {
+                doConnect(agent);
+            }
+        }
     }
 }

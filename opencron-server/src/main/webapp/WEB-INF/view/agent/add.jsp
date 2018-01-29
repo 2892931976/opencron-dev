@@ -158,7 +158,6 @@
                         ajax({
                             url: "${contextPath}/verify/guid.do",
                             type: "post",
-                            dataType:"html",
                             data: {
                                 "proxy": _ping || 0,
                                 "proxyId": proxyId,
@@ -167,7 +166,9 @@
                                 "password": calcMD5($("#password").val())
                             }
                         },function (data) {
-                            $("#machineId").val(data);
+                            if (data.status){
+                                $("#machineId").val(data.macId);
+                            }
                             if(callback){
                                 callback();
                             }

@@ -21,6 +21,7 @@
 
 package org.opencron.server.job;
 
+import net.sf.ehcache.store.chm.ConcurrentHashMap;
 import org.opencron.common.Constants;
 import org.opencron.common.logging.LoggerFactory;
 import org.opencron.common.util.MacUtils;
@@ -35,7 +36,10 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentMap;
 
 import static org.opencron.common.util.CommonUtils.uuid;
 
@@ -53,6 +57,8 @@ public class OpencronRegistry {
     private final URL registryURL = URL.valueOf(PropertyPlaceholder.get(Constants.PARAM_OPENCRON_REGISTRY_KEY));
 
     private final String registryPath = Constants.ZK_REGISTRY_SERVER_PATH + "/" + MacUtils.getMac() + "@" + uuid();
+
+    private Map<String,String> agentMap = new ConcurrentHashMap<String, String>(0);
 
     @Autowired
     private AgentService agentService;
@@ -78,28 +84,36 @@ public class OpencronRegistry {
             }
         }, "OpencronShutdownHook"));
 
-        //agentAdd
+        //agent添加,删除监控...
         registryService.getZKClient(registryURL).addChildListener(Constants.ZK_REGISTRY_AGENT_PATH, new ChildListener() {
             @Override
             public void childChanged(String path, List<String> children) {
-                for (String agent:children) {
-                    logger.info("[opencron] agent connected! info:{}",agent);
-                    agentService.doConnect(agent);
+                if (agentMap.isEmpty()) {
+                    for (String agent:children) {
+                        agentMap.put(agent,agent);
+                        logger.info("[opencron] agent connected! info:{}",agent);
+                        agentService.doConnect(agent);
+                    }
+                }else {
+                    Map<String,String> map = new ConcurrentHashMap<String, String>(agentMap);
+                    for (String agent:children) {
+                        map.remove(agent);
+                        if (!agentMap.containsKey(agent)) {
+                            //新增...
+                            agentMap.put(agent,agent);
+                            logger.info("[opencron] agent connected! info:{}",agent);
+                            agentService.doConnect(agent);
+                        }
+                    }
+
+                    for (String child:map.keySet()) {
+                        agentMap.remove(child);
+                        logger.info("[opencron] agent doDisconnect! info:{}",child);
+                        agentService.doDisconnect(child);
+                    }
                 }
             }
         });
-
-        //agentRemove
-        registryService.getZKClient(registryURL).removeChildListener(Constants.ZK_REGISTRY_AGENT_PATH, new ChildListener() {
-            @Override
-            public void childChanged(String path, List<String> children) {
-                for (String agent:children) {
-                    logger.warn("[opencron] agent disconnected! info:{}",agent);
-                    agentService.doDisconnect(agent);
-                }
-            }
-        });
-
     }
 
     @PreDestroy
