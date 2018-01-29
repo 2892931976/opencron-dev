@@ -366,7 +366,7 @@ public class AgentProcessor implements ServerHandler, AgentJob {
 
     @Override
     public Response guid(Request request) {
-        String macId = StringUtils.joinString(MacUtils.getAllMac(), "-");
+        String macId = MacUtils.getMac();
         Response response = Response.response(request).end();
         if (notEmpty(macId)) {
             return response.setMessage(macId).setSuccess(true).setExitCode(Constants.StatusCode.SUCCESS_EXIT.getValue());

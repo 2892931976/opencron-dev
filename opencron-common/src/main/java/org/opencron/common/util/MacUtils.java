@@ -38,7 +38,7 @@ public class MacUtils {
             StringBuffer buffer = new StringBuffer("");
             for (int i = 0; i < mac.length; i++) {
                 if (i > 0) {
-                    buffer.append(":");
+                    buffer.append("-");
                 }
                 int temp = mac[i] & 0xff;
                 String str = Integer.toHexString(temp);
@@ -67,7 +67,7 @@ public class MacUtils {
                         StringBuffer buffer = new StringBuffer("");
                         for (int i = 0; i < address.length; i++) {
                             if (i > 0) {
-                                buffer.append(":");
+                                buffer.append("-");
                             }
                             String str = Integer.toHexString(address[i] & 0xff);
                             if (str.length() == 1) {
