@@ -33,8 +33,7 @@ public class MacUtils {
 
     public static String getMac() {
         try {
-            byte[] mac = new byte[0];
-            mac = NetworkInterface.getByInetAddress(InetAddress.getLocalHost()).getHardwareAddress();
+            byte[] mac = NetworkInterface.getByInetAddress(InetAddress.getLocalHost()).getHardwareAddress();
             StringBuffer buffer = new StringBuffer("");
             for (int i = 0; i < mac.length; i++) {
                 if (i > 0) {
