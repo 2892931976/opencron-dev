@@ -208,7 +208,7 @@ public class AgentBootstrap implements Serializable {
             Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
                 public void run() {
                     if (logger.isInfoEnabled()) {
-                        logger.info("Run shutdown hook now.");
+                        logger.info("[opencron] run shutdown hook now...");
                     }
                     registryService.unregister(url,path);
                 }
