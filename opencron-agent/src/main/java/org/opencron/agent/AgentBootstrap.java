@@ -195,7 +195,7 @@ public class AgentBootstrap implements Serializable {
             if ( agentId == null ) {
                 throw new IllegalArgumentException("[opencron] getMac error.");
             }
-            final String path = Constants.ZK_REGISTRY_AGENT_PATH + "/" + agentId + ":" + this.port;
+            final String path = Constants.ZK_REGISTRY_AGENT_PATH + "/" + agentId + "@" + this.port;
 
             String registryAddress = AgentProperties.getProperty(Constants.PARAM_OPENCRON_REGISTRY_KEY);
             final URL url = URL.valueOf(registryAddress);
