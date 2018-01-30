@@ -155,7 +155,7 @@ public final class SchedulerService {
         Constants.CronType cronType = Constants.CronType.getByType(job.getCronType());
 
         //新增或修改的job往zookeeper中同步一次...
-        registryService.register(registryURL,Constants.ZK_REGISTRY_JOB_PATH+"/" + job.getJobId().toString(),false);
+        registryService.register(registryURL,Constants.ZK_REGISTRY_JOB_PATH+"/" + job.getJobId().toString(),true);
 
         switch (cronType) {
             case CRONTAB:

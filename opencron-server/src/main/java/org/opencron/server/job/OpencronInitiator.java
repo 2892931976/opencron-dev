@@ -79,6 +79,8 @@ public class OpencronInitiator {
 
     private List<String> serverList = new ArrayList<String>(0);
 
+    private volatile boolean destroy = false;
+
     /**
      * 每台server启动起来都必须往注册中心注册信息...注册中心在重新统一分配任务到每台server上...
      *
@@ -108,6 +110,9 @@ public class OpencronInitiator {
         registryService.getZKClient(registryURL).addChildListener(Constants.ZK_REGISTRY_AGENT_PATH, new ChildListener() {
             @Override
             public synchronized void childChanged(String path, List<String> children) {
+
+                if (destroy) return;
+
                 if (agentMap.isEmpty()) {
                     for (String agent:children) {
                         agentMap.put(agent,agent);
@@ -141,6 +146,9 @@ public class OpencronInitiator {
         registryService.getZKClient(registryURL).addChildListener(Constants.ZK_REGISTRY_SERVER_PATH, new ChildListener() {
             @Override
             public synchronized void childChanged(String path, List<String> children) {
+
+                if (destroy) return;
+
                 try {
                     serverList = children;
 
@@ -188,7 +196,7 @@ public class OpencronInitiator {
         });
 
         //将server加入到注册中心
-        registryService.register(registryURL,registryPath,false);
+        registryService.register(registryURL,registryPath,true);
 
         //register shutdown hook
         Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
@@ -207,6 +215,9 @@ public class OpencronInitiator {
         registryService.getZKClient(registryURL).addChildListener(Constants.ZK_REGISTRY_JOB_PATH, new ChildListener() {
             @Override
             public synchronized void childChanged(String path, List<String> children) {
+
+                if (destroy) return;
+
                 try {
                     //将job添加到缓存中.
                     Map<String,String> jobMap = (Map<String, String>) OpencronTools.CACHE.get(Constants.PARAM_CACHED_JOB_MAP_KEY);
@@ -243,16 +254,29 @@ public class OpencronInitiator {
         List<JobInfo> quartz = jobService.getJobInfo(Constants.CronType.QUARTZ);
         crontab.addAll(quartz);
         for (JobInfo jobInfo:crontab) {
-            registryService.register(registryURL,Constants.ZK_REGISTRY_JOB_PATH+"/"+jobInfo.getJobId(),false);
+            registryService.register(registryURL,Constants.ZK_REGISTRY_JOB_PATH+"/"+jobInfo.getJobId(),true);
         }
     }
 
     @PreDestroy
     public void destroy() throws Exception {
+
+        destroy = true;
+
         if (logger.isInfoEnabled()) {
             logger.info("[opencron] run destroy now...");
         }
+
+        //server unregister
         registryService.unregister(registryURL,registryPath);
+
+        //job unregister
+        Map<String,String> jobMap = (Map<String, String>) OpencronTools.CACHE.get(Constants.PARAM_CACHED_JOB_MAP_KEY);
+        if (CommonUtils.notEmpty(jobMap)) {
+            for (String job:jobMap.keySet()) {
+                registryService.unregister(registryURL,Constants.ZK_REGISTRY_JOB_PATH+"/"+ job);
+            }
+        }
     }
 
 }
