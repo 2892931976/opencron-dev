@@ -300,7 +300,7 @@ public class JobService {
                 }
             }
             queryDao.createSQLQuery(sql).executeUpdate();
-            schedulerService.syncJobTigger(jobId);
+            schedulerService.syncTigger(jobId);
             flushJob();
         }
     }

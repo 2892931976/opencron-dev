@@ -60,10 +60,15 @@ public final class SchedulerService {
 
     private Scheduler quartzScheduler;
 
-    private it.sauronsoftware.cron4j.Scheduler crontabScheduler;
-
     public SchedulerService() throws SchedulerException {
+        //crontab
+        it.sauronsoftware.cron4j.Scheduler scheduler = new it.sauronsoftware.cron4j.Scheduler();
+        scheduler.addTaskCollector(opencronCollector);
+        scheduler.start();
+
+        //quartz
         this.quartzScheduler = new StdSchedulerFactory().getScheduler();
+        this.startQuartz();
     }
 
     public boolean exists(Serializable jobId) throws SchedulerException {
@@ -130,7 +135,7 @@ public final class SchedulerService {
         }
     }
 
-    public void syncJobTigger(JobInfo job) throws SchedulerException {
+    public void syncTigger(JobInfo job) throws SchedulerException {
 
         /**
          * 从crontab或者quartz里删除任务
@@ -164,20 +169,9 @@ public final class SchedulerService {
         }
     }
 
-    public void syncJobTigger(Long jobId) throws SchedulerException {
+    public void syncTigger(Long jobId) throws SchedulerException {
         JobInfo job = jobService.getJobInfoById(jobId);
-        this.syncJobTigger(job);
-    }
-
-    public void initJob() throws SchedulerException {
-        if (this.crontabScheduler == null) {
-            this.crontabScheduler = new it.sauronsoftware.cron4j.Scheduler();
-            crontabScheduler.addTaskCollector(opencronCollector);
-        } else {
-            this.crontabScheduler.stop();
-        }
-        this.crontabScheduler.start();
-        this.startQuartz();
+        this.syncTigger(job);
     }
 
 }

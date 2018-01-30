@@ -85,9 +85,6 @@ public class OpencronInitiator {
         //初始化数据库...
         configService.initDataBase();
 
-        //初始化JOB
-        schedulerService.initJob();
-
         //监控agent的增加和删除
         agentMonitor();
 
@@ -144,7 +141,7 @@ public class OpencronInitiator {
                         String server = hash.get(jobInfo.getJobId());
                         //该任务落在当前的机器上
                         if (server.equals(SERVER_ID)) {
-                            schedulerService.syncJobTigger(jobInfo);
+                            schedulerService.syncTigger(jobInfo);
                         }
                     }
 
@@ -153,7 +150,7 @@ public class OpencronInitiator {
                         String server = hash.get(jobInfo.getJobId());
                         //落在该机器上的quartz任务
                         if (server.equals(SERVER_ID)) {
-                            schedulerService.syncJobTigger(jobInfo);
+                            schedulerService.syncTigger(jobInfo);
                         }
                     }
                 } catch (SchedulerException e) {
