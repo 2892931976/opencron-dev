@@ -143,8 +143,8 @@ public class OpencronInitiator {
 
                     //将job添加到缓存中.
                     Map<String,String> jobMap = (Map<String, String>) OpencronTools.CACHE.get(Constants.PARAM_CACHED_JOB_MAP_KEY);
-                    jobMap = jobMap == null?new HashMap<String, String>(0):jobMap;
-                    Map<String,String> unJobMap = new HashMap<String, String>(jobMap);
+                    jobMap = jobMap == null?new ConcurrentHashMap<String, String>(0):jobMap;
+                    Map<String,String> unJobMap = new ConcurrentHashMap<String, String>(jobMap);
 
                     //一致性哈希计算出每个Job落在哪个server上
                     ConsistentHash<String> hash = new ConsistentHash<String>(160,serverList);

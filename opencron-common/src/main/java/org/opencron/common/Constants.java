@@ -41,15 +41,6 @@ public class Constants {
 
     public static final String ZK_REGISTRY_JOB_PATH = "/opencron/job";
 
-    /**
-     * 注册中心是否同步存储文件，默认异步
-     */
-    public static final String REGISTRY_FILESAVE_SYNC_KEY = "save.file";
-
-    public static final String FILE_KEY = "file";
-
-    public static final String EMPTY_PROTOCOL = "empty";
-
     public static final Pattern COMMA_SPLIT_PATTERN = Pattern.compile("\\s*[,]+\\s*");
 
     public static final int HEADER_SIZE = 4;
