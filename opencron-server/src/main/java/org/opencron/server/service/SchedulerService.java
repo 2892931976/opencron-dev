@@ -23,6 +23,9 @@
 package org.opencron.server.service;
 
 import org.opencron.common.Constants;
+import org.opencron.common.util.PropertyPlaceholder;
+import org.opencron.registry.URL;
+import org.opencron.registry.api.RegistryService;
 import org.opencron.server.job.OpencronCollector;
 import org.opencron.server.vo.JobInfo;
 import org.quartz.*;
@@ -59,6 +62,11 @@ public final class SchedulerService {
     private OpencronCollector opencronCollector;
 
     private Scheduler quartzScheduler;
+
+    private RegistryService registryService = new RegistryService();
+
+    private final URL registryURL = URL.valueOf(PropertyPlaceholder.get(Constants.PARAM_OPENCRON_REGISTRY_KEY));
+
 
     public SchedulerService() throws SchedulerException {
         //crontab
@@ -146,12 +154,17 @@ public final class SchedulerService {
 
         //job已经被删除..
         if (job.getDeleted()) {
+            //将该作业从zookeeper中移除掉....
+            registryService.unregister(registryURL,Constants.ZK_REGISTRY_JOB_PATH+"/" + job.getJobId().toString());
             return;
         }
 
         job.setAgent(agentService.getAgent(job.getAgentId()));
 
         Constants.CronType cronType = Constants.CronType.getByType(job.getCronType());
+
+        //新增或修改的job往zookeeper中同步一次...
+        registryService.register(registryURL,Constants.ZK_REGISTRY_JOB_PATH+"/" + job.getJobId().toString(),false);
 
         switch (cronType) {
             case CRONTAB:
@@ -167,6 +180,7 @@ public final class SchedulerService {
                 this.put(job, executeService);
                 break;
         }
+
     }
 
     public void syncTigger(Long jobId) throws SchedulerException {

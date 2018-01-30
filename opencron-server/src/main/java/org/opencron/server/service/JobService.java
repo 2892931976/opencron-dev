@@ -30,6 +30,9 @@ import java.util.List;
 import static org.opencron.common.Constants.*;
 
 import org.opencron.common.Constants;
+import org.opencron.common.util.PropertyPlaceholder;
+import org.opencron.registry.URL;
+import org.opencron.registry.api.RegistryService;
 import org.opencron.server.dao.QueryDao;
 import org.opencron.server.domain.Job;
 import org.opencron.server.domain.User;

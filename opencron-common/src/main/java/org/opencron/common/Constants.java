@@ -39,6 +39,8 @@ public class Constants {
 
     public static final String ZK_REGISTRY_SERVER_PATH = "/opencron/server";
 
+    public static final String ZK_REGISTRY_JOB_PATH = "/opencron/job";
+
     /**
      * 注册中心是否同步存储文件，默认异步
      */
@@ -108,6 +110,8 @@ public class Constants {
 
     public static final String PARAM_CACHED_JOB_ID_KEY = "opencron_job";
 
+    public static final String PARAM_CACHED_JOB_MAP_KEY = "opencron_job_map";
+
     public static final String PARAM_LOGIN_USER_KEY = "opencron_user";
 
     public static final String PARAM_LOGIN_USER_ID_KEY = "opencron_user_id";
@@ -176,6 +180,7 @@ public class Constants {
      * kill file
      */
     public static final File OPENCRON_KILL_SHELL = new File(OPENCRON_HOME + "/bin/kill.sh");
+
 
 
     public static enum StatusCode implements Serializable {

@@ -22,7 +22,7 @@ public class RegistryTest {
 
     @Test
     public void create() throws IOException {
-        zookeeperClient.create("/opencron/agent/2",true);
+        zookeeperClient.create("/opencron/agent/6",true);
         System.in.read();
     }
 

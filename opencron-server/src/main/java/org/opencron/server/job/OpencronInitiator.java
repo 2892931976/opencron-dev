@@ -24,6 +24,7 @@ package org.opencron.server.job;
 import net.sf.ehcache.store.chm.ConcurrentHashMap;
 import org.opencron.common.Constants;
 import org.opencron.common.logging.LoggerFactory;
+import org.opencron.common.util.CommonUtils;
 import org.opencron.common.util.ConsistentHash;
 import org.opencron.common.util.PropertyPlaceholder;
 import org.opencron.registry.URL;
@@ -38,6 +39,8 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -74,6 +77,8 @@ public class OpencronInitiator {
 
     private Map<String,String> agentMap = new ConcurrentHashMap<String, String>(0);
 
+    private List<String> serverList = new ArrayList<String>(0);
+
     /**
      * 每台server启动起来都必须往注册中心注册信息...注册中心在重新统一分配任务到每台server上...
      *
@@ -90,6 +95,9 @@ public class OpencronInitiator {
 
         //server的监控和动态分配任务.
         serverMonitor();
+
+        //job的监控
+        jobMonitor();
     }
 
     private void agentMonitor() {
@@ -126,33 +134,48 @@ public class OpencronInitiator {
     }
 
     private void serverMonitor() {
-
         //server监控增加和删除
         registryService.getZKClient(registryURL).addChildListener(Constants.ZK_REGISTRY_SERVER_PATH, new ChildListener() {
             @Override
             public synchronized void childChanged(String path, List<String> children) {
                 try {
-                    //一致性哈希计算出每个Job落在哪个server上
-                    ConsistentHash<String> hash = new ConsistentHash<String>(160,children);
+                    serverList = children;
 
-                    List<JobInfo> crontab = jobService.getJobInfo(Constants.CronType.CRONTAB);
-                    //落在该机器上的crontab任务
-                    for (JobInfo jobInfo:crontab) {
-                        String server = hash.get(jobInfo.getJobId());
+                    //将job添加到缓存中.
+                    Map<String,String> jobMap = (Map<String, String>) OpencronTools.CACHE.get(Constants.PARAM_CACHED_JOB_MAP_KEY);
+                    jobMap = jobMap == null?new HashMap<String, String>(0):jobMap;
+                    Map<String,String> unJobMap = new HashMap<String, String>(jobMap);
+
+                    //一致性哈希计算出每个Job落在哪个server上
+                    ConsistentHash<String> hash = new ConsistentHash<String>(160,serverList);
+                    List<JobInfo> jobs = jobService.getJobInfo(Constants.CronType.CRONTAB);
+                    List<JobInfo> quartzJobs = jobService.getJobInfo(Constants.CronType.QUARTZ);
+                    jobs.addAll(quartzJobs);
+
+                    //落在该机器上的任务
+                    for (JobInfo jobInfo:jobs) {
+                        unJobMap.remove(jobInfo.getJobId().toString());
+                        String server = hash.get(jobInfo.getJobId().toString());
                         //该任务落在当前的机器上
                         if (server.equals(SERVER_ID)) {
-                            schedulerService.syncTigger(jobInfo);
+                            if (!jobMap.containsKey(jobInfo.getJobId().toString())) {
+                                jobMap.put(jobInfo.getJobId().toString(),jobInfo.getJobId().toString());
+                                schedulerService.syncTigger(jobInfo);
+                            }
                         }
                     }
 
-                    List<JobInfo> quartzJobs = jobService.getJobInfo(Constants.CronType.QUARTZ);
-                    for (JobInfo jobInfo:quartzJobs) {
-                        String server = hash.get(jobInfo.getJobId());
-                        //落在该机器上的quartz任务
-                        if (server.equals(SERVER_ID)) {
-                            schedulerService.syncTigger(jobInfo);
-                        }
+                    /**
+                     *
+                     * 已经删除的job
+                     * 忽略直接将任务从zookeeper中删除而不经过server
+                     * 如果是经过server发生的删除job行为则该job在第一时间就从zookeeper中移除了
+                     *
+                     */
+                    for (String job:unJobMap.keySet()) {
+                        jobMap.remove(job);
                     }
+
                 } catch (SchedulerException e) {
                     e.printStackTrace();
                 }
@@ -172,6 +195,50 @@ public class OpencronInitiator {
             }
         }, "OpencronShutdownHook"));
 
+    }
+
+    private void jobMonitor() {
+        //job的监控
+        registryService.getZKClient(registryURL).addChildListener(Constants.ZK_REGISTRY_JOB_PATH, new ChildListener() {
+            @Override
+            public synchronized void childChanged(String path, List<String> children) {
+                try {
+                    //将job添加到缓存中.
+                    Map<String,String> jobMap = (Map<String, String>) OpencronTools.CACHE.get(Constants.PARAM_CACHED_JOB_MAP_KEY);
+                    jobMap = jobMap == null?new HashMap<String, String>(0):jobMap;
+                    Map<String,String> unJobMap = new HashMap<String, String>(jobMap);
+
+                    ConsistentHash<String> hash = new ConsistentHash<String>(160,serverList);
+                    for (String job:children) {
+                        unJobMap.remove(job);
+                        if (SERVER_ID.equals(hash.get(job))) {
+                            if (!jobMap.containsKey(job)) {
+                                jobMap.put(job,job);
+                                schedulerService.syncTigger(CommonUtils.toLong(job));
+                            }
+                        }
+                    }
+                    /**
+                     * 已经删除的job
+                     * 忽略直接将任务从zookeeper中删除而不经过server
+                     * 如果是经过server发生的删除job行为则该job在第一时间就从zookeeper中移除了
+                     */
+                    for (String job:unJobMap.keySet()) {
+                        jobMap.remove(job);
+                    }
+                } catch (SchedulerException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        //将job加入到zookeeper
+        List<JobInfo> crontab = jobService.getJobInfo(Constants.CronType.CRONTAB);
+        List<JobInfo> quartz = jobService.getJobInfo(Constants.CronType.QUARTZ);
+        crontab.addAll(quartz);
+        for (JobInfo jobInfo:crontab) {
+            registryService.register(registryURL,Constants.ZK_REGISTRY_JOB_PATH+"/"+jobInfo.getJobId(),false);
+        }
     }
 
     @PreDestroy

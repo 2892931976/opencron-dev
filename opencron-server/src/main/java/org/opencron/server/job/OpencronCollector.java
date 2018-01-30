@@ -54,7 +54,7 @@ public class OpencronCollector implements TaskCollector {
 
     public synchronized void addTask(final JobInfo job) {
         jobIndex.put(job.getJobId(), jobIndex.size());
-        taskTable.add(new SchedulingPattern(job.getCronExp()), new Task() {
+        this.getTasks().add(new SchedulingPattern(job.getCronExp()), new Task() {
             @Override
             public void execute(TaskExecutionContext context) throws RuntimeException {
                 executeService.executeJob(job, Constants.ExecType.AUTO);
@@ -64,7 +64,7 @@ public class OpencronCollector implements TaskCollector {
 
     public synchronized void removeTask(Long jobId) {
         if (CommonUtils.notEmpty(jobId, jobIndex.get(jobId))) {
-            taskTable.remove(jobIndex.get(jobId));
+            this.getTasks().remove(jobIndex.get(jobId));
             Integer index = jobIndex.remove(jobId);
             for (Map.Entry<Long, Integer> entry : jobIndex.entrySet()) {
                 Long key = entry.getKey();
