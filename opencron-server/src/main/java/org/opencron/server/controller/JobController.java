@@ -213,7 +213,7 @@ public class JobController extends BaseController {
             jobService.saveFlowJob(job, children);
         }
 
-        schedulerService.syncJobTigger(job.getJobId(), executeService);
+        schedulerService.syncTigger(job.getJobId());
 
         return "redirect:/job/view.htm";
     }
@@ -266,7 +266,7 @@ public class JobController extends BaseController {
         }
         dbJob.setComment(job.getComment());
         jobService.merge(dbJob);
-        schedulerService.syncJobTigger(dbJob.getJobId(), executeService);
+        schedulerService.syncTigger(dbJob.getJobId());
         return Status.TRUE;
     }
 
@@ -278,7 +278,7 @@ public class JobController extends BaseController {
         if (!jobService.checkJobOwner(session, dbJob.getUserId())) return Status.FALSE;
         dbJob.setCommand(command);
         jobService.merge(dbJob);
-        schedulerService.syncJobTigger(Constants.JobType.FLOW.getCode().equals(dbJob.getJobType()) ? dbJob.getFlowId() : dbJob.getJobId(), executeService);
+        schedulerService.syncTigger(Constants.JobType.FLOW.getCode().equals(dbJob.getJobType()) ? dbJob.getFlowId() : dbJob.getJobId());
         return Status.TRUE;
     }
 
