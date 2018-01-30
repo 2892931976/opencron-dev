@@ -396,7 +396,8 @@
                     ajax({
                         type: "post",
                         url: "${contextPath}/job/checkdel.do",
-                        data: {"id": id}
+                        data: {"id": id},
+                        dataType:"html"
                     },function (data) {
                         if (data == "error") {
                             alert("该作业不存在,删除失败!")

@@ -68,16 +68,7 @@ public final class SchedulerService {
     private final URL registryURL = URL.valueOf(PropertyPlaceholder.get(Constants.PARAM_OPENCRON_REGISTRY_KEY));
 
 
-    public SchedulerService() throws SchedulerException {
-        //crontab
-        it.sauronsoftware.cron4j.Scheduler scheduler = new it.sauronsoftware.cron4j.Scheduler();
-        scheduler.addTaskCollector(opencronCollector);
-        scheduler.start();
-
-        //quartz
-        this.quartzScheduler = new StdSchedulerFactory().getScheduler();
-        this.startQuartz();
-    }
+    public SchedulerService() {}
 
     public boolean exists(Serializable jobId) throws SchedulerException {
         return quartzScheduler.checkExists(JobKey.jobKey(jobId.toString()));
@@ -186,6 +177,17 @@ public final class SchedulerService {
     public void syncTigger(Long jobId) throws SchedulerException {
         JobInfo job = jobService.getJobInfoById(jobId);
         this.syncTigger(job);
+    }
+
+    public void  initJob() throws SchedulerException {
+        //crontab
+        it.sauronsoftware.cron4j.Scheduler scheduler = new it.sauronsoftware.cron4j.Scheduler();
+        scheduler.addTaskCollector(opencronCollector);
+        scheduler.start();
+
+        //quartz
+        this.quartzScheduler = new StdSchedulerFactory().getScheduler();
+        this.startQuartz();
     }
 
 }

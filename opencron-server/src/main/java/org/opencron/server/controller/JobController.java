@@ -113,6 +113,7 @@ public class JobController extends BaseController {
     }
 
     @RequestMapping(value = "checkdel.do", method = RequestMethod.POST)
+    @ResponseBody
     public String checkDelete(Long id) {
         return jobService.checkDelete(id);
     }

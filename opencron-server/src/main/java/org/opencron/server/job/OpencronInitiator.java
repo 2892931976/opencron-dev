@@ -90,6 +90,9 @@ public class OpencronInitiator {
         //初始化数据库...
         configService.initDataBase();
 
+        //init job...
+        schedulerService.initJob();
+
         //监控agent的增加和删除
         agentMonitor();
 
@@ -176,6 +179,8 @@ public class OpencronInitiator {
                         jobMap.remove(job);
                     }
 
+                    OpencronTools.CACHE.put(Constants.PARAM_CACHED_JOB_MAP_KEY,jobMap);
+
                 } catch (SchedulerException e) {
                     e.printStackTrace();
                 }
@@ -183,7 +188,7 @@ public class OpencronInitiator {
         });
 
         //将server加入到注册中心
-        registryService.register(registryURL,registryPath,true);
+        registryService.register(registryURL,registryPath,false);
 
         //register shutdown hook
         Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
@@ -226,6 +231,7 @@ public class OpencronInitiator {
                     for (String job:unJobMap.keySet()) {
                         jobMap.remove(job);
                     }
+                    OpencronTools.CACHE.put(Constants.PARAM_CACHED_JOB_MAP_KEY,jobMap);
                 } catch (SchedulerException e) {
                     e.printStackTrace();
                 }

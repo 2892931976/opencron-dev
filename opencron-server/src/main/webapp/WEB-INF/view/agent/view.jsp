@@ -420,7 +420,8 @@
                 ajax({
                     type: "post",
                     url:"${contextPath}/agent/checkdel.do",
-                    data:{"id":id}
+                    data:{"id":id},
+                    dataType:"html"
                 },function (data) {
                     if (data.status){
                         alert("删除失败,找到不该执行器或者该执行器上定义了作业")
