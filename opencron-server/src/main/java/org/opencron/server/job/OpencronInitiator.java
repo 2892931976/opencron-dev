@@ -24,13 +24,14 @@ package org.opencron.server.job;
 import net.sf.ehcache.store.chm.ConcurrentHashMap;
 import org.opencron.common.Constants;
 import org.opencron.common.logging.LoggerFactory;
-import org.opencron.common.util.MacUtils;
+import org.opencron.common.util.ConsistentHash;
 import org.opencron.common.util.PropertyPlaceholder;
-import org.opencron.common.util.StringUtils;
 import org.opencron.registry.URL;
 import org.opencron.registry.api.RegistryService;
 import org.opencron.registry.zookeeper.ChildListener;
-import org.opencron.server.service.AgentService;
+import org.opencron.server.service.*;
+import org.opencron.server.vo.JobInfo;
+import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -47,20 +48,31 @@ import static org.opencron.common.util.CommonUtils.uuid;
  */
 
 @Component
-public class OpencronRegistry {
+public class OpencronInitiator {
 
-    private static final Logger logger = LoggerFactory.getLogger(OpencronRegistry.class);
+    private static final Logger logger = LoggerFactory.getLogger(OpencronInitiator.class);
+
+    @Autowired
+    private ConfigService configService;
+
+    @Autowired
+    private JobService jobService;
+
+    @Autowired
+    private SchedulerService schedulerService;
+
+    @Autowired
+    private AgentService agentService;
 
     private RegistryService registryService = new RegistryService();
 
     private final URL registryURL = URL.valueOf(PropertyPlaceholder.get(Constants.PARAM_OPENCRON_REGISTRY_KEY));
 
-    private final String registryPath = Constants.ZK_REGISTRY_SERVER_PATH + "/" + StringUtils.join(MacUtils.getAllMac(),"_") + "@" + uuid();
+    private final String SERVER_ID = uuid();
+
+    private final String registryPath = Constants.ZK_REGISTRY_SERVER_PATH + "/" + SERVER_ID;
 
     private Map<String,String> agentMap = new ConcurrentHashMap<String, String>(0);
-
-    @Autowired
-    private AgentService agentService;
 
     /**
      * 每台server启动起来都必须往注册中心注册信息...注册中心在重新统一分配任务到每台server上...
@@ -70,19 +82,20 @@ public class OpencronRegistry {
     @PostConstruct
     public void initialization() throws Exception {
 
-        //将server加入到注册中心
-        registryService.register(registryURL,registryPath,true);
+        //初始化数据库...
+        configService.initDataBase();
 
-        //register shutdown hook
-        Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
-            public void run() {
-                if (logger.isInfoEnabled()) {
-                    logger.info("[opencron] run shutdown hook now...");
-                }
-                registryService.unregister(registryURL,registryPath);
-            }
-        }, "OpencronShutdownHook"));
+        //初始化JOB
+        schedulerService.initJob();
 
+        //监控agent的增加和删除
+        agentMonitor();
+
+        //server的监控和动态分配任务.
+        serverMonitor();
+    }
+
+    private void agentMonitor() {
         //agent添加,删除监控...
         registryService.getZKClient(registryURL).addChildListener(Constants.ZK_REGISTRY_AGENT_PATH, new ChildListener() {
             @Override
@@ -115,6 +128,55 @@ public class OpencronRegistry {
         });
     }
 
+    private void serverMonitor() {
+
+        //server监控增加和删除
+        registryService.getZKClient(registryURL).addChildListener(Constants.ZK_REGISTRY_SERVER_PATH, new ChildListener() {
+            @Override
+            public synchronized void childChanged(String path, List<String> children) {
+                try {
+                    //一致性哈希计算出每个Job落在哪个server上
+                    ConsistentHash<String> hash = new ConsistentHash<String>(160,children);
+
+                    List<JobInfo> crontab = jobService.getJobInfo(Constants.CronType.CRONTAB);
+                    //落在该机器上的crontab任务
+                    for (JobInfo jobInfo:crontab) {
+                        String server = hash.get(jobInfo.getJobId());
+                        //该任务落在当前的机器上
+                        if (server.equals(SERVER_ID)) {
+                            schedulerService.syncJobTigger(jobInfo);
+                        }
+                    }
+
+                    List<JobInfo> quartzJobs = jobService.getJobInfo(Constants.CronType.QUARTZ);
+                    for (JobInfo jobInfo:quartzJobs) {
+                        String server = hash.get(jobInfo.getJobId());
+                        //落在该机器上的quartz任务
+                        if (server.equals(SERVER_ID)) {
+                            schedulerService.syncJobTigger(jobInfo);
+                        }
+                    }
+                } catch (SchedulerException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        //将server加入到注册中心
+        registryService.register(registryURL,registryPath,true);
+
+        //register shutdown hook
+        Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+            public void run() {
+                if (logger.isInfoEnabled()) {
+                    logger.info("[opencron] run shutdown hook now...");
+                }
+                registryService.unregister(registryURL,registryPath);
+            }
+        }, "OpencronShutdownHook"));
+
+    }
+
     @PreDestroy
     public void destroy() throws Exception {
         if (logger.isInfoEnabled()) {
@@ -122,5 +184,6 @@ public class OpencronRegistry {
         }
         registryService.unregister(registryURL,registryPath);
     }
+
 }
     

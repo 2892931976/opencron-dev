@@ -129,11 +129,6 @@ public class JobService {
         return queryDao.sqlQuery(Job.class, sql, jobType.getCode());
     }
 
-    public List<JobInfo> getCrontabJob() {
-        logger.info("[opencron] init quartzJob...");
-        return getJobInfo(Constants.CronType.CRONTAB);
-    }
-
     public List<Job> getAll() {
         List<Job> jobs = OpencronTools.CACHE.get(Constants.PARAM_CACHED_JOB_ID_KEY, List.class);
         if (CommonUtils.isEmpty(jobs)) {
@@ -305,7 +300,7 @@ public class JobService {
                 }
             }
             queryDao.createSQLQuery(sql).executeUpdate();
-            schedulerService.syncJobTigger(jobId, null);
+            schedulerService.syncJobTigger(jobId);
             flushJob();
         }
     }

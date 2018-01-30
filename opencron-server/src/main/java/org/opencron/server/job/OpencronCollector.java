@@ -41,51 +41,22 @@ import java.util.concurrent.ConcurrentHashMap;
 public class OpencronCollector implements TaskCollector {
 
     @Autowired
-    private JobService jobService;
-
-    @Autowired
     private ExecuteService executeService;
 
     private TaskTable taskTable;
 
     private Map<Long, Integer> jobIndex = new ConcurrentHashMap<Long, Integer>(0);
 
-    /**
-     * 初始化crontab任务,记录每个任务的索引...
-     *
-     * @return
-     */
     @Override
     public synchronized TaskTable getTasks() {
-        if (taskTable == null) {
-            taskTable = new TaskTable();
-            List<JobInfo> jobs = jobService.getCrontabJob();
-            for (int index = 0; index < jobs.size(); index++) {
-                final JobInfo job = jobs.get(index);
-                jobIndex.put(job.getJobId(), index);
-                taskTable.add(new SchedulingPattern(job.getCronExp()), new Task() {
-                    @Override
-                    public void execute(TaskExecutionContext context) throws RuntimeException {
-                        //自动执行
-                        executeService.executeJob(job, Constants.ExecType.AUTO);
-                    }
-                });
-            }
-        }
-        return taskTable;
+        return  taskTable = (taskTable == null?new TaskTable():taskTable);
     }
 
-    /**
-     * 将当前的job加入到crontab定时计划,并且加入索引值
-     *
-     * @param job
-     */
     public synchronized void addTask(final JobInfo job) {
         jobIndex.put(job.getJobId(), jobIndex.size());
         taskTable.add(new SchedulingPattern(job.getCronExp()), new Task() {
             @Override
             public void execute(TaskExecutionContext context) throws RuntimeException {
-                //自动执行
                 executeService.executeJob(job, Constants.ExecType.AUTO);
             }
         });

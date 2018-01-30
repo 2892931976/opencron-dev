@@ -53,6 +53,9 @@ public final class SchedulerService {
     private AgentService agentService;
 
     @Autowired
+    private ExecuteService executeService;
+
+    @Autowired
     private OpencronCollector opencronCollector;
 
     private Scheduler quartzScheduler;
@@ -127,16 +130,14 @@ public final class SchedulerService {
         }
     }
 
-    public void syncJobTigger(Long jobId, ExecuteService executeService) throws SchedulerException {
-
-        JobInfo job = jobService.getJobInfoById(jobId);
+    public void syncJobTigger(JobInfo job) throws SchedulerException {
 
         /**
          * 从crontab或者quartz里删除任务
          */
         opencronCollector.removeTask(job.getJobId());
 
-        SchedulerService.this.remove(job.getJobId());
+        this.remove(job.getJobId());
 
         //job已经被删除..
         if (job.getDeleted()) {
@@ -158,12 +159,17 @@ public final class SchedulerService {
                 /**
                  * 将作业加到quartz任务计划
                  */
-                SchedulerService.this.put(job, executeService);
+                this.put(job, executeService);
                 break;
         }
     }
 
-    public void initCrontab() {
+    public void syncJobTigger(Long jobId) throws SchedulerException {
+        JobInfo job = jobService.getJobInfoById(jobId);
+        this.syncJobTigger(job);
+    }
+
+    public void initJob() throws SchedulerException {
         if (this.crontabScheduler == null) {
             this.crontabScheduler = new it.sauronsoftware.cron4j.Scheduler();
             crontabScheduler.addTaskCollector(opencronCollector);
@@ -171,19 +177,7 @@ public final class SchedulerService {
             this.crontabScheduler.stop();
         }
         this.crontabScheduler.start();
+        this.startQuartz();
     }
 
-    public void initQuartz(Job jobExecutor) throws SchedulerException {
-        //quartz job
-        logger.info("[opencron] init quartzJob...");
-        List<JobInfo> jobs = jobService.getJobInfo(Constants.CronType.QUARTZ);
-        for (JobInfo job : jobs) {
-            try {
-                put(job, jobExecutor);
-            } catch (SchedulerException e) {
-                e.printStackTrace();
-            }
-        }
-        startQuartz();
-    }
 }
