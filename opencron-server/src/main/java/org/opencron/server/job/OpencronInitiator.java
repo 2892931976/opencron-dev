@@ -260,9 +260,7 @@ public class OpencronInitiator {
 
     @PreDestroy
     public void destroy() throws Exception {
-
         destroy = true;
-
         if (logger.isInfoEnabled()) {
             logger.info("[opencron] run destroy now...");
         }
