@@ -15,6 +15,15 @@ function alertMsg(msg){
     });
 }
 
+function alertModal(params,fn) {
+    swal(params, function () {
+        new Loading().exit(function () {
+            fn();
+        });
+    });
+}
+
+
 function ajax(params,successCallback,errorCallBack) {
     jQuery.ajax({
         headers: params.headers||{},

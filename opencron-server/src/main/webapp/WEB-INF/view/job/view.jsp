@@ -251,14 +251,14 @@
             },
             pauseJob:function (id,status) {
                 var msg = status?"暂停":"恢复";
-                swal({
+                alertModal({
                     title: "",
                     text: "您确定要"+msg+"这个作业吗？",
                     type: "warning",
                     showCancelButton: true,
                     closeOnConfirm: false,
                     confirmButtonText: msg
-                }, function () {
+                },function () {
                     ajax({
                         type: "post",
                         url: "${contextPath}/job/pause.do",
