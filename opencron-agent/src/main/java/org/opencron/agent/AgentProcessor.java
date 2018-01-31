@@ -56,21 +56,11 @@ public class AgentProcessor implements ServerHandler, AgentJob {
 
     private String EXITCODE_SCRIPT = String.format("\n\necho %s:$?", EXITCODE_KEY);
 
-    private String password;
-
-    public AgentProcessor() {
-        this.password =  SystemPropertyUtils.get(
-                Constants.PARAM_OPENCRON_PASSWORD_KEY,
-                DigestUtils.md5Hex(Constants.PARAM_DEF_PASSWORD_KEY)
-        );
-    }
-
     @Override
     public Response handle(Request request) {
-
         Action action = request.getAction();
         //verify password...
-        if (!password.equalsIgnoreCase(request.getPassword())) {
+        if (!SystemPropertyUtils.get(Constants.PARAM_OPENCRON_PASSWORD_KEY).equalsIgnoreCase(request.getPassword())) {
             return Response.response(request)
                     .setSuccess(false)
                     .setExitCode(Constants.StatusCode.ERROR_PASSWORD.getValue())
@@ -291,17 +281,13 @@ public class AgentProcessor implements ServerHandler, AgentJob {
 
     @Override
     public Response password(Request request) {
-
         String newPassword = request.getParams().get(Constants.PARAM_NEWPASSWORD_KEY);
         Response response = Response.response(request);
-
         if (isEmpty(newPassword)) {
             return response.setSuccess(false).setExitCode(Constants.StatusCode.SUCCESS_EXIT.getValue()).setMessage("密码不能为空").end();
         }
-
-        this.password = newPassword.toLowerCase().trim();
-        SystemPropertyUtils.setProperty("opencron.password", password);
-        IOUtils.writeText(Constants.OPENCRON_PASSWORD_FILE, password, "UTF-8");
+        SystemPropertyUtils.setProperty(Constants.PARAM_OPENCRON_PASSWORD_KEY,newPassword);
+        IOUtils.writeText(Constants.OPENCRON_PASSWORD_FILE, newPassword, "UTF-8");
         return response.setSuccess(true).setExitCode(Constants.StatusCode.SUCCESS_EXIT.getValue()).end();
     }
 

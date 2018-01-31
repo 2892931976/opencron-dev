@@ -99,8 +99,6 @@ public class Constants {
 
     public static final String PARAM_CACHED_JOB_ID_KEY = "opencron_job";
 
-    public static final String PARAM_CACHED_JOB_MAP_KEY = "opencron_job_map";
-
     public static final String PARAM_LOGIN_USER_KEY = "opencron_user";
 
     public static final String PARAM_LOGIN_USER_ID_KEY = "opencron_user_id";

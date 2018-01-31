@@ -184,8 +184,8 @@ public class AgentBootstrap implements Serializable {
 
             logger.info("[opencron]agent started @ port:{},pid:{}", port, getPid());
 
-            String agentId = StringUtils.join(MacUtils.getAllMac(),"_");
-            if ( agentId == null ) {
+            String agentId = StringUtils.join(MacUtils.getAllMac(), "_");
+            if (agentId == null) {
                 throw new IllegalArgumentException("[opencron] getMac error.");
             }
             final String path = Constants.ZK_REGISTRY_AGENT_PATH + "/" + agentId + "@" + this.port;
@@ -193,7 +193,7 @@ public class AgentBootstrap implements Serializable {
             String registryAddress = AgentProperties.getProperty(Constants.PARAM_OPENCRON_REGISTRY_KEY);
             final URL url = URL.valueOf(registryAddress);
             final RegistryService registryService = new RegistryService();
-            registryService.register(url,path,false);
+            registryService.register(url, path, false);
 
             logger.info("[opencron] agent register to zookeeper done");
 
@@ -203,7 +203,7 @@ public class AgentBootstrap implements Serializable {
                     if (logger.isInfoEnabled()) {
                         logger.info("[opencron] run shutdown hook now...");
                     }
-                    registryService.unregister(url,path);
+                    registryService.unregister(url, path);
                 }
             }, "OpencronShutdownHook"));
         } catch (Exception e) {

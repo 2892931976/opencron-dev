@@ -79,6 +79,8 @@ public class OpencronInitiator {
 
     private Map<String,String> agents = new ConcurrentHashMap<String, String>(0);
 
+    private Map<String,String> jobMap = new ConcurrentHashMap<String, String>(0);
+
     private List<String> servers = new ArrayList<String>(0);
 
     private volatile boolean destroy = false;
@@ -149,41 +151,29 @@ public class OpencronInitiator {
             @Override
             public synchronized void childChanged(String path, List<String> children) {
 
-                System.out.println("Running........" + children);
-
                 if (destroy) return;
 
+                servers = children;
+
                 try {
-
-                    servers = children;
-
-                    //将job添加到缓存中.
-                    Map<String,String> jobMap = (Map<String, String>) OpencronTools.CACHE.get(Constants.PARAM_CACHED_JOB_MAP_KEY);
-                    jobMap = jobMap == null?new ConcurrentHashMap<String, String>(0):jobMap;
-                    Map<String,String> unJobMap = new ConcurrentHashMap<String, String>(jobMap);
-
                     //一致性哈希计算出每个Job落在哪个server上
                     ConsistentHash<String> hash = new ConsistentHash<String>(160, servers);
+
                     List<Job> jobs = jobService.getScheduleJob();
-                    //落在该机器上的任务
+
                     for (Job job:jobs) {
                         String jobId = job.getJobId().toString();
-                        unJobMap.remove(jobId);
                         //该任务落在当前的机器上
                         if ( SERVER_ID.equals(hash.get(jobId)) ) {
                             if (!jobMap.containsKey(jobId)) {
                                 jobMap.put(jobId,jobId);
                                 schedulerService.syncTigger(job.getJobId());
                             }
+                        }else {
+                            jobMap.remove(job);
+                            schedulerService.removeTigger(toLong(job));
                         }
                     }
-
-                    for (String job:unJobMap.keySet()) {
-                        jobMap.remove(job);
-                        schedulerService.removeTigger(toLong(job));
-                    }
-
-                    OpencronTools.CACHE.put(Constants.PARAM_CACHED_JOB_MAP_KEY,jobMap);
 
                 } catch (SchedulerException e) {
                     e.printStackTrace();
@@ -215,9 +205,7 @@ public class OpencronInitiator {
                 if (destroy) return;
 
                 try {
-                    //将job添加到缓存中.
-                    Map<String,String> jobMap = (Map<String, String>) OpencronTools.CACHE.get(Constants.PARAM_CACHED_JOB_MAP_KEY);
-                    jobMap = jobMap == null?new HashMap<String, String>(0):jobMap;
+
                     Map<String,String> unJobMap = new HashMap<String, String>(jobMap);
 
                     for (String job:children) {
@@ -235,11 +223,10 @@ public class OpencronInitiator {
                         jobMap.remove(job);
                         schedulerService.removeTigger(toLong(job));
                     }
-
-                    OpencronTools.CACHE.put(Constants.PARAM_CACHED_JOB_MAP_KEY,jobMap);
                 } catch (SchedulerException e) {
                     e.printStackTrace();
                 }
+
             }
         });
 
@@ -260,7 +247,6 @@ public class OpencronInitiator {
         registryService.unregister(registryURL,registryPath);
 
         //job unregister
-        Map<String,String> jobMap = (Map<String, String>) OpencronTools.CACHE.get(Constants.PARAM_CACHED_JOB_MAP_KEY);
         if (CommonUtils.notEmpty(jobMap)) {
             for (String job:jobMap.keySet()) {
                 registryService.unregister(registryURL,Constants.ZK_REGISTRY_JOB_PATH+"/"+ job);
