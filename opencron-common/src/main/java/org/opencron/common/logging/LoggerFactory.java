@@ -35,7 +35,7 @@ public abstract class LoggerFactory {
 
     public static Logger getLogger(@SuppressWarnings("rawtypes") Class clazz) {
 
-       /* ClassLoader loader = Thread.currentThread().getContextClassLoader();
+        ClassLoader loader = Thread.currentThread().getContextClassLoader();
         URL url = loader.getResource("log4j.properties");
         String path;
         if (url == null) {
@@ -48,7 +48,7 @@ public abstract class LoggerFactory {
         } else {
             path = url.getPath();
         }
-        PropertyConfigurator.configure(path);*/
+        PropertyConfigurator.configure(path);
         return org.slf4j.LoggerFactory.getLogger(clazz);
     }
 

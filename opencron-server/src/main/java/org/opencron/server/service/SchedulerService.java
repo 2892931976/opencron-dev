@@ -136,12 +136,7 @@ public final class SchedulerService {
 
     public void syncTigger(JobInfo job) throws SchedulerException {
 
-        /**
-         * 从crontab或者quartz里删除任务
-         */
-        opencronCollector.removeTask(job.getJobId());
-
-        this.remove(job.getJobId());
+        this.removeTigger(job.getJobId());
 
         //job已经被删除..
         if (job.getDeleted()) {
@@ -174,6 +169,12 @@ public final class SchedulerService {
 
     }
 
+    public void removeTigger(Long jobId) throws SchedulerException {
+        opencronCollector.removeTask(jobId);
+        this.remove(jobId);
+    }
+
+
     public void syncTigger(Long jobId) throws SchedulerException {
         JobInfo job = jobService.getJobInfoById(jobId);
         this.syncTigger(job);
@@ -189,5 +190,6 @@ public final class SchedulerService {
         this.quartzScheduler = new StdSchedulerFactory().getScheduler();
         this.startQuartz();
     }
+
 
 }

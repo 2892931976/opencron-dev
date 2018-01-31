@@ -44,6 +44,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.opencron.common.util.CommonUtils.toLong;
 import static org.opencron.common.util.CommonUtils.uuid;
 
 /**
@@ -176,15 +177,9 @@ public class OpencronInitiator {
                         }
                     }
 
-                    /**
-                     *
-                     * 已经删除的job
-                     * 忽略直接将任务从zookeeper中删除而不经过server
-                     * 如果是经过server发生的删除job行为则该job在第一时间就从zookeeper中移除了
-                     *
-                     */
                     for (String job:unJobMap.keySet()) {
                         jobMap.remove(job);
+                        schedulerService.removeTigger(toLong(job));
                     }
 
                     OpencronTools.CACHE.put(Constants.PARAM_CACHED_JOB_MAP_KEY,jobMap);
@@ -241,6 +236,7 @@ public class OpencronInitiator {
                      */
                     for (String job:unJobMap.keySet()) {
                         jobMap.remove(job);
+                        schedulerService.removeTigger(toLong(job));
                     }
                     OpencronTools.CACHE.put(Constants.PARAM_CACHED_JOB_MAP_KEY,jobMap);
                 } catch (SchedulerException e) {
