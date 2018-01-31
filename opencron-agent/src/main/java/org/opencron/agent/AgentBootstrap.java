@@ -61,7 +61,6 @@ public class AgentBootstrap implements Serializable {
      */
     private Server server = ExtensionLoader.load(Server.class);
 
-
     /**
      * rpc handler...
      */
@@ -142,34 +141,28 @@ public class AgentBootstrap implements Serializable {
      *
      * @throws Exception
      */
-    private void init() throws Exception {
+    private void init() {
         port = Integer.valueOf(Constants.OPENCRON_PORT);
-        String inputPassword = Constants.OPENCRON_PASSWORD;
-        if (notEmpty(inputPassword)) {
+        String inpass = Constants.OPENCRON_PASSWORD;
+
+        if (notEmpty(inpass)) {
             Constants.OPENCRON_PASSWORD_FILE.delete();
-            this.password = DigestUtils.md5Hex(inputPassword).toLowerCase();
+            this.password = DigestUtils.md5Hex(inpass).toUpperCase();
             IOUtils.writeText(Constants.OPENCRON_PASSWORD_FILE, this.password, Constants.CHARSET_UTF8);
         } else {
-            boolean writeDefault = false;
             //.password file already exists
             if (Constants.OPENCRON_PASSWORD_FILE.exists()) {
                 //read password from .password file
-                String filePassowrd = IOUtils.readText(Constants.OPENCRON_PASSWORD_FILE, Constants.CHARSET_UTF8).trim().toLowerCase();
-                if (notEmpty(filePassowrd)) {
-                    this.password = filePassowrd;
-                } else {
-                    writeDefault = true;
-                }
-            } else {
-                writeDefault = true;
-            }
-
-            if (writeDefault) {
-                this.password = DigestUtils.md5Hex(AgentProperties.getProperty(Constants.PARAM_OPENCRON_PASSWORD_KEY)).toLowerCase();
-                Constants.OPENCRON_PASSWORD_FILE.delete();
-                IOUtils.writeText(Constants.OPENCRON_PASSWORD_FILE, this.password, Constants.CHARSET_UTF8);
+                this.password = IOUtils.readText(Constants.OPENCRON_PASSWORD_FILE, Constants.CHARSET_UTF8).trim().toUpperCase();
             }
         }
+
+        if (isEmpty(this.password)) {
+            this.password = DigestUtils.md5Hex(AgentProperties.getProperty(Constants.PARAM_OPENCRON_PASSWORD_KEY)).toUpperCase();
+            Constants.OPENCRON_PASSWORD_FILE.delete();
+            IOUtils.writeText(Constants.OPENCRON_PASSWORD_FILE, this.password, Constants.CHARSET_UTF8);
+        }
+
         SystemPropertyUtils.setProperty(Constants.PARAM_OPENCRON_PORT_KEY, this.port.toString());
         SystemPropertyUtils.setProperty(Constants.PARAM_OPENCRON_PASSWORD_KEY, this.password);
     }
@@ -200,7 +193,7 @@ public class AgentBootstrap implements Serializable {
             String registryAddress = AgentProperties.getProperty(Constants.PARAM_OPENCRON_REGISTRY_KEY);
             final URL url = URL.valueOf(registryAddress);
             final RegistryService registryService = new RegistryService();
-            registryService.register(url,path,true);
+            registryService.register(url,path,false);
 
             logger.info("[opencron] agent register to zookeeper done");
 

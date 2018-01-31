@@ -53,7 +53,7 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Request> {
         if (request.getRpcType() != RpcType.ONE_WAY) {    //非单向调用
             handlerContext.writeAndFlush(response);
         }
-        logger.info("[opencron] agent process done,request:{},action:", request.getAction());
+        logger.info("[opencron] agent process done,action:{}", request.getAction());
     }
 
     @Override
