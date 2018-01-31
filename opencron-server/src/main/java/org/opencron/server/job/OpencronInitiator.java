@@ -30,6 +30,7 @@ import org.opencron.common.util.PropertyPlaceholder;
 import org.opencron.registry.URL;
 import org.opencron.registry.api.RegistryService;
 import org.opencron.registry.zookeeper.ChildListener;
+import org.opencron.server.domain.Job;
 import org.opencron.server.service.*;
 import org.opencron.server.vo.JobInfo;
 import org.quartz.SchedulerException;
@@ -148,9 +149,12 @@ public class OpencronInitiator {
             @Override
             public synchronized void childChanged(String path, List<String> children) {
 
+                System.out.println("Running........" + children);
+
                 if (destroy) return;
 
                 try {
+
                     servers = children;
 
                     //将job添加到缓存中.
@@ -160,19 +164,16 @@ public class OpencronInitiator {
 
                     //一致性哈希计算出每个Job落在哪个server上
                     ConsistentHash<String> hash = new ConsistentHash<String>(160, servers);
-                    List<JobInfo> jobs = jobService.getJobInfo(Constants.CronType.CRONTAB);
-                    List<JobInfo> quartzJobs = jobService.getJobInfo(Constants.CronType.QUARTZ);
-                    jobs.addAll(quartzJobs);
-
+                    List<Job> jobs = jobService.getScheduleJob();
                     //落在该机器上的任务
-                    for (JobInfo jobInfo:jobs) {
-                        unJobMap.remove(jobInfo.getJobId().toString());
-                        String server = hash.get(jobInfo.getJobId().toString());
+                    for (Job job:jobs) {
+                        String jobId = job.getJobId().toString();
+                        unJobMap.remove(jobId);
                         //该任务落在当前的机器上
-                        if (server.equals(SERVER_ID)) {
-                            if (!jobMap.containsKey(jobInfo.getJobId().toString())) {
-                                jobMap.put(jobInfo.getJobId().toString(),jobInfo.getJobId().toString());
-                                schedulerService.syncTigger(jobInfo);
+                        if ( SERVER_ID.equals(hash.get(jobId)) ) {
+                            if (!jobMap.containsKey(jobId)) {
+                                jobMap.put(jobId,jobId);
+                                schedulerService.syncTigger(job.getJobId());
                             }
                         }
                     }
@@ -219,25 +220,22 @@ public class OpencronInitiator {
                     jobMap = jobMap == null?new HashMap<String, String>(0):jobMap;
                     Map<String,String> unJobMap = new HashMap<String, String>(jobMap);
 
-                    ConsistentHash<String> hash = new ConsistentHash<String>(160, servers);
                     for (String job:children) {
                         unJobMap.remove(job);
-                        if (SERVER_ID.equals(hash.get(job))) {
-                            if (!jobMap.containsKey(job)) {
+                        if ( !jobMap.containsKey(job)) {
+                            ConsistentHash<String> hash = new ConsistentHash<String>(160, servers);
+                            if ( hash.get(job).equals(SERVER_ID) ) {
                                 jobMap.put(job,job);
                                 schedulerService.syncTigger(CommonUtils.toLong(job));
                             }
                         }
                     }
-                    /**
-                     * 已经删除的job
-                     * 忽略直接将任务从zookeeper中删除而不经过server
-                     * 如果是经过server发生的删除job行为则该job在第一时间就从zookeeper中移除了
-                     */
+
                     for (String job:unJobMap.keySet()) {
                         jobMap.remove(job);
                         schedulerService.removeTigger(toLong(job));
                     }
+
                     OpencronTools.CACHE.put(Constants.PARAM_CACHED_JOB_MAP_KEY,jobMap);
                 } catch (SchedulerException e) {
                     e.printStackTrace();
@@ -245,17 +243,14 @@ public class OpencronInitiator {
             }
         });
 
-        //将job加入到zookeeper
-        List<JobInfo> crontab = jobService.getJobInfo(Constants.CronType.CRONTAB);
-        List<JobInfo> quartz = jobService.getJobInfo(Constants.CronType.QUARTZ);
-        crontab.addAll(quartz);
-        for (JobInfo jobInfo:crontab) {
-            registryService.register(registryURL,Constants.ZK_REGISTRY_JOB_PATH+"/"+jobInfo.getJobId(),true);
+        List<Job> jobs = jobService.getScheduleJob();
+        for (Job job:jobs) {
+            registryService.register(registryURL,Constants.ZK_REGISTRY_JOB_PATH+"/"+job.getJobId(),true);
         }
     }
 
     @PreDestroy
-    public void destroy() throws Exception {
+    public void destroy() {
         destroy = true;
         if (logger.isInfoEnabled()) {
             logger.info("[opencron] run destroy now...");

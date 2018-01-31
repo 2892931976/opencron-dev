@@ -22,15 +22,13 @@
 
 package org.opencron.server.service;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 import static org.opencron.common.Constants.*;
 
 import org.opencron.common.Constants;
 import org.opencron.common.util.PropertyPlaceholder;
+import org.opencron.common.util.collection.ParamsMap;
 import org.opencron.registry.URL;
 import org.opencron.registry.api.RegistryService;
 import org.opencron.server.dao.QueryDao;
@@ -74,6 +72,7 @@ public class JobService {
     private OpencronCollector opencronCollector;
 
     private Logger logger = LoggerFactory.getLogger(JobService.class);
+    private List<JobInfo> scheduleJob;
 
     public Job getJob(Long jobId) {
         return queryDao.get(Job.class, jobId);
@@ -422,5 +421,15 @@ public class JobService {
 
     public List<Job> getFlowJob(Long id) {
         return queryDao.hqlQuery("from Job where flowId=?",id);
+    }
+
+    public List<Job> getScheduleJob() {
+        Integer[] cronTypes = new Integer[2];
+        cronTypes[0] = CronType.CRONTAB.getType();
+        cronTypes[1] = CronType.QUARTZ.getType();
+        Map params = ParamsMap.map().set("cronType",cronTypes);
+
+        String hql = "from Job where cronType in (:cronType)";
+        return queryDao.hqlQuery(hql,params);
     }
 }
