@@ -70,32 +70,6 @@ public class ConsistentHash<T> {
         return circle.size();
     }
 
-    public static void main(String[] args) {
-
-        Set<String> nodes = new HashSet();
-        nodes.add("A");
-        nodes.add("B");
-        nodes.add("C");
-
-        ConsistentHash<String> consistentHash = new ConsistentHash<String>(123, nodes);
-
-        System.out.println(consistentHash.get("1")); //B
-        System.out.println(consistentHash.get("2")); //B
-        System.out.println(consistentHash.get("3")); //B
-        System.out.println(consistentHash.get("4")); //B
-        System.out.println(consistentHash.get("5")); //A
-        System.out.println(consistentHash.get("6")); //A
-        System.out.println(consistentHash.get("7")); //A
-        System.out.println(consistentHash.get("8")); //B
-        System.out.println(consistentHash.get("9")); //C
-        System.out.println(consistentHash.get("10"));//C
-        System.out.println(consistentHash.get("11"));//B
-        System.out.println(consistentHash.get("12"));//B
-        System.out.println(consistentHash.get("13"));//B
-        System.out.println(consistentHash.get("14"));//B
-        System.out.println(consistentHash.get("15"));//B
-    }
-
 
 }
 
