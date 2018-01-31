@@ -44,6 +44,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import static org.opencron.common.util.CommonUtils.toLong;
 import static org.opencron.common.util.CommonUtils.uuid;
@@ -85,6 +87,8 @@ public class OpencronInitiator {
 
     private volatile boolean destroy = false;
 
+    private Lock lock = new ReentrantLock();
+
     /**
      * 每台server启动起来都必须往注册中心注册信息...注册中心在重新统一分配任务到每台server上...
      *
@@ -113,7 +117,9 @@ public class OpencronInitiator {
         //agent添加,删除监控...
         registryService.getZKClient(registryURL).addChildListener(Constants.ZK_REGISTRY_AGENT_PATH, new ChildListener() {
             @Override
-            public synchronized void childChanged(String path, List<String> children) {
+            public void childChanged(String path, List<String> children) {
+
+                lock.lock();
 
                 if (destroy) return;
 
@@ -141,6 +147,8 @@ public class OpencronInitiator {
                         agentService.doDisconnect(child);
                     }
                 }
+
+                lock.unlock();
             }
         });
     }
@@ -149,13 +157,16 @@ public class OpencronInitiator {
         //server监控增加和删除
         registryService.getZKClient(registryURL).addChildListener(Constants.ZK_REGISTRY_SERVER_PATH, new ChildListener() {
             @Override
-            public synchronized void childChanged(String path, List<String> children) {
+            public void childChanged(String path, List<String> children) {
 
                 if (destroy) return;
 
                 servers = children;
 
                 try {
+
+                    lock.lock();
+
                     //一致性哈希计算出每个Job落在哪个server上
                     ConsistentHash<String> hash = new ConsistentHash<String>(160, servers);
 
@@ -177,6 +188,8 @@ public class OpencronInitiator {
 
                 } catch (SchedulerException e) {
                     e.printStackTrace();
+                }finally {
+                    lock.unlock();
                 }
             }
         });
@@ -206,6 +219,8 @@ public class OpencronInitiator {
 
                 try {
 
+                    lock.lock();
+
                     Map<String,String> unJobMap = new HashMap<String, String>(jobMap);
 
                     for (String job:children) {
@@ -225,6 +240,8 @@ public class OpencronInitiator {
                     }
                 } catch (SchedulerException e) {
                     e.printStackTrace();
+                }finally {
+                    lock.unlock();
                 }
 
             }
