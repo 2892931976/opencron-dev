@@ -69,15 +69,15 @@ public class OpencronInitiator {
 
     private RegistryService registryService = new RegistryService();
 
-    private final URL registryURL = URL.valueOf(PropertyPlaceholder.get(Constants.PARAM_OPENCRON_REGISTRY_KEY));
-
     private final String SERVER_ID = uuid();
+
+    private final URL registryURL = URL.valueOf(PropertyPlaceholder.get(Constants.PARAM_OPENCRON_REGISTRY_KEY));
 
     private final String registryPath = Constants.ZK_REGISTRY_SERVER_PATH + "/" + SERVER_ID;
 
-    private Map<String,String> agentMap = new ConcurrentHashMap<String, String>(0);
+    private Map<String,String> agents = new ConcurrentHashMap<String, String>(0);
 
-    private List<String> serverList = new ArrayList<String>(0);
+    private List<String> servers = new ArrayList<String>(0);
 
     private volatile boolean destroy = false;
 
@@ -113,26 +113,26 @@ public class OpencronInitiator {
 
                 if (destroy) return;
 
-                if (agentMap.isEmpty()) {
+                if (agents.isEmpty()) {
                     for (String agent:children) {
-                        agentMap.put(agent,agent);
+                        agents.put(agent,agent);
                         logger.info("[opencron] agent connected! info:{}",agent);
                         agentService.doConnect(agent);
                     }
                 }else {
-                    Map<String,String> map = new ConcurrentHashMap<String, String>(agentMap);
+                    Map<String,String> map = new ConcurrentHashMap<String, String>(agents);
                     for (String agent:children) {
                         map.remove(agent);
-                        if (!agentMap.containsKey(agent)) {
+                        if (!agents.containsKey(agent)) {
                             //新增...
-                            agentMap.put(agent,agent);
+                            agents.put(agent,agent);
                             logger.info("[opencron] agent connected! info:{}",agent);
                             agentService.doConnect(agent);
                         }
                     }
 
                     for (String child:map.keySet()) {
-                        agentMap.remove(child);
+                        agents.remove(child);
                         logger.info("[opencron] agent doDisconnect! info:{}",child);
                         agentService.doDisconnect(child);
                     }
@@ -150,7 +150,7 @@ public class OpencronInitiator {
                 if (destroy) return;
 
                 try {
-                    serverList = children;
+                    servers = children;
 
                     //将job添加到缓存中.
                     Map<String,String> jobMap = (Map<String, String>) OpencronTools.CACHE.get(Constants.PARAM_CACHED_JOB_MAP_KEY);
@@ -158,7 +158,7 @@ public class OpencronInitiator {
                     Map<String,String> unJobMap = new ConcurrentHashMap<String, String>(jobMap);
 
                     //一致性哈希计算出每个Job落在哪个server上
-                    ConsistentHash<String> hash = new ConsistentHash<String>(160,serverList);
+                    ConsistentHash<String> hash = new ConsistentHash<String>(160, servers);
                     List<JobInfo> jobs = jobService.getJobInfo(Constants.CronType.CRONTAB);
                     List<JobInfo> quartzJobs = jobService.getJobInfo(Constants.CronType.QUARTZ);
                     jobs.addAll(quartzJobs);
@@ -224,7 +224,7 @@ public class OpencronInitiator {
                     jobMap = jobMap == null?new HashMap<String, String>(0):jobMap;
                     Map<String,String> unJobMap = new HashMap<String, String>(jobMap);
 
-                    ConsistentHash<String> hash = new ConsistentHash<String>(160,serverList);
+                    ConsistentHash<String> hash = new ConsistentHash<String>(160, servers);
                     for (String job:children) {
                         unJobMap.remove(job);
                         if (SERVER_ID.equals(hash.get(job))) {
