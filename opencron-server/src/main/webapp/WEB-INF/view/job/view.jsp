@@ -127,7 +127,6 @@
                                 "cronExp": cronExp,
                                 "agentId": agentId,
                                 "command": toBase64(command),
-                                "runAs":$("#runAs").val(),
                                 "successExit":successExit,
                                 "timeout": timeout,
                                 "jobName": jobName,
@@ -233,7 +232,6 @@
                         $("#mobiles").val(obj.mobiles);
                         $("#email").val(obj.emailAddress);
                         $("#comment").val(unEscapeHtml(obj.comment));
-                        $("#runAs").val(obj.runAs);
                         $("#successExit").val(obj.successExit);
                         $("#timeout").val(obj.timeout);
                         $('#jobModal').modal('show');
@@ -710,13 +708,6 @@
                             <div class="col-md-9">
                                 <textarea class="form-control" id="cmd" name="cmd" style="height:100px;resize:vertical"></textarea>
                                 <span class="tips none" tip="请采用unix/linux的shell支持的命令">请采用unix/linux的shell支持的命令</span>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="runAs" class="col-lab control-label wid100">运行身份&nbsp;<b>*</b></label>
-                            <div class="col-md-9">
-                                <input type="text" class="form-control" id="runAs" name="runAs" value="root">
-                                <span class="tips none" tip="该任务以哪个身份执行(默认是root)">该任务以哪个身份执行(默认是root)</span>
                             </div>
                         </div>
                         <div class="form-group">

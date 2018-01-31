@@ -42,7 +42,6 @@ public class Job implements Serializable {
     private String command;
 
     private String comment;
-    private String runAs;
     private String successExit;
     private Long userId;
     private Date updateTime;
@@ -134,14 +133,6 @@ public class Job implements Serializable {
 
     public void setComment(String comment) {
         this.comment = comment;
-    }
-
-    public String getRunAs() {
-        return runAs;
-    }
-
-    public void setRunAs(String runAs) {
-        this.runAs = runAs;
     }
 
     public String getSuccessExit() {
@@ -282,7 +273,6 @@ public class Job implements Serializable {
                 ", cronExp='" + cronExp + '\'' +
                 ", command='" + command + '\'' +
                 ", comment='" + comment + '\'' +
-                ", runAs='" + runAs + '\'' +
                 ", successExit='" + successExit + '\'' +
                 ", userId=" + userId +
                 ", updateTime=" + updateTime +

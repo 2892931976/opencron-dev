@@ -109,16 +109,6 @@ function Validata() {
             }
         },
 
-        runAs: function () {
-            var prefix = arguments[0] || "";
-            if ($("#runAs" + prefix).val().length == 0) {
-                opencron.tipError("#runAs" + prefix, "任务运行身份不能为空,请填写任务运行身份");
-                this.status = false;
-            } else {
-                opencron.tipOk("#runAs" + prefix);
-            }
-        },
-
         successExit: function () {
             var prefix = arguments[0] || "";
             var successExit = $("#successExit" + prefix).val();
@@ -234,7 +224,6 @@ function Validata() {
             this.cronExp();
             this.command();
             this.successExit();
-            this.runAs();
             this.runCount();
             this.subJob();
             this.timeout();
@@ -248,7 +237,6 @@ function Validata() {
         tipDefault: function () {
             opencron.tipDefault("#jobName1");
             opencron.tipDefault("#cmd1");
-            opencron.tipDefault("#runAs1");
             opencron.tipDefault("#successExit1");
             opencron.tipDefault("#timeout1");
             opencron.tipDefault("#runCount1");
@@ -273,10 +261,6 @@ function Validata() {
                 }
                 if ($(element).attr("name") == "child.command") {
                     $("#cmd1").val(passBase64($(element).val()));
-                }
-
-                if ($(element).attr("name") == "child.runAs") {
-                    $("#runAs1").val($(element).val());
                 }
 
                 if ($(element).attr("name") == "child.successExit") {
@@ -316,7 +300,6 @@ function Validata() {
             self.validata.init();
             self.validata.jobName("1");
             self.validata.command("1");
-            self.validata.runAs("1");
             self.validata.successExit("1");
             self.validata.timeout("1");
             self.validata.runCount("1");
@@ -349,7 +332,6 @@ function Validata() {
                                 "<input type='hidden' name='child.redo' value='" + $('#itemRedo').val() + "'>" +
                                 "<input type='hidden' name='child.runCount' value='" + $("#runCount1").val() + "'>" +
                                 "<input type='hidden' name='child.timeout' value='" + $("#timeout1").val() + "'>" +
-                                "<input type='hidden' name='child.runAs' value='" + $("#runAs1").val() + "'>" +
                                 "<input type='hidden' name='child.successExit' value='" + $("#successExit1").val() + "'>" +
                                 "<input type='hidden' name='child.comment' value='" + escapeHtml($("#comment1").val()) + "'>" +
                                 "</li>";
@@ -372,10 +354,6 @@ function Validata() {
 
                                 if ($(element).attr("name") == "child.successExit") {
                                     $(element).attr("value", $("#successExit1").val());
-                                }
-
-                                if ($(element).attr("name") == "child.runAs") {
-                                    $(element).attr("value", $("#runAs1").val());
                                 }
 
                                 if ($(element).attr("name") == "child.agentId") {
@@ -637,17 +615,6 @@ Validata.prototype.ready = function () {
         _this.validata.command("1");
     }).focus(function () {
         opencron.tipDefault("#cmd1");
-    });
-
-    $("#runAs").blur(function () {
-        _this.validata.runAs();
-    }).focus(function () {
-        opencron.tipDefault("#runAs");
-    });
-    $("#runAs1").blur(function () {
-        _this.validata.runAs("1");
-    }).focus(function () {
-        opencron.tipDefault("#runAs1");
     });
 
     $("#runCount").blur(function () {

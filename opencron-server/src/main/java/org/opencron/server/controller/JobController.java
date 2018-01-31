@@ -152,7 +152,7 @@ public class JobController extends BaseController {
             /**
              * 将数据库中持久化的作业和当前修改的合并,当前修改的属性覆盖持久化的属性...
              */
-            BeanUtils.copyProperties(job1, job, "jobName", "cronType", "cronExp", "command", "comment", "runAs", "successExit", "redo", "runCount", "jobType", "runModel", "warning", "mobiles", "emailAddress", "timeout");
+            BeanUtils.copyProperties(job1, job, "jobName", "cronType", "cronExp", "command", "comment","successExit", "redo", "runCount", "jobType", "runModel", "warning", "mobiles", "emailAddress", "timeout");
         }
 
         //单任务
@@ -170,7 +170,6 @@ public class JobController extends BaseController {
             Object[] runCount = map.get("child.runCount");
             Object[] timeout = map.get("child.timeout");
             Object[] comment = map.get("child.comment");
-            Object[] runAs = map.get("child.runAs");
             Object[] successExit = map.get("child.successExit");
             List<Job> children = new ArrayList<Job>(0);
             for (int i = 0; i < jobName.length; i++) {
@@ -189,7 +188,6 @@ public class JobController extends BaseController {
                 child.setCommand(DigestUtils.passBase64((String) command[i]));
                 child.setJobType(Constants.JobType.FLOW.getCode());
                 child.setComment(StringUtils.htmlEncode((String) comment[i]));
-                child.setRunAs(StringUtils.htmlEncode((String) runAs[i]));
                 child.setSuccessExit(StringUtils.htmlEncode((String) successExit[i]));
                 child.setTimeout(Integer.parseInt((String) timeout[i]));
                 child.setRedo(Integer.parseInt((String) redo[i]));
@@ -255,7 +253,6 @@ public class JobController extends BaseController {
         dbJob.setCronExp(job.getCronExp());
         dbJob.setCommand(DigestUtils.passBase64(job.getCommand()));
         dbJob.setJobName(job.getJobName());
-        dbJob.setRunAs(job.getRunAs());
         dbJob.setSuccessExit(job.getSuccessExit());
         dbJob.setRedo(job.getRedo());
         dbJob.setRunCount(job.getRunCount());

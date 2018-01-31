@@ -122,14 +122,6 @@
                  </div><br>--%>
 
                 <div class="form-group">
-                    <label for="runAs" class="col-lab control-label wid150"><i class="glyphicons glyphicons-user"></i>&nbsp;&nbsp;运行身份&nbsp;&nbsp;<b>*&nbsp;</b></label>
-                    <div class="col-md-10">
-                        <input type="text" class="form-control input-sm" id="runAs" name="runAs" value="root">
-                        <span class="tips none" tip="该任务以哪个身份执行(默认是root)">该任务以哪个身份执行(默认是root)</span>
-                    </div>
-                </div>
-
-                <div class="form-group">
                     <label for="successExit" class="col-lab control-label wid150"><i class="glyphicons glyphicons-tags"></i>&nbsp;&nbsp;成功标识&nbsp;&nbsp;<b>*&nbsp;</b></label>
                     <div class="col-md-10">
                         <input type="text" class="form-control input-sm" id="successExit" name="successExit" value="0">
@@ -274,15 +266,6 @@
                                 <span class="tips none" tip="请采用unix/linux的shell支持的命令">请采用unix/linux的shell支持的命令</span>
                             </div>
                         </div>
-
-                        <div class="form-group">
-                            <label for="runAs1" class="col-lab control-label wid100">运行身份&nbsp;<b>*</b></label>
-                            <div class="col-md-9">
-                                <input type="text" class="form-control" id="runAs1" name="runAs1" value="root">
-                                <span class="tips none" tip="该任务以哪个身份执行(默认是root)">该任务以哪个身份执行(默认是root)</span>
-                            </div>
-                        </div>
-                        <br>
 
                         <div class="form-group">
                             <label for="successExit1" class="col-lab control-label wid100">成功标识&nbsp;<b>*</b></label>

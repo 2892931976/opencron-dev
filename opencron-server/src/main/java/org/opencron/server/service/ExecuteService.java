@@ -301,7 +301,6 @@ public class ExecuteService implements Job {
         for (String agentId : arrayIds) {
             Agent agent = agentService.getAgent(Long.parseLong(agentId));
             final JobInfo jobInfo = new JobInfo(userId, command, agent);
-            jobInfo.setRunAs("root");
             jobInfo.setSuccessExit("0");
 
             Runnable task = new Runnable() {
@@ -489,7 +488,6 @@ public class ExecuteService implements Job {
                 .putParam(Constants.PARAM_COMMAND_KEY, job.getCommand())
                 .putParam(Constants.PARAM_PID_KEY, record.getPid())
                 .putParam(Constants.PARAM_TIMEOUT_KEY, job.getTimeout() + "")
-                .putParam(Constants.PARAM_RUNAS_KEY, job.getRunAs())
                 .putParam(Constants.PARAM_SUCCESSEXIT_KEY, job.getSuccessExit())
         );
 

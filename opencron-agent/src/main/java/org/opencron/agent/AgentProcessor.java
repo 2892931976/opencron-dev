@@ -144,7 +144,7 @@ public class AgentProcessor implements ServerHandler, AgentJob {
 
         logger.info("[opencron]:execute:{},pid:{}", command, pid);
 
-        File shellFile = CommandUtils.createShellFile(command, pid, request.getParams().get(Constants.PARAM_RUNAS_KEY), EXITCODE_SCRIPT);
+        File shellFile = CommandUtils.createShellFile(command, pid, EXITCODE_SCRIPT);
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 

@@ -71,8 +71,6 @@ public class Constants {
 
     public static final String PARAM_TIMEOUT_KEY = "timeout";
 
-    public static final String PARAM_RUNAS_KEY = "runAs";
-
     public static final String PARAM_SUCCESSEXIT_KEY = "successExit";
 
     public static final String PARAM_OPENCRON_AUTOREGKEY_KEY = "opencron.autoRegKey";

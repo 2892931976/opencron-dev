@@ -42,7 +42,7 @@ public abstract class CommandUtils implements Serializable {
 
     private static final long serialVersionUID = 6458428317155311192L;
 
-    public static File createShellFile(String command, String shellFileName, String runAs, String exitScript) {
+    public static File createShellFile(String command, String shellFileName,String exitScript) {
         String dirPath = IOUtils.getTempFolderPath();
         File dir = new File(dirPath);
         if (!dir.exists()) dir.mkdirs();
@@ -52,11 +52,7 @@ public abstract class CommandUtils implements Serializable {
         try {
             if (!shellFile.exists()) {
                 PrintWriter out = new PrintWriter(new OutputStreamWriter(new FileOutputStream(tempShellFilePath)));
-                if (CommonUtils.notEmpty(runAs)) {
-                    out.write("#!/bin/bash\n\nsu - " + runAs + " -c \"" + command + "\"\n\n" + exitScript);
-                } else {
-                    out.write("#!/bin/bash\n\n" + command + exitScript);
-                }
+                out.write("#!/bin/bash\n\n" + command + exitScript);
                 out.flush();
                 out.close();
             }

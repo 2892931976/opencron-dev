@@ -36,7 +36,6 @@ public class JobInfo implements Serializable {
     private Integer cronType;
     private String cronExp;
     private String command;
-    private String runAs;
     private String successExit;
     private String comment;
     private Long userId;
@@ -151,14 +150,6 @@ public class JobInfo implements Serializable {
 
     public void setCommand(String command) {
         this.command = command;
-    }
-
-    public String getRunAs() {
-        return runAs;
-    }
-
-    public void setRunAs(String runAs) {
-        this.runAs = runAs;
     }
 
     public String getSuccessExit() {
