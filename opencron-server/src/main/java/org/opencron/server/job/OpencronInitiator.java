@@ -32,7 +32,6 @@ import org.opencron.registry.api.RegistryService;
 import org.opencron.registry.zookeeper.ChildListener;
 import org.opencron.server.domain.Job;
 import org.opencron.server.service.*;
-import org.opencron.server.vo.JobInfo;
 import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -159,6 +158,8 @@ public class OpencronInitiator {
             @Override
             public void childChanged(String path, List<String> children) {
 
+                System.out.println("==================================================================================================================================");
+
                 if (destroy) return;
 
                 servers = children;
@@ -176,11 +177,13 @@ public class OpencronInitiator {
                         String jobId = job.getJobId().toString();
                         //该任务落在当前的机器上
                         if ( SERVER_ID.equals(hash.get(jobId)) ) {
+                            System.out.println("have job>>>>>>>>>>>>>>>>>>>>>>>>" + jobId);
                             if (!jobMap.containsKey(jobId)) {
                                 jobMap.put(jobId,jobId);
                                 schedulerService.syncTigger(job.getJobId());
                             }
                         }else {
+                            System.out.println("remove job>>>>>>>>>>>>>>>>>>>>>>>>" + jobId);
                             jobMap.remove(job);
                             schedulerService.removeTigger(toLong(job));
                         }
