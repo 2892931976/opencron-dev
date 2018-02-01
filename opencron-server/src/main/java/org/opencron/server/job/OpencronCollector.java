@@ -63,7 +63,7 @@ public class OpencronCollector implements TaskCollector {
     }
 
     public synchronized void removeTask(Long jobId) {
-        if (CommonUtils.notEmpty(jobId, jobIndex.get(jobId))) {
+        if ( jobId!=null && jobIndex.get(jobId)!=null ) {
             this.getTasks().remove(jobIndex.get(jobId));
             Integer index = jobIndex.remove(jobId);
             for (Map.Entry<Long, Integer> entry : jobIndex.entrySet()) {

@@ -427,7 +427,9 @@
         </div>
     </div>
 
-    <c:if test="${agents ne null and !empty agents}">
+   <%-- <c:if test="${agents ne null and !empty agents}">--%>
+
+     <c:if test="${ 1==2 } ">
 
         <h4 class="page-title" ><i class="icon">&#61881;</i> &nbsp;监控概况</h4>
         <!-- Main Widgets -->

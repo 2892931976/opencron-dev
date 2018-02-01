@@ -70,21 +70,31 @@ public class OpencronInitiator {
     @Autowired
     private AgentService agentService;
 
+
     private RegistryService registryService = new RegistryService();
+
 
     private final String SERVER_ID = uuid();
 
+
     private final URL registryURL = URL.valueOf(PropertyPlaceholder.get(Constants.PARAM_OPENCRON_REGISTRY_KEY));
+
 
     private final String registryPath = Constants.ZK_REGISTRY_SERVER_PATH + "/" + SERVER_ID;
 
+
     private Map<String,String> agents = new ConcurrentHashMap<String, String>(0);
+
 
     private Map<String,String> jobMap = new ConcurrentHashMap<String, String>(0);
 
+
     private List<String> servers = new ArrayList<String>(0);
 
+
+    //在server销毁之前会将server从zookeeper中移除,这有可能会在此触发回调事件,而回调触发的时候server可能已经终止.
     private volatile boolean destroy = false;
+
 
     private Lock lock = new ReentrantLock();
 
@@ -158,18 +168,16 @@ public class OpencronInitiator {
             @Override
             public void childChanged(String path, List<String> children) {
 
-                System.out.println("==================================================================================================================================");
-
-                if (destroy) return;
-
-                servers = children;
-
                 try {
 
                     lock.lock();
 
+                    if (destroy) return;
+
+                    servers = children;
+
                     //一致性哈希计算出每个Job落在哪个server上
-                    ConsistentHash<String> hash = new ConsistentHash<String>(160, servers);
+                    ConsistentHash<String> hash = new ConsistentHash<String>(servers);
 
                     List<Job> jobs = jobService.getScheduleJob();
 
@@ -177,15 +185,13 @@ public class OpencronInitiator {
                         String jobId = job.getJobId().toString();
                         //该任务落在当前的机器上
                         if ( SERVER_ID.equals(hash.get(jobId)) ) {
-                            System.out.println("have job>>>>>>>>>>>>>>>>>>>>>>>>" + jobId);
                             if (!jobMap.containsKey(jobId)) {
                                 jobMap.put(jobId,jobId);
                                 schedulerService.syncTigger(job.getJobId());
                             }
                         }else {
-                            System.out.println("remove job>>>>>>>>>>>>>>>>>>>>>>>>" + jobId);
-                            jobMap.remove(job);
-                            schedulerService.removeTigger(toLong(job));
+                            jobMap.remove(jobId);
+                            schedulerService.removeTigger(job.getJobId());
                         }
                     }
 
@@ -217,19 +223,18 @@ public class OpencronInitiator {
         registryService.getZKClient(registryURL).addChildListener(Constants.ZK_REGISTRY_JOB_PATH, new ChildListener() {
             @Override
             public synchronized void childChanged(String path, List<String> children) {
-
-                if (destroy) return;
-
                 try {
 
                     lock.lock();
+
+                    if (destroy) return;
 
                     Map<String,String> unJobMap = new HashMap<String, String>(jobMap);
 
                     for (String job:children) {
                         unJobMap.remove(job);
                         if ( !jobMap.containsKey(job)) {
-                            ConsistentHash<String> hash = new ConsistentHash<String>(160, servers);
+                            ConsistentHash<String> hash = new ConsistentHash<String>(servers);
                             if ( hash.get(job).equals(SERVER_ID) ) {
                                 jobMap.put(job,job);
                                 schedulerService.syncTigger(CommonUtils.toLong(job));

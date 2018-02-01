@@ -71,6 +71,9 @@ public final class SchedulerService {
     public SchedulerService() {}
 
     public boolean exists(Serializable jobId) throws SchedulerException {
+        if (jobId == null || JobKey.jobKey(jobId.toString()) == null) {
+            return false;
+        }
         return quartzScheduler.checkExists(JobKey.jobKey(jobId.toString()));
     }
 

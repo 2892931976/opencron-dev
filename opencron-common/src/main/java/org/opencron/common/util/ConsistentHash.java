@@ -26,12 +26,11 @@ import java.util.*;
 public class ConsistentHash<T> {
 
     private final MurmurHash murmurHash;
-    private final int numberOfReplicas;
+    private int numberOfReplicas =  2 << 3;
     private final SortedMap<Long, T> circle = new TreeMap<Long, T>();
 
-    public ConsistentHash(int numberOfReplicas, Collection<T> nodes) {
+    public ConsistentHash(Collection<T> nodes) {
         this.murmurHash = new MurmurHash();
-        this.numberOfReplicas = numberOfReplicas;
         for (T node : nodes) {
             add(node);
         }
@@ -49,11 +48,6 @@ public class ConsistentHash<T> {
         }
     }
 
-    /**
-     * 获得一个最近的顺时针节点
-     * @param key 为给定键取Hash，取得顺时针方向上最近的一个虚拟节点对应的实际节点
-     * @return
-     */
     public T get(Object key) {
         if (circle.isEmpty()) {
             return null;
