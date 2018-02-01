@@ -154,9 +154,12 @@
                window.setTimeout(function () {
                    $("#upload_push").find(".progress-bar-success").addClass("progress-bar-danger").removeClass("progress-bar-success");
                    $(".file-actions").find(".glyphicon-ok-sign").addClass("text-danger glyphicon-remove-sign").removeClass("glyphicon-ok-sign text-success");
-                   var uperrorhtml = '<span class="close kv-error-close" onclick="colseUpError()">×</span><ul><li><b>上传失败: (可能有以下原因)</b></li>' +
-                       '<li><b>1): </b>文件大小太大,上传失败</li>' +
-                       '<li><b>2): </b>上传路径是当前路径,且控制台正在实时输出日志(无法获取当前路径)</li>' +
+                   var uperrorhtml =
+                       '<span class="close kv-error-close" onclick="colseUpError()">×</span>' +
+                       '<ul>' +
+                           '<li><b>上传失败: (可能有以下原因)</b></li>' +
+                           '<li><b>1): </b>文件大小太大,上传失败</li>' +
+                           '<li><b>2): </b>上传路径是当前路径,且控制台正在实时输出日志(无法获取当前路径)</li>' +
                        '</ul>';
                    $(".file-error-message").css({"margin":"8px 0px"});
                     $("#errorBlock").html(uperrorhtml).show();

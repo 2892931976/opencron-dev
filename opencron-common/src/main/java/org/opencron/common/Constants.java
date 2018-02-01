@@ -593,6 +593,35 @@ public class Constants {
 
     }
 
+
+    public enum SshType {
+        ACCOUNT(0x0),
+        SSHKEY(0x1);
+
+        private Integer type;
+
+        SshType(Integer type){
+            this.type = type;
+        }
+
+        public static SshType getByType(Integer type) {
+            for (SshType sshType : SshType.values()) {
+                if (sshType.getType().equals(type)) {
+                    return sshType;
+                }
+            }
+            return null;
+        }
+
+        public Integer getType() {
+            return type;
+        }
+
+        public void setType(Integer type) {
+            this.type = type;
+        }
+    }
+
     public enum LauncherType {
         TOMCAT("tomcat"),
         JETTY("jetty");
