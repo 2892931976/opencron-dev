@@ -403,10 +403,10 @@ public class JobService {
             case CRONTAB:
                 try {
                     if (jobBean.getPause()) {
-                        opencronCollector.removeTask(jobBean.getJobId());
+                        opencronCollector.remove(jobBean.getJobId());
                     } else {
                         JobInfo jobInfo = getJobInfoById(job.getJobId());
-                        opencronCollector.addTask(jobInfo);
+                        opencronCollector.add(jobInfo);
                     }
                     job.setPause(jobBean.getPause());
                     merge(job);
@@ -427,9 +427,8 @@ public class JobService {
         Integer[] cronTypes = new Integer[2];
         cronTypes[0] = CronType.CRONTAB.getType();
         cronTypes[1] = CronType.QUARTZ.getType();
-        Map params = ParamsMap.map().set("cronType",cronTypes);
-
-        String hql = "from Job where cronType in (:cronType)";
+        Map params = ParamsMap.map().set("cronType",cronTypes).set("deleted",false);
+        String hql = "from Job where cronType in (:cronType) and deleted=:deleted";
         return queryDao.hqlQuery(hql,params);
     }
 }

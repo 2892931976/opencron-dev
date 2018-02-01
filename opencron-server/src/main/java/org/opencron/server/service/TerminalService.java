@@ -35,6 +35,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
@@ -109,8 +110,30 @@ public class TerminalService {
         JSch jSch = new JSch();
         Session session = null;
         try {
-            session = jSch.getSession(terminal.getUserName(), terminal.getHost(), terminal.getPort());
-            session.setPassword(terminal.getPassword());
+            Constants.SshType sshType = Constants.SshType.getByType(terminal.getSshType());
+            switch (sshType) {
+                case SSHKEY:
+                    jSch.getSession(terminal.getHost());
+                    //需要读取用户上传的sshKey
+                    if ( terminal.getSshKeyFile()!=null ) {
+                       //todo parse
+                    }
+                    //设置密钥和密码
+                    if ( notEmpty(terminal.getPrivateKey()) ) {
+                        if ( notEmpty(terminal.getPassphrase()) ) {
+                            //设置带口令的密钥
+                            jSch.addIdentity(terminal.getPrivateKey(), terminal.getPassphrase());
+                        } else {
+                            //设置不带口令的密钥
+                            jSch.addIdentity(terminal.getPrivateKey());
+                        }
+                    }
+                    break;
+                case ACCOUNT:
+                    session = jSch.getSession(terminal.getUserName(), terminal.getHost(), terminal.getPort());
+                    session.setPassword(terminal.getPassword());
+                    break;
+            }
 
             session.setConfig("StrictHostKeyChecking", "no");
             session.setConfig("PreferredAuthentications", "publickey,keyboard-interactive,password");

@@ -32,6 +32,7 @@ import org.opencron.registry.api.RegistryService;
 import org.opencron.registry.zookeeper.ChildListener;
 import org.opencron.server.domain.Job;
 import org.opencron.server.service.*;
+import org.opencron.server.vo.JobInfo;
 import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +40,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -66,6 +68,9 @@ public class OpencronInitiator {
 
     @Autowired
     private SchedulerService schedulerService;
+
+    @Autowired
+    private OpencronCollector opencronCollector;
 
     @Autowired
     private AgentService agentService;
@@ -187,17 +192,17 @@ public class OpencronInitiator {
                         if ( SERVER_ID.equals(hash.get(jobId)) ) {
                             if (!jobMap.containsKey(jobId)) {
                                 jobMap.put(jobId,jobId);
-                                schedulerService.syncTigger(job.getJobId());
+                                distribute(job.getJobId());
                             }
                         }else {
                             jobMap.remove(jobId);
-                            schedulerService.removeTigger(job.getJobId());
+                            remove(job.getJobId());
                         }
                     }
 
-                } catch (SchedulerException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
-                }finally {
+                } finally {
                     lock.unlock();
                 }
             }
@@ -237,16 +242,16 @@ public class OpencronInitiator {
                             ConsistentHash<String> hash = new ConsistentHash<String>(servers);
                             if ( hash.get(job).equals(SERVER_ID) ) {
                                 jobMap.put(job,job);
-                                schedulerService.syncTigger(CommonUtils.toLong(job));
+                                distribute(job);
                             }
                         }
                     }
 
                     for (String job:unJobMap.keySet()) {
                         jobMap.remove(job);
-                        schedulerService.removeTigger(toLong(job));
+                        remove(job);
                     }
-                } catch (SchedulerException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }finally {
                     lock.unlock();
@@ -268,15 +273,33 @@ public class OpencronInitiator {
             logger.info("[opencron] run destroy now...");
         }
 
-        //server unregister
-        registryService.unregister(registryURL,registryPath);
-
         //job unregister
         if (CommonUtils.notEmpty(jobMap)) {
             for (String job:jobMap.keySet()) {
                 registryService.unregister(registryURL,Constants.ZK_REGISTRY_JOB_PATH+"/"+ job);
             }
         }
+
+        //server unregister
+        registryService.unregister(registryURL,registryPath);
+    }
+
+    private void distribute(Serializable jobId) throws Exception {
+        JobInfo jobInfo = jobService.getJobInfoById(CommonUtils.toLong(jobId));
+        Constants.CronType cronType = Constants.CronType.getByType(jobInfo.getCronType());
+        switch (cronType) {
+            case CRONTAB:
+                opencronCollector.add(jobInfo);
+                break;
+            case QUARTZ:
+                schedulerService.put(jobInfo);
+                break;
+        }
+    }
+
+    public void remove(Serializable jobId) throws SchedulerException {
+        opencronCollector.remove(toLong(jobId));
+        schedulerService.remove(jobId);
     }
 
 }

@@ -168,7 +168,7 @@ public class AgentService {
              */
             List<JobInfo> jobInfos = jobService.getJobInfoByAgentId(agent.getAgentId(), Constants.CronType.QUARTZ);
             try {
-                schedulerService.put(jobInfos, this.executeService);
+                schedulerService.put(jobInfos);
             } catch (SchedulerException e) {
                 /**
                  * 创新任务列表失败,抛出异常,整个事务回滚...

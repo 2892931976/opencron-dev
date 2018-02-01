@@ -24,9 +24,11 @@ import com.alibaba.fastjson.annotation.JSONField;
 import org.opencron.common.util.DigestUtils;
 import org.opencron.common.util.RSAUtils;
 import org.opencron.server.job.OpencronTools;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.Date;
 
 /**
@@ -46,6 +48,11 @@ public class Terminal implements Serializable {
     private int port;
     private String userName;
     private String theme;
+    private Integer sshType;//0账户登录,1:sshKey登录
+
+    private String privateKey;
+    private String publicKey;
+    private String passphrase;
 
     @Lob
     @Column(columnDefinition = "BLOB")
@@ -67,6 +74,9 @@ public class Terminal implements Serializable {
 
     @Transient
     private String clientId;
+
+    @Transient
+    private MultipartFile sshKeyFile;
 
     public Long getId() {
         return id;
@@ -180,17 +190,66 @@ public class Terminal implements Serializable {
         this.theme = theme;
     }
 
+    public Integer getSshType() {
+        return sshType;
+    }
+
+    public void setSshType(Integer sshType) {
+        this.sshType = sshType;
+    }
+
+    public String getPrivateKey() {
+        return privateKey;
+    }
+
+    public void setPrivateKey(String privateKey) {
+        this.privateKey = privateKey;
+    }
+
+    public String getPublicKey() {
+        return publicKey;
+    }
+
+    public void setPublicKey(String publicKey) {
+        this.publicKey = publicKey;
+    }
+
+    public String getPassphrase() {
+        return passphrase;
+    }
+
+    public void setPassphrase(String passphrase) {
+        this.passphrase = passphrase;
+    }
+
+    public MultipartFile getSshKeyFile() {
+        return sshKeyFile;
+    }
+
+    public void setSshKeyFile(MultipartFile sshKeyFile) {
+        this.sshKeyFile = sshKeyFile;
+    }
+
     @Override
     public String toString() {
         return "Terminal{" +
                 "id=" + id +
+                ", name='" + name + '\'' +
                 ", userId=" + userId +
                 ", host='" + host + '\'' +
                 ", port=" + port +
                 ", userName='" + userName + '\'' +
+                ", theme='" + theme + '\'' +
+                ", sshType='" + sshType + '\'' +
+                ", privateKey='" + privateKey + '\'' +
+                ", publicKey='" + publicKey + '\'' +
+                ", passphrase='" + passphrase + '\'' +
+                ", authorization=" + Arrays.toString(authorization) +
                 ", status='" + status + '\'' +
                 ", logintime=" + logintime +
+                ", user=" + user +
                 ", password='" + password + '\'' +
+                ", clientId='" + clientId + '\'' +
                 '}';
     }
 
@@ -226,4 +285,6 @@ public class Terminal implements Serializable {
         }
 
     }
+
+
 }

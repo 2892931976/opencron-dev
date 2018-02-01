@@ -53,9 +53,6 @@ public final class SchedulerService {
     private JobService jobService;
 
     @Autowired
-    private AgentService agentService;
-
-    @Autowired
     private ExecuteService executeService;
 
     @Autowired
@@ -67,7 +64,6 @@ public final class SchedulerService {
 
     private final URL registryURL = URL.valueOf(PropertyPlaceholder.get(Constants.PARAM_OPENCRON_REGISTRY_KEY));
 
-
     public SchedulerService() {}
 
     public boolean exists(Serializable jobId) throws SchedulerException {
@@ -77,13 +73,13 @@ public final class SchedulerService {
         return quartzScheduler.checkExists(JobKey.jobKey(jobId.toString()));
     }
 
-    public void put(List<JobInfo> jobs, Job jobBean) throws SchedulerException {
+    public void put(List<JobInfo> jobs) throws SchedulerException {
         for (JobInfo jobInfo : jobs) {
-            put(jobInfo, jobBean);
+            put(jobInfo);
         }
     }
 
-    public void put(JobInfo job, Job jobBean) throws SchedulerException {
+    public void put(JobInfo job) throws SchedulerException {
         TriggerKey triggerKey = TriggerKey.triggerKey(job.getJobId().toString());
         CronTrigger cronTrigger = newTrigger().withIdentity(triggerKey).withSchedule(cronSchedule(job.getCronExp())).build();
 
@@ -92,9 +88,9 @@ public final class SchedulerService {
             this.remove(job.getJobId());
         }
         //add new job 。。。
-        JobDetail jobDetail = JobBuilder.newJob(jobBean.getClass()).withIdentity(JobKey.jobKey(job.getJobId().toString())).build();
+        JobDetail jobDetail = JobBuilder.newJob(this.executeService.getClass()).withIdentity(JobKey.jobKey(job.getJobId().toString())).build();
         jobDetail.getJobDataMap().put(job.getJobId().toString(), job);
-        jobDetail.getJobDataMap().put("jobBean", jobBean);
+        jobDetail.getJobDataMap().put("jobBean", this.executeService);
         Date date = quartzScheduler.scheduleJob(jobDetail, cronTrigger);
         logger.info("opencron: add success,cronTrigger:{}", cronTrigger, date);
     }
@@ -138,9 +134,6 @@ public final class SchedulerService {
     }
 
     public void syncTigger(JobInfo job) throws SchedulerException {
-
-        this.removeTigger(job.getJobId());
-
         //job已经被删除..
         if (job.getDeleted()) {
             //将该作业从zookeeper中移除掉....
@@ -148,35 +141,9 @@ public final class SchedulerService {
             return;
         }
 
-        job.setAgent(agentService.getAgent(job.getAgentId()));
-
-        Constants.CronType cronType = Constants.CronType.getByType(job.getCronType());
-
         //新增或修改的job往zookeeper中同步一次...
         registryService.register(registryURL,Constants.ZK_REGISTRY_JOB_PATH+"/" + job.getJobId().toString(),true);
-
-        switch (cronType) {
-            case CRONTAB:
-                /**
-                 * 将作业加到crontab任务计划
-                 */
-                opencronCollector.addTask(job);
-                break;
-            case QUARTZ:
-                /**
-                 * 将作业加到quartz任务计划
-                 */
-                this.put(job, executeService);
-                break;
-        }
-
     }
-
-    public void removeTigger(Long jobId) throws SchedulerException {
-        opencronCollector.removeTask(jobId);
-        this.remove(jobId);
-    }
-
 
     public void syncTigger(Long jobId) throws SchedulerException {
         JobInfo job = jobService.getJobInfoById(jobId);

@@ -24,6 +24,7 @@ package org.opencron.server.job;
 import it.sauronsoftware.cron4j.*;
 import org.opencron.common.Constants;
 import org.opencron.common.util.CommonUtils;
+import org.opencron.server.domain.Job;
 import org.opencron.server.service.ExecuteService;
 import org.opencron.server.service.JobService;
 import org.opencron.server.vo.JobInfo;
@@ -52,7 +53,7 @@ public class OpencronCollector implements TaskCollector {
         return  taskTable = (taskTable == null?new TaskTable():taskTable);
     }
 
-    public synchronized void addTask(final JobInfo job) {
+    public synchronized void add(final JobInfo job) {
         jobIndex.put(job.getJobId(), jobIndex.size());
         this.getTasks().add(new SchedulingPattern(job.getCronExp()), new Task() {
             @Override
@@ -62,7 +63,7 @@ public class OpencronCollector implements TaskCollector {
         });
     }
 
-    public synchronized void removeTask(Long jobId) {
+    public synchronized void remove(Long jobId) {
         if ( jobId!=null && jobIndex.get(jobId)!=null ) {
             this.getTasks().remove(jobIndex.get(jobId));
             Integer index = jobIndex.remove(jobId);

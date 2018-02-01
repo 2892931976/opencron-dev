@@ -219,7 +219,8 @@ public class TerminalController extends BaseController {
 
     @RequestMapping(value = "save.do", method = RequestMethod.POST)
     @ResponseBody
-    public String save(HttpSession session, Terminal term) throws Exception {
+    public String save(HttpSession session, Terminal term,@RequestParam(value = "sshkey", required = false) MultipartFile sshkey) throws Exception {
+        term.setSshKeyFile(sshkey);
         Terminal.AuthStatus authStatus = termService.auth(term);
         if (authStatus.equals(Terminal.AuthStatus.SUCCESS)) {
             User user = OpencronTools.getUser(session);
