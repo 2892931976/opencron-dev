@@ -121,7 +121,7 @@ public class JobController extends BaseController {
         try {
             jobService.delete(id);
             return Status.TRUE;
-        } catch (SchedulerException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return Status.FALSE;
         }

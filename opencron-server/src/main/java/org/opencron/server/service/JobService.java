@@ -284,7 +284,7 @@ public class JobService {
 
 
     @Transactional(rollbackFor = Exception.class)
-    public void delete(Long jobId) throws SchedulerException {
+    public void delete(Long jobId) throws Exception {
         Job job = getJob(jobId);
         if (job != null) {
             //单一任务,直接执行删除
@@ -308,7 +308,7 @@ public class JobService {
     }
 
 
-    public void saveFlowJob(Job job, List<Job> children) throws SchedulerException {
+    public void saveFlowJob(Job job, List<Job> children) throws Exception {
         job.setLastChild(false);
         job.setUpdateTime(new Date());
         job.setFlowNum(0);//顶层sort是0
