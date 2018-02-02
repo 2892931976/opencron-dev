@@ -23,12 +23,9 @@ package org.opencron.server.controller;
 
 import java.util.*;
 
-import com.alibaba.fastjson.JSON;
-import org.apache.zookeeper.data.Stat;
 import org.opencron.common.Constants;
 import org.opencron.common.util.DigestUtils;
 import org.opencron.common.util.StringUtils;
-import org.opencron.common.util.collection.ParamsMap;
 import org.opencron.server.domain.Job;
 import org.opencron.server.job.OpencronTools;
 import org.opencron.server.service.*;
@@ -142,7 +139,7 @@ public class JobController extends BaseController {
     }
 
     @RequestMapping(value = "save.do", method = RequestMethod.POST)
-    public String save(HttpSession session, Job job, HttpServletRequest request) throws SchedulerException {
+    public String save(HttpSession session, Job job, HttpServletRequest request) throws Exception {
         job.setCommand(DigestUtils.passBase64(job.getCommand()));
         job.setDeleted(false);
         if (job.getJobId() != null) {
@@ -246,7 +243,7 @@ public class JobController extends BaseController {
 
     @RequestMapping(value = "edit.do", method = RequestMethod.POST)
     @ResponseBody
-    public Status edit(HttpSession session, Job job) throws SchedulerException {
+    public Status edit(HttpSession session, Job job) throws Exception {
         Job dbJob = jobService.getJob(job.getJobId());
         if (!jobService.checkJobOwner(session, dbJob.getUserId())) return Status.FALSE;
         dbJob.setCronType(job.getCronType());
@@ -270,7 +267,7 @@ public class JobController extends BaseController {
 
     @RequestMapping(value = "editcmd.do", method = RequestMethod.POST)
     @ResponseBody
-    public Status editCmd(HttpSession session, Long jobId, String command) throws SchedulerException {
+    public Status editCmd(HttpSession session, Long jobId, String command) throws Exception {
         command = DigestUtils.passBase64(command);
         Job dbJob = jobService.getJob(jobId);
         if (!jobService.checkJobOwner(session, dbJob.getUserId())) return Status.FALSE;

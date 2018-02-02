@@ -21,7 +21,6 @@
 
 package org.opencron.server.job;
 
-import org.opencron.common.logging.LoggerFactory;
 import org.opencron.server.service.*;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,7 +45,6 @@ public class OpencronInitiator {
     private OpencronRegistry opencronRegistry;
 
     /**
-     * 每台server启动起来都必须往注册中心注册信息...注册中心在重新统一分配任务到每台server上...
      *
      * @throws Exception
      */
@@ -59,7 +57,6 @@ public class OpencronInitiator {
         //init job...
         schedulerService.initJob();
 
-        //监控agent的增加和删除
         opencronRegistry.agentRegister();
 
         opencronRegistry.serverRegister();

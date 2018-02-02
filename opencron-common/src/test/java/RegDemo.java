@@ -27,8 +27,7 @@ public class RegDemo {
 
     public static void main(String[] args) {
 
-        String xx = "ffdsfd/fdsafds/fdsa";
-        System.out.println(xx.replaceFirst("/$", ""));
+        System.out.println() ;
 
 
     }

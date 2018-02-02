@@ -162,7 +162,7 @@ public class OpencronRegistry {
                         if ( SERVER_ID.equals(hash.get(jobId)) ) {
                             if (!jobMap.containsKey(jobId)) {
                                 jobMap.put(jobId,jobId);
-                                distribute(job.getJobId());
+                                jobDistribute(job.getJobId());
                             }
                         }else {
                             jobMap.remove(jobId);
@@ -216,7 +216,7 @@ public class OpencronRegistry {
                             ConsistentHash<String> hash = new ConsistentHash<String>(servers);
                             if (hash.get(job).equals(SERVER_ID)) {
                                 jobMap.put(job, job);
-                                distribute(job);
+                                jobDistribute(job);
                             }
                         }
                     }
@@ -252,16 +252,16 @@ public class OpencronRegistry {
     }
 
     //job新增的时候手动触发.....
-    public void jobAddChanged(Serializable jobId) {
+    public void jobRegister(Serializable jobId) {
         registryService.register(registryURL,Constants.ZK_REGISTRY_JOB_PATH+"/"+jobId,false);
     }
 
     //job删除的时候手动触发.....
-    public void jobRemoveChanged(Serializable jobId) {
+    public void jobUnRegister(Serializable jobId) {
         registryService.unregister(registryURL,Constants.ZK_REGISTRY_JOB_PATH+"/"+jobId);
     }
 
-    private void distribute(Serializable jobId) throws Exception {
+    public void jobDistribute(Serializable jobId) throws Exception {
         JobInfo jobInfo = jobService.getJobInfoById(CommonUtils.toLong(jobId));
         Constants.CronType cronType = Constants.CronType.getByType(jobInfo.getCronType());
         switch (cronType) {
@@ -278,8 +278,6 @@ public class OpencronRegistry {
         opencronCollector.remove(toLong(jobId));
         schedulerService.remove(jobId);
     }
-
-
 
 }
     

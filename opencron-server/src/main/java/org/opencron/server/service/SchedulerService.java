@@ -22,15 +22,10 @@
 
 package org.opencron.server.service;
 
-import org.opencron.common.Constants;
-import org.opencron.common.util.PropertyPlaceholder;
-import org.opencron.registry.URL;
-import org.opencron.registry.api.RegistryService;
 import org.opencron.server.job.OpencronCollector;
 import org.opencron.server.job.OpencronRegistry;
 import org.opencron.server.vo.JobInfo;
 import org.quartz.*;
-import org.quartz.Job;
 import org.quartz.Scheduler;
 import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
@@ -63,10 +58,6 @@ public final class SchedulerService {
     private OpencronRegistry opencronRegistry;
 
     private Scheduler quartzScheduler;
-
-    private RegistryService registryService = new RegistryService();
-
-    private final URL registryURL = URL.valueOf(PropertyPlaceholder.get(Constants.PARAM_OPENCRON_REGISTRY_KEY));
 
     public SchedulerService() {}
 
@@ -132,29 +123,29 @@ public final class SchedulerService {
         if (exists(jobId)) {
             TriggerKey triggerKey = TriggerKey.triggerKey(jobId.toString());
             quartzScheduler.resumeTrigger(triggerKey);
-        } else {
-            //skip.....
         }
     }
 
-    public void syncTigger(JobInfo job) throws SchedulerException {
+    public void syncTigger(JobInfo job) throws Exception {
         //job已经被删除..
         if (job.getDeleted()) {
             //将该作业从zookeeper中移除掉....
-            opencronRegistry.jobRemoveChanged(job.getJobId());
+            opencronRegistry.jobUnRegister(job.getJobId());
             return;
         }
-
         //新增或修改的job往zookeeper中同步一次...
-        opencronRegistry.jobAddChanged(job.getJobId());
+        opencronRegistry.jobRegister(job.getJobId());
+
+        //还需要手动往quartz或crontab里同步一份
+        opencronRegistry.jobDistribute(job.getJobId());
     }
 
-    public void syncTigger(Long jobId) throws SchedulerException {
+    public void syncTigger(Long jobId) throws Exception {
         JobInfo job = jobService.getJobInfoById(jobId);
         this.syncTigger(job);
     }
 
-    public void  initJob() throws SchedulerException {
+    public void initJob() throws SchedulerException {
         //crontab
         it.sauronsoftware.cron4j.Scheduler scheduler = new it.sauronsoftware.cron4j.Scheduler();
         scheduler.addTaskCollector(opencronCollector);

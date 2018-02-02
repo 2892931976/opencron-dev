@@ -54,13 +54,19 @@ public class OpencronCollector implements TaskCollector {
     }
 
     public synchronized void add(final JobInfo job) {
-        jobIndex.put(job.getJobId(), jobIndex.size());
-        this.getTasks().add(new SchedulingPattern(job.getCronExp()), new Task() {
-            @Override
-            public void execute(TaskExecutionContext context) throws RuntimeException {
-                executeService.executeJob(job, Constants.ExecType.AUTO);
-            }
-        });
+        if ( job != null && !exists(job.getJobId()) ) {
+            jobIndex.put(job.getJobId(), jobIndex.size());
+            this.getTasks().add(new SchedulingPattern(job.getCronExp()), new Task() {
+                @Override
+                public void execute(TaskExecutionContext context) throws RuntimeException {
+                    executeService.executeJob(job, Constants.ExecType.AUTO);
+                }
+            });
+        }
+    }
+
+    public boolean exists(final Long jobId) {
+        return jobIndex.containsKey(jobId);
     }
 
     public synchronized void remove(Long jobId) {
