@@ -22,7 +22,6 @@
 package org.opencron.server.job;
 
 import org.opencron.server.service.*;
-import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

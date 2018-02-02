@@ -193,7 +193,7 @@ public class AgentBootstrap implements Serializable {
             String registryAddress = AgentProperties.getProperty(Constants.PARAM_OPENCRON_REGISTRY_KEY);
             final URL url = URL.valueOf(registryAddress);
             final RegistryService registryService = new RegistryService();
-            registryService.register(url, path, false);
+            registryService.register(url, path, true);
 
             logger.info("[opencron] agent register to zookeeper done");
 

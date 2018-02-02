@@ -253,7 +253,7 @@ public class OpencronRegistry {
 
     //job新增的时候手动触发.....
     public void jobRegister(Serializable jobId) {
-        registryService.register(registryURL,Constants.ZK_REGISTRY_JOB_PATH+"/"+jobId,false);
+        registryService.register(registryURL,Constants.ZK_REGISTRY_JOB_PATH+"/"+jobId,true);
     }
 
     //job删除的时候手动触发.....
