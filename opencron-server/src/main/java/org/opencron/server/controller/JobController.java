@@ -35,7 +35,6 @@ import org.opencron.server.domain.Agent;
 import org.opencron.server.vo.CrontabInfo;
 import org.opencron.server.vo.JobInfo;
 import org.opencron.server.vo.Status;
-import org.quartz.SchedulerException;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
