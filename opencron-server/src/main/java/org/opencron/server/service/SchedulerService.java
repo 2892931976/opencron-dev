@@ -27,6 +27,7 @@ import org.opencron.common.util.PropertyPlaceholder;
 import org.opencron.registry.URL;
 import org.opencron.registry.api.RegistryService;
 import org.opencron.server.job.OpencronCollector;
+import org.opencron.server.job.OpencronRegistry;
 import org.opencron.server.vo.JobInfo;
 import org.quartz.*;
 import org.quartz.Job;
@@ -57,6 +58,9 @@ public final class SchedulerService {
 
     @Autowired
     private OpencronCollector opencronCollector;
+
+    @Autowired
+    private OpencronRegistry opencronRegistry;
 
     private Scheduler quartzScheduler;
 
@@ -137,12 +141,12 @@ public final class SchedulerService {
         //job已经被删除..
         if (job.getDeleted()) {
             //将该作业从zookeeper中移除掉....
-            registryService.unregister(registryURL,Constants.ZK_REGISTRY_JOB_PATH+"/" + job.getJobId().toString());
+            opencronRegistry.jobRemoveChanged(job.getJobId());
             return;
         }
 
         //新增或修改的job往zookeeper中同步一次...
-        registryService.register(registryURL,Constants.ZK_REGISTRY_JOB_PATH+"/" + job.getJobId().toString(),true);
+        opencronRegistry.jobAddChanged(job.getJobId());
     }
 
     public void syncTigger(Long jobId) throws SchedulerException {
