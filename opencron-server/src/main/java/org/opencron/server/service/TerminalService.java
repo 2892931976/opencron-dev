@@ -128,6 +128,7 @@ public class TerminalService {
                             keyFile.delete();
                         }
                         //将数据库中的私钥写到用户的机器上
+
                         IOUtils.writeFile(keyFile,new ByteArrayInputStream(terminal.getPrivateKey()));
 
                         if ( notEmpty(terminal.getPassphrase()) ) {

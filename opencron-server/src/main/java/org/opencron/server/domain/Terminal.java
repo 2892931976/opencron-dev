@@ -21,6 +21,7 @@
 package org.opencron.server.domain;
 
 import com.alibaba.fastjson.annotation.JSONField;
+import org.opencron.common.util.CommonUtils;
 import org.opencron.common.util.DigestUtils;
 import org.opencron.common.util.RSAUtils;
 import org.opencron.server.job.OpencronTools;
@@ -201,19 +202,38 @@ public class Terminal implements Serializable {
     }
 
     public byte[] getPrivateKey() {
-        return privateKey;
+        //拿本地的公钥解密ssh的私钥
+        try {
+            return RSAUtils.decryptByPrivateKey(this.privateKey, OpencronTools.Auth.getPrivateKey());
+        } catch (Exception e) {
+            throw new RuntimeException("[opencron] getPrivateKey error!");
+        }
     }
 
-    public void setPrivateKey(byte[] privateKey) {
-        this.privateKey = privateKey;
+    public void setPrivateKey(byte[] privateKey) throws Exception {
+        //拿本地的公钥加密ssh的私钥
+        this.privateKey = RSAUtils.encryptByPublicKey(privateKey, OpencronTools.Auth.getPublicKey());;
     }
 
     public String getPassphrase() {
-        return passphrase;
+        if (CommonUtils.notEmpty(this.passphrase)) {
+            try {
+                byte[] decodedData = RSAUtils.decryptByPrivateKey(this.passphrase.getBytes(), OpencronTools.Auth.getPrivateKey());
+                return new String(decodedData);
+            } catch (Exception e) {
+            }
+        }
+        return null;
     }
 
     public void setPassphrase(String passphrase) {
-        this.passphrase = passphrase;
+        if (CommonUtils.notEmpty(passphrase)) {
+            try {
+                byte[] passbyte = RSAUtils.decryptByPrivateKey(passphrase.getBytes(), OpencronTools.Auth.getPrivateKey());
+                this.passphrase = new String(passbyte);
+            } catch (Exception e) {
+            }
+        }
     }
 
     public String getPrivateKeyPath(){

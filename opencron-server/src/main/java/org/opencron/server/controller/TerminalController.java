@@ -77,11 +77,11 @@ public class TerminalController extends BaseController {
             OpencronTools.setSshSessionId(session, token);
 
             return ParamsMap.map().put(
-                    "status","success",
-                    "url", String.format("/terminal/open.htm?token=%s",token)
+                    "status", "success",
+                    "url", String.format("/terminal/open.htm?token=%s", token)
             );
         } else {
-            return ParamsMap.map().set("status",authStatus.status);
+            return ParamsMap.map().set("status", authStatus.status);
         }
     }
 
@@ -218,7 +218,7 @@ public class TerminalController extends BaseController {
 
     @RequestMapping(value = "save.do", method = RequestMethod.POST)
     @ResponseBody
-    public String save(HttpSession session, Terminal term,@RequestParam(value = "sshkey", required = false) MultipartFile sshkey) throws Exception {
+    public String save(HttpSession session, Terminal term, @RequestParam(value = "sshkey", required = false) MultipartFile sshkey) throws Exception {
         term.setSshKeyFile(sshkey);
         Terminal.AuthStatus authStatus = termService.auth(term);
         if (authStatus.equals(Terminal.AuthStatus.SUCCESS)) {

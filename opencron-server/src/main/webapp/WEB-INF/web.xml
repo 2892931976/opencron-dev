@@ -74,7 +74,7 @@
 
     <servlet>
         <servlet-name>opencronServlet</servlet-name>
-        <servlet-class>org.opencron.server.handler.OpencronServlet</servlet-class>
+        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
         <init-param>
             <param-name>contextConfigLocation</param-name>
             <param-value>classpath*:app-mvc.xml</param-value>
