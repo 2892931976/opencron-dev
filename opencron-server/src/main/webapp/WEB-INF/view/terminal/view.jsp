@@ -524,7 +524,7 @@
                     <form class="form-horizontal" role="form" id="sshform">
                         <input type="hidden" id="sshid">
                         <div class="form-group">
-                            <label for="sshname" class="col-lab control-label"><i class="glyphicon glyphicon-leaf"></i>&nbsp;&nbsp;名&nbsp;&nbsp;&nbsp;称&nbsp;&nbsp;</label>
+                            <label for="sshname" class="col-lab control-label">&nbsp;&nbsp;<i class="glyphicon glyphicon-leaf"></i>&nbsp;&nbsp;&nbsp;名&nbsp;&nbsp;&nbsp;称&nbsp;&nbsp;</label>
                             <div class="col-md-9">
                                 <input type="text" class="form-control " id="sshname" name="name"
                                        placeholder="请输入终端的实例名称">&nbsp;&nbsp;<label class="error_msg" id="sshname_lab"></label>
@@ -532,7 +532,7 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="sshhost" class="col-lab control-label"><i class="glyphicon glyphicon-tag"></i>&nbsp;&nbsp;地&nbsp;&nbsp;&nbsp;址&nbsp;&nbsp;</label>
+                            <label for="sshhost" class="col-lab control-label">&nbsp;&nbsp;<i class="glyphicon glyphicon-tag"></i>&nbsp;&nbsp;&nbsp;地&nbsp;&nbsp;&nbsp;址&nbsp;&nbsp;</label>
                             <div class="col-md-9">
                                 <input type="text" class="form-control " id="sshhost"
                                        placeholder="请输入主机地址(IP)">&nbsp;&nbsp;<label class="error_msg" id="sshhost_lab"></label>
@@ -540,7 +540,7 @@
                         </div>
 
                         <div class="form-group" >
-                            <label for="sshport" class="col-lab control-label"><i class="glyphicon glyphicon-question-sign"></i>&nbsp;&nbsp;端&nbsp;&nbsp;&nbsp;口&nbsp;&nbsp;</label>
+                            <label for="sshport" class="col-lab control-label">&nbsp;&nbsp;<i class="glyphicon glyphicon-question-sign"></i>&nbsp;&nbsp;&nbsp;端&nbsp;&nbsp;&nbsp;口&nbsp;&nbsp;</label>
                             <div class="col-md-9">
                                 <input type="text" class="form-control " id="sshport"
                                        placeholder="请输入端口">&nbsp;&nbsp;<label class="error_msg" id="sshport_lab"></label>
@@ -548,7 +548,7 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="sshuser" class="col-lab control-label"><i class="glyphicon glyphicon-user"></i>&nbsp;&nbsp;帐&nbsp;&nbsp;&nbsp;号&nbsp;&nbsp;</label>
+                            <label for="sshuser" class="col-lab control-label">&nbsp;&nbsp;<i class="glyphicon glyphicon-user"></i>&nbsp;&nbsp;&nbsp;帐&nbsp;&nbsp;&nbsp;号&nbsp;&nbsp;</label>
                             <div class="col-md-9">
                                 <input type="text" class="form-control " id="sshuser"
                                        placeholder="请输入账户">&nbsp;&nbsp;<label class="error_msg" id="sshuser_lab"></label>
@@ -556,7 +556,7 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="sshhost" class="col-lab control-label"><i class="glyphicon glyphicon-transfer"></i>&nbsp;&nbsp;方&nbsp;&nbsp;&nbsp;式&nbsp;&nbsp;</label>
+                            <label for="sshhost" class="col-lab control-label">&nbsp;&nbsp;<i class="glyphicon glyphicon-transfer"></i>&nbsp;&nbsp;&nbsp;方&nbsp;&nbsp;&nbsp;式&nbsp;&nbsp;</label>
                             <div class="col-md-9 sshtype">
                                 <ul class="nav nav-tabs">
                                     <input type="hidden" id="sshtype" name="sshType" value="0"/>
@@ -573,7 +573,7 @@
                         <div class="form-group tab-content">
                             <div class="tab-pane fade in active" id="home">
                                 <div class="form-group">
-                                    <label for="sshpwd" class="col-lab control-label"><i class="glyphicon glyphicon-lock"></i>&nbsp;&nbsp;密&nbsp;&nbsp;&nbsp;码&nbsp;&nbsp;</label>
+                                    <label for="sshpwd" class="col-lab control-label">&nbsp;&nbsp;<i class="glyphicon glyphicon-lock"></i>&nbsp;&nbsp;&nbsp;密&nbsp;&nbsp;&nbsp;码&nbsp;&nbsp;</label>
                                     <div class="col-md-9">
                                         <input type="password" class="form-control " id="sshpwd" placeholder="请输入密码"/>&nbsp;&nbsp;<label class="error_msg" id="sshpwd_lab"></label>
                                     </div>
@@ -582,14 +582,14 @@
 
                             <div class="tab-pane fade" id="sshkey">
                                 <div class="form-group">
-                                    <label for="keyfile" class="col-lab control-label"><i class="glyphicon glyphicon-file"></i>&nbsp;SSH KEY</label>
+                                    <label for="keyfile" class="col-lab control-label">&nbsp;&nbsp;<i class="glyphicon glyphicon-file"></i>&nbsp;SSH KEY</label>
                                     <div class="col-md-9">
-                                        <input type="file" class="file form-control" data-show-preview="false" id="keyfile" value="请点击上传私钥文件" name="sshkey"/>&nbsp;&nbsp;<label class="error_msg" id="keyfile_lab"></label>
+                                        <input type="file" class="file form-control" data-show-preview="false" id="keyfile" value="请点击上传私钥文件" name="sshkey"/>&nbsp;&nbsp;&nbsp;<label class="error_msg" id="keyfile_lab"></label>
                                     </div>
                                 </div>
 
                                 <div class="form-group">
-                                    <label for="passphrase" class="col-lab control-label"><i class="glyphicon glyphicon-lock"></i>&nbsp;&nbsp;密&nbsp;&nbsp;&nbsp;钥&nbsp;&nbsp;</label>
+                                    <label for="passphrase" class="col-lab control-label">&nbsp;&nbsp;<i class="glyphicon glyphicon-lock"></i>&nbsp;&nbsp;&nbsp;密&nbsp;&nbsp;&nbsp;钥&nbsp;&nbsp;</label>
                                     <div class="col-md-9">
                                         <input type="password" class="form-control " id="passphrase" placeholder="请输入SSH密钥"/>&nbsp;&nbsp;<label class="error_msg" id="passphrase_lab"></label>
                                     </div>
