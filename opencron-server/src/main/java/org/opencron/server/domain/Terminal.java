@@ -55,7 +55,11 @@ public class Terminal implements Serializable {
     @Column(columnDefinition = "BLOB")
     @JSONField(serialize = false)
     private byte[] privateKey;
-    private String passphrase;
+
+    @Lob
+    @Column(columnDefinition = "BLOB")
+    @JSONField(serialize = false)
+    private byte[] passphrase;
 
     @Lob
     @Column(columnDefinition = "BLOB")
@@ -74,6 +78,10 @@ public class Terminal implements Serializable {
     @Transient
     @JSONField(serialize = false)
     private String password;
+
+    @Transient
+    @JSONField(serialize = false)
+    private String phrase;
 
     @Transient
     private String clientId;
@@ -212,27 +220,29 @@ public class Terminal implements Serializable {
 
     public void setPrivateKey(byte[] privateKey) throws Exception {
         //拿本地的公钥加密ssh的私钥
-        this.privateKey = RSAUtils.encryptByPublicKey(privateKey, OpencronTools.Auth.getPublicKey());;
+        this.privateKey = RSAUtils.encryptByPublicKey(privateKey, OpencronTools.Auth.getPublicKey());
     }
 
-    public String getPassphrase() {
-        if (CommonUtils.notEmpty(this.passphrase)) {
-            try {
-                byte[] decodedData = RSAUtils.decryptByPrivateKey(this.passphrase.getBytes(), OpencronTools.Auth.getPrivateKey());
-                return new String(decodedData);
-            } catch (Exception e) {
-            }
+    public byte[] getPassphrase() {
+        return passphrase;
+    }
+
+    public void setPassphrase(byte[] passphrase) {
+        this.passphrase = passphrase;
+    }
+
+    public String getPhrase() {
+        try {
+            byte[] decodedData = RSAUtils.decryptByPrivateKey(this.passphrase, OpencronTools.Auth.getPrivateKey());
+            return new String(decodedData);
+        } catch (Exception e) {
         }
         return null;
     }
 
-    public void setPassphrase(String passphrase) {
-        if (CommonUtils.notEmpty(passphrase)) {
-            try {
-                byte[] passbyte = RSAUtils.decryptByPrivateKey(passphrase.getBytes(), OpencronTools.Auth.getPrivateKey());
-                this.passphrase = new String(passbyte);
-            } catch (Exception e) {
-            }
+    public void setPhrase(String phrase) throws Exception {
+        if (phrase != null) {
+            this.passphrase = RSAUtils.encryptByPublicKey(phrase.getBytes(), OpencronTools.Auth.getPublicKey());
         }
     }
 

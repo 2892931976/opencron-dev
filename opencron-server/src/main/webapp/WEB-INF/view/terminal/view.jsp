@@ -246,7 +246,7 @@
                 form.append("sshType",1);
                 form.append("port",port);
                 form.append("host",host);
-                form.append("passphrase",$("#passphrase").val());
+                form.append("phrase",$("#passphrase").val());
                 form.append("sshkey",$('input[name=sshkey]')[0].files[0]);
                 $.ajax({
                     url: "${contextPath}/terminal/save.do",
@@ -295,7 +295,7 @@
                             data: {
                                 "name":name,
                                 "userName": user,
-                                "type":sshtype,
+                                "sshType":sshtype,
                                 "password": toBase64(pwd),
                                 "port": port,
                                 "host": host

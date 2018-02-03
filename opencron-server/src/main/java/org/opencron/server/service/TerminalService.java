@@ -96,12 +96,14 @@ public class TerminalService {
     }
 
     public boolean merge(Terminal term) throws Exception {
-        Terminal dbTerm = queryDao.get(Terminal.class,term.getId());
-        if (dbTerm != null) {
-            term.setId(dbTerm.getId());
-        }
         try {
-            queryDao.merge(term);
+            if (term.getId()==null) {
+                queryDao.save(term);
+            }else {
+                Terminal terminal = queryDao.get(Terminal.class,term.getId());
+                term.setId(terminal.getId());
+                queryDao.merge(term);
+            }
             return true;
         } catch (Exception e) {
             e.printStackTrace();
@@ -131,9 +133,9 @@ public class TerminalService {
 
                         IOUtils.writeFile(keyFile,new ByteArrayInputStream(terminal.getPrivateKey()));
 
-                        if ( notEmpty(terminal.getPassphrase()) ) {
+                        if ( notEmpty(terminal.getPhrase()) ) {
                             //设置带口令的密钥
-                            jSch.addIdentity(terminal.getPrivateKeyPath(), terminal.getPassphrase());
+                            jSch.addIdentity(terminal.getPrivateKeyPath(), terminal.getPhrase());
                         } else {
                             //设置不带口令的密钥
                             jSch.addIdentity(terminal.getPrivateKeyPath());
@@ -290,9 +292,9 @@ public class TerminalService {
                             //将数据库中的私钥写到用户的机器上
                             IOUtils.writeFile(keyFile,new ByteArrayInputStream(terminal.getPrivateKey()));
                         }
-                        if ( notEmpty(terminal.getPassphrase()) ) {
+                        if ( notEmpty(terminal.getPhrase()) ) {
                             //设置带口令的密钥
-                            jSch.addIdentity(terminal.getPrivateKeyPath(), terminal.getPassphrase());
+                            jSch.addIdentity(terminal.getPrivateKeyPath(), terminal.getPhrase());
                         } else {
                             //设置不带口令的密钥
                             jSch.addIdentity(terminal.getPrivateKeyPath());
