@@ -129,6 +129,8 @@
                 $("#sshname").val(unEscapeHtml(json.name));
                 $("#sshport").val(json.port);
                 $("#sshhost").val(json.host).attr("readonly","readonly");
+                $("#sshtype").val(json.sshType);
+                $(".nav-tabs [type="+json.sshType+"]").tab("show");
                 $("#sshuser")[0].focus();
                 $("#sshModal").modal("show");
             });
@@ -591,7 +593,7 @@
                                 <div class="form-group">
                                     <label for="passphrase" class="col-lab control-label">&nbsp;&nbsp;<i class="glyphicon glyphicon-lock"></i>&nbsp;&nbsp;&nbsp;密&nbsp;&nbsp;&nbsp;钥&nbsp;&nbsp;</label>
                                     <div class="col-md-9">
-                                        <input type="password" class="form-control " id="passphrase" placeholder="请输入SSH密钥"/>&nbsp;&nbsp;<label class="error_msg" id="passphrase_lab"></label>
+                                        <input type="password" class="form-control " id="passphrase" placeholder="请输入SSH密钥,如未设置不用输入"/>&nbsp;&nbsp;<label class="error_msg" id="passphrase_lab"></label>
                                     </div>
                                 </div>
 
