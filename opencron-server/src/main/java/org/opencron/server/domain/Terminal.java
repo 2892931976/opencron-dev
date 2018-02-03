@@ -50,8 +50,10 @@ public class Terminal implements Serializable {
     private String theme;
     private Integer sshType;//0账户登录,1:sshKey登录
 
-    private String privateKey;
-    private String publicKey;
+    @Lob
+    @Column(columnDefinition = "BLOB")
+    @JSONField(serialize = false)
+    private byte[] privateKey;
     private String passphrase;
 
     @Lob
@@ -198,20 +200,12 @@ public class Terminal implements Serializable {
         this.sshType = sshType;
     }
 
-    public String getPrivateKey() {
+    public byte[] getPrivateKey() {
         return privateKey;
     }
 
-    public void setPrivateKey(String privateKey) {
+    public void setPrivateKey(byte[] privateKey) {
         this.privateKey = privateKey;
-    }
-
-    public String getPublicKey() {
-        return publicKey;
-    }
-
-    public void setPublicKey(String publicKey) {
-        this.publicKey = publicKey;
     }
 
     public String getPassphrase() {
@@ -220,6 +214,10 @@ public class Terminal implements Serializable {
 
     public void setPassphrase(String passphrase) {
         this.passphrase = passphrase;
+    }
+
+    public String getPrivateKeyPath(){
+        return OpencronTools.Auth.getKeyPath().concat("/").concat(this.getHost()).concat("@").concat(this.getUserName()).concat("_id_rsa");
     }
 
     public MultipartFile getSshKeyFile() {
@@ -242,7 +240,6 @@ public class Terminal implements Serializable {
                 ", theme='" + theme + '\'' +
                 ", sshType='" + sshType + '\'' +
                 ", privateKey='" + privateKey + '\'' +
-                ", publicKey='" + publicKey + '\'' +
                 ", passphrase='" + passphrase + '\'' +
                 ", authorization=" + Arrays.toString(authorization) +
                 ", status='" + status + '\'' +

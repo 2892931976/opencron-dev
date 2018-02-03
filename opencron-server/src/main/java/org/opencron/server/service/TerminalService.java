@@ -25,6 +25,7 @@ import com.jcraft.jsch.*;
 import org.opencron.common.Constants;
 import org.opencron.common.util.CommonUtils;
 import org.opencron.common.util.DigestUtils;
+import org.opencron.common.util.IOUtils;
 import org.opencron.server.dao.QueryDao;
 import org.opencron.server.domain.Terminal;
 import org.opencron.server.domain.User;
@@ -41,9 +42,11 @@ import org.springframework.web.socket.WebSocketSession;
 
 import javax.crypto.BadPaddingException;
 import javax.servlet.http.HttpSession;
+import javax.swing.*;
 import java.io.*;
 import java.text.DecimalFormat;
 import java.util.*;
+import java.util.Timer;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static org.opencron.common.util.CommonUtils.notEmpty;
@@ -87,13 +90,13 @@ public class TerminalService {
     @Autowired
     private QueryDao queryDao;
 
-    public boolean exists(Long userId, String host) throws Exception {
-        Terminal terminal = queryDao.sqlUniqueQuery(Terminal.class, "SELECT * FROM T_TERMINAL WHERE userId=? AND host=?", userId, host);
-        return terminal != null;
+    public boolean exists(String userName, String host) throws Exception {
+        Integer count = queryDao.hqlIntUniqueResult("select count(1) from Terminal where userName=? and host=?", userName, host);
+        return count > 0;
     }
 
     public boolean merge(Terminal term) throws Exception {
-        Terminal dbTerm = queryDao.sqlUniqueQuery(Terminal.class, "SELECT * FROM T_TERMINAL WHERE ID=?", term.getId());
+        Terminal dbTerm = queryDao.get(Terminal.class,term.getId());
         if (dbTerm != null) {
             term.setId(dbTerm.getId());
         }
@@ -110,33 +113,42 @@ public class TerminalService {
         JSch jSch = new JSch();
         Session session = null;
         try {
+            session = jSch.getSession(terminal.getUserName(), terminal.getHost(), terminal.getPort());
             Constants.SshType sshType = Constants.SshType.getByType(terminal.getSshType());
             switch (sshType) {
                 case SSHKEY:
-                    jSch.getSession(terminal.getHost());
                     //需要读取用户上传的sshKey
                     if ( terminal.getSshKeyFile()!=null ) {
-                       //todo parse
+                        //将keyfile读取到数据库
+                        terminal.setPrivateKey(terminal.getSshKeyFile().getBytes());
                     }
-                    //设置密钥和密码
                     if ( notEmpty(terminal.getPrivateKey()) ) {
+                        File keyFile = new File(terminal.getPrivateKeyPath());
+                        if (keyFile.exists()) {
+                            keyFile.delete();
+                        }
+                        //将数据库中的私钥写到用户的机器上
+                        IOUtils.writeFile(keyFile,new ByteArrayInputStream(terminal.getPrivateKey()));
+
                         if ( notEmpty(terminal.getPassphrase()) ) {
                             //设置带口令的密钥
-                            jSch.addIdentity(terminal.getPrivateKey(), terminal.getPassphrase());
+                            jSch.addIdentity(terminal.getPrivateKeyPath(), terminal.getPassphrase());
                         } else {
                             //设置不带口令的密钥
-                            jSch.addIdentity(terminal.getPrivateKey());
+                            jSch.addIdentity(terminal.getPrivateKeyPath());
                         }
+                        UserInfo userInfo = new MyUserInfo();
+                        session.setUserInfo(userInfo);
                     }
+                    session.setConfig("StrictHostKeyChecking", "no");
                     break;
                 case ACCOUNT:
-                    session = jSch.getSession(terminal.getUserName(), terminal.getHost(), terminal.getPort());
+                    session.setConfig("StrictHostKeyChecking", "no");
+                    session.setConfig("PreferredAuthentications", "publickey,keyboard-interactive,password");
                     session.setPassword(terminal.getPassword());
                     break;
             }
 
-            session.setConfig("StrictHostKeyChecking", "no");
-            session.setConfig("PreferredAuthentications", "publickey,keyboard-interactive,password");
             session.connect(TerminalClient.SESSION_TIMEOUT);
             return Terminal.AuthStatus.SUCCESS;
         } catch (Exception e) {
@@ -180,7 +192,8 @@ public class TerminalService {
         if (!OpencronTools.isPermission(session) && !user.getUserId().equals(term.getUserId())) {
             return "error";
         }
-        int count = queryDao.createSQLQuery("DELETE FROM T_TERMINAL WHERE id=?", term.getId()).executeUpdate();
+
+        int count = queryDao.createQuery("delete from Terminal where id=?",term.getId()).executeUpdate();
         return String.valueOf(count > 0);
     }
 
@@ -191,13 +204,39 @@ public class TerminalService {
     }
 
     public List<Terminal> getListByUser(User user) {
-        String sql = "SELECT * FROM  T_TERMINAL WHERE USERID = ? ";
-        return queryDao.sqlQuery(Terminal.class, sql, user.getUserId());
+        return queryDao.hqlQuery("from  Terminal where userId =?", user.getUserId());
     }
 
     public void theme(Terminal terminal, String theme) throws Exception {
         terminal.setTheme(theme);
         merge(terminal);
+    }
+
+    private static class MyUserInfo implements UserInfo {
+
+        //private String passphrase = null;
+
+        public MyUserInfo() {
+            //this.passphrase = passphrase;
+        }
+        public String getPassphrase() {
+            return null;//passphrase;
+        }
+        public String getPassword() {
+            return null;
+        }
+        public boolean promptPassphrase(String s) {
+            return true;
+        }
+        public boolean promptPassword(String s) {
+            return true;
+        }
+        public boolean promptYesNo(String s) {
+            return true;
+        }
+        public void showMessage(String s) {
+            System.out.println(s);
+        }
     }
 
     public static class TerminalClient {
@@ -241,10 +280,33 @@ public class TerminalService {
 
         public void openTerminal(final int cols, int rows, int width, int height) throws Exception {
             this.session = jSch.getSession(terminal.getUserName(), terminal.getHost(), terminal.getPort());
-            this.session.setPassword(terminal.getPassword());
-
-            this.session.setConfig("StrictHostKeyChecking", "no");
-            this.session.setConfig("PreferredAuthentications", "publickey,keyboard-interactive,password");
+            Constants.SshType sshType = Constants.SshType.getByType(terminal.getSshType());
+            switch (sshType) {
+                case SSHKEY:
+                    if ( notEmpty(terminal.getPrivateKey()) ) {
+                        File keyFile = new File(terminal.getPrivateKeyPath());
+                        if (!keyFile.exists()) {
+                            //将数据库中的私钥写到用户的机器上
+                            IOUtils.writeFile(keyFile,new ByteArrayInputStream(terminal.getPrivateKey()));
+                        }
+                        if ( notEmpty(terminal.getPassphrase()) ) {
+                            //设置带口令的密钥
+                            jSch.addIdentity(terminal.getPrivateKeyPath(), terminal.getPassphrase());
+                        } else {
+                            //设置不带口令的密钥
+                            jSch.addIdentity(terminal.getPrivateKeyPath());
+                        }
+                        UserInfo userInfo = new MyUserInfo();
+                        session.setUserInfo(userInfo);
+                    }
+                    session.setConfig("StrictHostKeyChecking", "no");
+                    break;
+                case ACCOUNT:
+                    session.setConfig("StrictHostKeyChecking", "no");
+                    session.setConfig("PreferredAuthentications", "publickey,keyboard-interactive,password");
+                    session.setPassword(terminal.getPassword());
+                    break;
+            }
             this.session.setServerAliveInterval(SERVER_ALIVE_INTERVAL);
             this.session.connect(SESSION_TIMEOUT);
             this.channelShell = (ChannelShell) session.openChannel("shell");

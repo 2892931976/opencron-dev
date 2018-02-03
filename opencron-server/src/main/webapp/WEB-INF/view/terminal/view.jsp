@@ -184,18 +184,6 @@
                     $("#keyfile_lab").text("请上传SSH KEY文件");
                     return false;
                 }
-
-                var form = new FormData(document.getElementById("sshform"));
-                ajax({
-                    url: "${contextPath}/terminal/save.do",
-                    type:"post",
-                    data:form,
-                    processData:false,
-                    contentType:false
-                },function (data) {
-                    console.log("over..");
-                });
-                return;
             }
 
 
@@ -250,6 +238,36 @@
                 }
             }
 
+
+            if (sshtype == 1 ) {
+                var form = new FormData();
+                form.append("name",name);
+                form.append("userName",user);
+                form.append("sshType",1);
+                form.append("port",port);
+                form.append("host",host);
+                form.append("passphrase",$("#passphrase").val());
+                form.append("sshkey",$('input[name=sshkey]')[0].files[0]);
+                $.ajax({
+                    url: "${contextPath}/terminal/save.do",
+                    type:"post",
+                    data:form,
+                    processData: false,
+                    contentType: false,
+                    success:function (data) {
+                        $("#sshModal").modal("hide");
+                        $("#sshform")[0].reset();
+                        if (data == "success") {
+                            alertMsg("恭喜你添加终端成功!");
+                            location.reload();
+                        } else {
+                            alert("用户名密码错误,添加终端失败");
+                        }
+                    }
+                });
+                return;
+            }
+
             if(!pwd){
                 $("#sshpwd_lab").text("登陆密码不能为空");
                 falg = false;
@@ -266,6 +284,7 @@
                     url: "${contextPath}/terminal/exists.do",
                     type: "post",
                     data: {
+                        "userName":user,
                         "host":host
                     }
                 },function (status) {
@@ -284,11 +303,21 @@
                         },function (data) {
                             $("#sshModal").modal("hide");
                             $("#sshform")[0].reset();
-                            if (data == "success") {
-                                alertMsg("恭喜你添加终端成功!");
-                                location.reload();
-                            } else {
-                                alert("用户名密码错误,添加终端失败");
+                            if(action == "login") {
+                                if (data == "success") {
+                                    ssh($("#sshid").val(),function () {
+                                        edit(id,false);
+                                    });
+                                }else {
+                                    alert("用户名密码错误,登陆终端失败!");
+                                }
+                            }else {
+                                if (data == "success") {
+                                    alertMsg("恭喜你修改终端成功!");
+                                    location.reload();
+                                } else {
+                                    alert("用户名密码错误,修改终端失败");
+                                }
                             }
                         });
                     }else {
@@ -510,6 +539,14 @@
                             </div>
                         </div>
 
+                        <div class="form-group" >
+                            <label for="sshport" class="col-lab control-label"><i class="glyphicon glyphicon-question-sign"></i>&nbsp;&nbsp;端&nbsp;&nbsp;&nbsp;口&nbsp;&nbsp;</label>
+                            <div class="col-md-9">
+                                <input type="text" class="form-control " id="sshport"
+                                       placeholder="请输入端口">&nbsp;&nbsp;<label class="error_msg" id="sshport_lab"></label>
+                            </div>
+                        </div>
+
                         <div class="form-group">
                             <label for="sshuser" class="col-lab control-label"><i class="glyphicon glyphicon-user"></i>&nbsp;&nbsp;帐&nbsp;&nbsp;&nbsp;号&nbsp;&nbsp;</label>
                             <div class="col-md-9">
@@ -541,15 +578,6 @@
                                         <input type="password" class="form-control " id="sshpwd" placeholder="请输入密码"/>&nbsp;&nbsp;<label class="error_msg" id="sshpwd_lab"></label>
                                     </div>
                                 </div>
-
-                                <div class="form-group" >
-                                    <label for="sshport" class="col-lab control-label"><i class="glyphicon glyphicon-question-sign"></i>&nbsp;&nbsp;端&nbsp;&nbsp;&nbsp;口&nbsp;&nbsp;</label>
-                                    <div class="col-md-9">
-                                        <input type="text" class="form-control " id="sshport"
-                                               placeholder="请输入端口">&nbsp;&nbsp;<label class="error_msg" id="sshport_lab"></label>
-                                    </div>
-                                </div>
-
                             </div>
 
                             <div class="tab-pane fade" id="sshkey">

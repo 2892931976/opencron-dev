@@ -113,20 +113,19 @@ public class TerminalController extends BaseController {
 
     @RequestMapping(value = "exists.do", method = RequestMethod.POST)
     @ResponseBody
-    public boolean exists(HttpSession session, Terminal terminal) throws Exception {
-        User user = OpencronTools.getUser(session);
-        return termService.exists(user.getUserId(), terminal.getHost());
+    public boolean exists(Terminal terminal) throws Exception {
+        return termService.exists(terminal.getUserName(), terminal.getHost());
     }
 
     @RequestMapping("view.htm")
-    public String view(HttpSession session, PageBean pageBean, Model model) throws Exception {
+    public String view(HttpSession session, PageBean pageBean, Model model) {
         pageBean = termService.getPageBeanByUser(pageBean, OpencronTools.getUserId(session));
         model.addAttribute("pageBean", pageBean);
         return "/terminal/view";
     }
 
     @RequestMapping("open.htm")
-    public String open(HttpServletRequest request, String token, Long id) throws Exception {
+    public String open(HttpServletRequest request, String token, Long id) {
         //登陆失败
         if (token == null && id != null) {
             Terminal terminal = termService.getById(id);

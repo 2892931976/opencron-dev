@@ -162,7 +162,7 @@ public final class OpencronTools {
             return getKey(KeyType.PRIVATE);
         }
 
-        private static String getKey(KeyType type) {
+        public static String getKey(KeyType type) {
             File file = new File(type.equals(KeyType.PUBLIC) ? getPublicKeyPath() : getPrivateKeyPath());
             if (file.exists()) {
                 switch (type) {
@@ -185,7 +185,7 @@ public final class OpencronTools {
             return type.equals(KeyType.PUBLIC) ? publicKey : privateKey;
         }
 
-        private static String getKeyPath() {
+        public static String getKeyPath() {
             if (KEY_PATH == null) {
                 KEY_PATH = SystemPropertyUtils.get("user.home") + File.separator + ".opencron";
                 // 从config.properties配置都读取用户手动设置的keypath的位置,配置文件里默认没有,不建议用户指定
