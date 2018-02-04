@@ -86,7 +86,9 @@ public class ExecuteService implements Job {
             boolean success = executeService.executeJob(jobInfo, ExecType.AUTO);
             this.loggerInfo("[opencron] job:{} at {}:{},execute:{}", jobInfo, success ? "successful" : "failed");
         } catch (Exception e) {
-            logger.error(e.getLocalizedMessage(), e);
+            if (logger.isErrorEnabled()) {
+                logger.error(e.getLocalizedMessage(), e);
+            }
         }
     }
 
@@ -204,7 +206,9 @@ public class ExecuteService implements Job {
         exec.shutdown();
         while (true) {
             if (exec.isTerminated()) {
-                logger.info("[opencron]SameTimeJob,All doned!");
+                if (logger.isInfoEnabled()) {
+                    logger.info("[opencron]SameTimeJob,All doned!");
+                }
                 return !result.contains(false);
             }
         }
@@ -320,7 +324,9 @@ public class ExecuteService implements Job {
         exec.shutdown();
         while (true) {
             if (exec.isTerminated()) {
-                logger.info("[opencron]batchExecuteJob doned!");
+                if (logger.isInfoEnabled()) {
+                    logger.info("[opencron]batchExecuteJob doned!");
+                }
                 break;
             }
         }
@@ -674,15 +680,21 @@ public class ExecuteService implements Job {
 
     private void loggerInfo(String str, JobInfo job, String message) {
         if (message != null) {
-            logger.info(str, job.getJobName(), job.getHost(), job.getPort(), message);
+            if (logger.isInfoEnabled()) {
+                logger.info(str, job.getJobName(), job.getHost(), job.getPort(), message);
+            }
         } else {
-            logger.info(str, job.getJobName(), job.getHost(), job.getPort());
+            if (logger.isInfoEnabled()) {
+                logger.info(str, job.getJobName(), job.getHost(), job.getPort());
+            }
         }
     }
 
     private String loggerError(String str, JobInfo job, String message, Exception e) {
         String errorInfo = String.format(str, job.getJobName(), job.getHost(), job.getPort(), message);
-        logger.error(errorInfo, e);
+        if (logger.isErrorEnabled()) {
+            logger.error(errorInfo, e);
+        }
         return errorInfo;
     }
 }

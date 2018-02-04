@@ -43,7 +43,9 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Request> {
 
     @Override
     public void channelActive(ChannelHandlerContext handlerContext) {
-        logger.info("[opencron] agent channelActive Active...");
+        if (logger.isInfoEnabled()) {
+            logger.info("[opencron] agent channelActive Active...");
+        }
         handlerContext.fireChannelActive();
     }
 
@@ -53,12 +55,16 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Request> {
         if (request.getRpcType() != RpcType.ONE_WAY) {    //非单向调用
             handlerContext.writeAndFlush(response);
         }
-        logger.info("[opencron] agent process done,action:{}", request.getAction());
+        if (logger.isInfoEnabled()) {
+            logger.info("[opencron] agent process done,action:{}", request.getAction());
+        }
     }
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        logger.error("[opencron] agent channelInactive");
+        if (logger.isErrorEnabled()) {
+            logger.error("[opencron] agent channelInactive");
+        }
         super.channelInactive(ctx);
     }
 

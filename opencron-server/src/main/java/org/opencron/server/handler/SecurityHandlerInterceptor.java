@@ -84,7 +84,9 @@ public class SecurityHandlerInterceptor extends HandlerInterceptorAdapter {
         String referer = request.getHeader("referer");
         if (referer != null && !referer.startsWith(urlPath)) {
             response.sendRedirect("/");
-            logger.info("[opencron]Bad request,redirect to login page");
+            if (logger.isInfoEnabled()) {
+                logger.info("[opencron]Bad request,redirect to login page");
+            }
             OpencronTools.invalidSession(session);
             return false;
         }
@@ -94,11 +96,15 @@ public class SecurityHandlerInterceptor extends HandlerInterceptorAdapter {
             if (user == null) {
                 //跳到登陆页面
                 response.sendRedirect("/");
-                logger.info("[opencron]User not login,redirect to login page");
+                if (logger.isInfoEnabled()) {
+                    logger.info("[opencron]User not login,redirect to login page");
+                }
                 return false;
             }
         } catch (IllegalStateException e) {
-            logger.info("[opencron]Session already invalidated,redirect to login page");
+            if (logger.isInfoEnabled()) {
+                logger.info("[opencron]Session already invalidated,redirect to login page");
+            }
             response.sendRedirect("/");
             return false;
         }
@@ -110,14 +116,18 @@ public class SecurityHandlerInterceptor extends HandlerInterceptorAdapter {
                         || requestURI.contains("/user/add")
                         || requestURI.contains("/agent/add")
                         || requestURI.contains("/agent/edit"))) {
-            logger.info("[opencron]illegal or limited access");
+            if (logger.isInfoEnabled()) {
+                logger.info("[opencron]illegal or limited access");
+            }
             return false;
         }
 
         if (handler instanceof HandlerMethod) {
             if (!verifyCSRF(request)) {
                 response.sendRedirect("/");
-                logger.info("[opencron]Bad request,redirect to login page");
+                if (logger.isInfoEnabled()) {
+                    logger.info("[opencron]Bad request,redirect to login page");
+                }
                 OpencronTools.invalidSession(session);
                 return false;
             }

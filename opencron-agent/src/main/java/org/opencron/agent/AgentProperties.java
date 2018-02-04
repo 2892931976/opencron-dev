@@ -79,19 +79,25 @@ public class AgentProperties {
                 properties.load(is);
             } catch (Throwable t) {
                 handleThrowable(t);
-                logger.warn("[opencron] init properties error:{}", t.getMessage());
+                if (logger.isWarnEnabled()) {
+                    logger.warn("[opencron] init properties error:{}", t.getMessage());
+                }
             } finally {
                 try {
                     is.close();
                 } catch (IOException ioe) {
-                    logger.warn("[opencron]Could not close opencron properties file", ioe);
+                    if (logger.isWarnEnabled()) {
+                        logger.warn("[opencron]Could not close opencron properties file", ioe);
+                    }
                 }
             }
         }
 
         if (is == null) {
             // Do something
-            logger.warn("[opencron]Failed to load opencron properties file");
+            if (logger.isWarnEnabled()) {
+                logger.warn("[opencron]Failed to load opencron properties file");
+            }
             // That's fine - we have reasonable defaults.
             properties = new Properties();
         }

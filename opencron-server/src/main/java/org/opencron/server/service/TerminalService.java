@@ -159,7 +159,9 @@ public class TerminalService {
             } else if (e.getMessage().toLowerCase().contains("auth fail") || e.getMessage().toLowerCase().contains("auth cancel")) {
                 return Terminal.AuthStatus.AUTH_FAIL;
             } else if (e.getMessage().toLowerCase().contains("unknownhostexception")) {
-                logger.info("[opencron]:error: DNS Lookup Failed ");
+                if (logger.isInfoEnabled()) {
+                    logger.info("[opencron]:error: DNS Lookup Failed ");
+                }
                 return Terminal.AuthStatus.HOST_FAIL;
             } else if (e instanceof BadPaddingException) {//RSA解码错误..密码错误...
                 return Terminal.AuthStatus.AUTH_FAIL;
@@ -344,7 +346,9 @@ public class TerminalService {
                                         continue;
                                     }
                                     pwd = message.replace(sendTempCmdId, "").replaceAll("\r\n.*", "") + "/";
-                                    logger.info("[opencron] Sftp upload file target path:{}", pwd);
+                                    if (logger.isInfoEnabled()) {
+                                        logger.info("[opencron] Sftp upload file target path:{}", pwd);
+                                    }
                                 }
                             } else {
                                 webSocketSession.sendMessage(new TextMessage(message));
@@ -593,29 +597,39 @@ public class TerminalService {
                 if (transfered != fileSize) { // 判断当前已传输数据大小是否等于文件总大小
                     sendProgressMessage(transfered);
                 } else {
-                    logger.info("[opencron] Sftp file transfering is done.");
+                    if (logger.isInfoEnabled()) {
+                        logger.info("[opencron] Sftp file transfering is done.");
+                    }
                     setEnd(true); // 如果当前已传输数据大小等于文件总大小，说明已完成，设置end
                 }
             } else {
-                logger.info("[opencron] Sftp file transfering is done.cancel timer");
+                if (logger.isInfoEnabled()) {
+                    logger.info("[opencron] Sftp file transfering is done.cancel timer");
+                }
                 stop(); // 如果传输结束，停止timer记时器
                 return;
             }
         }
 
         public void stop() {
-            logger.info("[opencron] Sftp progress monitor Stopping...");
+            if (logger.isInfoEnabled()) {
+                logger.info("[opencron] Sftp progress monitor Stopping...");
+            }
             if (timer != null) {
                 timer.cancel();
                 timer.purge();
                 timer = null;
                 isScheduled = false;
             }
-            logger.info("[opencron] Sftp progress monitor Stoped.");
+            if (logger.isInfoEnabled()) {
+                logger.info("[opencron] Sftp progress monitor Stoped.");
+            }
         }
 
         public void start() {
-            logger.info("[opencron] Sftp progress monitor Starting...");
+            if (logger.isInfoEnabled()) {
+                logger.info("[opencron] Sftp progress monitor Starting...");
+            }
             if (timer == null) {
                 timer = new Timer();
             }
@@ -627,9 +641,13 @@ public class TerminalService {
             if (fileSize != 0) {
                 double d = ((double) transfered * 100) / (double) fileSize;
                 DecimalFormat df = new DecimalFormat("#.##");
-                logger.info("[opencron] Sftp Sending progress message: {} %", df.format(d));
+                if (logger.isInfoEnabled()) {
+                    logger.info("[opencron] Sftp Sending progress message: {} %", df.format(d));
+                }
             } else {
-                logger.info("[opencron] Sftp Sending progress message: ", transfered);
+                if (logger.isInfoEnabled()) {
+                    logger.info("[opencron] Sftp Sending progress message: ", transfered);
+                }
             }
         }
 

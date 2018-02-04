@@ -37,7 +37,9 @@ public class MinaServer implements Server {
         acceptor.setHandler(serverHandler);
         try {
             acceptor.bind(this.socketAddress);
-            logger.info("[opencron] MinaServer start at address:{} success", port);
+            if (logger.isInfoEnabled()) {
+                logger.info("[opencron] MinaServer start at address:{} success", port);
+            }
         } catch (IOException e) {
             logger.error("[opencron] MinaServer start failure: {}", stackTrace(e));
         }
@@ -49,9 +51,13 @@ public class MinaServer implements Server {
             if (acceptor != null) {
                 acceptor.dispose();
             }
-            logger.info("[opencron] MinaServer stoped!");
+            if (logger.isInfoEnabled()) {
+                logger.info("[opencron] MinaServer stoped!");
+            }
         } catch (Throwable e) {
-            logger.error("[opencron] MinaServer stop error:{}", stackTrace(e));
+            if (logger.isErrorEnabled()) {
+                logger.error("[opencron] MinaServer stop error:{}", stackTrace(e));
+            }
         }
     }
 

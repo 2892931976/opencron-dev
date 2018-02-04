@@ -22,11 +22,15 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<Response> {
 
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, Response response) throws Exception {
-        logger.info("[opencron] nettyRpc client receive response id:{}", response.getId());
+        if (logger.isInfoEnabled()) {
+            logger.info("[opencron] nettyRpc client receive response id:{}", response.getId());
+        }
         Promise promise = promiseGetter.getPromise(response.getId());
         promise.setResult(response);
         if (promise.isAsync()) {   //异步调用
-            logger.info("[opencron] nettyRpc client async callback invoke");
+            if (logger.isInfoEnabled()) {
+                logger.info("[opencron] nettyRpc client async callback invoke");
+            }
             promise.execCallback();
         }
     }
@@ -34,6 +38,8 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<Response> {
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         super.exceptionCaught(ctx, cause);
-        logger.error("捕获异常", cause);
+        if (logger.isErrorEnabled()) {
+            logger.error("捕获异常", cause);
+        }
     }
 }

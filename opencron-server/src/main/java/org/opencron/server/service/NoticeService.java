@@ -75,7 +75,9 @@ public class NoticeService {
     public void notice(Agent agent) {
         if (!agent.getWarning()) return;
         String content = getMessage(agent, "通信失败,请速速处理!");
-        logger.info(content);
+        if (logger.isInfoEnabled()) {
+            logger.info(content);
+        }
         try {
             sendMessage(agent.getUsers(), agent.getAgentId(), agent.getEmailAddress(), agent.getMobiles(), content);
         } catch (Exception e) {
@@ -93,7 +95,9 @@ public class NoticeService {
             message = String.format(message, "[" + msg + "]");
         }
         String content = getMessage(agent, message);
-        logger.info(content);
+        if (logger.isInfoEnabled()) {
+            logger.info(content);
+        }
         try {
             sendMessage(Arrays.asList(job.getUser()), agent.getAgentId(), job.getEmailAddress(), job.getMobiles(), content);
         } catch (Exception e) {
@@ -145,7 +149,9 @@ public class NoticeService {
                 String postData = sendUrl.substring(sendUrl.indexOf("?") + 1);
                 String message = HttpUtils.doPost(url, postData, "UTF-8");
                 log.setResult(message);
-                logger.info(message);
+                if (logger.isInfoEnabled()) {
+                    logger.info(message);
+                }
                 log.setReceiver(mobiles);
                 log.setType(Constants.MsgType.SMS.getValue());
                 log.setSendTime(new Date());

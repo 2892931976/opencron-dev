@@ -135,7 +135,9 @@ public class AgentProcessor implements ServerHandler, AgentJob {
 
         boolean timeoutFlag = timeout > 0;
 
-        logger.info("[opencron]:execute:{},pid:{}", command, pid);
+        if (logger.isInfoEnabled()) {
+            logger.info("[opencron]:execute:{},pid:{}", command, pid);
+        }
 
         File shellFile = CommandUtils.createShellFile(command, pid, EXITCODE_SCRIPT);
 
@@ -229,9 +231,13 @@ public class AgentProcessor implements ServerHandler, AgentJob {
                     timer.cancel();
                     watchdog.stop();
                 }
-                logger.info("[opencron]:job has be killed!at pid :{}", request.getParams().get(Constants.PARAM_PID_KEY));
+                if (logger.isInfoEnabled()) {
+                    logger.info("[opencron]:job has be killed!at pid :{}", request.getParams().get(Constants.PARAM_PID_KEY));
+                }
             } else {
-                logger.info("[opencron]:job execute error:{}", e.getCause().getMessage());
+                if (logger.isInfoEnabled()) {
+                    logger.info("[opencron]:job execute error:{}", e.getCause().getMessage());
+                }
             }
         } finally {
 
@@ -252,7 +258,9 @@ public class AgentProcessor implements ServerHandler, AgentJob {
                     }
                     outputStream.close();
                 } catch (Exception e) {
-                    logger.error("[opencron]:error:{}", e);
+                    if (logger.isErrorEnabled()) {
+                        logger.error("[opencron]:error:{}", e);
+                    }
                 }
             }
 
@@ -272,7 +280,9 @@ public class AgentProcessor implements ServerHandler, AgentJob {
             shellFile.delete();
         }
 
-        logger.info("[opencron]:execute result:{}", response.toString());
+        if (logger.isInfoEnabled()) {
+            logger.info("[opencron]:execute result:{}", response.toString());
+        }
 
         watchdog.stop();
 
@@ -294,7 +304,9 @@ public class AgentProcessor implements ServerHandler, AgentJob {
     @Override
     public Response kill(Request request) {
         String pid = request.getParams().get(Constants.PARAM_PID_KEY);
-        logger.info("[opencron]:kill pid:{}", pid);
+        if (logger.isInfoEnabled()) {
+            logger.info("[opencron]:kill pid:{}", pid);
+        }
 
         Response response = Response.response(request);
         String text = CommandUtils.executeShell(Constants.OPENCRON_KILL_SHELL, pid, EXITCODE_SCRIPT);
@@ -314,7 +326,9 @@ public class AgentProcessor implements ServerHandler, AgentJob {
                 .setMessage(message)
                 .end();
 
-        logger.info("[opencron]:kill result:{}" + response);
+        if (logger.isInfoEnabled()) {
+            logger.info("[opencron]:kill result:{}" + response);
+        }
         return response;
     }
 
@@ -427,7 +441,9 @@ public class AgentProcessor implements ServerHandler, AgentJob {
             params.put("port", Constants.OPENCRON_PORT);
             params.put("key", Constants.OPENCRON_REGKEY);
 
-            logger.info("[opencron]agent auto register staring:{}", Constants.OPENCRON_SERVER);
+            if (logger.isInfoEnabled()) {
+                logger.info("[opencron]agent auto register staring:{}", Constants.OPENCRON_SERVER);
+            }
             try {
                 String result = HttpClientUtils.httpPostRequest(url, params);
                 if (result == null) {
@@ -437,7 +453,9 @@ public class AgentProcessor implements ServerHandler, AgentJob {
                 if (jsonObject.get("status").toString().equals("200")) {
                     return true;
                 }
-                logger.error("[opencron:agent auto regsiter error:{}]", jsonObject.get("message"));
+                if (logger.isErrorEnabled()) {
+                    logger.error("[opencron:agent auto regsiter error:{}]", jsonObject.get("message"));
+                }
             } catch (Exception e) {
                 e.printStackTrace();
                 return false;

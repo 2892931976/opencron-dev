@@ -80,15 +80,21 @@ public class NettyServer implements Server {
                 @Override
                 public void operationComplete(ChannelFuture future) {
                     if (future.isSuccess()) {
-                        logger.info("[opencron] NettyServer start at address:{} success", port);
+                        if (logger.isInfoEnabled()) {
+                            logger.info("[opencron] NettyServer start at address:{} success", port);
+                        }
                     } else {
-                        logger.error("[opencron] NettyServer start at address:{} failure", port);
+                        if (logger.isErrorEnabled()) {
+                            logger.error("[opencron] NettyServer start at address:{} failure", port);
+                        }
                     }
                 }
             }).channel().closeFuture().sync();
 
         } catch (InterruptedException e) {
-            logger.error("[opencron] NettyServer start failure: {}", stackTrace(e));
+            if (logger.isInfoEnabled()) {
+                logger.error("[opencron] NettyServer start failure: {}", stackTrace(e));
+            }
         }
     }
 
@@ -100,9 +106,13 @@ public class NettyServer implements Server {
                 bossGroup.shutdownGracefully();
                 workerGroup.shutdownGracefully();
             }
-            logger.info("[opencron] NettyServer stoped!");
+            if (logger.isInfoEnabled()) {
+                logger.info("[opencron] NettyServer stoped!");
+            }
         } catch (Throwable e) {
-            logger.error("[opencron] NettyServer stop error:{}", stackTrace(e));
+            if (logger.isErrorEnabled()) {
+                logger.error("[opencron] NettyServer stop error:{}", stackTrace(e));
+            }
         }
     }
 

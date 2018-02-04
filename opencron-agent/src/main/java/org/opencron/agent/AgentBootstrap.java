@@ -108,7 +108,9 @@ public class AgentBootstrap implements Serializable {
 
         try {
             if (isEmpty(args)) {
-                logger.warn("Bootstrap: error,usage start|stop");
+                if (logger.isWarnEnabled()) {
+                    logger.warn("Bootstrap: error,usage start|stop");
+                }
             } else {
                 String command = args[0];
                 if ("start".equals(command)) {
@@ -123,7 +125,9 @@ public class AgentBootstrap implements Serializable {
                 } else if ("stop".equals(command)) {
                     daemon.shutdown();
                 } else {
-                    logger.warn("Bootstrap: command \"" + command + "\" does not exist.");
+                    if (logger.isWarnEnabled()) {
+                        logger.warn("Bootstrap: command \"" + command + "\" does not exist.");
+                    }
                 }
             }
         } catch (Throwable t) {
@@ -182,7 +186,9 @@ public class AgentBootstrap implements Serializable {
              */
             IOUtils.writeText(Constants.OPENCRON_PID_FILE, getPid(), Constants.CHARSET_UTF8);
 
-            logger.info("[opencron]agent started @ port:{},pid:{}", port, getPid());
+            if (logger.isInfoEnabled()) {
+                logger.info("[opencron]agent started @ port:{},pid:{}", port, getPid());
+            }
 
             String agentId = StringUtils.join(MacUtils.getAllMac(), "_");
             if (agentId == null) {
@@ -195,7 +201,9 @@ public class AgentBootstrap implements Serializable {
             final RegistryService registryService = new RegistryService();
             registryService.register(url, path, true);
 
-            logger.info("[opencron] agent register to zookeeper done");
+            if (logger.isInfoEnabled()) {
+                logger.info("[opencron] agent register to zookeeper done");
+            }
 
             //register shutdown hook
             Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
@@ -237,7 +245,9 @@ public class AgentBootstrap implements Serializable {
         try {
             awaitSocket = new ServerSocket(shutdownPort);
         } catch (IOException e) {
-            logger.error("[opencron] agent .await: create[{}] ", shutdownPort, e);
+            if (logger.isErrorEnabled()) {
+                logger.error("[opencron] agent .await: create[{}] ", shutdownPort, e);
+            }
             return;
         }
 
@@ -261,16 +271,22 @@ public class AgentBootstrap implements Serializable {
                     } catch (SocketTimeoutException ste) {
                         // This should never happen but bug 56684 suggests that
                         // it does.
-                        logger.warn("[opencron] agentServer accept.timeout", Long.valueOf(System.currentTimeMillis() - acceptStartTime), ste);
+                        if (logger.isWarnEnabled()) {
+                            logger.warn("[opencron] agentServer accept.timeout", Long.valueOf(System.currentTimeMillis() - acceptStartTime), ste);
+                        }
                         continue;
                     } catch (AccessControlException ace) {
-                        logger.warn("[opencron] agentServer .accept security exception: {}", ace.getMessage(), ace);
+                        if (logger.isWarnEnabled()) {
+                            logger.warn("[opencron] agentServer .accept security exception: {}", ace.getMessage(), ace);
+                        }
                         continue;
                     } catch (IOException e) {
                         if (stopAwait) {
                             break;
                         }
-                        logger.error("[opencron] agent .await: accept: ", e);
+                        if (logger.isErrorEnabled()) {
+                            logger.error("[opencron] agent .await: accept: ", e);
+                        }
                         break;
                     }
 
@@ -287,7 +303,9 @@ public class AgentBootstrap implements Serializable {
                         try {
                             ch = stream.read();
                         } catch (IOException e) {
-                            logger.warn("[opencron] agent .await: read: ", e);
+                            if (logger.isWarnEnabled()) {
+                                logger.warn("[opencron] agent .await: read: ", e);
+                            }
                             ch = -1;
                         }
                         if (ch < 32)  // Control character or EOF terminates loop
@@ -307,7 +325,9 @@ public class AgentBootstrap implements Serializable {
                 if (match) {
                     break;
                 } else {
-                    logger.warn("[opencron] agent .await: Invalid command '" + command.toString() + "' received");
+                    if (logger.isWarnEnabled()) {
+                        logger.warn("[opencron] agent .await: Invalid command '" + command.toString() + "' received");
+                    }
                 }
             }
         } finally {
@@ -345,10 +365,14 @@ public class AgentBootstrap implements Serializable {
             stream.flush();
             socket.close();
         } catch (ConnectException ce) {
-            logger.error("[opencron] Agent.stop error:{} ", ce);
+            if (logger.isErrorEnabled()) {
+                logger.error("[opencron] Agent.stop error:{} ", ce);
+            }
             System.exit(1);
         } catch (Exception e) {
-            logger.error("[opencron] Agent.stop error:{} ", e);
+            if (logger.isErrorEnabled()) {
+                logger.error("[opencron] Agent.stop error:{} ", e);
+            }
             System.exit(1);
         }
     }

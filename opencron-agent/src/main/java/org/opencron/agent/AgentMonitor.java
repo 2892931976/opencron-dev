@@ -73,7 +73,9 @@ public class AgentMonitor {
                 @Override
                 public void onConnect(final SocketIOClient client) {
                     UUID sessionId = client.getSessionId();
-                    logger.info("[opencron]:monitor connected:SessionId @ {},port @ {}", sessionId, port);
+                    if (logger.isInfoEnabled()) {
+                        logger.info("[opencron]:monitor connected:SessionId @ {},port @ {}", sessionId, port);
+                    }
                     clients.put(sessionId, client);
                     /**
                      * 断开连接或者获取数据错误,不在推送数据...
@@ -96,9 +98,13 @@ public class AgentMonitor {
                      * 一旦客户端断开连接,立即将该连接实例移除...
                      */
                     clients.remove(client.getSessionId());
-                    logger.info("[opencron]:monitor disconnect:SessionId @ {},port @ {} ", client.getSessionId(), port);
+                    if (logger.isInfoEnabled()) {
+                        logger.info("[opencron]:monitor disconnect:SessionId @ {},port @ {} ", client.getSessionId(), port);
+                    }
                     if (clients.isEmpty()) {
-                        logger.info("[opencron]:monitor client is empty...");
+                        if (logger.isInfoEnabled()) {
+                            logger.info("[opencron]:monitor client is empty...");
+                        }
                     }
                 }
             });

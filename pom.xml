@@ -10,10 +10,9 @@
     <version>1.2.0-RELEASE</version>
     <modules>
         <module>opencron-common</module>
-        <!-- <module>opencron-config</module>-->
         <module>opencron-registry</module>
         <module>opencron-rpc</module>
-        <!--  <module>opencron-examples</module>-->
+        <module>opencron-examples</module>
         <module>opencron-api</module>
         <module>opencron-agent</module>
         <module>opencron-server</module>

@@ -87,7 +87,9 @@ public final class SchedulerService {
         jobDetail.getJobDataMap().put(job.getJobId().toString(), job);
         jobDetail.getJobDataMap().put("jobBean", this.executeService);
         Date date = quartzScheduler.scheduleJob(jobDetail, cronTrigger);
-        logger.info("opencron: add success,cronTrigger:{}", cronTrigger, date);
+        if (logger.isInfoEnabled()) {
+            logger.info("opencron: add success,cronTrigger:{}", cronTrigger, date);
+        }
     }
 
     public void remove(Serializable jobId) throws SchedulerException {
@@ -96,7 +98,9 @@ public final class SchedulerService {
             quartzScheduler.pauseTrigger(triggerKey);// 停止触发器
             quartzScheduler.unscheduleJob(triggerKey);// 移除触发器
             quartzScheduler.deleteJob(JobKey.jobKey(jobId.toString()));// 删除任务
-            logger.info("opencron: removed, triggerKey:{},", triggerKey);
+            if (logger.isInfoEnabled()) {
+                logger.info("opencron: removed, triggerKey:{},", triggerKey);
+            }
         }
     }
 

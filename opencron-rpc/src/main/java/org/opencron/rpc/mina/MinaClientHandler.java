@@ -20,11 +20,15 @@ public class MinaClientHandler extends IoHandlerAdapter {
     @Override
     public void messageReceived(IoSession session, Object message) throws Exception {
         Response response = (Response) message;
-        logger.info("[opencron] minaRpc client receive response id:{}", response.getId());
+        if (logger.isInfoEnabled()) {
+            logger.info("[opencron] minaRpc client receive response id:{}", response.getId());
+        }
         Promise promise = promiseGetter.getPromise(response.getId());
         promise.setResult(response);
         if (promise.isAsync()) {   //异步调用
-            logger.info("[opencron] minaRpc client async callback invoke");
+            if (logger.isInfoEnabled()) {
+                logger.info("[opencron] minaRpc client async callback invoke");
+            }
             promise.execCallback();
         }
     }

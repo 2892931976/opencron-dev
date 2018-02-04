@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
  */
 public class ChannelWrapper {
 
-    private final Logger log = LoggerFactory.getLogger(this.getClass());
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     private final ChannelFuture channelFuture;
 
@@ -60,8 +60,10 @@ public class ChannelWrapper {
         getChannel().close().addListener(new ChannelFutureListener() {
             @Override
             public void operationComplete(ChannelFuture future) throws Exception {
-                log.info("closeChannel: close the connection to remote address:{}, result: {}",
-                        getChannel().remoteAddress(), future.isSuccess());
+                if (logger.isInfoEnabled()) {
+                    logger.info("closeChannel: close the connection to remote address:{}, result: {}",
+                            getChannel().remoteAddress(), future.isSuccess());
+                }
             }
         });
     }

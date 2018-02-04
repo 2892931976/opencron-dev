@@ -94,11 +94,15 @@ public class MinaClient implements Client {
                 @Override
                 public void operationComplete(IoFuture future) {
                     if (future.isDone()) {
-                        logger.info("[opencron] MinaRPC sentSync success, request id:{}", request.getId());
+                        if (logger.isInfoEnabled()) {
+                            logger.info("[opencron] MinaRPC sentSync success, request id:{}", request.getId());
+                        }
                         promise.setSendRequestSuccess(true);
                         return;
                     } else {
-                        logger.info("[opencron] MinaRPC sentSync failure, request id:{}", request.getId());
+                        if (logger.isInfoEnabled()) {
+                            logger.info("[opencron] MinaRPC sentSync failure, request id:{}", request.getId());
+                        }
                         promiseTable.remove(request.getId());
                         promise.setSendRequestSuccess(false);
                         promise.setFailure(connect.getException());
@@ -120,9 +124,13 @@ public class MinaClient implements Client {
                 @Override
                 public void operationComplete(IoFuture future) {
                     if (future.isDone()) {
-                        logger.info("[opencron] MinaRPC sentOneway success, request id:{}", request.getId());
+                        if (logger.isInfoEnabled()) {
+                            logger.info("[opencron] MinaRPC sentOneway success, request id:{}", request.getId());
+                        }
                     } else {
-                        logger.info("[opencron] MinaRPC sentOneway failure, request id:{}", request.getId(), future);
+                        if (logger.isInfoEnabled()) {
+                            logger.info("[opencron] MinaRPC sentOneway failure, request id:{}", request.getId(), future);
+                        }
                     }
                 }
             });
@@ -143,11 +151,15 @@ public class MinaClient implements Client {
                 @Override
                 public void operationComplete(IoFuture future) {
                     if (future.isDone()) {
-                        logger.info("[opencron] MinaRPC sentAsync success, request id:{}", request.getId());
+                        if (logger.isInfoEnabled()) {
+                            logger.info("[opencron] MinaRPC sentAsync success, request id:{}", request.getId());
+                        }
                         promise.setSendRequestSuccess(true);
                         return;
                     } else {
-                        logger.info("[opencron] MinaRPC sentAsync failure, request id:{}", request.getId());
+                        if (logger.isInfoEnabled()) {
+                            logger.info("[opencron] MinaRPC sentAsync failure, request id:{}", request.getId());
+                        }
                         promiseTable.remove(request.getId());
                         promise.setSendRequestSuccess(false);
                         promise.setFailure(connect.getException());
@@ -186,13 +198,19 @@ public class MinaClient implements Client {
             long timeout = 5000;
             if (connectFuture.awaitUninterruptibly(timeout)) {
                 if (connectWrapper.isActive()) {
-                    logger.info("[opencron] MinaRPC getOrCreateConnect: connect remote host[{}] success, {}", request.getAddress(), connectFuture.toString());
+                    if (logger.isInfoEnabled()) {
+                        logger.info("[opencron] MinaRPC getOrCreateConnect: connect remote host[{}] success, {}", request.getAddress(), connectFuture.toString());
+                    }
                     return connectWrapper.getConnectFuture();
                 } else {
-                    logger.warn("[opencron] MinaRPC getOrCreateConnect: connect remote host[" + request.getAddress() + "] failed, " + connectFuture.toString(), connectFuture.getException());
+                    if (logger.isWarnEnabled()) {
+                        logger.warn("[opencron] MinaRPC getOrCreateConnect: connect remote host[" + request.getAddress() + "] failed, " + connectFuture.toString(), connectFuture.getException());
+                    }
                 }
             } else {
-                logger.warn("[opencron] MinaRPC getOrCreateConnect: connect remote host[{}] timeout {}ms, {}", request.getAddress(), timeout, connectFuture);
+                if (logger.isWarnEnabled()) {
+                    logger.warn("[opencron] MinaRPC getOrCreateConnect: connect remote host[{}] timeout {}ms, {}", request.getAddress(), timeout, connectFuture);
+                }
             }
         }
         return null;

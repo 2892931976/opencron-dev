@@ -110,7 +110,9 @@ public class OpencronRegistry {
                 if (agents.isEmpty()) {
                     for (String agent:children) {
                         agents.put(agent,agent);
-                        logger.info("[opencron] agent connected! info:{}",agent);
+                        if (logger.isInfoEnabled()) {
+                            logger.info("[opencron] agent connected! info:{}", agent);
+                        }
                         agentService.doConnect(agent);
                     }
                 }else {
