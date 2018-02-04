@@ -21,18 +21,6 @@
 
     <script type="text/javascript">
 
-        $(document).ready(function () {
-            $("#size").change(function () {
-                var pageSize = $("#size").val();
-                window.location.href="${contextPath}/terminal/view.htm?pageNo=${pageBean.pageNo}&pageSize="+pageSize+"&orderBy=${pageBean.orderBy}&order=${pageBean.order}";
-            });
-            
-            $(".sshtype").find("a").click(function () {
-                $("#sshtype").val($(this).attr("type"));
-                $(".error_msg").empty();
-            });
-        });
-
         var page = {
             /**
              *  true:用于判断登录之后是否有后续操作，true:有后续操作，false:无
@@ -48,18 +36,19 @@
                     if(json&&json.toString().indexOf("login")>-1){
                         window.location.href="${contextPath}";
                     }
-                    if (json.status == "authfail" || json.status == "keyauthfail") {
-
+                    if ( json.status != "success" ) {
                         if (!failCallback) {
-                            alert("用户名密码错误,登录失败");
+                            if (json.status == "authfail" || json.status == "keyauthfail") {
+                                alert("用户名密码错误,登录失败");
+                            } else if (json.status == "hostfail") {
+                                alert("DNS解析失败");
+                            } else if (json.status == "genericfail") {
+                                alert("连接失败请重试");
+                            }
                         } else {
                             failCallback();
                         }
-                    } else if (json.status == "hostfail") {
-                        alert("DNS解析失败");
-                    } else if (json.status == "genericfail") {
-                        alert("连接失败请重试");
-                    } else if (json.status == "success") {
+                    } else {
                         var url = '${contextPath}' + json.url;
                         swal({
                             title: "",
@@ -121,15 +110,9 @@
             },
             edit:function (id) {
                 $(".error_msg").empty();
-                if (arguments[1]||false) {
-                    $("#sshform").attr("action","edit");
-                    $("#sshTitle").text("编辑终端");
-                    $("#sshbtn").text("保存");
-                }else {
-                    $("#sshform").attr("action","login");
-                    $("#sshTitle").text("登陆终端");
-                    $("#sshbtn").text("登陆");
-                }
+                $("#sshform").attr("action","edit");
+                $("#sshTitle").text("编辑终端");
+                $("#sshbtn").text("保存");
 
                 ajax({
                     url: "${contextPath}/terminal/detail.do",
@@ -267,21 +250,13 @@
                 var callback = function (data,opt) {
                     $("#sshModal").modal("hide");
                     $("#sshform")[0].reset();
-                    if(action == "login") {
-                        if (data == "success") {
-                            page.ssh($("#sshid").val(),opt + "成功,要打开终端吗?",function () {
-                                page.edit(id,false);
-                            });
-                        }else {
-                            alert("用户名密码错误,登陆终端失败!");
-                        }
-                    }else {
-                        if (data == "success") {
-                            alertMsg("恭喜你"+opt+"终端成功!");
+                    if (data == "success") {
+                        alertMsg("恭喜你"+opt+"终端成功!");
+                        setTimeout(function () {
                             location.reload();
-                        } else {
-                            alert("用户名密码错误,"+opt+"终端失败");
-                        }
+                        },1000);
+                    } else {
+                        alert("用户名密码错误,"+opt+"终端失败");
                     }
                 };
 
@@ -362,6 +337,35 @@
                 location.href="${contextPath}/terminal/view.htm?pageNo=${pageBean.pageNo}&pageSize=${pageBean.pageSize}&orderBy="+field+"&order="+("${pageBean.order}"=="asc"?"desc":"asc");
             }
         }
+
+        $(document).ready(function () {
+            $("#size").change(function () {
+                var pageSize = $("#size").val();
+                window.location.href="${contextPath}/terminal/view.htm?pageNo=${pageBean.pageNo}&pageSize="+pageSize+"&orderBy=${pageBean.orderBy}&order=${pageBean.order}";
+            });
+
+            $(".sshtype").find("a").click(function () {
+                $("#sshtype").val($(this).attr("type"));
+                $(".error_msg").empty();
+            });
+
+            $(".sshlink").click(function () {
+                var id = $(this).attr("ssh");
+                page.ssh(id,null,function () {
+                    swal({
+                        title: "",
+                        text: "登录失败,请重新设置用户名密码",
+                        type: "warning",
+                        showCancelButton: true,
+                        closeOnConfirm: true,
+                        confirmButtonText:"设置"
+                    }, function () {
+                        page.edit(id);
+                    });
+                })
+
+            });
+        });
 
     </script>
 </head>
@@ -446,6 +450,19 @@
                        <th  class="sortable sort-numeric" style="cursor: pointer" onclick="page.sort('port')" title="点击排序">SSH端口</th>
                    </c:when>
                </c:choose>
+                <c:choose>
+                    <c:when test="${pageBean.orderBy eq 'sshType'}">
+                        <c:if test="${pageBean.order eq 'asc'}">
+                            <th  class="sortable sort-numeric sort-asc" style="cursor: pointer" onclick="page.sort('sshType')" title="点击排序">登录方式</th>
+                        </c:if>
+                        <c:if test="${pageBean.order eq 'desc'}">
+                            <th  class="sortable sort-numeric sort-desc" style="cursor: pointer" onclick="page.sort('sshType')" title="点击排序">登录方式</th>
+                        </c:if>
+                    </c:when>
+                    <c:when test="${pageBean.orderBy ne 'port'}">
+                        <th  class="sortable sort-numeric" style="cursor: pointer" onclick="page.sort('sshType')" title="点击排序">登录方式</th>
+                    </c:when>
+                </c:choose>
                <c:choose>
                    <c:when test="${pageBean.orderBy eq 'logintime'}">
                        <c:if test="${pageBean.order eq 'asc'}">
@@ -469,10 +486,18 @@
                     <td id="name_${t.id}">${t.name}</td>
                     <td>${t.host}</td>
                     <td>${t.port}</td>
+                    <td>
+                        <c:if test="${t.sshType eq 0}">
+                            <span class="label label-success">&nbsp;&nbsp;账&nbsp;号&nbsp;登&nbsp;录&nbsp;&nbsp;</span>
+                        </c:if>
+                        <c:if test="${t.sshType eq 1}">
+                            <span class="label label-warning">&nbsp;&nbsp;SSH&nbsp;KEY&nbsp;登&nbsp;录&nbsp;&nbsp;</span>
+                        </c:if>
+                    </td>
                     <td id="time_${t.id}"><fmt:formatDate value="${t.logintime}" pattern="yyyy-MM-dd HH:mm:ss"/></td>
                     <td class="text-center">
                             <div class="visible-md visible-lg hidden-sm hidden-xs action-buttons">
-                                <a href="javascript:page.ssh('${t.id}')" title="登录">
+                                <a class="sshlink" ssh="${t.id}" href="javascript:void(0);" title="登录">
                                     <i aria-hidden="true" class="fa fa-tv"></i>
                                 </a>&nbsp;&nbsp;
                                 <a href="javascript:page.edit('${t.id}')" title="编辑">
