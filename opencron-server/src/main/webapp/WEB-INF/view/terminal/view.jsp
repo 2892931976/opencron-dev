@@ -22,11 +22,6 @@
     <script type="text/javascript">
 
         var page = {
-            /**
-             *  true:用于判断登录之后是否有后续操作，true:有后续操作，false:无
-             * @param id
-             * @param failCallback
-             */
             ssh:function (id,msg,failCallback) {
                 ajax({
                     url: "${contextPath}/terminal/ssh.do",
