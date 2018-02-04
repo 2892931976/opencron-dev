@@ -483,10 +483,10 @@
                     <td>${t.port}</td>
                     <td>
                         <c:if test="${t.sshType eq 0}">
-                            <span class="label label-success">&nbsp;&nbsp;账&nbsp;号&nbsp;登&nbsp;录&nbsp;&nbsp;</span>
+                            <span class="label label-success">&nbsp;&nbsp;账&nbsp;号&nbsp;密&nbsp;码&nbsp;&nbsp;</span>
                         </c:if>
                         <c:if test="${t.sshType eq 1}">
-                            <span class="label label-warning">&nbsp;&nbsp;SSH&nbsp;KEY&nbsp;登&nbsp;录&nbsp;&nbsp;</span>
+                            <span class="label label-warning">&nbsp;&nbsp;&nbsp;Private&nbsp;&nbsp;Key&nbsp;&nbsp;&nbsp;</span>
                         </c:if>
                     </td>
                     <td id="time_${t.id}"><fmt:formatDate value="${t.logintime}" pattern="yyyy-MM-dd HH:mm:ss"/></td>
