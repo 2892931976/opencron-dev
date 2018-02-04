@@ -693,26 +693,20 @@ function OpencronChart() {
 
     if ($.isMobile()) {
         $("#overview_pie_div").remove();
-        $("#report_detail").remove();
-        $("#overview_report_div").removeClass("col-xs-7").addClass("col-xs-12")
+        $("#overview_report_div").removeClass("col-xs-9").addClass("col-xs-12")
     } else {
-        if ($(window).width() < 1024) {
-            $("#overview_pie_div").removeClass("col-xs-3").removeClass("col-xs-4").hide();
-            $("#report_detail").removeClass("col-xs-2").hide();
-            $("#overview_report_div").removeClass("col-xs-7").removeClass("col-xs-8").addClass("col-xs-12")
-        } else if ($(window).width() < 1280) {//1024 ~ 1280
-            $("#report_detail").removeClass("col-xs-2").hide();
-            $("#overview_report_div").removeClass("col-xs-7").addClass("col-xs-8");
-            $("#overview_pie_div").removeClass("col-xs-3").addClass("col-xs-4");
-        } else {//>1280
-            $("#overview_report_div").removeClass("col-xs-8").addClass("col-xs-7");
-            $("#overview_pie_div").removeClass("col-xs-4").addClass("col-xs-3");
-            $("#report_detail").addClass("col-xs-2").show();
+        console.log($(window).width())
+        if ($(window).width() < 1280) {
+            $("#overview_pie_div").hide();
+            $("#overview_report_div").removeClass("col-xs-9").addClass("col-xs-12")
+        } else {
+            $("#overview_report_div").removeClass("col-xs-12").addClass("col-xs-9");
+            $("#overview_pie_div").show();
         }
     }
 
     //屏幕大于1024显示饼状图
-    if ($(window).width() >= 1024) {
+    if ($(window).width() >= 1280) {
         $("#overview_pie").html('');
         $("#overview_pie_div").show();
         $('#overview_pie').highcharts({
@@ -755,45 +749,6 @@ function OpencronChart() {
 
             }]
         });
-    }
-
-    //屏幕大于1280显示占比进度图
-    if ($(window).width() >= 1280) {
-
-        var job_type = parseInt(parseFloat(this.resizeChartData.auto / (this.resizeChartData.auto + this.resizeChartData.operator)) * 100);
-        if (isNaN(job_type)) {
-            $("#job_type").attr("data-original-title", 0).css("width", "0%");
-        } else {
-            $("#job_type").attr("data-original-title", job_type+"%").css("width", job_type + "%");
-        }
-
-        var job_category = parseInt(parseFloat(this.resizeChartData.singleton / (this.resizeChartData.singleton + this.resizeChartData.flow)) * 100);
-        if (isNaN(job_category)) {
-            $("#job_category").attr("data-original-title", 0).css("width", "0%");
-        } else {
-            $("#job_category").attr("data-original-title", job_category+"%").css("width", job_category + "%");
-        }
-
-        var job_model = parseInt(parseFloat(this.resizeChartData.crontab / (this.resizeChartData.crontab + this.resizeChartData.quartz)) * 100);
-        if (isNaN(job_model)) {
-            $("#job_model").attr("data-original-title", 0).css("width", "0%");
-        } else {
-            $("#job_model").attr("data-original-title", job_model+"%").css("width", job_model + "%");
-        }
-
-        var job_rerun = parseInt(parseFloat((this.resizeChartData.success + this.resizeChartData.failure + this.resizeChartData.killed - this.resizeChartData.rerun) / (this.resizeChartData.success + this.resizeChartData.failure + this.resizeChartData.killed)) * 100);
-        if (isNaN(job_rerun)) {
-            $("#job_rerun").attr("data-original-title", 0).css("width", "0%");
-        } else {
-            $("#job_rerun").attr("data-original-title", job_rerun+"%").css("width", job_rerun + "%");
-        }
-
-        var job_status = parseInt(parseFloat(this.resizeChartData.success / (this.resizeChartData.success + this.resizeChartData.failure + this.resizeChartData.killed)) * 100);
-        if (isNaN(job_status)) {
-            $("#job_status").attr("data-original-title", 0).css("width", "0%");
-        } else {
-            $("#job_status").attr("data-original-title", job_status+"%").css("width", job_status + "%");
-        }
     }
 
     //线型报表

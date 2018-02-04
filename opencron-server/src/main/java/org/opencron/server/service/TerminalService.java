@@ -143,15 +143,14 @@ public class TerminalService {
                         UserInfo userInfo = new MyUserInfo();
                         session.setUserInfo(userInfo);
                     }
-                    session.setConfig("StrictHostKeyChecking", "no");
                     break;
                 case ACCOUNT:
-                    session.setConfig("StrictHostKeyChecking", "no");
+
                     session.setConfig("PreferredAuthentications", "publickey,keyboard-interactive,password");
                     session.setPassword(terminal.getPassword());
                     break;
             }
-
+            session.setConfig("StrictHostKeyChecking", "no");
             session.connect(TerminalClient.SESSION_TIMEOUT);
             return Terminal.AuthStatus.SUCCESS;
         } catch (Exception e) {

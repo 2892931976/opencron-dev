@@ -362,47 +362,8 @@
             </div>
 
             <div id="record-report-havedata">
-                <div class="col-xs-7 block-color" id="overview_report_div" style="display: none">
+                <div class="col-xs-9 block-color" id="overview_report_div" style="display: none">
                    <div id="overview_report" style="height: 300px;" class="main-chart" ></div>
-               </div>
-                <div id="report_detail" class="col-xs-2 block-color" style="height: 300px;padding-top:15px;display: none">
-                   <h5 class="subtitle mb5" style="font-size: 20px;">报告明细</h5>
-                   <div class="clearfix"></div>
-
-                   <span class="sublabel">运行模式(自动/手动)</span>
-                   <div class="progress progress-sm report_detail">
-                       <a href="#" data-toggle="tooltip" class="tooltips progress-bar progress-bar-primary" role="progressbar" id="job_type">
-                           <span class="sr-only"></span>
-                       </a>
-                   </div><!-- progress -->
-
-                   <span class="sublabel">作业类型(单一/流程）</span>
-                   <div class="progress progress-sm report_detail">
-                       <a href="#" data-toggle="tooltip" class="tooltips progress-bar progress-bar-success" role="progressbar" id="job_category" >
-                           <span class="sr-only"></span>
-                       </a>
-                   </div><!-- progress -->
-
-                   <span class="sublabel">规则类型(crontab/quartz)</span>
-                   <div class="progress progress-sm report_detail">
-                       <a href="#" data-toggle="tooltip" class="tooltips progress-bar progress-bar-danger" role="progressbar"  id="job_model" >
-                           <span class="sr-only"></span>
-                       </a>
-                   </div><!-- progress -->
-
-                   <span class="sublabel">重跑状态 (非重跑/重跑)</span>
-                   <div class="progress progress-sm report_detail">
-                       <a href="#" data-toggle="tooltip" class="tooltips progress-bar progress-bar-warning" role="progressbar"  id="job_rerun"  >
-                           <span class="sr-only"></span>
-                       </a>
-                   </div><!-- progress -->
-
-                   <span class="sublabel">执行状态(成功/失败)</span>
-                   <div class="progress progress-sm report_detail">
-                       <a href="#" data-toggle="tooltip" class="tooltips progress-bar progress-bar-success" role="progressbar" id="job_status" >
-                           <span class="sr-only"></span>
-                       </a>
-                   </div><!-- progress -->
                </div>
                 <div class="col-xs-3 block-color" id="overview_pie_div" style="display: none">
                      <div id="overview_pie" class="main-chart" style="height: 300px;" ></div>
