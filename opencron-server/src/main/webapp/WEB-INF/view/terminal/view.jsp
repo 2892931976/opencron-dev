@@ -14,6 +14,9 @@
             margin-top: 5px;
             font-size: 12px;
         }
+        .visible-md i {
+            font-size: 15px;
+        }
     </style>
 
     <script type="text/javascript">
@@ -30,361 +33,346 @@
             });
         });
 
-        /**
-         *
-         * @param id
-         * @param type
-         *  true:用于判断登录之后是否有后续操作，true:有后续操作，false:无
-         */
-        function ssh(id, failCallback) {
-            ajax({
-                url: "${contextPath}/terminal/ssh.do",
-                type: "post",
-                data: {"id":id}
-            },function (json) {
-                if(json&&json.toString().indexOf("login")>-1){
-                    window.location.href="${contextPath}";
-                }
-                if (json.status == "authfail" || json.status == "keyauthfail") {
-
-                    if (!failCallback) {
-                        alert("用户名密码错误,登录失败");
-                    } else {
-                        failCallback();
-                    }
-                } else if (json.status == "hostfail") {
-                    alert("DNS解析失败");
-                } else if (json.status == "genericfail") {
-                    alert("连接失败请重试");
-                } else if (json.status == "success") {
-                    var url = '${contextPath}' + json.url;
-                    swal({
-                        title: "",
-                        text: "登陆成功,您确定要打开终端吗？",
-                        type: "warning",
-                        showCancelButton: true,
-                        closeOnConfirm: false,
-                        confirmButtonText: "打开"
-                    });
-
-                    /**
-                     *
-                     * 默认打开新的弹窗浏览器会阻止,有的浏览器如Safair连询问用户是否打开新窗口的对话框都没有.
-                     * 这里页面自己弹出询问框,当用户点击"打开"产生了真正的点击行为,然后利用事件冒泡就触发了包裹它的a标签,使得可以在新窗口打开a标签的连接
-                     *
-                     */
-                    if ($("#openLink").length == 0) {
-                        $(".sweet-alert").find(".confirm").wrap("<a id='openLink' href='" + url + "'  target='_blank'/></a>");
-                    } else {
-                        $("#openLink").attr("href", url);
-                    }
-
-                    $("#openLink").click(function () {
-
-                        $("div[class^='sweet-']").remove();
-
-                        //更改最后登录日期
-                        window.setTimeout(function(){
-                            $.ajax({
-                                url: "${contextPath}/terminal/detail.do",
-                                type: "post",
-                                data: {"id":id},
-                                dataType: "json"
-                            }).done(function (json) {
-                                $("#time_"+id).text(json.logintime);
-                            })
-                        },5000);
-
-                    });
-
-                    $(".sweet-alert").find(".cancel").click(function () {
-                        window.setTimeout(function () {
-                            $("div[class^='sweet-']").remove();
-                        }, 50);
-                    });
-                }
-            });
-
-        }
-
-        function edit(id) {
-            $(".error_msg").empty();
-            if (arguments[1]||false) {
-                $("#sshform").attr("action","edit");
-                $("#sshTitle").text("编辑终端");
-                $("#sshbtn").text("保存");
-            }else {
-                $("#sshform").attr("action","login");
-                $("#sshTitle").text("登陆终端");
-                $("#sshbtn").text("登陆");
-            }
-            
-            ajax({
-                url: "${contextPath}/terminal/detail.do",
-                type: "post",
-                data: {"id":id}
-            },function (json) {
-                $("#sshid").val(id);
-                $("#sshuser").val(json.user);
-                $("#sshname").val(unEscapeHtml(json.name));
-                $("#sshport").val(json.port);
-                $("#sshhost").val(json.host).attr("readonly","readonly");
-                $("#sshtype").val(json.sshType);
-                $(".nav-tabs [type="+json.sshType+"]").tab("show");
-                $("#sshuser")[0].focus();
-                $("#sshModal").modal("show");
-            });
-        }
-
-
-        function del(id) {
-            swal({
-                title: "",
-                text: "您确定要删除该终端吗?",
-                type: "warning",
-                showCancelButton: true,
-                closeOnConfirm: false,
-                confirmButtonText: "删除"
-            },function () {
+        var page = {
+            /**
+             *  true:用于判断登录之后是否有后续操作，true:有后续操作，false:无
+             * @param id
+             * @param failCallback
+             */
+            ssh:function (id, failCallback) {
                 ajax({
-                    url: "${contextPath}/terminal/delete.do",
+                    url: "${contextPath}/terminal/ssh.do",
                     type: "post",
                     data: {"id":id}
-                },function (data) {
-                    if (data) {
-                        alertMsg("删除成功!");
-                        $("#tr_" + id).remove();
-                    }else {
-                        alert("删除失败!")
+                },function (json) {
+                    if(json&&json.toString().indexOf("login")>-1){
+                        window.location.href="${contextPath}";
                     }
-                })
-            });
-        }
+                    if (json.status == "authfail" || json.status == "keyauthfail") {
 
-        function save() {
+                        if (!failCallback) {
+                            alert("用户名密码错误,登录失败");
+                        } else {
+                            failCallback();
+                        }
+                    } else if (json.status == "hostfail") {
+                        alert("DNS解析失败");
+                    } else if (json.status == "genericfail") {
+                        alert("连接失败请重试");
+                    } else if (json.status == "success") {
+                        var url = '${contextPath}' + json.url;
+                        swal({
+                            title: "",
+                            text: "登陆成功,您确定要打开终端吗？",
+                            type: "warning",
+                            showCancelButton: true,
+                            closeOnConfirm: false,
+                            confirmButtonText: "打开"
+                        });
 
-            $(".error_msg").empty();
+                        /**
+                         *
+                         * 默认打开新的弹窗浏览器会阻止,有的浏览器如Safair连询问用户是否打开新窗口的对话框都没有.
+                         * 这里页面自己弹出询问框,当用户点击"打开"产生了真正的点击行为,然后利用事件冒泡就触发了包裹它的a标签,使得可以在新窗口打开a标签的连接
+                         *
+                         */
+                        if ($("#openLink").length == 0) {
+                            $(".sweet-alert").find(".confirm").wrap("<a id='openLink' href='" + url + "'  target='_blank'/></a>");
+                        } else {
+                            $("#openLink").attr("href", url);
+                        }
 
-            var name = $("#sshname").val();
+                        $("#openLink").click(function () {
 
-            var falg = true;
+                            $("div[class^='sweet-']").remove();
 
-            if(!name){
-                $("#sshname_lab").text("终端实例名称不能为空");
-                falg = false;
-            }else {
-                if (name.length>20){
-                    $("#sshname_lab").text("终端实例名称输入太长不合法");
-                    falg = false;
-                }
-            }
+                            //更改最后登录日期
+                            window.setTimeout(function(){
+                                $.ajax({
+                                    url: "${contextPath}/terminal/detail.do",
+                                    type: "post",
+                                    data: {"id":id},
+                                    dataType: "json"
+                                }).done(function (json) {
+                                    $("#time_"+id).text(json.logintime);
+                                })
+                            },5000);
 
-            var sshtype = $("#sshtype").val();
+                        });
 
-            if (sshtype == 1 ) {
-                if($.trim($("#keyfile").val())==''){
-                    $("#keyfile_lab").text("请上传SSH KEY文件");
-                    return false;
-                }
-            }
-
-
-            var user = $("#sshuser").val();
-            var pwd =  $("#sshpwd").val();
-            var port = $("#sshport").val();
-            var host = $("#sshhost").val();
-
-            if(!host) {
-                $("#sshhost_lab").text("机器地址不能为空");
-                falg = false;
-            }else {
-                var reg = /^([hH][tT]{2}[pP]:\/\/|[hH][tT]{2}[pP][sS]:\/\/)(([A-Za-z0-9-~]+)\.)+([A-Za-z0-9-~\/])+$/;
-                //验证是否为网址
-                var objExp=new RegExp(reg);
-                if(!objExp.test(host)){
-                    //验证是否为IP
-                    reg = /^([0-9]|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.([0-9]|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.([0-9]|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.([0-9]|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])$/;
-                    if (!reg.test(host)) {
-                        $("#sshhost_lab").text("机器地址不合法,必须你网址或者IP");
-                        falg = false;
+                        $(".sweet-alert").find(".cancel").click(function () {
+                            window.setTimeout(function () {
+                                $("div[class^='sweet-']").remove();
+                            }, 50);
+                        });
                     }
-                }
-            }
+                });
 
-            if(!port){
-                $("#sshport_lab").text("连接端口不能为空");
-                falg = false;
-            }else {
-                if(isNaN(port)){
-                    $("#sshport_lab").text("连接端口输入不合法,必须为数字");
+            },
+            add:function () {
+                $(".error_msg").empty();
+                $("#sshform")[0].reset();
+                $("#sshform").attr("action","add");
+                $("#sshhost").removeAttr("readonly");
+                $("#sshTitle").text("添加终端");
+                $("#sshbtn").text("保存");
+                $("#sshid").empty();
+                $("#sshModal").modal("show");
+            },
+            edit:function (id) {
+                $(".error_msg").empty();
+                if (arguments[1]||false) {
+                    $("#sshform").attr("action","edit");
+                    $("#sshTitle").text("编辑终端");
+                    $("#sshbtn").text("保存");
+                }else {
+                    $("#sshform").attr("action","login");
+                    $("#sshTitle").text("登陆终端");
+                    $("#sshbtn").text("登陆");
+                }
+
+                ajax({
+                    url: "${contextPath}/terminal/detail.do",
+                    type: "post",
+                    data: {"id":id}
+                },function (json) {
+                    $("#sshid").val(id);
+                    $("#sshuser").val(json.user);
+                    $("#sshname").val(unEscapeHtml(json.name));
+                    $("#sshport").val(json.port);
+                    $("#sshhost").val(json.host).attr("readonly","readonly");
+                    $("#sshtype").val(json.sshType);
+                    $(".nav-tabs [type="+json.sshType+"]").tab("show");
+                    $("#sshuser")[0].focus();
+                    $("#sshModal").modal("show");
+                });
+            },
+            remove:function (id) {
+                swal({
+                    title: "",
+                    text: "您确定要删除该终端吗?",
+                    type: "warning",
+                    showCancelButton: true,
+                    closeOnConfirm: false,
+                    confirmButtonText: "删除"
+                },function () {
+                    ajax({
+                        url: "${contextPath}/terminal/delete.do",
+                        type: "post",
+                        data: {"id":id}
+                    },function (data) {
+                        if (data) {
+                            alertMsg("删除成功!");
+                            $("#tr_" + id).remove();
+                        }else {
+                            alert("删除失败!")
+                        }
+                    })
+                });
+            },
+            save:function () {
+                $(".error_msg").empty();
+
+                var name = $("#sshname").val();
+
+                var falg = true;
+
+                if(!name){
+                    $("#sshname_lab").text("终端实例名称不能为空");
                     falg = false;
                 }else {
-                    port = parseInt(port);
-                    if (port<0){
-                        $("#sshport_lab").text("连接端口输入不合法,不能为负数");
-                        falg = false;
-                    }else if(port>65535){
-                        $("#sshport_lab").text("连接端口输入不合法,不能超过65535");
+                    if (name.length>20){
+                        $("#sshname_lab").text("终端实例名称输入太长不合法");
                         falg = false;
                     }
                 }
-            }
 
-            if(!user){
-                $("#sshuser_lab").text("登陆账号不能为空");
-                falg = false;
-            }else {
-                if(user.length>255){
-                    $("#sshuser_lab").text("登陆账号太长,不合法");
-                    falg = false;
+                var sshtype = $("#sshtype").val();
+
+                if (sshtype == 1 ) {
+                    if($.trim($("#keyfile").val())==''){
+                        $("#keyfile_lab").text("请上传SSH KEY文件");
+                        return false;
+                    }
                 }
-            }
 
 
-            if (sshtype == 1 ) {
-                var form = new FormData();
-                form.append("name",name);
-                form.append("userName",user);
-                form.append("sshType",1);
-                form.append("port",port);
-                form.append("host",host);
-                form.append("phrase",$("#passphrase").val());
-                form.append("sshkey",$('input[name=sshkey]')[0].files[0]);
-                $.ajax({
-                    url: "${contextPath}/terminal/save.do",
-                    type:"post",
-                    data:form,
-                    processData: false,
-                    contentType: false,
-                    success:function (data) {
-                        $("#sshModal").modal("hide");
-                        $("#sshform")[0].reset();
-                        if (data == "success") {
-                            alertMsg("恭喜你添加终端成功!");
-                            location.reload();
-                        } else {
-                            alert("用户名密码错误,添加终端失败");
+                var user = $("#sshuser").val();
+                var pwd =  $("#sshpwd").val();
+                var port = $("#sshport").val();
+                var host = $("#sshhost").val();
+
+                if(!host) {
+                    $("#sshhost_lab").text("机器地址不能为空");
+                    falg = false;
+                }else {
+                    var reg = /^([hH][tT]{2}[pP]:\/\/|[hH][tT]{2}[pP][sS]:\/\/)(([A-Za-z0-9-~]+)\.)+([A-Za-z0-9-~\/])+$/;
+                    //验证是否为网址
+                    var objExp=new RegExp(reg);
+                    if(!objExp.test(host)){
+                        //验证是否为IP
+                        reg = /^([0-9]|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.([0-9]|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.([0-9]|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.([0-9]|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])$/;
+                        if (!reg.test(host)) {
+                            $("#sshhost_lab").text("机器地址不合法,必须你网址或者IP");
+                            falg = false;
                         }
                     }
-                });
-                return;
-            }
+                }
 
-            if(!pwd){
-                $("#sshpwd_lab").text("登陆密码不能为空");
-                falg = false;
-            }
-
-            if (!falg) return;
-
-            var host = $("#sshhost").val();
-
-            var action = $("#sshform").attr("action");
-
-            if (action == "add") {
-                ajax({
-                    url: "${contextPath}/terminal/exists.do",
-                    type: "post",
-                    data: {
-                        "userName":user,
-                        "host":host
+                if(!port){
+                    $("#sshport_lab").text("连接端口不能为空");
+                    falg = false;
+                }else {
+                    if(isNaN(port)){
+                        $("#sshport_lab").text("连接端口输入不合法,必须为数字");
+                        falg = false;
+                    }else {
+                        port = parseInt(port);
+                        if (port<0){
+                            $("#sshport_lab").text("连接端口输入不合法,不能为负数");
+                            falg = false;
+                        }else if(port>65535){
+                            $("#sshport_lab").text("连接端口输入不合法,不能超过65535");
+                            falg = false;
+                        }
                     }
-                },function (status) {
-                    if(!status) {
-                        ajax({
-                            url: "${contextPath}/terminal/save.do",
-                            type: "post",
-                            data: {
-                                "name":name,
-                                "userName": user,
-                                "sshType":sshtype,
-                                "password": toBase64(pwd),
-                                "port": port,
-                                "host": host
-                            }
-                        },function (data) {
+                }
+
+                if(!user){
+                    $("#sshuser_lab").text("登陆账号不能为空");
+                    falg = false;
+                }else {
+                    if(user.length>255){
+                        $("#sshuser_lab").text("登陆账号太长,不合法");
+                        falg = false;
+                    }
+                }
+
+                if (sshtype == 1 ) {
+                    var form = new FormData();
+                    form.append("name",name);
+                    form.append("userName",user);
+                    form.append("sshType",1);
+                    form.append("port",port);
+                    form.append("host",host);
+                    form.append("phrase",$("#passphrase").val());
+                    form.append("sshkey",$('input[name=sshkey]')[0].files[0]);
+                    $.ajax({
+                        url: "${contextPath}/terminal/save.do",
+                        type:"post",
+                        data:form,
+                        processData: false,
+                        contentType: false,
+                        success:function (data) {
                             $("#sshModal").modal("hide");
                             $("#sshform")[0].reset();
-                            if(action == "login") {
-                                if (data == "success") {
-                                    ssh($("#sshid").val(),function () {
-                                        edit(id,false);
-                                    });
-                                }else {
-                                    alert("用户名密码错误,登陆终端失败!");
-                                }
-                            }else {
-                                if (data == "success") {
-                                    alertMsg("恭喜你修改终端成功!");
-                                    location.reload();
-                                } else {
-                                    alert("用户名密码错误,修改终端失败");
-                                }
+                            if (data == "success") {
+                                alertMsg("恭喜你添加终端成功!");
+                                location.reload();
+                            } else {
+                                alert("用户名密码错误,添加终端失败");
                             }
-                        });
-                    }else {
-                        alert("添加终端失败,该机器终端实例已存在!");
-                    }
-                });
-            }else {
-                ajax({
-                    type: "post",
-                    url: "${contextPath}/terminal/save.do",
-                    data: {
-                        "id":$("#sshid").val(),
-                        "name":name,
-                        "userName": user,
-                        "password": toBase64(pwd),
-                        "port": port,
-                        "host": host
-                    }
-                },function (data) {
-                    $("#sshModal").modal("hide");
-                    $("#sshform")[0].reset();
-                    if(action == "login") {
-                        if (data == "success") {
-                            ssh($("#sshid").val(),function () {
-                                edit(id,false);
+                        }
+                    });
+                    return;
+                }
+
+                if(!pwd){
+                    $("#sshpwd_lab").text("登陆密码不能为空");
+                    falg = false;
+                }
+
+                if (!falg) return;
+
+                var host = $("#sshhost").val();
+
+                var action = $("#sshform").attr("action");
+
+                if (action == "add") {
+                    ajax({
+                        url: "${contextPath}/terminal/exists.do",
+                        type: "post",
+                        data: {
+                            "userName":user,
+                            "host":host
+                        }
+                    },function (status) {
+                        if(!status) {
+                            ajax({
+                                url: "${contextPath}/terminal/save.do",
+                                type: "post",
+                                data: {
+                                    "name":name,
+                                    "userName": user,
+                                    "sshType":sshtype,
+                                    "password": toBase64(pwd),
+                                    "port": port,
+                                    "host": host
+                                }
+                            },function (data) {
+                                $("#sshModal").modal("hide");
+                                $("#sshform")[0].reset();
+                                if(action == "login") {
+                                    if (data == "success") {
+                                        page.ssh($("#sshid").val(),function () {
+                                            page.edit(id,false);
+                                        });
+                                    }else {
+                                        alert("用户名密码错误,登陆终端失败!");
+                                    }
+                                }else {
+                                    if (data == "success") {
+                                        alertMsg("恭喜你修改终端成功!");
+                                        location.reload();
+                                    } else {
+                                        alert("用户名密码错误,修改终端失败");
+                                    }
+                                }
                             });
                         }else {
-                            alert("用户名密码错误,登陆终端失败!");
+                            alert("添加终端失败,该机器终端实例已存在!");
                         }
-                    }else {
-                        if (data == "success") {
-                            alertMsg("恭喜你修改终端成功!");
-                            location.reload();
-                        } else {
-                            alert("用户名密码错误,修改终端失败");
+                    });
+                }else {
+                    ajax({
+                        type: "post",
+                        url: "${contextPath}/terminal/save.do",
+                        data: {
+                            "id":$("#sshid").val(),
+                            "name":name,
+                            "userName": user,
+                            "password": toBase64(pwd),
+                            "port": port,
+                            "host": host
                         }
-                    }
-                });
+                    },function (data) {
+                        $("#sshModal").modal("hide");
+                        $("#sshform")[0].reset();
+                        if(action == "login") {
+                            if (data == "success") {
+                                page.ssh($("#sshid").val(),function () {
+                                    page.edit(id,false);
+                                });
+                            }else {
+                                alert("用户名密码错误,登陆终端失败!");
+                            }
+                        }else {
+                            if (data == "success") {
+                                alertMsg("恭喜你修改终端成功!");
+                                location.reload();
+                            } else {
+                                alert("用户名密码错误,修改终端失败");
+                            }
+                        }
+                    });
+                }
+            },
+            sort:function (field) {
+                location.href="${contextPath}/terminal/view.htm?pageNo=${pageBean.pageNo}&pageSize=${pageBean.pageSize}&orderBy="+field+"&order="+("${pageBean.order}"=="asc"?"desc":"asc");
             }
-
-        }
-
-        function addSSH() {
-            $(".error_msg").empty();
-            $("#sshform")[0].reset();
-            $("#sshform").attr("action","add");
-            $("#sshhost").removeAttr("readonly");
-            $("#sshTitle").text("添加终端");
-            $("#sshbtn").text("保存");
-            $("#sshid").empty();
-            $("#sshModal").modal("show");
-        }
-
-        function sortPage(field) {
-            location.href="${contextPath}/terminal/view.htm?pageNo=${pageBean.pageNo}&pageSize=${pageBean.pageSize}&orderBy="+field+"&order="+("${pageBean.order}"=="asc"?"desc":"asc");
         }
 
     </script>
-
-    <style type="text/css">
-        .visible-md i {
-            font-size: 15px;
-        }
-    </style>
-
 </head>
 
 <body>
@@ -417,7 +405,7 @@
             </div>
             <c:if test="${permission eq true}">
                 <div style="float: right;margin-top: -10px">
-                    <a href="javascript:addSSH();" class="btn btn-sm m-t-10"
+                    <a href="javascript:page.add();" class="btn btn-sm m-t-10"
                        style="margin-left: 50px;margin-bottom: 8px"><i class="icon">&#61943;</i>添加</a>
                 </div>
             </c:if>
@@ -429,55 +417,55 @@
                 <c:choose>
                     <c:when test="${pageBean.orderBy eq 'name'}">
                         <c:if test="${pageBean.order eq 'asc'}">
-                            <th  class="sortable sort-alpha sort-asc" style="cursor: pointer" onclick="sortPage('name')" title="点击排序">实例名称</th>
+                            <th  class="sortable sort-alpha sort-asc" style="cursor: pointer" onclick="page.sort('name')" title="点击排序">实例名称</th>
                         </c:if>
                         <c:if test="${pageBean.order eq 'desc'}">
-                            <th  class="sortable sort-alpha sort-desc" style="cursor: pointer" onclick="sortPage('name')" title="点击排序">实例名称</th>
+                            <th  class="sortable sort-alpha sort-desc" style="cursor: pointer" onclick="page.sort('name')" title="点击排序">实例名称</th>
                         </c:if>
                     </c:when>
                     <c:when test="${pageBean.orderBy ne 'name'}">
-                        <th  class="sortable sort-alpha" style="cursor: pointer" onclick="sortPage('name')" title="点击排序">实例名称</th>
+                        <th  class="sortable sort-alpha" style="cursor: pointer" onclick="page.sort('name')" title="点击排序">实例名称</th>
                     </c:when>
                 </c:choose>
 
                <c:choose>
                    <c:when test="${pageBean.orderBy eq 'host'}">
                        <c:if test="${pageBean.order eq 'asc'}">
-                           <th  class="sortable sort-numeric sort-asc" style="cursor: pointer" onclick="sortPage('host')" title="点击排序">主机地址</th>
+                           <th  class="sortable sort-numeric sort-asc" style="cursor: pointer" onclick="page.sort('host')" title="点击排序">主机地址</th>
                        </c:if>
                        <c:if test="${pageBean.order eq 'desc'}">
-                           <th  class="sortable sort-numeric sort-desc" style="cursor: pointer" onclick="sortPage('host')" title="点击排序">主机地址</th>
+                           <th  class="sortable sort-numeric sort-desc" style="cursor: pointer" onclick="page.sort('host')" title="点击排序">主机地址</th>
                        </c:if>
                    </c:when>
                    <c:when test="${pageBean.orderBy ne 'host'}">
-                       <th  class="sortable sort-numeric" style="cursor: pointer" onclick="sortPage('host')" title="点击排序">主机地址</th>
+                       <th  class="sortable sort-numeric" style="cursor: pointer" onclick="page.sort('host')" title="点击排序">主机地址</th>
                    </c:when>
                </c:choose>
 
                <c:choose>
                    <c:when test="${pageBean.orderBy eq 'port'}">
                        <c:if test="${pageBean.order eq 'asc'}">
-                           <th  class="sortable sort-numeric sort-asc" style="cursor: pointer" onclick="sortPage('port')" title="点击排序">SSH端口</th>
+                           <th  class="sortable sort-numeric sort-asc" style="cursor: pointer" onclick="page.sort('port')" title="点击排序">SSH端口</th>
                        </c:if>
                        <c:if test="${pageBean.order eq 'desc'}">
-                           <th  class="sortable sort-numeric sort-desc" style="cursor: pointer" onclick="sortPage('port')" title="点击排序">SSH端口</th>
+                           <th  class="sortable sort-numeric sort-desc" style="cursor: pointer" onclick="page.sort('port')" title="点击排序">SSH端口</th>
                        </c:if>
                    </c:when>
                    <c:when test="${pageBean.orderBy ne 'port'}">
-                       <th  class="sortable sort-numeric" style="cursor: pointer" onclick="sortPage('port')" title="点击排序">SSH端口</th>
+                       <th  class="sortable sort-numeric" style="cursor: pointer" onclick="page.sort('port')" title="点击排序">SSH端口</th>
                    </c:when>
                </c:choose>
                <c:choose>
                    <c:when test="${pageBean.orderBy eq 'logintime'}">
                        <c:if test="${pageBean.order eq 'asc'}">
-                           <th  class="sortable sort-numeric sort-asc" style="cursor: pointer" onclick="sortPage('logintime')" title="点击排序">最后登陆</th>
+                           <th  class="sortable sort-numeric sort-asc" style="cursor: pointer" onclick="page.sort('logintime')" title="点击排序">最后登陆</th>
                        </c:if>
                        <c:if test="${pageBean.order eq 'desc'}">
-                           <th  class="sortable sort-numeric sort-desc" style="cursor: pointer" onclick="sortPage('logintime')" title="点击排序">最后登陆</th>
+                           <th  class="sortable sort-numeric sort-desc" style="cursor: pointer" onclick="page.sort('logintime')" title="点击排序">最后登陆</th>
                        </c:if>
                    </c:when>
                    <c:when test="${pageBean.orderBy ne 'logintime'}">
-                       <th  class="sortable sort-numeric" style="cursor: pointer" onclick="sortPage('logintime')" title="点击排序">最后登陆</th>
+                       <th  class="sortable sort-numeric" style="cursor: pointer" onclick="page.sort('logintime')" title="点击排序">最后登陆</th>
                    </c:when>
                </c:choose>
                 <th class="text-center">操作</th>
@@ -493,13 +481,13 @@
                     <td id="time_${t.id}"><fmt:formatDate value="${t.logintime}" pattern="yyyy-MM-dd HH:mm:ss"/></td>
                     <td class="text-center">
                             <div class="visible-md visible-lg hidden-sm hidden-xs action-buttons">
-                                <a href="javascript:ssh('${t.id}')" title="登录">
+                                <a href="javascript:page.ssh('${t.id}')" title="登录">
                                     <i aria-hidden="true" class="fa fa-tv"></i>
                                 </a>&nbsp;&nbsp;
-                                <a href="javascript:edit('${t.id}')" title="编辑">
+                                <a href="javascript:page.edit('${t.id}')" title="编辑">
                                     <i aria-hidden="true" class="fa fa-edit"></i>
                                 </a>&nbsp;&nbsp;
-                                <a href="javascript:del('${t.id}')" title="删除">
+                                <a href="javascript:page.remove('${t.id}')" title="删除">
                                     <i aria-hidden="true" class="fa fa-remove"></i>
                                 </a>&nbsp;&nbsp;
                             </div>
@@ -604,7 +592,7 @@
                 </div>
                 <div class="modal-footer">
                     <center>
-                        <button type="button" class="btn btn-sm" id="sshbtn" onclick="save()">保存</button>
+                        <button type="button" class="btn btn-sm" id="sshbtn" onclick="page.save()">保存</button>
                         &nbsp;&nbsp;
                         <button type="button" class="btn btn-sm" data-dismiss="modal">关闭</button>
                     </center>
