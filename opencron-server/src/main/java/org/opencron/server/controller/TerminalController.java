@@ -76,10 +76,9 @@ public class TerminalController extends BaseController {
             TerminalContext.put(token, terminal);
             OpencronTools.setSshSessionId(session, token);
 
-            return ParamsMap.map().put(
-                    "status", "success",
-                    "url", String.format("/terminal/open.htm?token=%s", token)
-            );
+            return ParamsMap.map()
+                    .set("status","success")
+                    .set("url","/terminal/open.htm?token="+token);
         } else {
             return ParamsMap.map().set("status", authStatus.status);
         }

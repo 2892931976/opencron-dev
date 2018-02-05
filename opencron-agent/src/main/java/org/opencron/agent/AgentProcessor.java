@@ -369,10 +369,10 @@ public class AgentProcessor implements ServerHandler, AgentJob {
 
     @Override
     public Response guid(Request request) {
-        String macId = StringUtils.join(MacUtils.getAllMac(),"_");
+        String guid = MacUtils.getMachineId();
         Response response = Response.response(request).end();
-        if (notEmpty(macId)) {
-            return response.setMessage(macId).setSuccess(true).setExitCode(Constants.StatusCode.SUCCESS_EXIT.getValue());
+        if (notEmpty(guid)) {
+            return response.setMessage(guid).setSuccess(true).setExitCode(Constants.StatusCode.SUCCESS_EXIT.getValue());
         }
         return response.setSuccess(false).setExitCode(Constants.StatusCode.ERROR_EXIT.getValue());
     }
@@ -427,42 +427,5 @@ public class AgentProcessor implements ServerHandler, AgentJob {
         }
         return resultMap;
     }
-
-    @Override
-    public boolean register() {
-        if (CommonUtils.notEmpty(Constants.OPENCRON_SERVER)) {
-            String url = Constants.OPENCRON_SERVER + "/agent/autoreg.do";
-            String mac = StringUtils.join(MacUtils.getAllMac(),"_");
-            String agentPassword = IOUtils.readText(Constants.OPENCRON_PASSWORD_FILE, "UTF-8").trim().toLowerCase();
-
-            Map<String, Object> params = new HashMap<String, Object>(0);
-            params.put("machineId", mac);
-            params.put("password", agentPassword);
-            params.put("port", Constants.OPENCRON_PORT);
-            params.put("key", Constants.OPENCRON_REGKEY);
-
-            if (logger.isInfoEnabled()) {
-                logger.info("[opencron]agent auto register staring:{}", Constants.OPENCRON_SERVER);
-            }
-            try {
-                String result = HttpClientUtils.httpPostRequest(url, params);
-                if (result == null) {
-                    return false;
-                }
-                JSONObject jsonObject = JSON.parseObject(result);
-                if (jsonObject.get("status").toString().equals("200")) {
-                    return true;
-                }
-                if (logger.isErrorEnabled()) {
-                    logger.error("[opencron:agent auto regsiter error:{}]", jsonObject.get("message"));
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-                return false;
-            }
-        }
-        return false;
-    }
-
 
 }

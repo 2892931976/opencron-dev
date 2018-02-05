@@ -81,6 +81,8 @@ public class Constants {
 
     public static final String PARAM_OPENCRON_PASSWORD_KEY = "opencron.password";
 
+    public static final String PARAM_OPENCRON_HOST_KEY = "opencron.host";
+
     public static final String PARAM_OPENCRON_SHUTDOWN_KEY = "opencron.shutdown";
 
     public static final String PARAM_OPENCRON_REGISTRY_KEY = "opencron.registry";
@@ -139,14 +141,9 @@ public class Constants {
     public static final String OPENCRON_PASSWORD = SystemPropertyUtils.get(PARAM_OPENCRON_PASSWORD_KEY, PARAM_DEF_PASSWORD_KEY);
 
     /**
-     * serverurl
+     * agenthost
      */
-    public static final String OPENCRON_SERVER = SystemPropertyUtils.get("opencron.server");
-    /**
-     * regkey
-     */
-    public static final String OPENCRON_REGKEY = SystemPropertyUtils.get("opencron.regkey");
-
+    public static final String OPENCRON_HOST = SystemPropertyUtils.get(PARAM_OPENCRON_HOST_KEY);
     /**
      * pid
      */

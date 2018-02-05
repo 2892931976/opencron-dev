@@ -31,10 +31,4 @@ public interface AgentJob {
 
     void restart(Request request);
 
-    /**
-     * agent 自动注册...
-     *
-     * @return
-     */
-    boolean register();
 }

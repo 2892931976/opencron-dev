@@ -53,43 +53,53 @@ public class MacUtils {
         }
     }
 
+    /**
+     * 获取本机所有的网卡(过滤虚拟网卡)
+     * @return
+     */
     public static Set<String> getAllMac() {
         List<String> list = new ArrayList<String>();
         try {
             Enumeration<NetworkInterface> enumeration = NetworkInterface.getNetworkInterfaces();
             while (enumeration.hasMoreElements()) {
                 NetworkInterface network = enumeration.nextElement();
-                if (network != null) {
-                    if (network.getHardwareAddress() != null) {
-                        byte[] address = network.getHardwareAddress();
-
-                        StringBuffer buffer = new StringBuffer("");
-                        for (int i = 0; i < address.length; i++) {
-                            if (i > 0) {
-                                buffer.append("-");
-                            }
-                            String str = Integer.toHexString(address[i] & 0xff);
-                            if (str.length() == 1) {
-                                buffer.append("0" + str);
-                            } else {
-                                buffer.append(str);
-                            }
-                        }
-                        list.add(buffer.toString());
-                    }
-                } else {
-                    throw new UnknownException("[opencron] getAllMac error");
+                if (network == null || network.getHardwareAddress() == null || network.isLoopback() || network.isVirtual() || !network.isUp() ) {
+                    continue;
                 }
+                byte[] address = network.getHardwareAddress();
+                StringBuffer buffer = new StringBuffer("");
+                for (int i = 0; i < address.length; i++) {
+                    if (i > 0) {
+                        buffer.append("-");
+                    }
+                    String str = Integer.toHexString(address[i] & 0xff);
+                    if (str.length() == 1) {
+                        buffer.append("0" + str);
+                    } else {
+                        buffer.append(str);
+                    }
+                }
+                list.add(buffer.toString());
             }
         } catch (SocketException e) {
             e.printStackTrace();
+        }
+        if (list.isEmpty()) {
+            throw new UnknownException("[opencron] getAllMac error");
         }
         //按照字典顺序排序
         return new TreeSet<String>(list);
     }
 
+    //获取机器唯一标识
+    public static String getMachineId() {
+        String unId = StringUtils.join(MacUtils.getAllMac(), "");
+        return DigestUtils.md5Hex(unId);
+    }
+
     public static void main(String[] args) throws SocketException, UnknownHostException {
         System.out.println(MacUtils.getMac());
         System.out.println(MacUtils.getAllMac());
+        System.out.println(MacUtils.getMachineId());
     }
 }

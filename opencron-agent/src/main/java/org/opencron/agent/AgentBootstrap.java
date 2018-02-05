@@ -77,6 +77,11 @@ public class AgentBootstrap implements Serializable {
     private String password;
 
     /**
+     * agent host
+     */
+    private String host;
+
+    /**
      * bootstrap instance....
      */
     private static AgentBootstrap daemon;
@@ -146,9 +151,19 @@ public class AgentBootstrap implements Serializable {
      * @throws Exception
      */
     private void init() {
-        port = Integer.valueOf(Constants.OPENCRON_PORT);
-        String inpass = Constants.OPENCRON_PASSWORD;
+        this.port = Constants.OPENCRON_PORT;
+        this.host = Constants.OPENCRON_HOST;
+        if (CommonUtils.isEmpty(this.host)) {
+            this.host = AgentProperties.getProperty(Constants.PARAM_OPENCRON_HOST_KEY);
+        }
 
+        if (CommonUtils.isEmpty(this.host)) {
+            if (logger.isWarnEnabled()) {
+                logger.warn("[opencron] agent host not input,auto register can not be run，you can add this agent by yourself");
+            }
+        }
+
+        String inpass = Constants.OPENCRON_PASSWORD;
         if (notEmpty(inpass)) {
             Constants.OPENCRON_PASSWORD_FILE.delete();
             this.password = DigestUtils.md5Hex(inpass).toUpperCase();
@@ -167,13 +182,11 @@ public class AgentBootstrap implements Serializable {
             IOUtils.writeText(Constants.OPENCRON_PASSWORD_FILE, this.password, Constants.CHARSET_UTF8);
         }
 
-        SystemPropertyUtils.setProperty(Constants.PARAM_OPENCRON_PORT_KEY, this.port.toString());
         SystemPropertyUtils.setProperty(Constants.PARAM_OPENCRON_PASSWORD_KEY, this.password);
     }
 
     private void start() {
         try {
-            final int port = SystemPropertyUtils.getInt(Constants.PARAM_OPENCRON_PORT_KEY, 1577);
             //new thread to start for netty server
             Executors.newSingleThreadExecutor().submit(new Runnable() {
                 @Override
@@ -190,11 +203,18 @@ public class AgentBootstrap implements Serializable {
                 logger.info("[opencron]agent started @ port:{},pid:{}", port, getPid());
             }
 
-            String agentId = StringUtils.join(MacUtils.getAllMac(), "_");
+            String agentId = MacUtils.getMachineId();
             if (agentId == null) {
-                throw new IllegalArgumentException("[opencron] getMac error.");
+                throw new IllegalArgumentException("[opencron] getUniqueId error.");
             }
-            final String path = Constants.ZK_REGISTRY_AGENT_PATH + "/" + agentId + "@" + this.port;
+
+            //mac_host_password
+            final String path = String.format("%s/%s_%s_%s_%s",
+                    Constants.ZK_REGISTRY_AGENT_PATH,
+                    agentId,
+                    this.password,
+                    this.host,
+                    this.port);
 
             String registryAddress = AgentProperties.getProperty(Constants.PARAM_OPENCRON_REGISTRY_KEY);
             final URL url = URL.valueOf(registryAddress);

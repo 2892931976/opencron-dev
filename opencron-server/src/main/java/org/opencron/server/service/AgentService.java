@@ -26,6 +26,7 @@ import java.util.*;
 
 import org.opencron.common.Constants;
 import org.opencron.common.util.CommonUtils;
+import org.opencron.common.util.PropertyPlaceholder;
 import org.opencron.server.dao.QueryDao;
 import org.opencron.server.domain.User;
 import org.opencron.server.job.OpencronTools;
@@ -42,6 +43,8 @@ import javax.servlet.http.HttpSession;
 
 import static org.opencron.common.util.CommonUtils.isEmpty;
 import static org.opencron.common.util.CommonUtils.notEmpty;
+import static org.opencron.common.util.WebUtils.getIp;
+import static org.opencron.common.util.WebUtils.writeJson;
 
 @Service
 @Transactional
@@ -76,7 +79,6 @@ public class AgentService {
         }
         return OpencronTools.CACHE.get(Constants.PARAM_CACHED_AGENT_ID_KEY, List.class);
     }
-
 
     private synchronized void flushAgent() {
         OpencronTools.CACHE.put(
@@ -301,7 +303,7 @@ public class AgentService {
 
     public void doDisconnect(String info) {
         if (CommonUtils.notEmpty(info)) {
-            String macId = info.split("@")[0];
+            String macId = info.split("_")[0];
             Agent agent = getAgentByMachineId(macId);
             if (agent!=null) {
                 doDisconnect(agent);
@@ -310,10 +312,33 @@ public class AgentService {
     }
 
     public void doConnect(String info) {
-        if (CommonUtils.notEmpty(info)) {
-            String macId = info.split("@")[0];
-            Agent agent = getAgentByMachineId(macId);
-            if (agent!=null) {
+        if (CommonUtils.isEmpty(info)) return;
+        String mac = info.split("_")[0];
+        String password = info.split("_")[1];
+        String host = info.split("_")[2];
+        String port = info.split("_")[3];
+        Agent agent = getAgentByMachineId(mac);
+        //自动注册,新增机器
+        if (agent == null) {
+            //新的机器，需要自动注册.
+            agent = new Agent();
+            agent.setHost(host);
+            agent.setName(host);
+            agent.setPort(Integer.valueOf(port));
+            agent.setMachineId(mac);
+            agent.setPassword(password);
+            agent.setComment("auto registered.");
+            agent.setWarning(false);
+            agent.setMobiles(null);
+            agent.setEmailAddress(null);
+            agent.setProxy(Constants.ConnType.CONN.getType());
+            agent.setProxyAgent(null);
+            agent.setStatus(true);
+            agent.setDeleted(false);
+            merge(agent);
+        }else {
+            //密码一致
+            if (agent.getPassword().equals(password)) {
                 doConnect(agent);
             }
         }

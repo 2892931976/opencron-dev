@@ -278,7 +278,7 @@ fi
 
 case "$1" in
     start)
-        GETOPT_ARGS=`getopt -o P:p:s:k: -al port:,password: -- "$@"`
+        GETOPT_ARGS=`getopt -o P:p:h: -al port:,password:,host: -- "$@"`
         eval set -- "$GETOPT_ARGS"
         while [ -n "$1" ]
         do
@@ -289,11 +289,8 @@ case "$1" in
                 -p|--pass)
                     OPENCRON_PASSWORD=$2;
                     shift 2;;
-                -s|--server)
-                     OPENCRON_SERVER=$2;
-                     shift 2;;
-                -k|--key)
-                     OPENCRON_REGKEY=$2;
+                -h|--host)
+                     OPENCRON_HOST=$2;
                      shift 2;;
                 --) break ;;
                 *)
@@ -370,8 +367,7 @@ case "$1" in
         -Dopencron.pid="$OPENCRON_PID" \
         -Djava.io.tmpdir="$OPENCRON_TMPDIR" \
         -Dopencron.port="$OPENCRON_PORT" \
-        -Dopencron.server="$OPENCRON_SERVER" \
-        -Dopencron.regkey="$OPENCRON_REGKEY" \
+        -Dopencron.host="$OPENCRON_HOST" \
         -Dopencron.password="$OPENCRON_PASSWORD" \
         org.opencron.agent.AgentBootstrap start \
         >> "$OPENCRON_OUT" 2>&1 "&";
