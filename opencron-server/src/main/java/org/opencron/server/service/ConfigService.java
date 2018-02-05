@@ -21,8 +21,11 @@
 
 package org.opencron.server.service;
 
+import org.hibernate.Query;
+import org.opencron.common.util.CommonUtils;
 import org.opencron.common.util.DigestUtils;
 import org.opencron.server.dao.QueryDao;
+import org.opencron.server.domain.Agent;
 import org.opencron.server.domain.Config;
 import org.opencron.server.domain.Role;
 import org.opencron.server.domain.User;
@@ -30,6 +33,8 @@ import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 /**
  * Created by ChenHui on 2016/2/17.
@@ -54,6 +59,18 @@ public class ConfigService {
     }
 
     public void initDataBase() {
+
+        /**
+         * for version 1.1.0 update to version 1.2.0(ip rename to host)
+         */
+        try {
+            Query query = queryDao.createSQLQuery("update T_AGENT set host=ip where host is null and ip is not null");
+            query.executeUpdate();
+        }catch (Exception e) {
+            //skip
+        }
+
+        //init config
         long count = queryDao.hqlLongUniqueResult("select count(1) from Config");
         if (count == 0) {
 
