@@ -123,52 +123,6 @@ public class AgentController extends BaseController {
         return "redirect:/agent/view.htm";
     }
 
-
-    @RequestMapping(value = "autoreg.do", method = RequestMethod.POST)
-    public synchronized void autoReg(HttpServletRequest request, HttpServletResponse response, Agent agent, String key) {
-        String host = getIp(request);
-        String format = "{\"status\":%d,\"message\":\"%s\"}";
-        if (host == null) {
-            writeJson(response, String.format(format, 500, "can't get agent'host"));
-            return;
-        }
-
-        //验证Key是否与服务器端一致
-        String serverAutoRegKey = PropertyPlaceholder.get(Constants.PARAM_OPENCRON_AUTOREGKEY_KEY);
-        if (CommonUtils.notEmpty(serverAutoRegKey)) {
-            if (CommonUtils.isEmpty(key) || !key.equals(serverAutoRegKey)) {
-                writeJson(response, String.format(format, 400, "auto register key error!"));
-            }
-        }
-
-        if (agent.getMachineId() == null) {
-            writeJson(response, String.format(format, 500, "can't get agent'macaddress"));
-            return;
-        }
-
-        Agent dbAgent = agentService.getAgentByMachineId(agent.getMachineId());
-        //agent host发生改变的情况下，自动重新注册
-        if (dbAgent != null) {
-            dbAgent.setHost(host);
-            agentService.merge(dbAgent);
-            writeJson(response, String.format(format, 200, host));
-        } else {
-            //新的机器，需要自动注册.
-            agent.setHost(host);
-            agent.setName(host);
-            agent.setComment("agent auto registered");
-            agent.setWarning(false);
-            agent.setMobiles(null);
-            agent.setEmailAddress(null);
-            agent.setProxy(Constants.ConnType.CONN.getType());
-            agent.setProxyAgent(null);
-            agent.setStatus(true);
-            agent.setDeleted(false);
-            agentService.merge(agent);
-            writeJson(response, String.format(format, 200, host));
-        }
-    }
-
     @RequestMapping(value = "get.do", method = RequestMethod.POST)
     @ResponseBody
     public Agent get(HttpServletResponse response, Long id) {
