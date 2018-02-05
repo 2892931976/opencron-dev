@@ -7,21 +7,23 @@ V1.2.0 by 2018-xx-xx
     
     2)引入zookeeper,agent端心跳检测改为zookeeper通知的方式
     
-    3)基于zookeeper实现server集群,动态增减server,job自动分配,实现高可用
+    3)基于zookeeper,agent实现自动注册
+    
+    4)基于zookeeper实现server集群,动态增减server,job自动分配,实现高可用
 
-    4)简化安装部署流程,提供三个脚本一键安装启动项目(build.sh,agent.sh,server.sh)
+    5)简化安装部署流程,提供三个脚本一键安装启动项目(build.sh,agent.sh,server.sh)
     
-    5)server内置tomcat和jetty组件,支持开发者模式,大大减轻运维部署的难度
+    6)server内置tomcat和jetty组件,支持开发者模式,大大减轻运维部署的难度
     
-    6)改进首页实时监控,大幅度提升agent端性能
+    7)改进首页实时监控,大幅度提升agent端性能
     
-    7)webssh新增基于privateKey方式的登录
+    8)webssh新增基于privateKey方式的登录
     
-    8)支持对外提供api的方式,控制任务调度
+    9)支持对外提供api的方式,控制任务调度
     
-    9)新增一系列的examples调度使用实例
+    10)新增一系列的examples调度使用实例
     
-    10)修复一系列已知bug,增强稳定性和可用性
+    11)修复一系列已知bug,增强稳定性和可用性
     
     此版本是里程碑版本,从底层架构到项目实现都进行重新规划,大大提高了可用性和稳定性,建议所有人升级
 
