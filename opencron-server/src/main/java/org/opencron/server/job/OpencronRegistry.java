@@ -74,21 +74,15 @@ public class OpencronRegistry {
 
     private RegistryService registryService = new RegistryService();
 
-
     private final String SERVER_ID = uuid();
-
 
     private final URL registryURL = URL.valueOf(PropertyPlaceholder.get(Constants.PARAM_OPENCRON_REGISTRY_KEY));
 
-
     private final String registryPath = Constants.ZK_REGISTRY_SERVER_PATH + "/" + SERVER_ID;
-
 
     private Map<String,String> agents = new ConcurrentHashMap<String, String>(0);
 
-
     private Map<String,String> jobMap = new ConcurrentHashMap<String, String>(0);
-
 
     private List<String> servers = new ArrayList<String>(0);
 
