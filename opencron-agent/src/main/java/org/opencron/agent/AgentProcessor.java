@@ -21,7 +21,6 @@
 package org.opencron.agent;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.exec.*;
 import org.opencron.common.Constants;
 import org.opencron.common.api.AgentJob;

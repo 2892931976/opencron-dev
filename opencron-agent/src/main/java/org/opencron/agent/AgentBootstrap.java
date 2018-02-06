@@ -161,8 +161,6 @@ public class AgentBootstrap implements Serializable {
             this.host = AgentProperties.getProperty(Constants.PARAM_OPENCRON_HOST_KEY);
         }
 
-
-
         String inpass = Constants.OPENCRON_PASSWORD;
         if (notEmpty(inpass)) {
             Constants.OPENCRON_PASSWORD_FILE.delete();
@@ -183,6 +181,14 @@ public class AgentBootstrap implements Serializable {
         }
 
         SystemPropertyUtils.setProperty(Constants.PARAM_OPENCRON_PASSWORD_KEY, this.password);
+
+        //init sigar
+        String libPath = System.getProperty("java.library.path");
+        String path = Constants.OPENCRON_HOME.concat("/lib");
+        if (!libPath.contains(path)) {
+            libPath += ";" + path;
+        }
+        System.setProperty("java.library.path", libPath);
     }
 
     private void start() {
