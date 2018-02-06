@@ -116,21 +116,24 @@ public class DashboardController extends BaseController {
         /**
          * 成功作业,自动执行
          */
-        Integer successAutoRecord = recordService.getRecords(session, 1, Constants.ExecType.AUTO);
-        Integer successOperRecord = recordService.getRecords(session, 1, Constants.ExecType.OPERATOR);
+        Integer successAutoRecord = recordService.getRecords(session, Constants.ResultStatus.SUCCESSFUL, Constants.ExecType.AUTO);
+        Integer successOperRecord = recordService.getRecords(session, Constants.ResultStatus.SUCCESSFUL, Constants.ExecType.OPERATOR);
+        Integer successBatchRecord = recordService.getRecords(session, Constants.ResultStatus.SUCCESSFUL, Constants.ExecType.BATCH);
 
         model.addAttribute("successAutoRecord", successAutoRecord);
-        model.addAttribute("successOperRecord", successOperRecord);
-        model.addAttribute("successRecord", successAutoRecord + successOperRecord);
+        model.addAttribute("successOperRecord", successOperRecord + successBatchRecord);
+        model.addAttribute("successRecord", successAutoRecord + successOperRecord + successBatchRecord );
 
         /**
          * 失败作业
          */
-        Integer failedAutoRecord = recordService.getRecords(session, 0, Constants.ExecType.AUTO);
-        Integer failedOperRecord = recordService.getRecords(session, 0, Constants.ExecType.OPERATOR);
+        Integer failedAutoRecord = recordService.getRecords(session, Constants.ResultStatus.FAILED, Constants.ExecType.AUTO);
+        Integer failedOperRecord = recordService.getRecords(session, Constants.ResultStatus.FAILED, Constants.ExecType.OPERATOR);
+        Integer failedBatchRecord = recordService.getRecords(session, Constants.ResultStatus.FAILED, Constants.ExecType.BATCH);
+
         model.addAttribute("failedAutoRecord", failedAutoRecord);
-        model.addAttribute("failedOperRecord", failedOperRecord);
-        model.addAttribute("failedRecord", failedAutoRecord + failedOperRecord);
+        model.addAttribute("failedOperRecord", failedOperRecord + failedBatchRecord);
+        model.addAttribute("failedRecord", failedAutoRecord + failedOperRecord + failedBatchRecord);
 
         model.addAttribute("startTime", DateUtils.getCurrDayPrevDay(7));
         model.addAttribute("endTime", DateUtils.formatSimpleDate(new Date()));

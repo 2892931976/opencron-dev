@@ -309,18 +309,16 @@ public class RecordService {
         return queryDao.sqlQuery(Record.class, sql, recordId);
     }
 
-    public Integer getRecords(HttpSession session, int status, Constants.ExecType execType) {
-        String sql;
-        if (status == 1) {
-            sql = "SELECT COUNT(1) FROM T_RECORD WHERE success=? AND execType=? AND STATUS IN (?,?,?) AND (FLOWNUM IS NULL OR flowNum=1)";
-        } else {
-            sql = "SELECT COUNT(1) FROM T_RECORD WHERE success<>? AND execType=? AND STATUS IN (?,?,?) AND (FLOWNUM IS NULL OR flowNum=1)";
-        }
+    public Integer getRecords(HttpSession session, Constants.ResultStatus status, Constants.ExecType execType) {
+        String hql = "select count(1) from Record where success=:success and exectype=:exectype and status in (:status) and (flownum is null or flownum=1)";
         if (!OpencronTools.isPermission(session)) {
             User user = OpencronTools.getUser(session);
-            sql += " AND userId = " + user.getUserId() + " AND agentid IN (" + user.getAgentIds() + ")";
+            hql += " and userId = " + user.getUserId() + " and agentid IN (" + user.getAgentIds() + ")";
         }
-        return queryDao.sqlCount(sql, 1, execType.getStatus(), Constants.RunStatus.STOPED.getStatus(), Constants.RunStatus.DONE.getStatus(), Constants.RunStatus.RERUNDONE.getStatus());
+        Map<String,String> params = ParamsMap.map().set("success",status.getStatus())
+                .set("exectype",execType.getStatus())
+                .set("status",Arrays.asList(Constants.RunStatus.STOPED.getStatus(), Constants.RunStatus.DONE.getStatus(), Constants.RunStatus.RERUNDONE.getStatus()));
+        return queryDao.hqlCount(hql,params );
     }
 
     @Transactional

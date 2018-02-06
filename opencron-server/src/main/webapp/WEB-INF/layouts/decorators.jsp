@@ -45,7 +45,7 @@
                 $.ajax({
                     type: "POST",
                     url: "${contextPath}/progress.do",
-                    dataType: "JSON",
+                    dataType: "json",
                     success: function (data) {
                         if (data) {
                             $(".opencron-progress").show();
@@ -146,7 +146,7 @@
                 url: "${contextPath}/notice/uncount.do",
                 dataType: "html",
                 success: function (data) {
-                    if (data){
+                    if ( data && parseInt(data)>0 ){
                         $(".n-count").text(data);
                         $("#msg-icon").show();
                         $.ajax({

@@ -167,7 +167,7 @@ public class Constants {
 
 
 
-    public static enum StatusCode implements Serializable {
+    public enum StatusCode implements Serializable {
         SUCCESS_EXIT(0x0, "正常退出"),
         ERROR_EXIT(0x1, "异常退出"),
         ERROR_PING(-0x63, "连接失败,ping不通"),
@@ -202,7 +202,7 @@ public class Constants {
         }
     }
 
-    public static enum ExecType implements Serializable {
+    public enum ExecType implements Serializable {
 
         AUTO(0x0, "auto", "自动模式,系统调用"),
         OPERATOR(0x1, "operator", "手动模式,手动调用"),
@@ -253,7 +253,7 @@ public class Constants {
         }
     }
 
-    public static enum ConnStatus implements Serializable {
+    public enum ConnStatus implements Serializable {
         CONNECTED(0x1, true, "通信成功"),
         DISCONNECTED(0x0, false, "通信失败");
 
@@ -301,7 +301,7 @@ public class Constants {
         }
     }
 
-    public static enum CronType implements Serializable {
+    public enum CronType implements Serializable {
 
         CRONTAB(0x0, "crontab", "crontab表达式"),
         QUARTZ(0x1, "quartz", "quartz表达式");
@@ -350,7 +350,7 @@ public class Constants {
         }
     }
 
-    public static enum ResultStatus {
+    public enum ResultStatus {
         FAILED(0x0, "失败"),
         SUCCESSFUL(0x1, "成功"),
         KILLED(0x2, "被杀"),
@@ -381,7 +381,7 @@ public class Constants {
         }
     }
 
-    public static enum RunStatus implements Serializable {
+    public enum RunStatus implements Serializable {
 
         RUNNING(0x0, "running", "正在运行"),
         DONE(0x1, "done", "已完成"),
@@ -426,7 +426,7 @@ public class Constants {
         }
     }
 
-    public static enum JobType implements Serializable {
+    public enum JobType implements Serializable {
         SINGLETON(0x0, "单一任务"),
         FLOW(0x1, "流程任务");
 
@@ -465,7 +465,7 @@ public class Constants {
         }
     }
 
-    public static enum MsgType {
+    public enum MsgType {
         EMAIL(0x0, "邮件"),
         SMS(0x1, "短信"),
         WEBSITE(0x2, "站内信");
@@ -495,7 +495,7 @@ public class Constants {
         }
     }
 
-    public static enum RunModel {
+    public enum RunModel {
         SEQUENCE(0x0, "串行"),
         SAMETIME(0x1, "并行");
         private Integer value;
@@ -532,7 +532,7 @@ public class Constants {
         }
     }
 
-    public static enum ConnType {
+    public enum ConnType {
         CONN(0x0, "conn", "直连"),
         PROXY(0x1, "proxy", "代理");
 

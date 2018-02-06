@@ -56,7 +56,7 @@ public class HomeService {
     public int checkLogin(HttpServletRequest request, String username, String password) throws IOException {
 
         HttpSession httpSession = request.getSession();
-        User user = queryDao.hqlUniqueQuery("FROM User WHERE userName = ?", username);
+        User user = queryDao.hqlUniqueQuery("from User where userName = ?", username);
         if (user == null) return 500;
 
         //拿到数据库的数据盐
@@ -109,13 +109,13 @@ public class HomeService {
     }
 
     public List<LogInfo> getUnReadMessage(HttpSession session) {
-        String sql = "SELECT * FROM T_LOG WHERE isRead=0 AND type=?  and userId = ? ORDER BY sendTime DESC LIMIT 5 ";
-        return queryDao.sqlQuery(LogInfo.class, sql, Constants.MsgType.WEBSITE.getValue(), OpencronTools.getUserId(session));
+        String hql = "from Log where isread=? AND type=?  and userId = ? order by sendTime desc";
+        return queryDao.hqlPageQuery(hql,1,5, false,Constants.MsgType.WEBSITE.getValue(), OpencronTools.getUserId(session));
     }
 
     public Integer getUnReadCount(HttpSession session) {
-        String sql = "SELECT COUNT(1) FROM T_LOG WHERE isRead=0 AND type=? and userId = ?";
-        return queryDao.sqlCount(sql, Constants.MsgType.WEBSITE.getValue(), OpencronTools.getUserId(session));
+        String hql = "select count(1) from Log where isread=? and type=? and userid = ?";
+        return queryDao.hqlCount(hql, false,Constants.MsgType.WEBSITE.getValue(), OpencronTools.getUserId(session));
     }
 
     public void saveLog(Log log) {
@@ -128,8 +128,12 @@ public class HomeService {
     }
 
     public void updateAfterRead(Long logId) {
-        String sql = "UPDATE T_LOG SET isRead = 1 WHERE logId = ? and Type = ?";
-        queryDao.createSQLQuery(sql, logId, Constants.MsgType.WEBSITE.getValue()).executeUpdate();
+        String hql = "from Log where logId=? and type=?";
+        Log log = queryDao.hqlUniqueQuery(hql,logId,Constants.MsgType.WEBSITE.getValue());
+        if (log!=null) {
+            log.setIsread(true);
+            queryDao.merge(log);
+        }
     }
 
 }
