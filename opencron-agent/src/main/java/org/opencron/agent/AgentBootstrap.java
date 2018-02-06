@@ -82,6 +82,10 @@ public class AgentBootstrap implements Serializable {
     private String host;
 
     /**
+     * zookeeper registryPath
+     */
+    private String registryPath;
+    /**
      * bootstrap instance....
      */
     private static AgentBootstrap daemon;
@@ -157,11 +161,7 @@ public class AgentBootstrap implements Serializable {
             this.host = AgentProperties.getProperty(Constants.PARAM_OPENCRON_HOST_KEY);
         }
 
-        if (CommonUtils.isEmpty(this.host)) {
-            if (logger.isWarnEnabled()) {
-                logger.warn("[opencron] agent host not input,auto register can not be run，you can add this agent by yourself");
-            }
-        }
+
 
         String inpass = Constants.OPENCRON_PASSWORD;
         if (notEmpty(inpass)) {
@@ -203,23 +203,32 @@ public class AgentBootstrap implements Serializable {
                 logger.info("[opencron]agent started @ port:{},pid:{}", port, getPid());
             }
 
-            String agentId = MacUtils.getMachineId();
-            if (agentId == null) {
+            String machineId = MacUtils.getMachineId();
+            if (machineId == null) {
                 throw new IllegalArgumentException("[opencron] getUniqueId error.");
             }
 
-            //mac_host_password
-            final String path = String.format("%s/%s_%s_%s_%s",
-                    Constants.ZK_REGISTRY_AGENT_PATH,
-                    agentId,
-                    this.password,
-                    this.host,
-                    this.port);
+            //mac
+            this.registryPath = String.format("%s/%s_%s",Constants.ZK_REGISTRY_AGENT_PATH,machineId,this.password);
+
+            if (CommonUtils.isEmpty(this.host)) {
+                if (logger.isWarnEnabled()) {
+                    logger.warn("[opencron] agent host not input,auto register can not be run，you can add this agent by yourself");
+                }
+            }else {
+                //mac_password_host_port
+                this.registryPath = String.format("%s/%s_%s_%s_%s",
+                        Constants.ZK_REGISTRY_AGENT_PATH,
+                        machineId,
+                        this.password,
+                        this.host,
+                        this.port);
+            }
 
             String registryAddress = AgentProperties.getProperty(Constants.PARAM_OPENCRON_REGISTRY_KEY);
             final URL url = URL.valueOf(registryAddress);
             final RegistryService registryService = new RegistryService();
-            registryService.register(url, path, true);
+            registryService.register(url, this.registryPath, true);
 
             if (logger.isInfoEnabled()) {
                 logger.info("[opencron] agent register to zookeeper done");
@@ -231,7 +240,7 @@ public class AgentBootstrap implements Serializable {
                     if (logger.isInfoEnabled()) {
                         logger.info("[opencron] run shutdown hook now...");
                     }
-                    registryService.unregister(url, path);
+                    registryService.unregister(url, AgentBootstrap.this.registryPath);
                 }
             }, "OpencronShutdownHook"));
         } catch (Exception e) {

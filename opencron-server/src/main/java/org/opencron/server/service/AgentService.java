@@ -313,33 +313,46 @@ public class AgentService {
 
     public void doConnect(String info) {
         if (CommonUtils.isEmpty(info)) return;
-        String mac = info.split("_")[0];
-        String password = info.split("_")[1];
-        String host = info.split("_")[2];
-        String port = info.split("_")[3];
-        Agent agent = getAgentByMachineId(mac);
-        //自动注册,新增机器
-        if (agent == null) {
-            //新的机器，需要自动注册.
-            agent = new Agent();
-            agent.setHost(host);
-            agent.setName(host);
-            agent.setPort(Integer.valueOf(port));
-            agent.setMachineId(mac);
-            agent.setPassword(password);
-            agent.setComment("auto registered.");
-            agent.setWarning(false);
-            agent.setMobiles(null);
-            agent.setEmailAddress(null);
-            agent.setProxy(Constants.ConnType.CONN.getType());
-            agent.setProxyAgent(null);
-            agent.setStatus(true);
-            agent.setDeleted(false);
-            merge(agent);
-        }else {
+        String[] array = info.split("_");
+        //非法注册信息
+        if (array.length!=2 && array.length!=4) {
+            return;
+        }
+        String macId = array[0];
+        String password = array[1];
+        Agent agent = getAgentByMachineId(macId);
+        if (array.length == 2) {
             //密码一致
-            if (agent.getPassword().equals(password)) {
+            if ( agent!=null && agent.getPassword().equals(password)) {
                 doConnect(agent);
+            }
+        }else {
+            String host = array[2];
+            String port = array[3];
+            if (agent == null) {
+                //新的机器，需要自动注册.
+                agent = new Agent();
+                agent.setHost(host);
+                agent.setName(host);
+                agent.setPort(Integer.valueOf(port));
+                agent.setMachineId(macId);
+                agent.setPassword(password);
+                agent.setComment("auto registered.");
+                agent.setWarning(false);
+                agent.setMobiles(null);
+                agent.setEmailAddress(null);
+                agent.setProxy(Constants.ConnType.CONN.getType());
+                agent.setProxyAgent(null);
+                agent.setStatus(true);
+                agent.setDeleted(false);
+                if (executeService.ping(agent)) {
+                    merge(agent);
+                }
+            }else {
+                //密码一致
+                if (agent.getPassword().equals(password)) {
+                    doConnect(agent);
+                }
             }
         }
     }

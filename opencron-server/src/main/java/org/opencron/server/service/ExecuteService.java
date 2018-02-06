@@ -560,7 +560,6 @@ public class ExecuteService implements Job {
                     null,
                     agent.getProxyAgent()
             ));
-
             return response != null && response.isSuccess();
         } catch (Exception e) {
             logger.error("[opencron]ping failed,host:{},port:{}", agent.getHost(), agent.getPort());
