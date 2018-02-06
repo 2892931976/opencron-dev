@@ -196,7 +196,7 @@ public class DashboardController extends BaseController {
 
     @RequestMapping(value = "login.do", method = RequestMethod.POST)
     @ResponseBody
-    public Map login(HttpSession session, HttpServletRequest request, HttpServletResponse response, HttpSession httpSession, @RequestParam String username, @RequestParam String password) throws Exception {
+    public Map login(HttpSession session, HttpServletRequest request, HttpServletResponse response,@RequestParam String username, @RequestParam String password) throws Exception {
 
         //用户信息验证
         int status = homeService.checkLogin(request, username, password);
@@ -221,7 +221,7 @@ public class DashboardController extends BaseController {
 
             if (user.getHeaderpic() != null) {
                 String name = user.getUserId() + "_140" + user.getPicExtName();
-                String path = httpSession.getServletContext().getRealPath("/").replaceFirst("/$", "") + "/upload/" + name;
+                String path = session.getServletContext().getRealPath("/").replaceFirst("/$", "") + "/upload/" + name;
                 IOUtils.writeFile(new File(path), user.getHeaderpic().getBinaryStream());
                 user.setHeaderPath(getWebUrlPath(request) + "/upload/" + name);
                 session.setAttribute(Constants.PARAM_LOGIN_USER_KEY, user);
@@ -241,14 +241,13 @@ public class DashboardController extends BaseController {
 
     @RequestMapping(value = "headpic/upload.do", method = RequestMethod.POST)
     @ResponseBody
-    public Map upload(@RequestParam(value = "file", required = false) MultipartFile file, Long userId, String data, HttpServletRequest request, HttpSession httpSession, HttpServletResponse response) throws Exception {
+    public Map upload(@RequestParam(value = "file", required = false) MultipartFile file, Long userId, String data, HttpServletRequest request, HttpSession httpSession) throws Exception {
 
         String extensionName = null;
         if (file != null) {
             extensionName = file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf("."));
             extensionName = extensionName.replaceAll("\\?\\d+$", "");
         }
-
 
         Cropper cropper = JSON.parseObject(DigestUtils.passBase64(data), Cropper.class);
         ParamsMap result = ParamsMap.map();
