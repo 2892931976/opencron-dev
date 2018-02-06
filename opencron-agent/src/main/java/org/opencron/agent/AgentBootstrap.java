@@ -188,7 +188,7 @@ public class AgentBootstrap implements Serializable {
         if (!libPath.contains(path)) {
             libPath += ";" + path;
         }
-        System.setProperty("java.library.path", libPath);
+        SystemPropertyUtils.setProperty(Constants.PARAM_JAVA_LIBRARY_PATH_KEY,libPath);
     }
 
     private void start() {

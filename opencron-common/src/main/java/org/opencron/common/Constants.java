@@ -73,13 +73,13 @@ public class Constants {
 
     public static final String PARAM_SUCCESSEXIT_KEY = "successExit";
 
-    public static final String PARAM_OPENCRON_AUTOREGKEY_KEY = "opencron.autoRegKey";
-
     public static final String PARAM_OPENCRON_KEYPATH_KEY = "opencron.keypath";
 
     public static final String PARAM_OPENCRON_SINGLELOGIN_KEY = "opencron.singlelogin";
 
     public static final String PARAM_OPENCRON_PASSWORD_KEY = "opencron.password";
+
+    public static final String PARAM_JAVA_LIBRARY_PATH_KEY = "java.library.path";
 
     public static final String PARAM_OPENCRON_HOST_KEY = "opencron.host";
 
