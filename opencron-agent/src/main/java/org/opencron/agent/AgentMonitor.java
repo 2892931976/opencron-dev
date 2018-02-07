@@ -42,11 +42,11 @@ public class AgentMonitor {
         Monitor monitor = new Monitor();
         monitor.setCpu(getCup());
         monitor.setMem(getMem());
-        return null;
+        monitor.setLoad(getLoad());
+        return monitor;
     }
 
     public List<Monitor.CPU> getCup() throws SigarException {
-
         CpuInfo infos[] = sigar.getCpuInfoList();
         CpuPerc cpuList[] = sigar.getCpuPercList();
         List<Monitor.CPU> cpus = new ArrayList<Monitor.CPU>();
@@ -56,7 +56,11 @@ public class AgentMonitor {
         return cpus;
     }
 
-    public Monitor.Mem getMem() throws SigarException {
-        return new Monitor.Mem(sigar.getMem());
+    public  Monitor.Mem getMem() throws SigarException {
+        return new Monitor.Mem(sigar.getMem(),sigar.getSwap());
+    }
+
+    public Monitor.Load getLoad() throws SigarException {
+        return new Monitor.Load(sigar.getLoadAverage());
     }
 }
