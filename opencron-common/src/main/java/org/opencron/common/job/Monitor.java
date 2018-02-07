@@ -21,10 +21,10 @@
 
 package org.opencron.common.job;
 
-import com.alibaba.fastjson.annotation.JSONType;
+import org.hyperic.sigar.CpuInfo;
+import org.hyperic.sigar.CpuPerc;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -32,546 +32,320 @@ import java.util.List;
  */
 public class Monitor implements Serializable {
 
-    private String time;
+    private List<CPU> cpu;
 
-    private String memUsage;
+    private Mem mem;
 
-    private String swap;
-
-    private List<String> load = new ArrayList<String>(0);
-
-    private String diskUsage;
-
-    private String config;
-
-    private String cpuData;
-
-    private String top;
-
-    //get...set..
-
-    public String getTime() {
-        return time;
+    public List<CPU> getCpu() {
+        return cpu;
     }
 
-    public void setTime(String time) {
-        this.time = time;
+    public void setCpu(List<CPU> cpu) {
+        this.cpu = cpu;
     }
 
-    public String getMemUsage() {
-        return memUsage;
+    public Mem getMem() {
+        return mem;
     }
 
-    public void setMemUsage(String memUsage) {
-        this.memUsage = memUsage;
+    public void setMem(Mem mem) {
+        this.mem = mem;
     }
 
-    public String getSwap() {
-        return swap;
-    }
+    public static class CPU implements Serializable {
 
-    public void setSwap(String swap) {
-        this.swap = swap;
-    }
+        private int index;
+        private String vendor = null;
+        private String model = null;
+        private int mhz = 0;
+        private long cacheSize = 0L;
+        private int totalCores = 0;
+        private int totalSockets = 0;
+        private int coresPerSocket = 0;
+        private double user;
+        private double sys;
+        private double nice;
+        private double idle;
+        private double wait;
+        private double irq;
+        private double softIrq;
+        private double stolen;
+        private double combined;
 
-    public List<String> getLoad() {
-        return load;
-    }
+        public CPU(int index, CpuInfo info, CpuPerc perc) {
+            this.index = index;
+            this.cacheSize = info.getCacheSize();
+            this.coresPerSocket = info.getCoresPerSocket();
+            this.totalCores = info.getTotalCores();
+            this.totalSockets = info.getTotalSockets();
+            this.mhz = info.getMhz();
+            this.model = info.getModel();
+            this.vendor = info.getVendor();
 
-    public void setLoad(List<String> load) {
-        this.load = load;
-    }
-
-    public String getCpuData() {
-        return cpuData;
-    }
-
-    public void setCpuData(String cpuData) {
-        this.cpuData = cpuData;
-    }
-
-    public String getDiskUsage() {
-        return diskUsage;
-    }
-
-    public void setDiskUsage(String diskUsage) {
-        this.diskUsage = diskUsage;
-    }
-
-    public String getConfig() {
-        return config;
-    }
-
-    public void setConfig(String config) {
-        this.config = config;
-    }
-
-
-    public String getTop() {
-        return top;
-    }
-
-    public void setTop(String top) {
-        this.top = top;
-    }
-
-    @Override
-    public String toString() {
-        return "Monitor{" +
-                "time='" + time + '\'' +
-                ", memUsage='" + memUsage + '\'' +
-                ", swap='" + swap + '\'' +
-                ", load=" + load.toString() +
-                ", cpuData=" + cpuData +
-                ", diskUsage=" + diskUsage +
-                ", top=" + top +
-                ", config=" + config +
-                '}';
-    }
-
-    public static class Info implements Serializable {
-        private List<Net> net = new ArrayList<Net>();
-        private String disk;
-        private Mem mem;
-        private Swap swap;
-        private Cpu cpu;
-        private String load;
-        private String conf;
-        private String top;
-
-        public List<Net> getNet() {
-            return net;
-        }
-
-        public void setNet(List<Net> net) {
-            this.net = net;
-        }
-
-        public String getDisk() {
-            return disk;
-        }
-
-        public void setDisk(String disk) {
-            this.disk = disk;
-        }
-
-        public Mem getMem() {
-            return mem;
-        }
-
-        public void setMem(Mem mem) {
-            this.mem = mem;
-        }
-
-        public Swap getSwap() {
-            return swap;
-        }
-
-        public void setSwap(Swap swap) {
-            this.swap = swap;
-        }
-
-        public Cpu getCpu() {
-            return cpu;
-        }
-
-        public void setCpu(Cpu cpu) {
-            this.cpu = cpu;
-        }
-
-        public String getLoad() {
-            return load;
-        }
-
-        public void setLoad(String load) {
-            this.load = load;
-        }
-
-        public String getConf() {
-            return conf;
-        }
-
-        public void setConf(String conf) {
-            this.conf = conf;
-        }
-
-        public String getTop() {
-            return top;
-        }
-
-        public void setTop(String top) {
-            this.top = top;
-        }
-    }
-
-    public static class Iostat implements Serializable {
-        private String device;// device: 设备
-        private String rrqm;// rrqm/s:  每秒进行 merge 的读操作数目。即 rmerge/s
-        private String wrqm;//  wrqm/s:  每秒进行 merge 的写操作数目。即 wmerge/s
-        private String r;//  r/s:  每秒完成的读 I/O 设备次数。即 rio/s
-        private String w;//  w/s:  每秒完成的写 I/O 设备次数。即 wio/s
-        private String rkB;// rkB/s:  每秒读K字节数。是 rsect/s 的一半，因为每扇区大小为512字节
-        private String wkB;//  wkB/s:  每秒写K字节数。是 wsect/s 的一半
-        private String avgrq;// avgrq-sz:  平均每次设备I/O操作的数据大小 (扇区)
-        private String avgqu;// avgqu-sz:  平均I/O队列长度
-        private String await;// await:  平均每次设备I/O操作的等待时间 (毫秒)
-        private String svctm;// svctm: 平均每次设备I/O操作的服务时间 (毫秒)
-        private String util;//  %util:  一秒中有百分之多少的时间用于 I/O 操作，即被io消耗的cpu百分比
-
-        public String getDevice() {
-            return device;
-        }
-
-        public void setDevice(String device) {
-            this.device = device;
-        }
-
-        public String getRrqm() {
-            return rrqm;
-        }
-
-        public void setRrqm(String rrqm) {
-            this.rrqm = rrqm;
-        }
-
-        public String getWrqm() {
-            return wrqm;
-        }
-
-        public void setWrqm(String wrqm) {
-            this.wrqm = wrqm;
-        }
-
-        public String getR() {
-            return r;
-        }
-
-        public void setR(String r) {
-            this.r = r;
-        }
-
-        public String getW() {
-            return w;
-        }
-
-        public void setW(String w) {
-            this.w = w;
-        }
-
-        public String getRkB() {
-            return rkB;
-        }
-
-        public void setRkB(String rkB) {
-            this.rkB = rkB;
-        }
-
-        public String getWkB() {
-            return wkB;
+            this.user = perc.getUser();
+            this.sys = perc.getSys();
+            this.nice = perc.getNice();
+            this.idle = perc.getIdle();
+            this.wait = perc.getWait();
+            this.irq = perc.getIrq();
+            this.softIrq = perc.getSoftIrq();
+            this.stolen = perc.getStolen();
+            this.combined = perc.getCombined();
         }
 
-        public void setWkB(String wkB) {
-            this.wkB = wkB;
+        public int getIndex() {
+            return index;
         }
 
-        public String getAvgrq() {
-            return avgrq;
+        public void setIndex(int index) {
+            this.index = index;
         }
 
-        public void setAvgrq(String avgrq) {
-            this.avgrq = avgrq;
+        public String getVendor() {
+            return vendor;
         }
 
-        public String getAvgqu() {
-            return avgqu;
+        public void setVendor(String vendor) {
+            this.vendor = vendor;
         }
 
-        public void setAvgqu(String avgqu) {
-            this.avgqu = avgqu;
+        public String getModel() {
+            return model;
         }
 
-        public String getAwait() {
-            return await;
+        public void setModel(String model) {
+            this.model = model;
         }
 
-        public void setAwait(String await) {
-            this.await = await;
+        public int getMhz() {
+            return mhz;
         }
 
-        public String getSvctm() {
-            return svctm;
+        public void setMhz(int mhz) {
+            this.mhz = mhz;
         }
 
-        public void setSvctm(String svctm) {
-            this.svctm = svctm;
+        public long getCacheSize() {
+            return cacheSize;
         }
 
-        public String getUtil() {
-            return util;
+        public void setCacheSize(long cacheSize) {
+            this.cacheSize = cacheSize;
         }
 
-        public void setUtil(String util) {
-            this.util = util;
+        public int getTotalCores() {
+            return totalCores;
         }
-    }
 
-    public static class Conf implements Serializable {
-        private String hostname;
-        private String os;
-        private String kernel;
-        private String machine;
-        private String cpuinfo;
-
-        public String getHostname() {
-            return hostname;
-        }
-
-        public void setHostname(String hostname) {
-            this.hostname = hostname;
-        }
-
-        public String getOs() {
-            return os;
-        }
-
-        public void setOs(String os) {
-            this.os = os;
-        }
-
-        public String getKernel() {
-            return kernel;
-        }
-
-        public void setKernel(String kernel) {
-            this.kernel = kernel;
-        }
-
-        public String getMachine() {
-            return machine;
-        }
-
-        public void setMachine(String machine) {
-            this.machine = machine;
-        }
-
-        public String getCpuinfo() {
-            return cpuinfo;
-        }
-
-        public void setCpuinfo(String cpuinfo) {
-            this.cpuinfo = cpuinfo;
-        }
-    }
-
-    public static class Cpu implements Serializable {
-        private String id2;
-        private String id1;
-        private String total2;
-        private String total1;
-        private String detail;
-
-
-        public String getId2() {
-            return id2;
-        }
-
-        public void setId2(String id2) {
-            this.id2 = id2;
-        }
-
-        public String getId1() {
-            return id1;
-        }
-
-        public void setId1(String id1) {
-            this.id1 = id1;
-        }
-
-        public String getTotal2() {
-            return total2;
-        }
-
-        public void setTotal2(String total2) {
-            this.total2 = total2;
-        }
-
-        public String getTotal1() {
-            return total1;
+        public void setTotalCores(int totalCores) {
+            this.totalCores = totalCores;
         }
 
-        public void setTotal1(String total1) {
-            this.total1 = total1;
+        public int getTotalSockets() {
+            return totalSockets;
         }
 
-        public String getDetail() {
-            return detail;
+        public void setTotalSockets(int totalSockets) {
+            this.totalSockets = totalSockets;
         }
-
-        public void setDetail(String detail) {
-            this.detail = detail;
-        }
-    }
-
-    public static class Mem implements Serializable {
-        private float total;
-        private float used;
-
-        public float getTotal() {
-            return total;
-        }
-
-        public void setTotal(float total) {
-            this.total = total;
-        }
-
-        public float getUsed() {
-            return used;
-        }
-
-        public void setUsed(float used) {
-            this.used = used;
-        }
-    }
-
-    public static class Net implements Serializable {
-        private String name;
-        private float read;
-        private float write;
-
-        public String getName() {
-            return name;
-        }
-
-        public void setName(String name) {
-            this.name = name;
-        }
-
-        public float getRead() {
-            return read;
-        }
-
-        public void setRead(float read) {
-            this.read = read;
-        }
-
-        public float getWrite() {
-            return write;
-        }
-
-        public void setWrite(float write) {
-            this.write = write;
-        }
-    }
-
-    public static class Swap implements Serializable {
-        private float total;
-        private float free;
-
-        public float getTotal() {
-            return total;
-        }
-
-        public void setTotal(float total) {
-            this.total = total;
-        }
-
-        public float getFree() {
-            return free;
-        }
-
-        public void setFree(float free) {
-            this.free = free;
-        }
-    }
-
-    @JSONType(orders = {"pid", "user", "virt", "res", "cpu", "mem", "time", "command"})
-    public static class Top implements Serializable {
-
-        private String pid;
-        private String user;
-        private String virt;
-        private String res;
-        private String cpu;
-        private String mem;
-        private String time;
-        private String command;
 
-        public String getPid() {
-            return pid;
+        public int getCoresPerSocket() {
+            return coresPerSocket;
         }
 
-        public void setPid(String pid) {
-            this.pid = pid;
+        public void setCoresPerSocket(int coresPerSocket) {
+            this.coresPerSocket = coresPerSocket;
         }
 
-        public String getUser() {
+        public double getUser() {
             return user;
         }
 
-        public void setUser(String user) {
+        public void setUser(double user) {
             this.user = user;
         }
 
-        public String getVirt() {
-            return virt;
+        public double getSys() {
+            return sys;
         }
 
-        public void setVirt(String virt) {
-            this.virt = virt;
+        public void setSys(double sys) {
+            this.sys = sys;
         }
 
-        public String getRes() {
-            return res;
+        public double getNice() {
+            return nice;
         }
 
-        public void setRes(String res) {
-            this.res = res;
+        public void setNice(double nice) {
+            this.nice = nice;
         }
 
-        public String getCpu() {
-            return cpu;
+        public double getIdle() {
+            return idle;
         }
 
-        public void setCpu(String cpu) {
-            this.cpu = cpu;
+        public void setIdle(double idle) {
+            this.idle = idle;
         }
 
-        public String getMem() {
-            return mem;
+        public double getWait() {
+            return wait;
         }
 
-        public void setMem(String mem) {
-            this.mem = mem;
+        public void setWait(double wait) {
+            this.wait = wait;
         }
 
-        public String getTime() {
-            return time;
+        public double getIrq() {
+            return irq;
         }
 
-        public void setTime(String time) {
-            this.time = time;
+        public void setIrq(double irq) {
+            this.irq = irq;
         }
 
-        public String getCommand() {
-            return command;
+        public double getSoftIrq() {
+            return softIrq;
         }
 
-        public void setCommand(String command) {
-            this.command = command;
+        public void setSoftIrq(double softIrq) {
+            this.softIrq = softIrq;
+        }
+
+        public double getStolen() {
+            return stolen;
+        }
+
+        public void setStolen(double stolen) {
+            this.stolen = stolen;
+        }
+
+        public double getCombined() {
+            return combined;
+        }
+
+        public void setCombined(double combined) {
+            this.combined = combined;
         }
 
         @Override
         public String toString() {
-            return "Top{" +
-                    "pid='" + pid + '\'' +
-                    ", user='" + user + '\'' +
-                    ", virt='" + virt + '\'' +
-                    ", res='" + res + '\'' +
-                    ", cpu='" + cpu + '\'' +
-                    ", mem='" + mem + '\'' +
-                    ", time='" + time + '\'' +
-                    ", command='" + command + '\'' +
+            return "CPU{" +
+                    "index=" + index +
+                    ", vendor='" + vendor + '\'' +
+                    ", model='" + model + '\'' +
+                    ", mhz=" + mhz +
+                    ", cacheSize=" + cacheSize +
+                    ", totalCores=" + totalCores +
+                    ", totalSockets=" + totalSockets +
+                    ", coresPerSocket=" + coresPerSocket +
+                    ", user=" + user +
+                    ", sys=" + sys +
+                    ", nice=" + nice +
+                    ", idle=" + idle +
+                    ", wait=" + wait +
+                    ", irq=" + irq +
+                    ", softIrq=" + softIrq +
+                    ", stolen=" + stolen +
+                    ", combined=" + combined +
                     '}';
         }
     }
+
+    public static class Mem implements Serializable {
+        private long total = 0L;
+        private  long ram = 0L;
+        private long used = 0L;
+        private long free = 0L;
+        private long actualUsed = 0L;
+        private long actualFree = 0L;
+        private double usedPercent = 0.0D;
+        private double freePercent = 0.0D;
+        private String unitName = "K";
+        public Mem(org.hyperic.sigar.Mem mem){
+            this.total = mem.getTotal()/1024;
+            this.ram = mem.getRam()/1024;
+            this.used = mem.getUsed()/1024;
+            this.free = mem.getFree()/1024;
+            this.actualUsed = mem.getActualUsed()/1024;
+            this.actualFree = mem.getActualFree()/1024;
+            this.usedPercent = mem.getUsedPercent()/1024;
+            this.freePercent = mem.getFreePercent()/1024;
+        }
+
+        public long getTotal() {
+            return total;
+        }
+
+        public void setTotal(long total) {
+            this.total = total;
+        }
+
+        public long getRam() {
+            return ram;
+        }
+
+        public void setRam(long ram) {
+            this.ram = ram;
+        }
+
+        public long getUsed() {
+            return used;
+        }
+
+        public void setUsed(long used) {
+            this.used = used;
+        }
+
+        public long getFree() {
+            return free;
+        }
+
+        public void setFree(long free) {
+            this.free = free;
+        }
+
+        public long getActualUsed() {
+            return actualUsed;
+        }
+
+        public void setActualUsed(long actualUsed) {
+            this.actualUsed = actualUsed;
+        }
+
+        public long getActualFree() {
+            return actualFree;
+        }
+
+        public void setActualFree(long actualFree) {
+            this.actualFree = actualFree;
+        }
+
+        public double getUsedPercent() {
+            return usedPercent;
+        }
+
+        public void setUsedPercent(double usedPercent) {
+            this.usedPercent = usedPercent;
+        }
+
+        public double getFreePercent() {
+            return freePercent;
+        }
+
+        public void setFreePercent(double freePercent) {
+            this.freePercent = freePercent;
+        }
+
+        public String getUnitName() {
+            return unitName;
+        }
+
+        public void setUnitName(String unitName) {
+            this.unitName = unitName;
+        }
+    }
+
+
 }

@@ -21,7 +21,6 @@
 
 package org.opencron.server.controller;
 
-import com.alibaba.fastjson.JSON;
 import org.opencron.server.job.OpencronTools;
 import org.opencron.server.service.AgentService;
 import org.opencron.server.service.UserService;
@@ -44,7 +43,6 @@ import java.util.Date;
 import java.util.List;
 
 import static org.opencron.common.util.CommonUtils.notEmpty;
-import static org.opencron.common.util.WebUtils.*;
 
 /**
  * Created by ChenHui on 2016/2/18.

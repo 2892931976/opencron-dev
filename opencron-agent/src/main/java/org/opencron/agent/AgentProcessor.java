@@ -22,6 +22,7 @@ package org.opencron.agent;
 
 import com.alibaba.fastjson.JSON;
 import org.apache.commons.exec.*;
+import org.hyperic.sigar.SigarException;
 import org.opencron.common.Constants;
 import org.opencron.common.api.AgentJob;
 import org.opencron.common.ext.ExtensionLoader;
@@ -54,6 +55,8 @@ public class AgentProcessor implements ServerHandler, AgentJob {
     private String EXITCODE_KEY = "exitCode";
 
     private String EXITCODE_SCRIPT = String.format("\n\necho %s:$?", EXITCODE_KEY);
+
+    private AgentMonitor agentMonitor = new AgentMonitor();
 
     @Override
     public Response handle(Request request) {
@@ -114,7 +117,12 @@ public class AgentProcessor implements ServerHandler, AgentJob {
         Response response = Response.response(request);
         switch (connType) {
             case PROXY:
-                Monitor monitor = null;//agentMonitor.monitor();
+                Monitor monitor = null;
+                try {
+                    monitor = agentMonitor.monitor();
+                } catch (SigarException e) {
+                    e.printStackTrace();
+                }
                 Map<String, String> map = serializableToMap(monitor);
                 response.setResult(map);
                 return response;
