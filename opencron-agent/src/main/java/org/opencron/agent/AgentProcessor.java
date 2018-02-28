@@ -61,6 +61,9 @@ public class AgentProcessor implements ServerHandler, AgentJob {
     @Override
     public Response handle(Request request) {
         Action action = request.getAction();
+        if (Action.PATH.equals(action)) {
+            return path(request);
+        }
         //verify password...
         if (!SystemPropertyUtils.get(Constants.PARAM_OPENCRON_PASSWORD_KEY).equalsIgnoreCase(request.getPassword())) {
             return Response.response(request)
@@ -81,8 +84,6 @@ public class AgentProcessor implements ServerHandler, AgentJob {
                 return kill(request);
             case GUID:
                 return guid(request);
-            case PATH:
-                return path(request);
             case PROXY:
                 return proxy(request);
             case MONITOR:

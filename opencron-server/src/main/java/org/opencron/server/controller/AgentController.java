@@ -88,8 +88,9 @@ public class AgentController extends BaseController {
 
     @RequestMapping(value = "delete.do", method = RequestMethod.POST)
     @ResponseBody
-    public void delete(Long id) {
+    public Status delete(Long id) {
         agentService.delete(id);
+        return Status.TRUE;
     }
 
     @RequestMapping(value = "checkhost.do", method = RequestMethod.POST)

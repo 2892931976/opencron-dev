@@ -30,6 +30,7 @@ import org.opencron.common.util.PropertyPlaceholder;
 import org.opencron.registry.URL;
 import org.opencron.registry.api.RegistryService;
 import org.opencron.registry.zookeeper.ChildListener;
+import org.opencron.registry.zookeeper.ZookeeperClient;
 import org.opencron.server.domain.Job;
 import org.opencron.server.service.AgentService;
 import org.opencron.server.service.JobService;
@@ -74,6 +75,9 @@ public class OpencronRegistry {
 
     private RegistryService registryService = new RegistryService();
 
+
+    private ZookeeperClient zookeeperClient;
+
     private final String SERVER_ID = uuid();
 
     private final URL registryURL = URL.valueOf(PropertyPlaceholder.get(Constants.PARAM_OPENCRON_REGISTRY_KEY));
@@ -92,8 +96,10 @@ public class OpencronRegistry {
     private Lock lock = new ReentrantLock();
 
     public void agentRegister() {
+
+        this.initZookeeperClient();
         //agent添加,删除监控...
-        registryService.getZKClient(registryURL).addChildListener(Constants.ZK_REGISTRY_AGENT_PATH, new ChildListener() {
+        this.zookeeperClient.addChildListener(Constants.ZK_REGISTRY_AGENT_PATH, new ChildListener() {
             @Override
             public void childChanged(String path, List<String> children) {
 
@@ -134,8 +140,11 @@ public class OpencronRegistry {
     }
 
     public void serverRegister() {
+
+        this.initZookeeperClient();
+
         //server监控增加和删除
-        registryService.getZKClient(registryURL).addChildListener(Constants.ZK_REGISTRY_SERVER_PATH, new ChildListener() {
+        this.zookeeperClient.addChildListener(Constants.ZK_REGISTRY_SERVER_PATH, new ChildListener() {
             @Override
             public void childChanged(String path, List<String> children) {
 
@@ -177,6 +186,18 @@ public class OpencronRegistry {
         //将server加入到注册中心
         registryService.register(registryURL,registryPath,true);
 
+        //扫描agent自动注册到server
+        List<String> children = this.zookeeperClient.getChildren(Constants.ZK_REGISTRY_AGENT_PATH);
+        if (CommonUtils.notEmpty(children)) {
+            for (String agent:children) {
+                agents.put(agent,agent);
+                if (logger.isInfoEnabled()) {
+                    logger.info("[opencron] agent auto connected! info:{}", agent);
+                }
+                agentService.doConnect(agent);
+            }
+        }
+
         //register shutdown hook
         Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
             public void run() {
@@ -190,12 +211,13 @@ public class OpencronRegistry {
     }
 
     public void jobRegister() {
+        this.initZookeeperClient();
         List<Job> jobs = jobService.getScheduleJob();
         for (Job job:jobs) {
             registryService.register(registryURL,Constants.ZK_REGISTRY_JOB_PATH+"/"+job.getJobId(),true);
         }
         //job的监控
-        registryService.getZKClient(registryURL).addChildListener(Constants.ZK_REGISTRY_JOB_PATH, new ChildListener() {
+        this.zookeeperClient.addChildListener(Constants.ZK_REGISTRY_JOB_PATH, new ChildListener() {
             @Override
             public void childChanged(String path, List<String> children) {
                 try {
@@ -275,5 +297,8 @@ public class OpencronRegistry {
         schedulerService.remove(jobId);
     }
 
+    public void initZookeeperClient() {
+        this.zookeeperClient = registryService.getZKClient(registryURL);
+    }
 }
     

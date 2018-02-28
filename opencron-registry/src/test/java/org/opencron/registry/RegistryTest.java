@@ -35,6 +35,8 @@ public class RegistryTest {
     @Test
     public void lister() throws IOException {
 
+
+
         zookeeperClient.addChildListener("/opencron/agent",new ChildListener(){
             @Override
             public void childChanged(String path, List<String> children) {
@@ -57,6 +59,14 @@ public class RegistryTest {
 
 
         System.in.read();
+    }
+
+    @Test
+    public void get(){
+        List<String> paths = zookeeperClient.getChildren("/opencron/agent");
+
+        for (String path:paths)
+            System.out.println(path);
     }
 
 }
