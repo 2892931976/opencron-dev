@@ -118,15 +118,17 @@ public class AgentProcessor implements ServerHandler, AgentJob {
         Response response = Response.response(request);
         switch (connType) {
             case PROXY:
-                Monitor monitor = null;
                 try {
-                    monitor = agentMonitor.monitor();
+                    Monitor monitor = agentMonitor.monitor();
+                    Map<String, String> map = monitor.toMap();
+                    response.setResult(map)
+                            .setSuccess(true)
+                            .setExitCode(Constants.StatusCode.SUCCESS_EXIT.getValue())
+                            .end();
+                    return response;
                 } catch (SigarException e) {
                     e.printStackTrace();
                 }
-                Map<String, String> map = serializableToMap(monitor);
-                response.setResult(map);
-                return response;
             default:
                 return null;
         }
@@ -401,39 +403,6 @@ public class AgentProcessor implements ServerHandler, AgentJob {
     @Override
     public void restart(Request request) {
 
-    }
-
-    private Map<String, String> serializableToMap(Object obj) {
-        if (isEmpty(obj)) {
-            return Collections.EMPTY_MAP;
-        }
-
-        Map<String, String> resultMap = new HashMap<String, String>(0);
-        // 拿到属性器数组
-        try {
-            PropertyDescriptor[] pds = Introspector.getBeanInfo(obj.getClass()).getPropertyDescriptors();
-            for (int index = 0; pds.length > 1 && index < pds.length; index++) {
-                if (Class.class == pds[index].getPropertyType() || pds[index].getReadMethod() == null) {
-                    continue;
-                }
-                Object value = pds[index].getReadMethod().invoke(obj);
-                if (notEmpty(value)) {
-                    if (isPrototype(pds[index].getPropertyType())//java里的原始类型(去除自己定义类型)
-                            || pds[index].getPropertyType().isPrimitive()//基本类型
-                            //|| ReflectUtils.isPrimitivePackageType(pds[index].getPropertyType())
-                            || pds[index].getPropertyType() == String.class) {
-
-                        resultMap.put(pds[index].getName(), value.toString());
-
-                    } else {
-                        resultMap.put(pds[index].getName(), JSON.toJSONString(value));
-                    }
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return resultMap;
     }
 
 }

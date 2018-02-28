@@ -23,18 +23,23 @@ package org.opencron.common.job;
 
 import org.hyperic.sigar.CpuInfo;
 import org.hyperic.sigar.CpuPerc;
+import org.hyperic.sigar.Swap;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by benjobs on 16/4/7.
  */
 public class Monitor implements Serializable {
 
-    private List<CPU> cpu;
+    private List<CPU> cpu;//cpu
 
-    private Mem mem;
+    private Mem mem;//内存
+
+    private Load load;//负载
 
     public List<CPU> getCpu() {
         return cpu;
@@ -50,6 +55,29 @@ public class Monitor implements Serializable {
 
     public void setMem(Mem mem) {
         this.mem = mem;
+    }
+
+
+    public Load getLoad() {
+        return load;
+    }
+
+    public void setLoad(Load load) {
+        this.load = load;
+    }
+
+    public Map<String, String> toMap() {
+        Map<String,String> map = new HashMap<String, String>(0);
+        if (this.cpu!=null) {
+            map.put("cpu", this.cpu.toString());
+        }
+        if (this.mem!=null) {
+            map.put("mem",this.mem.toString());
+        }
+        if (this.load!=null) {
+            map.put("load",this.load.toString());
+        }
+        return map;
     }
 
     public static class CPU implements Serializable {
@@ -231,24 +259,24 @@ public class Monitor implements Serializable {
 
         @Override
         public String toString() {
-            return "CPU{" +
-                    "index=" + index +
-                    ", vendor='" + vendor + '\'' +
-                    ", model='" + model + '\'' +
-                    ", mhz=" + mhz +
-                    ", cacheSize=" + cacheSize +
-                    ", totalCores=" + totalCores +
-                    ", totalSockets=" + totalSockets +
-                    ", coresPerSocket=" + coresPerSocket +
-                    ", user=" + user +
-                    ", sys=" + sys +
-                    ", nice=" + nice +
-                    ", idle=" + idle +
-                    ", wait=" + wait +
-                    ", irq=" + irq +
-                    ", softIrq=" + softIrq +
-                    ", stolen=" + stolen +
-                    ", combined=" + combined +
+            return "{" +
+                    "\"index\":" + index +
+                    ",\"vendor\":\"" + vendor + "\"" +
+                    ",\"model\":'" + model + "\"" +
+                    ",\"mhz\":" + mhz +
+                    ",\"cacheSize\":" + cacheSize +
+                    ",\"totalCores\":" + totalCores +
+                    ",\"totalSockets\":" + totalSockets +
+                    ",\"coresPerSocket\":" + coresPerSocket +
+                    ",\"user\":" + user +
+                    ",\"sys\":" + sys +
+                    ",\"nice\":" + nice +
+                    ",\"idle\":" + idle +
+                    ",\"wait\":" + wait +
+                    ",\"irq\":" + irq +
+                    ",\"softIrq\":" + softIrq +
+                    ",\"stolen\":" + stolen +
+                    ",\"combined\":" + combined +
                     '}';
         }
     }
@@ -258,20 +286,28 @@ public class Monitor implements Serializable {
         private  long ram = 0L;
         private long used = 0L;
         private long free = 0L;
+
+        private long swapTotal = 0L;
+        private long swapUsed = 0L;
+        private long swapFree = 0L;
+
         private long actualUsed = 0L;
         private long actualFree = 0L;
         private double usedPercent = 0.0D;
         private double freePercent = 0.0D;
-        private String unitName = "K";
-        public Mem(org.hyperic.sigar.Mem mem){
+
+        public Mem(org.hyperic.sigar.Mem mem, Swap swap){
             this.total = mem.getTotal()/1024;
-            this.ram = mem.getRam()/1024;
+            this.ram = mem.getRam();
             this.used = mem.getUsed()/1024;
             this.free = mem.getFree()/1024;
             this.actualUsed = mem.getActualUsed()/1024;
             this.actualFree = mem.getActualFree()/1024;
             this.usedPercent = mem.getUsedPercent()/1024;
             this.freePercent = mem.getFreePercent()/1024;
+            this.swapTotal = swap.getTotal()/1024;
+            this.swapFree = swap.getFree()/1024;
+            this.swapUsed = swap.getUsed()/1024;
         }
 
         public long getTotal() {
@@ -306,6 +342,30 @@ public class Monitor implements Serializable {
             this.free = free;
         }
 
+        public long getSwapTotal() {
+            return swapTotal;
+        }
+
+        public void setSwapTotal(long swapTotal) {
+            this.swapTotal = swapTotal;
+        }
+
+        public long getSwapUsed() {
+            return swapUsed;
+        }
+
+        public void setSwapUsed(long swapUsed) {
+            this.swapUsed = swapUsed;
+        }
+
+        public long getSwapFree() {
+            return swapFree;
+        }
+
+        public void setSwapFree(long swapFree) {
+            this.swapFree = swapFree;
+        }
+
         public long getActualUsed() {
             return actualUsed;
         }
@@ -338,14 +398,68 @@ public class Monitor implements Serializable {
             this.freePercent = freePercent;
         }
 
-        public String getUnitName() {
-            return unitName;
-        }
-
-        public void setUnitName(String unitName) {
-            this.unitName = unitName;
+        @Override
+        public String toString() {
+            return "{" +
+                    "\"total\":" + total +
+                    ",\"ram\":" + ram +
+                    ",\"used\":" + used +
+                    ",\"free\":" + free +
+                    ",\"swapTotal\":" + swapTotal +
+                    ",\"swapUsed\":" + swapUsed +
+                    ",\"swapFree\":" + swapFree +
+                    ",\"actualUsed\":" + actualUsed +
+                    ",\"actualFree\":" + actualFree +
+                    ",\"usedPercent\":" + usedPercent +
+                    ",\"freePercent\":" + freePercent +
+                    '}';
         }
     }
 
+    public static class Load implements Serializable {
+
+        private double one;//1分钟的平均负载
+        private double five;//5分钟的平均负载
+        private double fifteen;//15分钟的评价负载
+
+        public Load(double[] loads){
+            this.one = loads[0];
+            this.five = loads[1];
+            this.fifteen = loads[2];
+        }
+
+        public double getOne() {
+            return one;
+        }
+
+        public void setOne(double one) {
+            this.one = one;
+        }
+
+        public double getFive() {
+            return five;
+        }
+
+        public void setFive(double five) {
+            this.five = five;
+        }
+
+        public double getFifteen() {
+            return fifteen;
+        }
+
+        public void setFifteen(double fifteen) {
+            this.fifteen = fifteen;
+        }
+
+        @Override
+        public String toString() {
+            return "{" +
+                    "\"one\":" + one +
+                    ",\"five\":" + five +
+                    ",\"fifteen\":" + fifteen +
+                    '}';
+        }
+    }
 
 }
