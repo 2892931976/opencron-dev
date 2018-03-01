@@ -31,8 +31,10 @@ import org.opencron.registry.URL;
 import org.opencron.registry.api.RegistryService;
 import org.opencron.registry.zookeeper.ChildListener;
 import org.opencron.registry.zookeeper.ZookeeperClient;
+import org.opencron.server.domain.Agent;
 import org.opencron.server.domain.Job;
 import org.opencron.server.service.AgentService;
+import org.opencron.server.service.ExecuteService;
 import org.opencron.server.service.JobService;
 import org.opencron.server.service.SchedulerService;
 import org.opencron.server.vo.JobInfo;
@@ -73,8 +75,10 @@ public class OpencronRegistry {
     @Autowired
     private AgentService agentService;
 
-    private RegistryService registryService = new RegistryService();
+    @Autowired
+    private ExecuteService executeService;
 
+    private RegistryService registryService = new RegistryService();
 
     private ZookeeperClient zookeeperClient;
 
@@ -137,6 +141,18 @@ public class OpencronRegistry {
                 lock.unlock();
             }
         });
+
+        //server第一次启动检查所有的agent是否可用
+        List<Agent> agents = this.agentService.getAll();
+        if (CommonUtils.notEmpty(agents)) {
+            for (Agent agent:agents) {
+               boolean ping = executeService.ping(agent);
+               if (!agent.getStatus().equals(ping)) {
+                   agent.setStatus(ping);
+                   agentService.merge(agent);
+               }
+            }
+        }
     }
 
     public void serverRegister() {

@@ -164,18 +164,18 @@ public class AgentBootstrap implements Serializable {
         String inpass = Constants.OPENCRON_PASSWORD;
         if (notEmpty(inpass)) {
             Constants.OPENCRON_PASSWORD_FILE.delete();
-            this.password = DigestUtils.md5Hex(inpass).toUpperCase();
+            this.password = DigestUtils.md5Hex(inpass);
             IOUtils.writeText(Constants.OPENCRON_PASSWORD_FILE, this.password, Constants.CHARSET_UTF8);
         } else {
             //.password file already exists
             if (Constants.OPENCRON_PASSWORD_FILE.exists()) {
                 //read password from .password file
-                this.password = IOUtils.readText(Constants.OPENCRON_PASSWORD_FILE, Constants.CHARSET_UTF8).trim().toUpperCase();
+                this.password = IOUtils.readText(Constants.OPENCRON_PASSWORD_FILE, Constants.CHARSET_UTF8).trim();
             }
         }
 
         if (isEmpty(this.password)) {
-            this.password = DigestUtils.md5Hex(AgentProperties.getProperty(Constants.PARAM_OPENCRON_PASSWORD_KEY)).toUpperCase();
+            this.password = DigestUtils.md5Hex(AgentProperties.getProperty(Constants.PARAM_OPENCRON_PASSWORD_KEY));
             Constants.OPENCRON_PASSWORD_FILE.delete();
             IOUtils.writeText(Constants.OPENCRON_PASSWORD_FILE, this.password, Constants.CHARSET_UTF8);
         }
